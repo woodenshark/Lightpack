@@ -34,9 +34,5 @@ CONFIG += ordered
 
 SUBDIRS = math grab
 
-unix:!macx {
-    SUBDIRS += qtserialport
-}
-
 win32:SUBDIRS += libraryinjector hooks tests
 SUBDIRS += src

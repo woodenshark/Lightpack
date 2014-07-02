@@ -1,16 +1,16 @@
 Package: prismatik
 Version: ${version} 
 Architecture: ${arch} 
-Maintainer: Timur Sattarov <tim.helloworld@gmail.com>
+Maintainer: Alexey Roslyakov<alexey.roslyakov@gmail.com>
 Installed-Size: ${size}
-Depends: libc6, libxext6, libx11-6, libusb-1.0-0, libappindicator1, libgtk2.0-0, libglib2.0-0, libqt5widgets5(>=5.0.2), libqt5network5(>=5.0.2), libqt5gui5(>=5.0.2), libqt5core5(>=5.0.2), libstdc++6, libgcc1
+Depends: libc6, libxext6, libx11-6, libusb-1.0-0, libappindicator1, libgtk2.0-0, libglib2.0-0, libqt5widgets5(>=5.0.2), libqt5network5(>=5.0.2), libqt5gui5(>=5.0.2), libqt5core5a(>=5.0.2), libstdc++6, libgcc1
 Conflicts: lightpack
 Replaces: lightpack
 Section: electronics
 Priority: optional
 Homepage: http://code.google.com/p/lightpack/
 Description: Content-driving ambient lighting system
- lightpack.googlecode.com
+ http://lightpack.tv
  .
   * Open software and hardware
   * Simple to build (DIY)

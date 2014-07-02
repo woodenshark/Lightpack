@@ -28,19 +28,6 @@ then
 	exit 2
 fi
 
-if [ ! -e "deb/usr/lib/prismatik" ];
-then
-	echo "File 'deb/usr/lib/prismatik' not found."
-	exit 3
-fi
-
-if [ ! -e "deb/usr/lib/prismatik/libQt5SerialPort.so.5" ];
-then
-	echo "File 'deb/usr/lib/prismatik/libQt5SerialPort.so.5' not found."
-	exit 4
-fi
-
-
 
 if [ -x "`which md5deep 2>/dev/null`" ]; 
 then

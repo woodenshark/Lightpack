@@ -50,6 +50,7 @@ Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{
 [Files]
 Source: "content/Prismatik.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Prismatik.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/*.qm"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Network.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -64,6 +65,10 @@ Source: "content/libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libraryinjector.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit regserver ignoreversion
 Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
+Source: "content/accessible/*"; DestDir: "{app}\accessible"; Flags: ignoreversion
+Source: "content/bearer/*"; DestDir: "{app}\bearer"; Flags: ignoreversion
+Source: "content/iconengines/*"; DestDir: "{app}\iconengines"; Flags: ignoreversion
+Source: "content/imageformats/*"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

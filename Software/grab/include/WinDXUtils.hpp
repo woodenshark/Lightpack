@@ -45,6 +45,7 @@ namespace WinUtils
  \param hWnd window handle to bind SwapChain to
  \return UINT
 */
+BOOL LoadD3DandDXGI();
 UINT GetDxgiPresentOffset(HWND hWnd);
 UINT GetD3D9PresentOffset(HWND hWnd);
 UINT GetD3D9SCPresentOffset(HWND hWnd);

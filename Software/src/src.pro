@@ -84,7 +84,7 @@ win32 {
     !isEmpty( DIRECTX_SDK_DIR ) {
         LIBS += -L$${DIRECTX_SDK_DIR}/Lib/x86
     }
-    LIBS    += -lwsock32 -lshlwapi -lole32 -ldxguid -ldxgi -ld3d10
+    LIBS    += -lwsock32 -lshlwapi -lole32 -ldxguid
 
     SOURCES += hidapi/windows/hid.c
 

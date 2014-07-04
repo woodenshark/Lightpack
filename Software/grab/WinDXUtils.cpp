@@ -41,12 +41,31 @@
 
 namespace WinUtils
 {
+typedef HRESULT (WINAPI* CREATEDXGIFACTORY)(REFIID, void**);
+typedef HRESULT (WINAPI* D3D10CREATEDEVICEANDSWAPCHAIN)(IDXGIAdapter*, D3D10_DRIVER_TYPE, HMODULE, UINT, UINT, DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**, ID3D10Device**);
+static CREATEDXGIFACTORY pCreateDXGIFactory = NULL;
+static D3D10CREATEDEVICEANDSWAPCHAIN pD3D10CreateDeviceAndSwapChain = NULL;
+
+BOOL LoadD3DandDXGI()
+{
+    HMODULE dxgi = LoadLibrary(L"dxgi.dll");
+    HMODULE d3d10 = LoadLibrary(L"d3d10.dll");
+    if (!dxgi || !d3d10)
+        return false;
+
+    pCreateDXGIFactory = (CREATEDXGIFACTORY) GetProcAddress(dxgi, "CreateDXGIFactory");
+    if (!pCreateDXGIFactory) return false;
+    pD3D10CreateDeviceAndSwapChain = (D3D10CREATEDEVICEANDSWAPCHAIN) GetProcAddress(d3d10, "D3D10CreateDeviceAndSwapChain");
+    if (!pD3D10CreateDeviceAndSwapChain) return false;
+
+    return true;
+}
 
 UINT GetDxgiPresentOffset(HWND hwnd) {
     Q_ASSERT(hwnd != NULL);
     IDXGIFactory1 * factory = NULL;
     IDXGIAdapter * adapter;
-    HRESULT hresult = CreateDXGIFactory(IID_IDXGIFactory, reinterpret_cast<void **>(&factory));
+    HRESULT hresult = pCreateDXGIFactory(IID_IDXGIFactory, reinterpret_cast<void **>(&factory));
     if (hresult != S_OK) {
         qCritical() << "Can't create DXGIFactory. " << hresult;
         return 0;
@@ -81,7 +100,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 
     IDXGISwapChain * pSc;
     ID3D10Device  * pDev;
-    hresult = D3D10CreateDeviceAndSwapChain(adapter, D3D10_DRIVER_TYPE_HARDWARE, NULL, 0, D3D10_SDK_VERSION, &dxgiSwapChainDesc, &pSc, &pDev);
+    hresult = pD3D10CreateDeviceAndSwapChain(adapter, D3D10_DRIVER_TYPE_HARDWARE, NULL, 0, D3D10_SDK_VERSION, &dxgiSwapChainDesc, &pSc, &pDev);
     if (S_OK != hresult) {
         qCritical() << Q_FUNC_INFO << QString("Can't create D3D10Device and SwapChain. hresult = 0x%1").arg(QString::number(hresult, 16));
         return 0;

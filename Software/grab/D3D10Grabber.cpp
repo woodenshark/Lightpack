@@ -125,6 +125,10 @@ public:
             qCritical() << Q_FUNC_INFO << "can't initialize winsocks2. error code " << result;
             return false;
         }
+        if (!LoadD3DandDXGI()) {
+            qCritical() << Q_FUNC_INFO << "D3D10 and DXGI initialization failed ";
+            return false;
+        }
 
         if (!initSharedMemory(lpsa))
             return false;

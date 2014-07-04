@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Prismatik"
-#define MyAppVersion "5.11.0"
-#define MyAppPublisher "Pixelkit LLC"
-#define MyAppURL "https://github.com/Atarity/Lightpack"
+#define MyAppVersion "5.11.1"
+#define MyAppPublisher "Woodenshark LLC"
+#define MyAppURL "https://github.com/woodenshark/Lightpack"
 #define MyAppExeName "Prismatik.exe"
 #define UserSettingsDirName "{%USERPROFILE|{app}}\Prismatik"
 
@@ -28,7 +28,7 @@ OutputBaseFilename={#MyAppName}Setup_{#MyAppVersion}
 SetupIconFile=Prismatik.ico
 Compression=lzma/Max
 SolidCompression=true
-AppCopyright=Pixelkit LLC
+AppCopyright=Woodenshark LLC
 UninstallDisplayName={cm:UninstallName}
 UninstallDisplayIcon={app}\Prismatik.exe
 VersionInfoDescription=Prismatik is a monitor light device used for presence effect strengthening. 
@@ -48,9 +48,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "content/below_win7/Prismatik.exe"; DestDir: "{app}"; OnlyBelowVersion: 6.1.7600; Flags: ignoreversion
-Source: "content/Prismatik.exe"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
-Source: "content/Prismatik.exe.manifest"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/Prismatik.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Prismatik.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -58,9 +56,9 @@ Source: "content/Qt5Network.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5SerialPort.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Widgets.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gpl-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icudt51.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icuin51.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icuuc51.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/icudt52.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/icuin52.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/icuuc52.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -80,7 +78,7 @@ Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "https://github.com/Atarity/Lightpack-docs"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser 
+Filename: "https://github.com/woodenshark/Lightpack-docs"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser 
 
 [UninstallDelete]
 Name: "{app}\*.*"; Type: filesandordirs

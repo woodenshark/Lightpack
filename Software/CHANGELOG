@@ -12,6 +12,21 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.1
+---------------
+July 4, 2014
+
+* API Server now listen to local interface by default
+* API Server port could be choosed in range 1-49151
+* Fixed: incorrect version displaying in Settings->About
+* Fixed: Mac OS X crash on computers equipped with Retina displays
+* Fixed: command line options (--off, --help)
+* Add new command line option "--on"
+* Mac OS X 10.6.8 support
+* Improved logging of settings values (read/change)
+* Fixed: Mood lamp not saved after restart
+* Code cleanup and refactoring
+
 Version 5.11.0
 ---------------
 May 13, 2014

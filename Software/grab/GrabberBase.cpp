@@ -23,8 +23,10 @@
  *
  */
 
+#include "GrabberContext.hpp"
+#include "GrabWidget.hpp"
 #include "GrabberBase.hpp"
-#include "../src/debug.h"
+#include "src/debug.h"
 
 int validCoord(int a) {
     const unsigned int neg = (1 << 15);

@@ -18,7 +18,10 @@ include(configure-grabbers.prf)
 
 LIBS += -lprismatik-math
 
-INCLUDEPATH += ./include ../src ../math/include
+INCLUDEPATH += ./include \
+               ../src \
+               ../math/include \
+               ..
 
 DEFINES += $${SUPPORTED_GRABBERS}
 # Linux/UNIX platform

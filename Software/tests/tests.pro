@@ -30,7 +30,13 @@ win32 {
     LIBS += -ladvapi32
 }
 
-INCLUDEPATH += ../src/ ../src/grab ../hooks ../grab/include ../math/include
+INCLUDEPATH += . \
+               ../src \
+               ../hooks \
+               ../grab/include \
+               ../math/include \
+               ..
+
 
 HEADERS += \
     ../common/defs.h \

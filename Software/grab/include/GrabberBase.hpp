@@ -28,10 +28,10 @@
 #include <QSharedPointer>
 #include <QColor>
 #include <QTimer>
-#include "../common/defs.h"
-#include "../src/GrabWidget.hpp"
+#include "src/GrabWidget.hpp"
 #include "calculations.hpp"
-#include "GrabberContext.hpp"
+
+class GrabberContext;
 
 enum GrabResult {
     GrabResultOk,

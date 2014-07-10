@@ -24,6 +24,7 @@
  */
 
 
+#include "src/GrabWidget.hpp"
 #include "TimeredGrabber.hpp"
 
 #include <QTimer>

@@ -24,14 +24,26 @@
  *
  */
 
-#include "GrabManager.hpp"
 #include <QtCore/qmath.h>
-#include "debug.h"
-#include "PrismatikMath.hpp"
-#include "LightpackApplication.hpp"
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+
+#include "debug.h"
+#include "PrismatikMath.hpp"
+#include "Settings.hpp"
+#include "GrabWidget.hpp"
 #include "GrabberContext.hpp"
+#include "TimeEvaluations.hpp"
+#include "WinAPIGrabber.hpp"
+#include "WinAPIGrabberEachWidget.hpp"
+#include "QtGrabber.hpp"
+#include "QtGrabberEachWidget.hpp"
+#include "X11Grabber.hpp"
+#include "MacOSGrabber.hpp"
+#include "D3D9Grabber.hpp"
+#include "D3D10Grabber.hpp"
+#include "GrabManager.hpp"
+
 using namespace SettingsScope;
 
 #ifdef D3D10_GRAB_SUPPORT

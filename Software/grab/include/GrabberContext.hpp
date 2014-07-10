@@ -29,7 +29,6 @@
 
 #include <QList>
 #include <QRgb>
-#include "GrabberBase.hpp"
 
 class GrabWidget;
 

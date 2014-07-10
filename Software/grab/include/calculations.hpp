@@ -28,7 +28,7 @@
 #include <QRect>
 #include <QRgb>
 #include <QList>
-#include "../common/BufferFormat.h"
+#include "common/BufferFormat.h"
 
 namespace Grab {
     namespace Calculations {

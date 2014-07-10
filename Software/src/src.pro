@@ -69,7 +69,6 @@ unix:!macx{
         PKGCONFIG += gtk+-2.0 appindicator-0.1 libnotify
     }
 
-    INCLUDEPATH += ../qtserialport/include
     LIBS += -L../qtserialport/lib -lQt5SerialPort
     QMAKE_LFLAGS += -Wl,-rpath=/usr/lib/prismatik
 }
@@ -169,7 +168,14 @@ macx{
     }
 }
 
-INCLUDEPATH += ./hidapi ./grab ./alienfx ../grab/include ../math/include ./
+INCLUDEPATH += . \
+               .. \
+               ./hidapi \
+               ../grab \
+               ../alienfx \
+               ../grab/include \
+               ../math/include \
+
 
 SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \

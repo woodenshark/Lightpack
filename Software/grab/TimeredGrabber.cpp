@@ -43,10 +43,12 @@ void TimeredGrabber::setGrabInterval(int msec) {
 }
 void TimeredGrabber::startGrabbing() {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    grabScreensCount = 0;
     m_timer->start();
 }
 void TimeredGrabber::stopGrabbing() {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    qWarning() << "grabScreensCount: " << grabScreensCount;
     m_timer->stop();
 }
 

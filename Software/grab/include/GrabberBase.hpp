@@ -134,6 +134,7 @@ signals:
 protected:
     GrabberContext *_context;
     GrabResult _lastGrabResult;
+    int grabScreensCount;
     QList<GrabbedScreen> _screensWithWidgets;
 
 };

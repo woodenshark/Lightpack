@@ -85,6 +85,7 @@ void GrabberBase::grab() {
         }
     }
     _lastGrabResult = grabScreens();
+    ++grabScreensCount;
     if (_lastGrabResult == GrabResultOk) {
         _context->grabResult->clear();
 

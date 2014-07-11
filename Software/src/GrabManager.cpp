@@ -47,7 +47,10 @@
 using namespace SettingsScope;
 
 #ifdef D3D10_GRAB_SUPPORT
-void *GetMainWindowHandle()
+
+#include "LightpackApplication.hpp"
+
+static void *GetMainWindowHandle()
 {
     return getLightpackApp()->getMainWindowHandle();
 }
@@ -510,9 +513,9 @@ void GrabManager::initGrabbers()
 
 GrabberBase *GrabManager::initGrabber(GrabberBase * grabber) {
     QMetaObject::invokeMethod(grabber, "setGrabInterval", Qt::QueuedConnection, Q_ARG(int, Settings::getGrabSlowdown()));
-//    QMetaObject::invokeMethod(grabber, "startGrabbing", Qt::QueuedConnection);
     bool isConnected = connect(grabber, SIGNAL(frameGrabAttempted(GrabResult)), this, SLOT(onFrameGrabAttempted(GrabResult)), Qt::QueuedConnection);
     Q_ASSERT_X(isConnected, "connecting grabber to grabManager", "failed");
+    Q_UNUSED(isConnected);
 
     return grabber;
 }

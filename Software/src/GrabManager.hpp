@@ -32,6 +32,7 @@
 
 class GrabberContext;
 class TimeEvaluations;
+class D3D10Grabber;
 
 class GrabManager : public QObject
 {

@@ -52,9 +52,10 @@ void LogWriter::writeMessage(const QString& msg, Level level)
     Q_STATIC_ASSERT(sizeof(s_logLevelNames)/sizeof(s_logLevelNames[0]) == LevelCount);
 
     const QString timeMark = QDateTime::currentDateTime().time().toString("hh:mm:ss:zzz");
+    const QString finalMsg = QString("%1 %2: %3\n").arg(timeMark, s_logLevelNames[level], msg);
     QMutexLocker locker(&m_mutex);
-    cerr << timeMark.toStdString() << s_logLevelNames[level] << ':' << msg.toStdString() << endl;
-    m_logStream << timeMark << s_logLevelNames[level] << ':' << msg << endl;
+    cerr << finalMsg.toStdString();
+    m_logStream << finalMsg;
     m_logStream.flush();
 }
 

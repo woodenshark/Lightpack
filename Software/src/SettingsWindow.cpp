@@ -456,7 +456,8 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
     updateUiFromSettings();
     this->requestFirmwareVersion();
-    this->m_trayIcon->checkUpdate();
+    if (m_trayIcon)
+        m_trayIcon->checkUpdate();
 }
 
 void SettingsWindow::onEnableApi_Toggled(bool isEnabled)

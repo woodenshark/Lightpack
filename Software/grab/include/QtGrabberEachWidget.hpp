@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 #ifdef QT_GRAB_SUPPORT
 
 #include "../src/enums.hpp"
@@ -33,7 +33,7 @@
 
 using namespace Grab;
 
-class QtGrabberEachWidget : public TimeredGrabber
+class QtGrabberEachWidget : public GrabberBase
 {
 public:
     QtGrabberEachWidget(QObject *parent, GrabberContext * context);

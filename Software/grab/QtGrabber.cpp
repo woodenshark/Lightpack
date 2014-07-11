@@ -32,7 +32,7 @@
 #include "../src/debug.h"
 
 QtGrabber::QtGrabber(QObject *parent, GrabberContext * context )
-    : TimeredGrabber(parent, context)
+    : GrabberBase(parent, context)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     screen = 0;

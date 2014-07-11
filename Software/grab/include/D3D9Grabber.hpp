@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 #include "../src/enums.hpp"
 
 #ifdef D3D9_GRAB_SUPPORT
@@ -42,7 +42,7 @@
 
 using namespace Grab;
 
-class D3D9Grabber : public TimeredGrabber
+class D3D9Grabber : public GrabberBase
 {
 public:
     D3D9Grabber(QObject * parent, GrabberContext *context);

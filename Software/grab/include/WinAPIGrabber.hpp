@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 #include "../src/enums.hpp"
 
 #ifdef WINAPI_GRAB_SUPPORT
@@ -47,7 +47,7 @@
 
 #include <windows.h>
 
-class WinAPIGrabber : public TimeredGrabber
+class WinAPIGrabber : public GrabberBase
 {
     Q_OBJECT
 public:

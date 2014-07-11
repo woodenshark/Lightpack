@@ -25,14 +25,14 @@
 
 #pragma once
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 #include "../src/enums.hpp"
 
 #ifdef QT_GRAB_SUPPORT
 
 using namespace Grab;
 
-class QtGrabber : public TimeredGrabber
+class QtGrabber : public GrabberBase
 {
 public:
     QtGrabber(QObject *parent, GrabberContext * context);

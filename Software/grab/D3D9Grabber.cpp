@@ -49,7 +49,7 @@ inline void safeRelease(T *&p)
 }
 
 D3D9Grabber::D3D9Grabber(QObject * parent, GrabberContext *context)
-    : TimeredGrabber(parent, context),
+    : GrabberBase(parent, context),
       m_d3D(NULL), m_d3Device(NULL), m_surface(NULL)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;

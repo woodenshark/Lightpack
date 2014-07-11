@@ -36,7 +36,7 @@
 const uint32_t kMaxDisplaysCount = 10;
 
 MacOSGrabber::MacOSGrabber(QObject *parent, GrabberContext *context):
-    TimeredGrabber(parent, context)
+    GrabberBase(parent, context)
 {
 }
 

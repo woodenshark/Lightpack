@@ -32,7 +32,7 @@
 #include "GrabberContext.hpp"
 
 QtGrabberEachWidget::QtGrabberEachWidget(QObject *parent, GrabberContext *context)
-    : TimeredGrabber(parent, context)
+    : GrabberBase(parent, context)
 {
 }
 

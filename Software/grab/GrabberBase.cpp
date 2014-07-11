@@ -28,14 +28,19 @@
 #include "GrabberBase.hpp"
 #include "src/debug.h"
 
-int validCoord(int a) {
+namespace
+{
+
+int validCoord(int a)
+{
     const unsigned int neg = (1 << 15);
     if (a & neg)
         a = ((~a + 1) & 0x0000ffff) * -1;
     return a;
 }
 
-inline QRect & getValidRect(QRect & rect) {
+inline QRect & getValidRect(QRect & rect)
+{
     int x1,x2,y1,y2;
     rect.getCoords(&x1, &y1, &x2, &y2);
     x1 = validCoord(x1);
@@ -44,11 +49,46 @@ inline QRect & getValidRect(QRect & rect) {
     return rect;
 }
 
-GrabberBase::GrabberBase(QObject *parent, GrabberContext *grabberContext) : QObject(parent) {
+} // anonymous namespace
+
+
+GrabberBase::GrabberBase(QObject *parent, GrabberContext *grabberContext) : QObject(parent)
+{
     _context = grabberContext;
+    if (m_timer && m_timer->isActive())
+        m_timer->stop();
+    m_timer.reset(new QTimer(this));
+    connect(m_timer.data(), SIGNAL(timeout()), this, SLOT(grab()));
 }
 
-const GrabbedScreen * GrabberBase::screenOfRect(const QRect &rect) const {
+void GrabberBase::setGrabInterval(int msec)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO <<  this->metaObject()->className();
+    m_timer->setInterval(msec);
+}
+
+void GrabberBase::startGrabbing()
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    grabScreensCount = 0;
+    m_timer->start();
+}
+
+void GrabberBase::stopGrabbing()
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    qWarning() << "grabScreensCount: " << grabScreensCount;
+    m_timer->stop();
+}
+
+bool GrabberBase::isGrabbingStarted() const
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    return m_timer->isActive();
+}
+
+const GrabbedScreen * GrabberBase::screenOfRect(const QRect &rect) const
+{
     QPoint center = rect.center();
     for (int i = 0; i < _screensWithWidgets.size(); ++i) {
         if (_screensWithWidgets[i].screenInfo.rect.contains(center))
@@ -61,7 +101,8 @@ const GrabbedScreen * GrabberBase::screenOfRect(const QRect &rect) const {
     return NULL;
 }
 
-bool GrabberBase::isReallocationNeeded(const QList< ScreenInfo > &screensWithWidgets) const  {
+bool GrabberBase::isReallocationNeeded(const QList< ScreenInfo > &screensWithWidgets) const
+{
     if (_screensWithWidgets.size() == 0 || screensWithWidgets.size() != _screensWithWidgets.size())
         return true;
 
@@ -72,7 +113,8 @@ bool GrabberBase::isReallocationNeeded(const QList< ScreenInfo > &screensWithWid
     return false;
 }
 
-void GrabberBase::grab() {
+void GrabberBase::grab()
+{
     DEBUG_MID_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
     QList< ScreenInfo > screens2Grab;
     screens2Grab.reserve(5);

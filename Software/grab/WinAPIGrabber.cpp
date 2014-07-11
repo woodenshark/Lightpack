@@ -46,7 +46,7 @@ struct WinAPIScreenData
 };
 
 WinAPIGrabber::WinAPIGrabber(QObject * parent, GrabberContext *context)
-    : TimeredGrabber(parent, context)
+    : GrabberBase(parent, context)
 {
 }
 

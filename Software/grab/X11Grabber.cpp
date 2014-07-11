@@ -49,7 +49,7 @@ struct X11GrabberData
 };
 
 X11Grabber::X11Grabber(QObject *parent, GrabberContext * context)
-    : TimeredGrabber(parent, context)
+    : GrabberBase(parent, context)
 {
     _display = XOpenDisplay(NULL);
 }

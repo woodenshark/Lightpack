@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 #include "../src/enums.hpp"
 
 #ifdef X11_GRAB_SUPPORT
@@ -38,7 +38,7 @@ struct _XDisplay;
 
 using namespace Grab;
 
-class X11Grabber : public TimeredGrabber
+class X11Grabber : public GrabberBase
 {
 public:
     X11Grabber(QObject *parent, GrabberContext *context);

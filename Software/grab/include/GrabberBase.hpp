@@ -88,10 +88,10 @@ public:
     virtual const char * name() const = 0;
 
 public slots:
-    virtual void startGrabbing() = 0;
-    virtual void stopGrabbing() = 0;
-    virtual bool isGrabbingStarted() const = 0;
-    virtual void setGrabInterval(int msec) = 0;
+    virtual void startGrabbing();
+    virtual void stopGrabbing();
+    virtual bool isGrabbingStarted() const;
+    virtual void setGrabInterval(int msec);
 
     virtual void grab();
 
@@ -136,5 +136,5 @@ protected:
     GrabResult _lastGrabResult;
     int grabScreensCount;
     QList<GrabbedScreen> _screensWithWidgets;
-
+    QScopedPointer<QTimer> m_timer;
 };

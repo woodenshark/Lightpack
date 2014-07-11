@@ -29,14 +29,14 @@
 
 #ifdef MAC_OS_CG_GRAB_SUPPORT
 
-#include "TimeredGrabber.hpp"
+#include "GrabberBase.hpp"
 
 #include <CoreGraphics/CGColorSpace.h>
 #include <CoreGraphics/CGContext.h>
 #include <CoreGraphics/CGImage.h>
 
 
-class MacOSGrabber : public TimeredGrabber
+class MacOSGrabber : public GrabberBase
 {
 public:
     MacOSGrabber(QObject *parent, GrabberContext *context);

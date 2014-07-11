@@ -76,7 +76,6 @@ contains(DEFINES, QT_GRAB_SUPPORT) {
 
 HEADERS += \
     include/calculations.hpp \
-    include/TimeredGrabber.hpp \
     include/GrabberBase.hpp \
     include/ColorProvider.hpp \
     include/GrabberContext.hpp \
@@ -84,7 +83,6 @@ HEADERS += \
 
 SOURCES += \
     calculations.cpp \
-    TimeredGrabber.cpp \
     GrabberBase.cpp \
     include/ColorProvider.cpp \
     $${GRABBERS_SOURCES}

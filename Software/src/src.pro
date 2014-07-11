@@ -175,11 +175,12 @@ INCLUDEPATH += . \
                ../alienfx \
                ../grab/include \
                ../math/include \
-
+               ./stuff \
 
 SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \
-      GrabWidget.cpp  GrabConfigWidget.cpp \
+    GrabWidget.cpp  GrabConfigWidget.cpp \
+    LogWriter.cpp \
     SpeedTest.cpp \
     LedDeviceLightpack.cpp \
     LedDeviceAdalight.cpp \
@@ -225,6 +226,7 @@ HEADERS += \
     GrabWidget.hpp \
     GrabConfigWidget.hpp \
     debug.h \
+    LogWriter.hpp \
     SpeedTest.hpp \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
@@ -293,13 +295,6 @@ FORMS += SettingsWindow.ui \
     wizard/GrabAreaWidget.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/SelectDevicePage.ui
-
-#
-#   QSerialDevice
-#
-#include(qserialdevice/qserialdevice/qserialdevice.pri)
-#include(qserialdevice/qserialdeviceenumerator/qserialdeviceenumerator.pri)
-#unix:include(qserialdevice/unix/ttylocker.pri)
 
 #
 # QtSingleApplication

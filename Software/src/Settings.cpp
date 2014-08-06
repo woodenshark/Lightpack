@@ -216,6 +216,25 @@ QString Settings::m_applicationDirPath = "";
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToNameMap;
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyNumberOfLedsMap;
 
+void Settings::Overrides::setProfile(const QString& profileName)
+{
+	m_overrides.insert(Main::Key::ProfileLast, QVariant(profileName));
+}
+
+void Settings::Overrides::setDebuglevel(Debug::DebugLevels level)
+{
+	m_overrides.insert(Main::Key::DebugLevel, QVariant(static_cast<uint>(level)));
+}
+
+void Settings::Overrides::apply(QSettings& settings) const
+{
+	for (OverridesMap::const_iterator it = m_overrides.cbegin(); it != m_overrides.cend(); ++it)
+	{
+		DEBUG_LOW_LEVEL << "Overriding setting[" << it.key() << "] with value = " << it.value();
+		setNewOption(it.key(), it.value(), true, &settings);
+	}
+}
+
 Settings::Settings() : QObject(NULL) {
     qRegisterMetaType<Grab::GrabberType>("Grab::GrabberType");
     qRegisterMetaType<QColor>("QColor");
@@ -225,7 +244,8 @@ Settings::Settings() : QObject(NULL) {
 }
 
 // Desktop should be initialized before call Settings::Initialize()
-bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevelObtainedFromCmdArgs)
+bool Settings::Initialize(const QString & applicationDirPath,
+                          const Settings::Overrides& overrides)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
@@ -277,20 +297,19 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::Virtual::NumberOfLeds,      Main::Virtual::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::LastReadUpdateId,           Main::LastReadUpdateId);
 
-    if (isDebugLevelObtainedFromCmdArgs == false)
-    {
-        bool ok = false;
-        int sDebugLevel = valueMain(Main::Key::DebugLevel).toInt(&ok);
+	overrides.apply(*m_mainConfig);
 
-        if (ok && sDebugLevel >= 0)
-        {
-            g_debugLevel = sDebugLevel;
-            DEBUG_LOW_LEVEL << Q_FUNC_INFO << "debugLevel =" << g_debugLevel;
-        } else {
-            qWarning() << "DebugLevel in config has an invalid value, set the default" << Main::DebugLevelDefault;
-            setValueMain(Main::Key::DebugLevel, Main::DebugLevelDefault);
-            g_debugLevel = Main::DebugLevelDefault;
-        }
+    bool ok = false;
+	uint sDebugLevel = valueMain(Main::Key::DebugLevel).toUInt(&ok);
+
+	if (ok && sDebugLevel <= Debug::HighLevel)
+    {
+        g_debugLevel = sDebugLevel;
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "debugLevel =" << g_debugLevel;
+    } else {
+        qWarning() << "DebugLevel in config has an invalid value, set the default" << Main::DebugLevelDefault;
+        setValueMain(Main::Key::DebugLevel, Main::DebugLevelDefault);
+        g_debugLevel = Main::DebugLevelDefault;
     }
 
     QString profileLast = getLastProfileName();

@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "Settings.hpp"
 #include "SettingsWindow.hpp"
 #include "LedDeviceManager.hpp"
 #include "qtsingleapplication.h"
@@ -85,7 +86,7 @@ private slots:
     void quitFromWizard(int result);
 
 private:
-    void processCommandLineArguments();
+	void processCommandLineArguments(SettingsScope::Settings::Overrides& overrides);
     void printHelpMessage() const;
     void printVersionsSoftwareQtOS() const;
     bool checkSystemTrayAvailability() const;
@@ -119,7 +120,6 @@ private:
     QWidget *consolePlugin;
 
     QString m_applicationDirPath;
-    bool m_isDebugLevelObtainedFromCmdArgs;
     bool m_noGui;
     DeviceLocked::DeviceLockStatus m_deviceLockStatus;
     bool m_isSettingsWindowActive;

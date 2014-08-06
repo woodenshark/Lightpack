@@ -90,11 +90,10 @@ win32 {
     #DX9 grab
     LIBS    += -lgdi32 -ld3d9
 
-    QMAKE_CFLAGS += -O2 -ggdb
+    QMAKE_CFLAGS += -O2
+
     # Windows version using WinAPI + GDI + DirectX for grab colors
-
     LIBS    += -lwsock32 -lshlwapi -lole32
-
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
@@ -111,6 +110,7 @@ win32 {
                 cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./
     } else {
+        QMAKE_CFLAGS += -ggdb
         QMAKE_POST_LINK = cd $(DESTDIR) && \
                 cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
                 cp -f \"../../lib/libraryinjector.dll\" ./ && \

@@ -875,10 +875,19 @@ void SettingsWindow::processMessage(const QString &message)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << message;
 
-    if ("on" == message)
+    if (LightpackApplication::kTurnBacklightOnMessage == message)
         setBacklightStatus(Backlight::StatusOn);
-    else if ("off" == message)
+    else if (LightpackApplication::kTurnBacklightOffMessage == message)
         setBacklightStatus(Backlight::StatusOff);
+    else if (message.startsWith(LightpackApplication::kSwithUserProfileMessage))
+    {
+        const QString profileName(message.mid(LightpackApplication::kSwithUserProfileMessage.length()));
+        if (!profileName.isEmpty())
+        {
+            DEBUG_LOW_LEVEL << "Swith user profile to " << profileName;
+            profileSwitch(profileName);
+        }
+    }
     else if (m_trayIcon != NULL) {
         m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
     }

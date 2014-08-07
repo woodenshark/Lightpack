@@ -64,6 +64,10 @@ public:
         JustEpicFail_ErrorCode                  = 93
     };
 
+    static const QString kTurnBacklightOnMessage;
+    static const QString kTurnBacklightOffMessage;
+    static const QString kSwithUserProfileMessage;
+
 signals:
     void clearColorBuffers();
     void postInitialization(); /*!< emits at the end of initializeAll method*/

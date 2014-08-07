@@ -48,6 +48,16 @@ public:
     { return &static_cast<QtMetaObject*>(0)->staticQtMetaObject; }
 };
 
+// static
+const QString LightpackApplication::kTurnBacklightOnMessage("on");
+
+// static
+const QString LightpackApplication::kTurnBacklightOffMessage("off");
+
+// static
+const QString LightpackApplication::kSwithUserProfileMessage("set-profile:");
+
+
 LightpackApplication::LightpackApplication(int &argc, char **argv)
     : QtSingleApplication(argc, argv)
 {
@@ -64,14 +74,14 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
     m_applicationDirPath = appDirPath;
     m_noGui = false;
 
-
-    processCommandLineArguments();
+    Settings::Overrides overrides;
+    processCommandLineArguments(overrides);
 
     printVersionsSoftwareQtOS();
     if (isRunning())
         return;
 
-    if (!Settings::Initialize(m_applicationDirPath, m_isDebugLevelObtainedFromCmdArgs)
+    if (!Settings::Initialize(m_applicationDirPath, overrides)
             && !m_noGui) {
         runWizardLoop(false);
     }
@@ -286,70 +296,85 @@ void LightpackApplication::quitFromWizard(int result)
     quit();
 }
 
-void LightpackApplication::processCommandLineArguments()
+void LightpackApplication::processCommandLineArguments(SettingsScope::Settings::Overrides& overrides)
 {
+    static const QString kSetProfileOption("--set-profile=");
+    bool isDebugLevelObtainedFromCmdArgs = false;
+    const QStringList& args = arguments();
+
     g_debugLevel = SettingsScope::Main::DebugLevelDefault;
-
-    m_isDebugLevelObtainedFromCmdArgs = false;
-
-    for (int i = 1; i < arguments().count(); i++)
+    for (int i = 1; i < args.count(); i++)
     {
-        if (arguments().at(i) == "--nogui")
+        const QString& argument = args.at(i);
+        if (argument == "--nogui")
         {
             m_noGui = true;
             DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
         }
-        else if (arguments().at(i) == "--wizard")
+        else if (argument == "--wizard")
         {
-            bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+            bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, overrides);
             runWizardLoop(isInitFromSettings);
         }
-        else if (arguments().at(i) == "--off")
+        else if (argument == "--off")
         {
             if (!isRunning()) {
                 LedDeviceLightpack lightpackDevice;
                 lightpackDevice.switchOffLeds();
             }
             else
-                sendMessage("off");
+                sendMessage(kTurnBacklightOffMessage);
             ::exit(0);
         }
-        else if (arguments().at(i) =="--on") {
+        else if (argument =="--on") {
             if (isRunning())
-                sendMessage("on");
+                sendMessage(kTurnBacklightOnMessage);
             ::exit(0);
         }
-        else if (arguments().at(i) =="--debug-high")
+        else if (argument =="--debug-high")
         {
             g_debugLevel = Debug::HighLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
+            isDebugLevelObtainedFromCmdArgs = true;
         }
-        else if (arguments().at(i) =="--debug-mid")
+        else if (argument =="--debug-mid")
         {
             g_debugLevel = Debug::MidLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-
+            isDebugLevelObtainedFromCmdArgs = true;
         }
-        else if (arguments().at(i) =="--debug-low")
+        else if (argument =="--debug-low")
         {
             g_debugLevel = Debug::LowLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-
+            isDebugLevelObtainedFromCmdArgs = true;
         }
-        else if (arguments().at(i) =="--debug-zero")
+        else if (argument =="--debug-zero")
         {
             g_debugLevel = Debug::ZeroLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
+            isDebugLevelObtainedFromCmdArgs = true;
+        }
+        else if (argument.startsWith(kSetProfileOption))
+        {
+            const QString profileName(argument.mid(kSetProfileOption.length()).trimmed());
+            DEBUG_LOW_LEVEL << "Overriding last used profile with value=" << profileName;
+            if (isRunning())
+            {
+                sendMessage(kSwithUserProfileMessage + profileName);
+                ::exit(0);
+            }
+            else
+            {
+                overrides.setProfile(profileName);
+            }
         } else {
-            qDebug() << "Wrong argument:" << arguments().at(i);
+            qDebug() << "Wrong argument:" << argument;
             printHelpMessage();
             ::exit(WrongCommandLineArgument_ErrorCode);
         }
     }
 
-    if (m_isDebugLevelObtainedFromCmdArgs)
+	if (isDebugLevelObtainedFromCmdArgs)
     {
         qDebug() << "Debug level" << g_debugLevel;
+        overrides.setDebuglevel(static_cast<Debug::DebugLevels>(g_debugLevel));
     }
 }
 

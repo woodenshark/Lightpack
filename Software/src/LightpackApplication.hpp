@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "Settings.hpp"
 #include "SettingsWindow.hpp"
 #include "LedDeviceManager.hpp"
 #include "qtsingleapplication.h"
@@ -63,6 +64,10 @@ public:
         JustEpicFail_ErrorCode                  = 93
     };
 
+    static const QString kTurnBacklightOnMessage;
+    static const QString kTurnBacklightOffMessage;
+    static const QString kSwithUserProfileMessage;
+
 signals:
     void clearColorBuffers();
     void postInitialization(); /*!< emits at the end of initializeAll method*/
@@ -85,7 +90,7 @@ private slots:
     void quitFromWizard(int result);
 
 private:
-    void processCommandLineArguments();
+    void processCommandLineArguments(SettingsScope::Settings::Overrides& overrides);
     void printHelpMessage() const;
     void printVersionsSoftwareQtOS() const;
     bool checkSystemTrayAvailability() const;
@@ -119,7 +124,6 @@ private:
     QWidget *consolePlugin;
 
     QString m_applicationDirPath;
-    bool m_isDebugLevelObtainedFromCmdArgs;
     bool m_noGui;
     DeviceLocked::DeviceLockStatus m_deviceLockStatus;
     bool m_isSettingsWindowActive;

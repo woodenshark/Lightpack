@@ -26,10 +26,11 @@
 
 #pragma once
 
-#include <QSettings>
-#include <QVariant>
-#include <QMutex>
 #include <QColor>
+#include <QVariant>
+#include <QSettings>
+#include <QMap>
+#include <QMutex>
 
 #include "SettingsDefaults.hpp"
 #include "enums.hpp"
@@ -57,6 +58,21 @@ class Settings : public QObject
     Q_OBJECT
 
 public:
+    class Overrides
+    {
+    public:
+        Overrides() {}
+
+        void setProfile(const QString& profileName);
+        void setDebuglevel(Debug::DebugLevels level);
+        void apply(QSettings& settings) const;
+
+    private:
+        typedef QMap<QString, QVariant> OverridesMap;
+
+        OverridesMap m_overrides;
+    };
+
     Settings();
 
     /*!
@@ -65,7 +81,7 @@ public:
      * \param isSetDebugLevelFromConfig
      * \return is settings file was present before initialization
      */
-    static bool Initialize(const QString & applicationDirPath, bool isSetDebugLevelFromConfig);
+    static bool Initialize(const QString & applicationDirPath, const Overrides& overrides);
     static void resetDefaults();
     static const Settings * settingsSingleton() { return m_this; }
     static bool isPresent(const QString & applicationDirPath);
@@ -108,8 +124,8 @@ public:
     static void setExpertModeEnabled(bool isEnabled);
     static bool isKeepLightsOnAfterExit();
     static void setKeepLightsOnAfterExit(bool isEnabled);
-	static bool isKeepLightsOnAfterLock();
-	static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterLock();
+    static void setKeepLightsOnAfterLock(bool isEnabled);
     static bool isPingDeviceEverySecond();
     static void setPingDeviceEverySecond(bool isEnabled);
     static bool isUpdateFirmwareMessageShown();

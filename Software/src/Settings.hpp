@@ -58,20 +58,20 @@ class Settings : public QObject
     Q_OBJECT
 
 public:
-	class Overrides
-	{
-	public:
-		Overrides() {}
+    class Overrides
+    {
+    public:
+        Overrides() {}
 
-		void setProfile(const QString& profileName);
-		void setDebuglevel(Debug::DebugLevels level);
-		void apply(QSettings& settings) const;
+        void setProfile(const QString& profileName);
+        void setDebuglevel(Debug::DebugLevels level);
+        void apply(QSettings& settings) const;
 
-	private:
-		typedef QMap<QString, QVariant> OverridesMap;
+    private:
+        typedef QMap<QString, QVariant> OverridesMap;
 
-		OverridesMap m_overrides;
-	};
+        OverridesMap m_overrides;
+    };
 
     Settings();
 
@@ -124,8 +124,8 @@ public:
     static void setExpertModeEnabled(bool isEnabled);
     static bool isKeepLightsOnAfterExit();
     static void setKeepLightsOnAfterExit(bool isEnabled);
-	static bool isKeepLightsOnAfterLock();
-	static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterLock();
+    static void setKeepLightsOnAfterLock(bool isEnabled);
     static bool isPingDeviceEverySecond();
     static void setPingDeviceEverySecond(bool isEnabled);
     static bool isUpdateFirmwareMessageShown();

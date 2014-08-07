@@ -218,21 +218,24 @@ QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyNumberOf
 
 void Settings::Overrides::setProfile(const QString& profileName)
 {
-	m_overrides.insert(Main::Key::ProfileLast, QVariant(profileName));
+    m_overrides.insert(Main::Key::ProfileLast, QVariant(profileName));
 }
 
 void Settings::Overrides::setDebuglevel(Debug::DebugLevels level)
 {
-	m_overrides.insert(Main::Key::DebugLevel, QVariant(static_cast<uint>(level)));
+    m_overrides.insert(Main::Key::DebugLevel, QVariant(static_cast<uint>(level)));
 }
 
 void Settings::Overrides::apply(QSettings& settings) const
 {
-	for (OverridesMap::const_iterator it = m_overrides.cbegin(); it != m_overrides.cend(); ++it)
-	{
-		DEBUG_LOW_LEVEL << "Overriding setting[" << it.key() << "] with value = " << it.value();
-		setNewOption(it.key(), it.value(), true, &settings);
-	}
+    if (m_overrides.isEmpty())
+        return;
+
+    for (OverridesMap::const_iterator it = m_overrides.cbegin(); it != m_overrides.cend(); ++it)
+    {
+        DEBUG_LOW_LEVEL << "Overriding setting[" << it.key() << "] with value = " << it.value();
+        setNewOption(it.key(), it.value(), true, &settings);
+    }
 }
 
 Settings::Settings() : QObject(NULL) {
@@ -297,12 +300,12 @@ bool Settings::Initialize(const QString & applicationDirPath,
     setNewOptionMain(Main::Key::Virtual::NumberOfLeds,      Main::Virtual::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::LastReadUpdateId,           Main::LastReadUpdateId);
 
-	overrides.apply(*m_mainConfig);
+    overrides.apply(*m_mainConfig);
 
     bool ok = false;
-	uint sDebugLevel = valueMain(Main::Key::DebugLevel).toUInt(&ok);
+    uint sDebugLevel = valueMain(Main::Key::DebugLevel).toUInt(&ok);
 
-	if (ok && sDebugLevel <= Debug::HighLevel)
+    if (ok && sDebugLevel <= Debug::HighLevel)
     {
         g_debugLevel = sDebugLevel;
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "debugLevel =" << g_debugLevel;

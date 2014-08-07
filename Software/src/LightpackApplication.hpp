@@ -90,7 +90,7 @@ private slots:
     void quitFromWizard(int result);
 
 private:
-	void processCommandLineArguments(SettingsScope::Settings::Overrides& overrides);
+    void processCommandLineArguments(SettingsScope::Settings::Overrides& overrides);
     void printHelpMessage() const;
     void printVersionsSoftwareQtOS() const;
     bool checkSystemTrayAvailability() const;

@@ -213,7 +213,8 @@ SOURCES += \
     wizard/CassiopeiaDistributor.cpp \
     wizard/PegasusDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
-    UpdatesProcessor.cpp
+    UpdatesProcessor.cpp \
+    LightpackCommandLineParser.cpp
 
 HEADERS += \
     LightpackApplication.hpp \
@@ -267,7 +268,8 @@ HEADERS += \
     wizard/PegasusDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp \
-    UpdatesProcessor.hpp
+    UpdatesProcessor.hpp \
+    LightpackCommandLineParser.hpp
 
 !contains(DEFINES,UNITY_DESKTOP) {
     HEADERS += systrayicon/SysTrayIcon_qt_p.hpp

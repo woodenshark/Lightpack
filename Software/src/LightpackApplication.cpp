@@ -34,6 +34,7 @@
 #include "PluginsManager.hpp"
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
+#include "LightpackCommandLineParser.hpp"
 
 #include <stdio.h>
 #include <iostream>
@@ -292,59 +293,54 @@ void LightpackApplication::processCommandLineArguments()
 
     m_isDebugLevelObtainedFromCmdArgs = false;
 
-    for (int i = 1; i < arguments().count(); i++)
+    LightpackCommandLineParser parser;
+    QString errorMessage;
+    if (!parser.parse(&errorMessage))
     {
-        if (arguments().at(i) == "--nogui")
-        {
-            m_noGui = true;
-            DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
+        DEBUG_LOW_LEVEL <<  errorMessage;
+        printHelpMessage();
+        ::exit(WrongCommandLineArgument_ErrorCode);
+    }
+    if (parser.isSetVersion())
+    {
+        printVersionsSoftwareQtOS();
+        ::exit(0);
+    }
+    if (parser.isSetHelp())
+    {
+        printHelpMessage();
+        ::exit(0);
+    }
+    if (parser.isSetNoGUI())
+    {
+        m_noGui = true;
+        DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
+    }
+    else if (parser.isSetWizard())
+    {
+        bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+        runWizardLoop(isInitFromSettings);
+    }
+    else if (parser.isSetBacklightOff())
+    {
+        if (!isRunning()) {
+            LedDeviceLightpack lightpackDevice;
+            lightpackDevice.switchOffLeds();
         }
-        else if (arguments().at(i) == "--wizard")
-        {
-            bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
-            runWizardLoop(isInitFromSettings);
-        }
-        else if (arguments().at(i) == "--off")
-        {
-            if (!isRunning()) {
-                LedDeviceLightpack lightpackDevice;
-                lightpackDevice.switchOffLeds();
-            }
-            else
-                sendMessage("off");
-            ::exit(0);
-        }
-        else if (arguments().at(i) =="--on") {
-            if (isRunning())
-                sendMessage("on");
-            ::exit(0);
-        }
-        else if (arguments().at(i) =="--debug-high")
-        {
-            g_debugLevel = Debug::HighLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-        }
-        else if (arguments().at(i) =="--debug-mid")
-        {
-            g_debugLevel = Debug::MidLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-
-        }
-        else if (arguments().at(i) =="--debug-low")
-        {
-            g_debugLevel = Debug::LowLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-
-        }
-        else if (arguments().at(i) =="--debug-zero")
-        {
-            g_debugLevel = Debug::ZeroLevel;
-            m_isDebugLevelObtainedFromCmdArgs = true;
-        } else {
-            qDebug() << "Wrong argument:" << arguments().at(i);
-            printHelpMessage();
-            ::exit(WrongCommandLineArgument_ErrorCode);
-        }
+        else
+            sendMessage("off");
+        ::exit(0);
+    }
+    else if (parser.isSetBacklightOn())
+    {
+        if (isRunning())
+            sendMessage("on");
+        ::exit(0);
+    }
+    else if (parser.isSetDebuglevel())
+    {
+        g_debugLevel = parser.debugLevel();
+        m_isDebugLevelObtainedFromCmdArgs = true;
     }
 
     if (m_isDebugLevelObtainedFromCmdArgs)

@@ -236,7 +236,8 @@ SOURCES += \
     wizard/SelectDevicePage.cpp \
     wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
-    UpdatesProcessor.cpp
+    UpdatesProcessor.cpp \
+    LightpackCommandLineParser.cpp
 
 HEADERS += \
     LightpackApplication.hpp \
@@ -287,7 +288,8 @@ HEADERS += \
     wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp \
-    UpdatesProcessor.hpp
+    UpdatesProcessor.hpp \
+    LightpackCommandLineParser.hpp
 
 !contains(DEFINES,UNITY_DESKTOP) {
     HEADERS += systrayicon/SysTrayIcon_qt_p.hpp

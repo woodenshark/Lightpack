@@ -292,102 +292,126 @@ void LightpackApplication::processCommandLineArguments()
 
     m_isDebugLevelObtainedFromCmdArgs = false;
 
-    for (int i = 1; i < arguments().count(); i++)
-    {
-        if (arguments().at(i) == "--nogui")
-        {
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Prismatik of Lightpack");
+    const QCommandLineOption optionHelp = parser.addHelpOption();
+    const QCommandLineOption optionVersion = parser.addVersionOption();
+    const QCommandLineOption optionNogui("nogui", "no GUI (console mode)");
+    parser.addOption(optionNogui);
+
+    const QCommandLineOption optionWizard("wizard", "run settings wizard first");
+    parser.addOption(optionWizard);
+
+    const QCommandLineOption optionOn("on", "send 'on leds' cmd to running instance, if any");
+    parser.addOption(optionOn);
+
+    const QCommandLineOption optionOff("off", "send 'off leds' cmd to the device or running instance");
+    parser.addOption(optionOff);
+
+    const QCommandLineOption optionDebug("debug", "verbosity level of debug output (high, mid, low, zero)", "debug");
+    parser.addOption(optionDebug);
+
+    if ( !parser.parse(arguments()) ) {
+        outputMessage(parser.errorText());
+        ::exit(WrongCommandLineArgument_ErrorCode);
+    }
+
+    if (parser.isSet(optionHelp)) {
+        outputMessage(parser.helpText());
+        ::exit(0);
+    }
+
+    if (parser.isSet(optionVersion)) {
+        QString m = "Version: " + QString(VERSION_STR) + "\n"
+#ifdef GIT_REVISION
+            "Revision: " + QString(GIT_REVISION) + "\n"
+#endif
+            "Build with Qt version " + QString(QT_VERSION_STR) + "\n";
+        outputMessage(m);
+        ::exit(0);
+    }
+
+    // these two options are mutually exclusive
+    if (parser.isSet(optionNogui)) {
             m_noGui = true;
             DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
+    }
+    else if (parser.isSet(optionWizard)) {
+        bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+        runWizardLoop(isInitFromSettings);
+    }
+
+    // 'on' and 'off' are mutually exclusive also
+    if (parser.isSet(optionOff)) {
+        if (!isRunning()) {
+            LedDeviceLightpack lightpackDevice;
+            lightpackDevice.switchOffLeds();
         }
-        else if (arguments().at(i) == "--wizard")
-        {
-            bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
-            runWizardLoop(isInitFromSettings);
+        else
+            sendMessage("off");
+        ::exit(0);
+    }
+    else if (parser.isSet(optionOn)) {
+        if (isRunning())
+            sendMessage("on");
+        ::exit(0);
+    }
+
+    if (parser.isSet(optionDebug)) {
+        QString debugLevel = parser.value(optionDebug);
+        m_isDebugLevelObtainedFromCmdArgs = true;
+        if (debugLevel == "high")
+            g_debugLevel = Debug::HighLevel;
+        else if (debugLevel == "mid")
+            g_debugLevel = Debug::MidLevel;
+        else if (debugLevel == "low")
+            g_debugLevel = Debug::LowLevel;
+        else if (debugLevel == "zero")
+            g_debugLevel = Debug::ZeroLevel;
+        else {
+            qDebug() << "Wrong debug level specified " << debugLevel;
+            m_isDebugLevelObtainedFromCmdArgs = false;
         }
-        else if (arguments().at(i) == "--off")
-        {
-            if (!isRunning()) {
-                LedDeviceLightpack lightpackDevice;
-                lightpackDevice.switchOffLeds();
-            }
-            else
-                sendMessage("off");
-            ::exit(0);
-        }
-        else if (arguments().at(i) =="--on") {
-            if (isRunning())
-                sendMessage("on");
-            ::exit(0);
-        }
-        else if (arguments().at(i) =="--debug-high")
-        {
+    }
+
+    // Keep this for a while for backward compatibility
+    // TODO: remove this block.
+    for (int i = 1; i < arguments().count(); i++)
+    {
+        if (arguments().at(i) =="--debug-high") {
             g_debugLevel = Debug::HighLevel;
             m_isDebugLevelObtainedFromCmdArgs = true;
+            break;
         }
-        else if (arguments().at(i) =="--debug-mid")
-        {
+        else if (arguments().at(i) =="--debug-mid") {
             g_debugLevel = Debug::MidLevel;
             m_isDebugLevelObtainedFromCmdArgs = true;
-
+            break;
         }
-        else if (arguments().at(i) =="--debug-low")
-        {
+        else if (arguments().at(i) =="--debug-low") {
             g_debugLevel = Debug::LowLevel;
             m_isDebugLevelObtainedFromCmdArgs = true;
-
+            break;
         }
-        else if (arguments().at(i) =="--debug-zero")
-        {
+        else if (arguments().at(i) =="--debug-zero") {
             g_debugLevel = Debug::ZeroLevel;
             m_isDebugLevelObtainedFromCmdArgs = true;
-        } else {
-            qDebug() << "Wrong argument:" << arguments().at(i);
-            printHelpMessage();
-            ::exit(WrongCommandLineArgument_ErrorCode);
+            break;
         }
     }
 
     if (m_isDebugLevelObtainedFromCmdArgs)
-    {
         qDebug() << "Debug level" << g_debugLevel;
-    }
 }
 
-void LightpackApplication::printHelpMessage() const
+void LightpackApplication::outputMessage(QString message) const
 {
-    QString m = "\n"
-            "Version: " + QString(VERSION_STR) + "\n"
-#ifdef GIT_REVISION
-            "Revision: " + QString(GIT_REVISION) + "\n"
-#endif
-            "Build with Qt version " + QString(QT_VERSION_STR) + "\n"
-            "\n"
-            "Options: \n"
-            "  --nogui       - no GUI (console mode) \n"
-            "  --wizard      - run settings wizard first \n"
-            "  --on          - send 'on leds' cmd to running instance, if any\n"
-            "  --off         - send 'off leds' cmd to the device or running instance\n"
-            "  --help        - show this help \n"
-            "  --debug-high  - maximum verbose level of debug output\n"
-            "  --debug-mid   - middle debug level\n"
-            "  --debug-low   - low debug level, DEFAULT\n"
-            "  --debug-zero  - minimum debug output\n";
-
 #ifdef Q_OS_WIN
-    QMessageBox::information(NULL, "Prismatik", m, QMessageBox::Ok);
+    QMessageBox::information(NULL, "Prismatik", message, QMessageBox::Ok);
 #else
-    fprintf(stderr, "%s\n", m.toStdString().c_str());
+    fprintf(stderr, "%s\n", message.toStdString().c_str());
 #endif
 }
-
-#ifdef Q_OS_LINUX
-//char * getSystemOutput(const char * cmd)
-//{
-//    /*
-//     * TODO: http://stackoverflow.com/questions/3852587/how-to-get-stdout-from-a-qprocess
-//     */
-//}
-#endif
 
 void LightpackApplication::printVersionsSoftwareQtOS() const
 {
@@ -413,19 +437,7 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
         default:                    qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
         }
 #       elif defined(Q_OS_LINUX)
-        //        $ lsb_release -a
-        //        No LSB modules are available.
-        //        Distributor ID:	Ubuntu
-        //        Description:	Ubuntu 10.04.3 LTS
-        //        Release:	10.04
-        //        Codename:	lucid
-        //        QString linuxDistrVersion = getSystemOutput("lsb_release -a");
-        //        QRegExp rx("Description:\\s+([^\\n]+)");
-        //        if (rx.indexIn(linuxDistrVersion) != -1)
-        //        {
-        //            linuxDistrVersion = rx.cap(1);
-        //            qDebug() << "Linux distribution version (lsb_release -a):" << linuxDistrVersion;
-        //        }
+        // TODO: print some details about OS (cat /proc/partitions? lsb_release -a?)
 #       elif defined(Q_OS_MAC)
         qDebug() << "Mac OS";
 #       else

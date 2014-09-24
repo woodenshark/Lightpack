@@ -86,7 +86,7 @@ private slots:
 
 private:
     void processCommandLineArguments();
-    void printHelpMessage() const;
+    void outputMessage(QString message) const;
     void printVersionsSoftwareQtOS() const;
     bool checkSystemTrayAvailability() const;
     void startApiServer();

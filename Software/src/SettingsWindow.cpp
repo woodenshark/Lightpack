@@ -879,6 +879,10 @@ void SettingsWindow::processMessage(const QString &message)
         setBacklightStatus(Backlight::StatusOn);
     else if ("off" == message)
         setBacklightStatus(Backlight::StatusOff);
+    else if (message.startsWith("set-profile ")) {
+        QString profile = message.mid(12);
+        profileSwitch(profile);
+    }
     else if (m_trayIcon != NULL) {
         m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
     }

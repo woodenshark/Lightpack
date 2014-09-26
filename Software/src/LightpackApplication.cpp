@@ -308,6 +308,9 @@ void LightpackApplication::processCommandLineArguments()
     const QCommandLineOption optionOff("off", "send 'off leds' cmd to the device or running instance");
     parser.addOption(optionOff);
 
+    const QCommandLineOption optionSetProfile("set-profile", "switch to another profile in already running instance", "profile");
+    parser.addOption(optionSetProfile);
+
     const QCommandLineOption optionDebug("debug", "verbosity level of debug output (high, mid, low, zero)", "debug");
     parser.addOption(optionDebug);
 
@@ -354,6 +357,12 @@ void LightpackApplication::processCommandLineArguments()
     else if (parser.isSet(optionOn)) {
         if (isRunning())
             sendMessage("on");
+        ::exit(0);
+    }
+
+    if (parser.isSet(optionSetProfile)) {
+        if (isRunning())
+            sendMessage("set-profile " + parser.value(optionSetProfile));
         ::exit(0);
     }
 

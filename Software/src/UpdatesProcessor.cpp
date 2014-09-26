@@ -24,11 +24,10 @@
  *
  */
 
-#include "UpdatesProcessor.hpp"
 #include <QXmlStreamReader>
 #include <QNetworkReply>
 #include "version.h"
-
+#include "UpdatesProcessor.hpp"
 
 
 const AppVersion kCurVersion(VERSION_STR);

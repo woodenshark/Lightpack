@@ -27,6 +27,7 @@
 #ifndef NEWSPROCESSOR_HPP
 #define NEWSPROCESSOR_HPP
 
+#include <QStringList>
 #include <QString>
 #include <QObject>
 #include <QNetworkAccessManager>

@@ -17,11 +17,11 @@ LIBS += -lshlwapi -ladvapi32 -luser32
 !isEmpty( DIRECTX_SDK_DIR ) {
     # This will suppress gcc warnings in DX headers.
     CONFIG(gcc) {
-        QMAKE_CXXFLAGS += -isystem "$${DIRECTX_SDK_DIR}/Include"
+        QMAKE_CXXFLAGS += -isystem "\"$${DIRECTX_SDK_DIR}/Include\""
     } else {
-        INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
+        INCLUDEPATH += "\"$${DIRECTX_SDK_DIR}/Include\""
     }
-    LIBS += -L"$${DIRECTX_SDK_DIR}/Lib/x86"
+    LIBS += "-L\"$${DIRECTX_SDK_DIR}/Lib/x86\""
 }
 LIBS += -ldxguid
 

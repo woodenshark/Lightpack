@@ -12,6 +12,20 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2
+---------------
+September 30, 2014
+
+* Qt updated to 5.3.2
+* Improved compatibility with Mac OS X 10.10 (Yosemite)
+* Refactored and cleaned up code
+* Wrong debug output formatting fixed
+* Rework command line arguments parsing code
+* Add missing dependency (linqt5serialport5) to deb-package information
+* New command line option: "--switch-profile <profile_name>" for switching profile from external programs/scripts
+* New command line option "--debug <level>" changes verbosity level of debug output. Valid values are: high, mid, low, zero. --debug-high and similar command line options from now on are obsolete and will be removed in future versions.
+
+
 Version 5.11.1
 ---------------
 July 4, 2014

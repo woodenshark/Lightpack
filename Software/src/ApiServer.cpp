@@ -1060,7 +1060,7 @@ void ApiServer::initPrivateVariables()
     m_apiPort = Settings::getApiPort();
     m_listenOnlyOnLoInterface = Settings::isListenOnlyOnLoInterface();
     m_apiAuthKey = Settings::getApiAuthKey();
-    m_isAuthEnabled = Settings::isApiAuthEnabled();
+    m_isAuthEnabled = !m_apiAuthKey.isEmpty();
 }
 
 void ApiServer::initApiSetColorTask()

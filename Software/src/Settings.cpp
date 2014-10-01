@@ -595,11 +595,6 @@ void Settings::setApiKey(const QString & apiKey)
     m_this->apiKeyChanged(apiKey);
 }
 
-bool Settings::isApiAuthEnabled()
-{
-    return getApiAuthKey().isEmpty();
-}
-
 bool Settings::isExpertModeEnabled()
 {   
     return valueMain(Main::Key::IsExpertModeEnabled).toBool();

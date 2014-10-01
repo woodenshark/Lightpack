@@ -102,7 +102,6 @@ public:
     static void setApiPort(int apiPort);
     static QString getApiAuthKey();
     static void setApiKey(const QString & apiKey);
-    static bool isApiAuthEnabled();
     static void setIsApiAuthEnabled(bool isEnabled);
     static bool isExpertModeEnabled();
     static void setExpertModeEnabled(bool isEnabled);

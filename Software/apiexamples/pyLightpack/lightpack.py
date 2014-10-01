@@ -17,39 +17,34 @@ class lightpack:
 		total_data=[]
 		data = self.connection.recv(8192)
 		total_data.append(data)
-		return ''.join(total_data)
+		return b"".join(total_data)
 		
 	def getProfiles(self):
-		cmd = 'getprofiles\n'
-		self.connection.send(cmd)
-		profiles = self.__readResult()
-		return profiles.split(':')[1].rstrip(';\n').split(';')		
+		self.connection.send(b"getprofiles\n")
+		profiles = self.__readResult().decode()
+		return profiles.split(':')[1].rstrip(';\n\r').split(';')		
 		
 	def getProfile(self):
-		cmd = 'getprofile\n'
-		self.connection.send(cmd)
-		profile = self.__readResult()
+		self.connection.send(b"getprofile\n")
+		profile = self.__readResult().decode()
 		profile = profile.split(':')[1]
 		return profile
 		
 	def getStatus(self):
-		cmd = 'getstatus\n'
-		self.connection.send(cmd)
-		status = self.__readResult()
+		self.connection.send(b"getstatus\n")
+		status = self.__readResult().decode()
 		status = status.split(':')[1]
 		return status
 
 	def getCountLeds(self):
-		cmd = 'getcountleds\n'
-		self.connection.send(cmd)
-		count = self.__readResult()
+		self.connection.send(b"getcountleds\n")
+		count = self.__readResult().decode()
 		count = count.split(':')[1]
 		return count
 		
 	def getAPIStatus(self):
-		cmd = 'getstatusapi\n'
-		self.connection.send(cmd)
-		status = self.__readResult()
+		self.connection.send(b"getstatusapi\n")
+		status = self.__readResult().decode()
 		status = status.split(':')[1]
 		return status
 		
@@ -64,64 +59,59 @@ class lightpack:
 				self.__readResult()
 			return 0
 		except:
-			print 'Lightpack API server is missing'
+			print('Lightpack API server is missing')
 			return -1
 		
 	def setColor(self, n, r, g, b): 	# Set color to the define LED		
 		cmd = 'setcolor:{0}-{1},{2},{3}\n'.format(self.ledMap[n-1], r, g, b)
-		self.connection.send(cmd)
-		self.__readResult()
+		self.connection.send(str.encode(cmd))
+		return self.__readResult().decode()
 		
 	def setColorToAll(self, r, g, b): 	# Set one color to all LEDs
 		cmdstr = ''
 		for i in self.ledMap:
-			cmdstr = str(cmdstr) + str(i) + '-{0},{1},{2};'.format(r,g,b)		
-		cmd = 'setcolor:' + cmdstr + '\n'			
-		self.connection.send(cmd)
-		self.__readResult()
+			cmdstr = str(cmdstr) + str(i) + '-{0},{1},{2};'.format(r,g,b)
+		cmd = 'setcolor:%s\n' % cmdstr
+		#print("cmd: " + cmd, self.ledMap);
+		self.connection.send(str.encode(cmd))
+		return self.__readResult().decode()
 
 	def setGamma(self, g):
 		cmd = 'setgamma:{0}\n'.format(g)
-		self.connection.send(cmd)
-		self.__readResult()		
+		self.connection.send(str.encode(cmd))
+		return self.__readResult()
 		
 	def setSmooth(self, s):
 		cmd = 'setsmooth:{0}\n'.format(s)
-		self.connection.send(cmd)
-		self.__readResult()
+		self.connection.send(str.encode(cmd))
+		return self.__readResult()
 
 	def setBrightness(self, s):
 		cmd = 'setbrightness:{0}\n'.format(s)
-		self.connection.send(cmd)
-		self.__readResult()
+		self.connection.send(str.encode(cmd))
+		return self.__readResult()
 
 	def setProfile(self, p):
-		#cmd = 'setprofile:{0}\n'.format(p)
 		cmd = 'setprofile:%s\n' % p
-		self.connection.send(cmd)		
-		self.__readResult()
+		self.connection.send(str.encode(cmd))
+		return self.__readResult()
 		
 	def lock(self):
-		cmd = 'lock\n'
-		self.connection.send(cmd)
-		self.__readResult()
+		self.connection.send(b"lock\n")
+		return self.__readResult()
 		
 	def unlock(self):
-		cmd = 'unlock\n'
-		self.connection.send(cmd)	
-		self.__readResult()
+		self.connection.send(b"unlock\n")
+		return self.__readResult()
 	
 	def turnOn(self):
-		cmd = 'setstatus:on\n'		
-		self.connection.send(cmd)
-		self.__readResult()
+		self.connection.send(b"setstatus:on\n")
+		return self.__readResult().decode()
 	
 	def turnOff(self):
-		cmd = 'setstatus:off\n'
-		self.connection.send(cmd)
-		self.__readResult()		
+		self.connection.send(b"setstatus:off\n")
+		return self.__readResult().decode()
 
 	def disconnect(self):
 		self.unlock()
 		self.connection.close()
-		

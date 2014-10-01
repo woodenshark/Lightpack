@@ -10,7 +10,7 @@ print ('	1 -- Basic flash 4 times')
 print ('	2 -- "Snake"')
 print ('	3 -- Cylon effect')
 print ('	4 -- Basic random color fluid')
-choice = raw_input('My choice is: ')
+choice = input('My choice is: ')
 
 while True :	
 	if int(choice) == 1 :	

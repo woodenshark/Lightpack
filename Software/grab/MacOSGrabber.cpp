@@ -71,7 +71,7 @@ QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(QList< ScreenInfo > * res
         for (unsigned int i = 0; i < displayCount; ++i) {
             CGRect cgScreenRect = CGDisplayBounds(displays[i]);
             for (int k = 0; k < grabWidgets.size(); ++k) {
-                QRect rect = grabWidgets[i]->frameGeometry();
+                QRect rect = grabWidgets[k]->frameGeometry();
                 CGPoint widgetCenter = CGPointMake(rect.x() + rect.width() / 2, rect.y() + rect.height() / 2);
                 if (CGRectContainsPoint(cgScreenRect, widgetCenter)) {
                     ScreenInfo screenInfo;

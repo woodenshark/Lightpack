@@ -22,7 +22,7 @@ September 30, 2014
 * Wrong debug output formatting fixed
 * Rework command line arguments parsing code
 * Add missing dependency (linqt5serialport5) to deb-package information
-* New command line option: "--switch-profile <profile_name>" for switching profile from external programs/scripts
+* New command line option: "--set-profile <profile_name>" for switching profile from external programs/scripts
 * New command line option "--debug <level>" changes verbosity level of debug output. Valid values are: high, mid, low, zero. --debug-high and similar command line options from now on are obsolete and will be removed in future versions.
 
 

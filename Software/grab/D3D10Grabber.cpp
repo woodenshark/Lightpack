@@ -28,6 +28,7 @@
 #ifdef D3D10_GRAB_SUPPORT
 
 #include <winsock2.h>
+#include <shlwapi.h>
 #define WINAPI_INLINE WINAPI
 
 #include <QObject>
@@ -161,7 +162,8 @@ public:
             return true;
 
         AcquirePrivileges();
-        GetCurrentDirectoryW(SIZEOF_ARRAY(m_hooksLibPath), m_hooksLibPath);
+        GetModuleFileName(NULL, m_hooksLibPath, SIZEOF_ARRAY(m_hooksLibPath));
+        PathRemoveFileSpec(m_hooksLibPath);
         wcscat(m_hooksLibPath, L"\\");
         wcscat(m_hooksLibPath, lightpackHooksDllName);
 

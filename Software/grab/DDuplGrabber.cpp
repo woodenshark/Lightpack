@@ -29,7 +29,8 @@
 
 
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
-	: GrabberBase(parent, context) 
+	: GrabberBase(parent, context),
+	m_initialized(false)
 {
 }
 
@@ -46,6 +47,11 @@ GrabResult DDuplGrabber::grabScreens()
 
 bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 {
+	if (!m_initialized)
+	{
+		init();
+	}
+
 	freeScreens();
 
 	for (const ScreenInfo& screen : grabScreens)
@@ -85,6 +91,19 @@ void DDuplGrabber::freeScreens()
 			screen.imgDataSize = 0;
 		}
 	}
+}
+
+void DDuplGrabber::init()
+{
+	IDXGIFactory1* factory;
+	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
+	if (FAILED(hr))
+	{
+		qCritical("Failed to CreateDXGIFactory1: 0x%X", hr);
+		return;
+	}
+
+	factory->Release();
 }
 
 #endif

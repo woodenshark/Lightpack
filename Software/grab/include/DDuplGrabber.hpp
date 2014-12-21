@@ -37,6 +37,8 @@
 
 #include <windows.h>
 
+#include <dxgi.h>
+
 class DDuplGrabber : public GrabberBase
 {
 	Q_OBJECT
@@ -53,7 +55,11 @@ protected slots:
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
 protected:
+	void init();
 	void freeScreens();
+
+private:
+	bool m_initialized;
 
 };
 

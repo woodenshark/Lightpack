@@ -231,7 +231,10 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->radioButton_GrabQt_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef WINAPI_GRAB_SUPPORT
-    connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+#endif
+#ifdef DDUPL_GRAB_SUPPORT
+	connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef WINAPI_EACH_GRAB_SUPPORT
     connect(ui->radioButton_GrabWinAPI_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -755,7 +758,10 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
     ui->radioButton_GrabWinAPI->setChecked(true);
 #endif
 #ifndef WINAPI_EACH_SUPPORT
-    ui->radioButton_GrabWinAPI_EachWidget->setVisible(false);
+	ui->radioButton_GrabWinAPI_EachWidget->setVisible(false);
+#endif
+#ifndef DDUPL_GRAB_SUPPORT
+	ui->radioButton_GrabDDupl->setVisible(false);
 #endif
 #ifndef D3D9_GRAB_SUPPORT
     ui->radioButton_GrabD3D9->setVisible(false);
@@ -1599,6 +1605,11 @@ void SettingsWindow::updateUiFromSettings()
         ui->radioButton_GrabWinAPI_EachWidget->setChecked(true);
         break;
 #endif
+#ifdef DDUPL_GRAB_SUPPORT
+	case Grab::GrabberTypeDDupl:
+		ui->radioButton_GrabDDupl->setChecked(true);
+		break;
+#endif
 #ifdef D3D9_GRAB_SUPPORT
     case Grab::GrabberTypeD3D9:
         ui->radioButton_GrabD3D9->setChecked(true);
@@ -1640,12 +1651,17 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
     }
 #endif
 #ifdef WINAPI_GRAB_SUPPORT
-    if (ui->radioButton_GrabWinAPI->isChecked()) {
-        return Grab::GrabberTypeWinAPI;
-    }
-    if (ui->radioButton_GrabWinAPI_EachWidget->isChecked()) {
-        return Grab::GrabberTypeWinAPIEachWidget;
-    }
+	if (ui->radioButton_GrabWinAPI->isChecked()) {
+		return Grab::GrabberTypeWinAPI;
+	}
+	if (ui->radioButton_GrabWinAPI_EachWidget->isChecked()) {
+		return Grab::GrabberTypeWinAPIEachWidget;
+	}
+#endif
+#ifdef DDUPL_GRAB_SUPPORT
+	if (ui->radioButton_GrabDDupl->isChecked()) {
+		return Grab::GrabberTypeDDupl;
+	}
 #endif
 #ifdef D3D9_GRAB_SUPPORT
     if (ui->radioButton_GrabD3D9->isChecked()) {

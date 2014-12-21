@@ -199,6 +199,7 @@ static const QString WinAPIEachWidget = "WinAPIEachWidget";
 static const QString X11 = "X11";
 static const QString D3D9 = "D3D9";
 static const QString MacCoreGraphics = "MacCoreGraphics";
+static const QString DDupl = "DDupl";
 }
 
 } /*Value*/
@@ -1053,6 +1054,11 @@ Grab::GrabberType Settings::getGrabberType()
         return Grab::GrabberTypeWinAPIEachWidget;
 #endif
 
+#ifdef DDUPL_GRAB_SUPPORT
+	if (strGrabber == Profile::Value::GrabberType::DDupl)
+		return Grab::GrabberTypeDDupl;
+#endif
+
 #ifdef D3D9_GRAB_SUPPORT
     if (strGrabber == Profile::Value::GrabberType::D3D9)
         return Grab::GrabberTypeD3D9;
@@ -1087,15 +1093,22 @@ void Settings::setGrabberType(Grab::GrabberType grabberType)
 
     case Grab::GrabberTypeQtEachWidget:
         strGrabber = Profile::Value::GrabberType::QtEachWidget;
-        break;
+		break;
 
 #ifdef WINAPI_GRAB_SUPPORT
-    case Grab::GrabberTypeWinAPI:
-        strGrabber = Profile::Value::GrabberType::WinAPI;
-        break;
-    case Grab::GrabberTypeWinAPIEachWidget:
-        strGrabber = Profile::Value::GrabberType::WinAPIEachWidget;
-        break;
+	case Grab::GrabberTypeWinAPI:
+		strGrabber = Profile::Value::GrabberType::WinAPI;
+		break;
+	case Grab::GrabberTypeWinAPIEachWidget:
+		strGrabber = Profile::Value::GrabberType::WinAPIEachWidget;
+		break;
+#endif
+
+#ifdef DDUPL_GRAB_SUPPORT
+	case Grab::GrabberTypeDDupl:
+		strGrabber = Profile::Value::GrabberType::DDupl;
+		break;
+
 #endif
 
 #ifdef D3D9_GRAB_SUPPORT

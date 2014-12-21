@@ -27,6 +27,17 @@
 
 #ifdef DDUPL_GRAB_SUPPORT
 
+struct DDuplScreenData
+{
+	DDuplScreenData(IDXGIOutputPtr _output, IDXGIOutputDuplicationPtr _duplication, ID3D11DevicePtr _device, ID3D11DeviceContextPtr _context)
+		: output(_output), duplication(_duplication), device(_device), context(_context)
+	{}
+
+	IDXGIOutputPtr output;
+	IDXGIOutputDuplicationPtr duplication;
+	ID3D11DevicePtr device;
+	ID3D11DeviceContextPtr context;
+};
 
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 	: GrabberBase(parent, context),
@@ -54,27 +65,105 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 
 	freeScreens();
 
-	for (const ScreenInfo& screen : grabScreens)
+	for (IDXGIAdapter1Ptr adapter : m_adapters)
 	{
-		GrabbedScreen grabScreen;
-		grabScreen.imgData = (unsigned char *)nullptr;
-		grabScreen.imgFormat = BufferFormatArgb;
-		grabScreen.screenInfo = screen;
-		grabScreen.associatedData = nullptr;
-		_screensWithWidgets.append(grabScreen);
+		ID3D11DevicePtr device;
+		ID3D11DeviceContextPtr context;
+		D3D_FEATURE_LEVEL featureLevel;
+		HRESULT hr = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &device, &featureLevel, &context);
+		if (FAILED(hr))
+		{
+			qCritical("Failed to create D3D11 device: 0x%X", hr);
+			return false;
+		}
+
+		IDXGIOutputPtr output;
+		for (int i = 0; adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND; i++)
+		{
+			IDXGIOutput1Ptr output1;
+			hr = output->QueryInterface(IID_IDXGIOutput1, (void**)&output1);
+			if (FAILED(hr))
+			{
+				qCritical("Failed to cast output to IDXGIOutput1: 0x%X", hr);
+				return false;
+			}
+
+			DXGI_OUTPUT_DESC outputDesc;
+			output->GetDesc(&outputDesc);
+			for (const ScreenInfo& screenInfo : grabScreens)
+			{
+				if (screenInfo.handle == outputDesc.Monitor)
+				{
+					IDXGIOutputDuplicationPtr duplication;
+					hr = output1->DuplicateOutput(device, &duplication);
+					if (FAILED(hr))
+					{
+						qCritical("Failed to duplicate output: 0x%X", hr);
+						return false;
+					}
+
+					GrabbedScreen grabScreen;
+					grabScreen.imgData = (unsigned char *)nullptr;
+					grabScreen.imgFormat = BufferFormatArgb;
+					grabScreen.screenInfo = screenInfo;
+					grabScreen.associatedData = new DDuplScreenData(output, duplication, device, context);
+
+					_screensWithWidgets.append(grabScreen);
+
+					break;
+				}
+			}
+
+		}
 	}
+
 	return true;
+}
+
+bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
+{
+	for (GrabWidget* widget : grabWidgets)
+	{
+		HMONITOR widgetMonitor = MonitorFromWindow(reinterpret_cast<HWND>(widget->winId()), MONITOR_DEFAULTTONULL);
+		if (widgetMonitor == monitor)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
 {
+	if (!m_initialized)
+	{
+		init();
+	}
+
 	result->clear();
 
-	ScreenInfo screenInfo;
-	screenInfo.rect = QRect(0, 0, 6000, 1080);
-	screenInfo.handle = nullptr;
+	for (IDXGIAdapter1Ptr adapter : m_adapters)
+	{
+		IDXGIOutputPtr output;
+		for (int i = 0; adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND; i++)
+		{
+			DXGI_OUTPUT_DESC outputDesc;
+			output->GetDesc(&outputDesc);
+			if (anyWidgetOnThisMonitor(outputDesc.Monitor, grabWidgets))
+			{
+				ScreenInfo screenInfo;
+				screenInfo.rect = QRect(
+					outputDesc.DesktopCoordinates.left,
+					outputDesc.DesktopCoordinates.top,
+					outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left,
+					outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top);
+				screenInfo.handle = outputDesc.Monitor;
 
-	result->append(screenInfo);
+				result->append(screenInfo);
+			}
+		}
+	}
 	return result;
 }
 
@@ -95,7 +184,7 @@ void DDuplGrabber::freeScreens()
 
 void DDuplGrabber::init()
 {
-	IDXGIFactory1* factory;
+	IDXGIFactory1Ptr factory;
 	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
 	if (FAILED(hr))
 	{
@@ -103,7 +192,13 @@ void DDuplGrabber::init()
 		return;
 	}
 
-	factory->Release();
+	IDXGIAdapter1Ptr adapter;
+	for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
+	{
+		m_adapters.push_back(adapter);
+	}
+
+	m_initialized = true;
 }
 
 #endif

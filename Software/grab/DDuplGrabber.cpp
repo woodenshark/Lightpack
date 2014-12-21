@@ -49,11 +49,88 @@ DDuplGrabber::~DDuplGrabber()
 {
 }
 
-
-GrabResult DDuplGrabber::grabScreens()
+void DDuplGrabber::init()
 {
-	//_screensWithWidgets.
-	return GrabResultError;
+	IDXGIFactory1Ptr factory;
+	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
+	if (FAILED(hr))
+	{
+		qCritical("Failed to CreateDXGIFactory1: 0x%X", hr);
+		return;
+	}
+
+	IDXGIAdapter1Ptr adapter;
+	for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
+	{
+		m_adapters.push_back(adapter);
+	}
+
+	m_initialized = true;
+}
+
+bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
+{
+	for (GrabWidget* widget : grabWidgets)
+	{
+		HMONITOR widgetMonitor = MonitorFromWindow(reinterpret_cast<HWND>(widget->winId()), MONITOR_DEFAULTTONULL);
+		if (widgetMonitor == monitor)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
+{
+	if (!m_initialized)
+	{
+		init();
+	}
+
+	result->clear();
+
+	for (IDXGIAdapter1Ptr adapter : m_adapters)
+	{
+		IDXGIOutputPtr output;
+		for (int i = 0; adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND; i++)
+		{
+			DXGI_OUTPUT_DESC outputDesc;
+			output->GetDesc(&outputDesc);
+			if (anyWidgetOnThisMonitor(outputDesc.Monitor, grabWidgets))
+			{
+				ScreenInfo screenInfo;
+				screenInfo.rect = QRect(
+					outputDesc.DesktopCoordinates.left,
+					outputDesc.DesktopCoordinates.top,
+					outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left,
+					outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top);
+				screenInfo.handle = outputDesc.Monitor;
+
+				result->append(screenInfo);
+			}
+		}
+	}
+	return result;
+}
+
+void DDuplGrabber::freeScreens()
+{
+	for (GrabbedScreen& screen : _screensWithWidgets)
+	{
+		if (screen.associatedData != NULL)
+		{
+			delete screen.associatedData;
+		}
+
+		if (screen.imgData != NULL)
+		{
+			free(screen.imgData);
+			screen.imgData = NULL;
+			screen.imgDataSize = 0;
+		}
+	}
 }
 
 bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
@@ -120,85 +197,15 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 	return true;
 }
 
-bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
-{
-	for (GrabWidget* widget : grabWidgets)
-	{
-		HMONITOR widgetMonitor = MonitorFromWindow(reinterpret_cast<HWND>(widget->winId()), MONITOR_DEFAULTTONULL);
-		if (widgetMonitor == monitor)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
-{
-	if (!m_initialized)
-	{
-		init();
-	}
-
-	result->clear();
-
-	for (IDXGIAdapter1Ptr adapter : m_adapters)
-	{
-		IDXGIOutputPtr output;
-		for (int i = 0; adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND; i++)
-		{
-			DXGI_OUTPUT_DESC outputDesc;
-			output->GetDesc(&outputDesc);
-			if (anyWidgetOnThisMonitor(outputDesc.Monitor, grabWidgets))
-			{
-				ScreenInfo screenInfo;
-				screenInfo.rect = QRect(
-					outputDesc.DesktopCoordinates.left,
-					outputDesc.DesktopCoordinates.top,
-					outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left,
-					outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top);
-				screenInfo.handle = outputDesc.Monitor;
-
-				result->append(screenInfo);
-			}
-		}
-	}
-	return result;
-}
-
-
-void DDuplGrabber::freeScreens()
+GrabResult DDuplGrabber::grabScreens()
 {
 	for (GrabbedScreen& screen : _screensWithWidgets)
 	{
-		screen.associatedData = nullptr;
 
-		if (screen.imgData != NULL) {
-			free(screen.imgData);
-			screen.imgData = NULL;
-			screen.imgDataSize = 0;
-		}
-	}
-}
-
-void DDuplGrabber::init()
-{
-	IDXGIFactory1Ptr factory;
-	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
-	if (FAILED(hr))
-	{
-		qCritical("Failed to CreateDXGIFactory1: 0x%X", hr);
-		return;
 	}
 
-	IDXGIAdapter1Ptr adapter;
-	for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
-	{
-		m_adapters.push_back(adapter);
-	}
-
-	m_initialized = true;
+	//TODO
+	return GrabResultError;
 }
 
 #endif

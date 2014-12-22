@@ -37,17 +37,10 @@
 
 #include <windows.h>
 
+// Forward declaration of IDXGIapter1 to avoid including dxgi and d3d11 here
 #include <comdef.h>
-#include <comip.h>
-#include <dxgi1_2.h>
-#include <d3d11.h>
-_COM_SMARTPTR_TYPEDEF(IDXGIFactory1, __uuidof(IDXGIFactory1));
+MIDL_INTERFACE("29038f61-3839-4626-91fd-086879011a05") IDXGIAdapter1;
 _COM_SMARTPTR_TYPEDEF(IDXGIAdapter1, __uuidof(IDXGIAdapter1));
-_COM_SMARTPTR_TYPEDEF(IDXGIOutput, __uuidof(IDXGIOutput));
-_COM_SMARTPTR_TYPEDEF(IDXGIOutput1, __uuidof(IDXGIOutput1));
-_COM_SMARTPTR_TYPEDEF(IDXGIOutputDuplication, __uuidof(IDXGIOutputDuplication));
-_COM_SMARTPTR_TYPEDEF(ID3D11Device, __uuidof(ID3D11Device));
-_COM_SMARTPTR_TYPEDEF(ID3D11DeviceContext, __uuidof(ID3D11DeviceContext));
 
 class DDuplGrabber : public GrabberBase
 {
@@ -64,12 +57,15 @@ protected slots:
 
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
+	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
+
 protected:
 	void init();
 	void freeScreens();
 
 private:
 	bool m_initialized;
+	bool m_lostAccess;
 	QList<IDXGIAdapter1Ptr> m_adapters;
 
 };

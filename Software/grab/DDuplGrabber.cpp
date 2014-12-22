@@ -26,6 +26,20 @@
 #include "DDuplGrabber.hpp"
 
 #ifdef DDUPL_GRAB_SUPPORT
+#include <comdef.h>
+#include <dxgi1_2.h>
+#include <d3d11.h>
+_COM_SMARTPTR_TYPEDEF(IDXGIFactory1, __uuidof(IDXGIFactory1));
+_COM_SMARTPTR_TYPEDEF(IDXGIOutput, __uuidof(IDXGIOutput));
+_COM_SMARTPTR_TYPEDEF(IDXGIOutput1, __uuidof(IDXGIOutput1));
+_COM_SMARTPTR_TYPEDEF(IDXGIOutputDuplication, __uuidof(IDXGIOutputDuplication));
+_COM_SMARTPTR_TYPEDEF(IDXGIResource, __uuidof(IDXGIResource));
+_COM_SMARTPTR_TYPEDEF(IDXGISurface1, __uuidof(IDXGISurface1));
+_COM_SMARTPTR_TYPEDEF(ID3D11Device, __uuidof(ID3D11Device));
+_COM_SMARTPTR_TYPEDEF(ID3D11DeviceContext, __uuidof(ID3D11DeviceContext));
+_COM_SMARTPTR_TYPEDEF(ID3D11Texture2D, __uuidof(ID3D11Texture2D));
+
+#define ACQUIRE_TIMEOUT_INTERVAL 50
 
 struct DDuplScreenData
 {
@@ -41,7 +55,8 @@ struct DDuplScreenData
 
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 	: GrabberBase(parent, context),
-	m_initialized(false)
+	m_initialized(false),
+	m_lostAccess(false)
 {
 }
 
@@ -55,7 +70,7 @@ void DDuplGrabber::init()
 	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
 	if (FAILED(hr))
 	{
-		qCritical("Failed to CreateDXGIFactory1: 0x%X", hr);
+		qCritical(Q_FUNC_INFO " Failed to CreateDXGIFactory1: 0x%X", hr);
 		return;
 	}
 
@@ -115,6 +130,11 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
 	return result;
 }
 
+bool DDuplGrabber::isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const
+{
+	return GrabberBase::isReallocationNeeded(grabScreens) || m_lostAccess;
+}
+
 void DDuplGrabber::freeScreens()
 {
 	for (GrabbedScreen& screen : _screensWithWidgets)
@@ -122,6 +142,7 @@ void DDuplGrabber::freeScreens()
 		if (screen.associatedData != NULL)
 		{
 			delete screen.associatedData;
+			screen.associatedData = NULL;
 		}
 
 		if (screen.imgData != NULL)
@@ -150,7 +171,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 		HRESULT hr = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &device, &featureLevel, &context);
 		if (FAILED(hr))
 		{
-			qCritical("Failed to create D3D11 device: 0x%X", hr);
+			qCritical(Q_FUNC_INFO " Failed to create D3D11 device: 0x%X", hr);
 			return false;
 		}
 
@@ -161,7 +182,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 			hr = output->QueryInterface(IID_IDXGIOutput1, (void**)&output1);
 			if (FAILED(hr))
 			{
-				qCritical("Failed to cast output to IDXGIOutput1: 0x%X", hr);
+				qCritical(Q_FUNC_INFO " Failed to cast output to IDXGIOutput1: 0x%X", hr);
 				return false;
 			}
 
@@ -175,12 +196,12 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 					hr = output1->DuplicateOutput(device, &duplication);
 					if (FAILED(hr))
 					{
-						qCritical("Failed to duplicate output: 0x%X", hr);
+						qCritical(Q_FUNC_INFO " Failed to duplicate output: 0x%X", hr);
 						return false;
 					}
 
 					GrabbedScreen grabScreen;
-					grabScreen.imgData = (unsigned char *)nullptr;
+					grabScreen.imgData = (unsigned char *)NULL;
 					grabScreen.imgFormat = BufferFormatArgb;
 					grabScreen.screenInfo = screenInfo;
 					grabScreen.associatedData = new DDuplScreenData(output, duplication, device, context);
@@ -194,18 +215,147 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 		}
 	}
 
+	m_lostAccess = false;
+
 	return true;
+}
+
+BufferFormat mapDXGIFormatToBufferFormat(DXGI_FORMAT format)
+{
+	switch (format)
+	{
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:
+			return BufferFormatArgb;
+		case DXGI_FORMAT_R8G8B8A8_UINT:
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:
+			return BufferFormatAbgr;
+		default:
+			return BufferFormatUnknown;
+	}
 }
 
 GrabResult DDuplGrabber::grabScreens()
 {
-	for (GrabbedScreen& screen : _screensWithWidgets)
+	try
 	{
+		for (GrabbedScreen& screen : _screensWithWidgets)
+		{
+			if (screen.associatedData == NULL)
+			{
+				return GrabResultError;
+			}
 
+			DDuplScreenData* screenData = (DDuplScreenData*)screen.associatedData;
+			DXGI_OUTDUPL_FRAME_INFO frameInfo;
+			IDXGIResourcePtr resource;
+			HRESULT hr = screenData->duplication->AcquireNextFrame(ACQUIRE_TIMEOUT_INTERVAL, &frameInfo, &resource);
+			if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+			{
+				return GrabResultFrameNotReady;
+			}
+			else if (hr == DXGI_ERROR_ACCESS_LOST)
+			{
+				m_lostAccess = true;
+				qWarning(Q_FUNC_INFO " Lost Access to desktop 0x%X, requesting realloc", screen.screenInfo.handle);
+				return GrabResultFrameNotReady;
+			}
+			else if (FAILED(hr))
+			{
+				qCritical(Q_FUNC_INFO " Failed to AcquireNextFrame: 0x%X", hr);
+				return GrabResultError;
+			}
+
+			ID3D11Texture2DPtr texture;
+			hr = resource->QueryInterface(IID_ID3D11Texture2D, (void**)&texture);
+			if (FAILED(hr))
+			{
+				qCritical(Q_FUNC_INFO " Failed to cast resource to ID3D11Texture2D: 0x%X", hr);
+				return GrabResultError;
+			}
+
+			D3D11_TEXTURE2D_DESC desc;
+			texture->GetDesc(&desc);
+
+			if (desc.Width != screen.screenInfo.rect.width() || desc.Height != screen.screenInfo.rect.height())
+			{
+				qCritical(Q_FUNC_INFO " Dimension mismatch: screen %d x %d, texture %d x %d",
+					screen.screenInfo.rect.width(),
+					screen.screenInfo.rect.height(),
+					desc.Width,
+					desc.Height);
+				return GrabResultError;
+			}
+
+			size_t sizeNeeded = desc.Height * desc.Width * 4; // Assumes 4 bytes per psxel
+			if (screen.imgData == NULL)
+			{
+				screen.imgData = (unsigned char*)malloc(sizeNeeded);
+				screen.imgDataSize = sizeNeeded;
+			}
+			else if (screen.imgDataSize != sizeNeeded)
+			{
+				qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+				return GrabResultError;
+			}
+
+			D3D11_TEXTURE2D_DESC texDesc;
+			ZeroMemory(&texDesc, sizeof(texDesc));
+			texDesc.Width = desc.Width;
+			texDesc.Height = desc.Height;
+			texDesc.MipLevels = 1;
+			texDesc.ArraySize = 1;
+			texDesc.SampleDesc.Count = 1;
+			texDesc.SampleDesc.Quality = 0;
+			texDesc.Usage = D3D11_USAGE_STAGING;
+			texDesc.Format = desc.Format;
+			texDesc.BindFlags = 0;
+			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+			texDesc.MiscFlags = 0;
+			ID3D11Texture2DPtr textureCopy;
+			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &textureCopy);
+			if (FAILED(hr))
+			{
+				qCritical(Q_FUNC_INFO " Failed to CreateTexture2D: 0x%X", hr);
+				return GrabResultError;
+			}
+
+			screenData->context->CopyResource(textureCopy, texture);
+
+			IDXGISurface1Ptr surface;
+			hr = textureCopy->QueryInterface(IID_IDXGISurface1, (void**)&surface);
+			if (FAILED(hr))
+			{
+				qCritical(Q_FUNC_INFO " Failed to cast textureCopy to IID_IDXGISurface1: 0x%X", hr);
+				return GrabResultError;
+			}
+
+			DXGI_MAPPED_RECT map;
+			hr = surface->Map(&map, DXGI_MAP_READ);
+			if (FAILED(hr))
+			{
+				qCritical(Q_FUNC_INFO " Failed to get surface map: 0x%X", hr);
+				return GrabResultError;
+			}
+
+			for (unsigned int i = 0; i < desc.Height; i++)
+			{
+				memcpy_s(screen.imgData + (i * desc.Width) * 4, desc.Width * 4, map.pBits + i*map.Pitch, desc.Width * 4);
+			}
+
+			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
+
+			screenData->duplication->ReleaseFrame();
+		}
+	}
+	catch (_com_error e)
+	{
+		qCritical(Q_FUNC_INFO " COM Error: 0x%X", e.Error());
+		return GrabResultError;
 	}
 
-	//TODO
-	return GrabResultError;
+	return GrabResultOk;
 }
 
 #endif

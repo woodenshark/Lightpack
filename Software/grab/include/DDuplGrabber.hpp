@@ -42,6 +42,16 @@
 MIDL_INTERFACE("29038f61-3839-4626-91fd-086879011a05") IDXGIAdapter1;
 _COM_SMARTPTR_TYPEDEF(IDXGIAdapter1, __uuidof(IDXGIAdapter1));
 
+enum DDuplGrabberState
+{
+	Uninitialized,
+	Ready,
+	Allocated,
+	LostAccess,
+	AccessDenied,
+	Unavailable
+};
+
 class DDuplGrabber : public GrabberBase
 {
 	Q_OBJECT
@@ -62,11 +72,12 @@ protected slots:
 protected:
 	void init();
 	void freeScreens();
+	GrabResult returnBlackBuffer();
 
 private:
-	bool m_initialized;
-	bool m_lostAccess;
 	QList<IDXGIAdapter1Ptr> m_adapters;
+	DDuplGrabberState m_state;
+	DWORD m_accessDeniedLastCheck;
 
 };
 

@@ -40,6 +40,7 @@ _COM_SMARTPTR_TYPEDEF(ID3D11DeviceContext, __uuidof(ID3D11DeviceContext));
 _COM_SMARTPTR_TYPEDEF(ID3D11Texture2D, __uuidof(ID3D11Texture2D));
 
 #define ACQUIRE_TIMEOUT_INTERVAL 50
+#define ACCESSDENIED_RETRY_INTERVAL 3000
 
 struct DDuplScreenData
 {
@@ -55,8 +56,8 @@ struct DDuplScreenData
 
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 	: GrabberBase(parent, context),
-	m_initialized(false),
-	m_lostAccess(false)
+	m_state(Uninitialized),
+	m_accessDeniedLastCheck(0)
 {
 }
 
@@ -80,7 +81,7 @@ void DDuplGrabber::init()
 		m_adapters.push_back(adapter);
 	}
 
-	m_initialized = true;
+	m_state = Ready;
 }
 
 bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
@@ -99,7 +100,7 @@ bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWid
 
 QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
 {
-	if (!m_initialized)
+	if (m_state == Uninitialized)
 	{
 		init();
 	}
@@ -132,7 +133,22 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
 
 bool DDuplGrabber::isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const
 {
-	return GrabberBase::isReallocationNeeded(grabScreens) || m_lostAccess;
+	if (m_state != Allocated)
+	{
+		if (m_state == AccessDenied)
+		{
+			// retry allocation every ACCESSDENIED_RETRY_INTERVAL ms in case the 3D app closed or the user left the secure desktop
+			return GetTickCount() - m_accessDeniedLastCheck > ACCESSDENIED_RETRY_INTERVAL;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	else
+	{
+		return GrabberBase::isReallocationNeeded(grabScreens);
+	}
 }
 
 void DDuplGrabber::freeScreens()
@@ -152,11 +168,13 @@ void DDuplGrabber::freeScreens()
 			screen.imgDataSize = 0;
 		}
 	}
+
+	_screensWithWidgets.clear();
 }
 
 bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 {
-	if (!m_initialized)
+	if (m_state == Uninitialized)
 	{
 		init();
 	}
@@ -194,7 +212,15 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 				{
 					IDXGIOutputDuplicationPtr duplication;
 					hr = output1->DuplicateOutput(device, &duplication);
-					if (FAILED(hr))
+					if (hr == E_ACCESSDENIED)
+					{
+						// fake success, see grabScreens
+						m_state = AccessDenied;
+						m_accessDeniedLastCheck = GetTickCount();
+						qWarning(Q_FUNC_INFO " Desktop Duplication not available, access denied.");
+						return true;
+					}
+					else if (FAILED(hr))
 					{
 						qCritical(Q_FUNC_INFO " Failed to duplicate output: 0x%X", hr);
 						return false;
@@ -215,7 +241,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 		}
 	}
 
-	m_lostAccess = false;
+	m_state = Allocated;
 
 	return true;
 }
@@ -236,8 +262,43 @@ BufferFormat mapDXGIFormatToBufferFormat(DXGI_FORMAT format)
 	}
 }
 
+GrabResult DDuplGrabber::returnBlackBuffer()
+{
+	for (GrabbedScreen& screen : _screensWithWidgets)
+	{
+		size_t sizeNeeded = screen.screenInfo.rect.height() * screen.screenInfo.rect.width() * 4; // Assumes 4 bytes per pixel
+		if (screen.imgData == NULL)
+		{
+			screen.imgData = (unsigned char*)malloc(sizeNeeded);
+			screen.imgDataSize = sizeNeeded;
+		}
+		else if (screen.imgDataSize != sizeNeeded)
+		{
+			qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+			return GrabResultError;
+		}
+		ZeroMemory(screen.imgData, screen.imgDataSize);
+	}
+
+	return GrabResultOk;
+}
+
 GrabResult DDuplGrabber::grabScreens()
 {
+	if (m_state != Allocated)
+	{
+		if (m_state == AccessDenied)
+		{
+			// If Access is denied, we are on a secure desktop or a 3D application is running
+			// Return black buffers and retry allocation in isReallocationNeeded
+			return returnBlackBuffer();
+		}
+		else
+		{
+			return GrabResultFrameNotReady;
+		}
+	}
+
 	try
 	{
 		for (GrabbedScreen& screen : _screensWithWidgets)
@@ -255,10 +316,12 @@ GrabResult DDuplGrabber::grabScreens()
 			{
 				return GrabResultFrameNotReady;
 			}
-			else if (hr == DXGI_ERROR_ACCESS_LOST)
+			else if (hr == DXGI_ERROR_ACCESS_LOST || hr == DXGI_ERROR_INVALID_CALL)
 			{
-				m_lostAccess = true;
-				qWarning(Q_FUNC_INFO " Lost Access to desktop 0x%X, requesting realloc", screen.screenInfo.handle);
+				// in theory, DXGI_ERROR_INVALID_CALL is returned if the frame was not released
+				// it also happens in conjunction with secure desktop (even though the frame was properly released)
+				m_state = LostAccess;
+				qWarning(Q_FUNC_INFO " Lost Access to desktop 0x%X: 0x%X, requesting realloc", screen.screenInfo.handle, hr);
 				return GrabResultFrameNotReady;
 			}
 			else if (FAILED(hr))
@@ -288,7 +351,7 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			size_t sizeNeeded = desc.Height * desc.Width * 4; // Assumes 4 bytes per psxel
+			size_t sizeNeeded = desc.Height * desc.Width * 4; // Assumes 4 bytes per pixel
 			if (screen.imgData == NULL)
 			{
 				screen.imgData = (unsigned char*)malloc(sizeNeeded);

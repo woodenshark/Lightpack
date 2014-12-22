@@ -141,7 +141,7 @@ void DDuplGrabber::freeScreens()
 	{
 		if (screen.associatedData != NULL)
 		{
-			delete screen.associatedData;
+			delete (DDuplScreenData*)screen.associatedData;
 			screen.associatedData = NULL;
 		}
 

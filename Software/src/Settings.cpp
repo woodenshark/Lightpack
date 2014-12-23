@@ -251,7 +251,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::DebugLevel,             Main::DebugLevelDefault);
     setNewOptionMain(Main::Key::IsExpertModeEnabled,    Main::IsExpertModeEnabledDefault);
     setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit,   Main::IsKeepLightsOnAfterExit);
-	setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
     setNewOptionMain(Main::Key::IsPingDeviceEverySecond,Main::IsPingDeviceEverySecond);
     setNewOptionMain(Main::Key::IsUpdateFirmwareMessageShown, Main::IsUpdateFirmwareMessageShown);
     setNewOptionMain(Main::Key::ConnectedDevice,        Main::ConnectedDeviceDefault);
@@ -622,12 +622,12 @@ void Settings::setKeepLightsOnAfterExit(bool isEnabled)
 
 bool Settings::isKeepLightsOnAfterLock()
 {
-	return valueMain(Main::Key::IsKeepLightsOnAfterLock).toBool();
+    return valueMain(Main::Key::IsKeepLightsOnAfterLock).toBool();
 }
 
 void Settings::setKeepLightsOnAfterLock(bool isEnabled)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     setValueMain(Main::Key::IsKeepLightsOnAfterLock, isEnabled);
     m_this->keepLightsOnAfterLockChanged(isEnabled);
 }
@@ -1055,8 +1055,8 @@ Grab::GrabberType Settings::getGrabberType()
 #endif
 
 #ifdef DDUPL_GRAB_SUPPORT
-	if (strGrabber == Profile::Value::GrabberType::DDupl)
-		return Grab::GrabberTypeDDupl;
+    if (strGrabber == Profile::Value::GrabberType::DDupl)
+        return Grab::GrabberTypeDDupl;
 #endif
 
 #ifdef D3D9_GRAB_SUPPORT
@@ -1093,21 +1093,21 @@ void Settings::setGrabberType(Grab::GrabberType grabberType)
 
     case Grab::GrabberTypeQtEachWidget:
         strGrabber = Profile::Value::GrabberType::QtEachWidget;
-		break;
+        break;
 
 #ifdef WINAPI_GRAB_SUPPORT
-	case Grab::GrabberTypeWinAPI:
-		strGrabber = Profile::Value::GrabberType::WinAPI;
-		break;
-	case Grab::GrabberTypeWinAPIEachWidget:
-		strGrabber = Profile::Value::GrabberType::WinAPIEachWidget;
-		break;
+    case Grab::GrabberTypeWinAPI:
+        strGrabber = Profile::Value::GrabberType::WinAPI;
+        break;
+    case Grab::GrabberTypeWinAPIEachWidget:
+        strGrabber = Profile::Value::GrabberType::WinAPIEachWidget;
+        break;
 #endif
 
 #ifdef DDUPL_GRAB_SUPPORT
-	case Grab::GrabberTypeDDupl:
-		strGrabber = Profile::Value::GrabberType::DDupl;
-		break;
+    case Grab::GrabberTypeDDupl:
+        strGrabber = Profile::Value::GrabberType::DDupl;
+        break;
 
 #endif
 

@@ -37,52 +37,52 @@
 
 #include <windows.h>
 
-// Forward declaration of IDXGIapter1 to avoid including dxgi and d3d11 here
+// Forward declaration of IDXGIAdapter1 to avoid including dxgi here
 #include <comdef.h>
 MIDL_INTERFACE("29038f61-3839-4626-91fd-086879011a05") IDXGIAdapter1;
 _COM_SMARTPTR_TYPEDEF(IDXGIAdapter1, __uuidof(IDXGIAdapter1));
 
 enum DDuplGrabberState
 {
-	Uninitialized,
-	Ready,
-	Allocated,
-	LostAccess,
-	AccessDenied,
-	Unavailable
+    Uninitialized,
+    Ready,
+    Allocated,
+    LostAccess,
+    AccessDenied,
+    Unavailable
 };
 
 class DDuplGrabber : public GrabberBase
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DDuplGrabber(QObject * parent, GrabberContext *context);
-	virtual ~DDuplGrabber();
+    DDuplGrabber(QObject * parent, GrabberContext *context);
+    virtual ~DDuplGrabber();
 
-	DECLARE_GRABBER_NAME("DDuplGrabber")
+    DECLARE_GRABBER_NAME("DDuplGrabber")
 
 protected slots:
-	virtual GrabResult grabScreens();
-	virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
+    virtual GrabResult grabScreens();
+    virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
 
-	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
+    virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
-	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
+    virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
 
 protected:
-	bool init();
-	void freeScreens();
-	GrabResult returnBlackBuffer();
+    bool init();
+    void freeScreens();
+    GrabResult returnBlackBuffer();
 
 private:
-	QList<IDXGIAdapter1Ptr> m_adapters;
-	DDuplGrabberState m_state;
-	DWORD m_accessDeniedLastCheck;
+    QList<IDXGIAdapter1Ptr> m_adapters;
+    DDuplGrabberState m_state;
+    DWORD m_accessDeniedLastCheck;
 
-	FARPROC m_createDXGIFactory1Func;
-	FARPROC m_D3D11CreateDeviceFunc;
-	HMODULE m_dxgiDll;
-	HMODULE m_d3d11Dll;
+    FARPROC m_createDXGIFactory1Func;
+    FARPROC m_D3D11CreateDeviceFunc;
+    HMODULE m_dxgiDll;
+    HMODULE m_d3d11Dll;
 
 };
 

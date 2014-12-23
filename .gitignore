@@ -58,3 +58,10 @@ Makefile*
 debug/
 release/
 Software/dist_windows/content
+Software/lib
+*.vcxproj
+*.filters
+*.sln
+*.suo
+*.sdf
+*.opensdf

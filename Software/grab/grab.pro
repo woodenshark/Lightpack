@@ -51,6 +51,11 @@ win32 {
         GRABBERS_HEADERS += include/WinAPIGrabberEachWidget.hpp
         GRABBERS_SOURCES += WinAPIGrabberEachWidget.cpp
     }
+	
+    contains(DEFINES, DDUPL_GRAB_SUPPORT) {
+        GRABBERS_HEADERS += include/DDuplGrabber.hpp
+        GRABBERS_SOURCES += DDuplGrabber.cpp
+    }
 
     contains(DEFINES, D3D9_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/D3D9Grabber.hpp

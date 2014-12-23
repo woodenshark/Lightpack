@@ -70,7 +70,7 @@ protected slots:
 	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
 
 protected:
-	void init();
+	bool init();
 	void freeScreens();
 	GrabResult returnBlackBuffer();
 
@@ -78,6 +78,11 @@ private:
 	QList<IDXGIAdapter1Ptr> m_adapters;
 	DDuplGrabberState m_state;
 	DWORD m_accessDeniedLastCheck;
+
+	FARPROC m_createDXGIFactory1Func;
+	FARPROC m_D3D11CreateDeviceFunc;
+	HMODULE m_dxgiDll;
+	HMODULE m_d3d11Dll;
 
 };
 

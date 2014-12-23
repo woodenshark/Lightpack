@@ -39,6 +39,19 @@ _COM_SMARTPTR_TYPEDEF(ID3D11Device, __uuidof(ID3D11Device));
 _COM_SMARTPTR_TYPEDEF(ID3D11DeviceContext, __uuidof(ID3D11DeviceContext));
 _COM_SMARTPTR_TYPEDEF(ID3D11Texture2D, __uuidof(ID3D11Texture2D));
 
+typedef HRESULT(WINAPI *CreateDXGIFactory1Func)(REFIID riid, _Out_ void **ppFactory);
+typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
+	_In_opt_ IDXGIAdapter* pAdapter,
+	D3D_DRIVER_TYPE DriverType,
+	HMODULE Software,
+	UINT Flags,
+	_In_reads_opt_(FeatureLevels) CONST D3D_FEATURE_LEVEL* pFeatureLevels,
+	UINT FeatureLevels,
+	UINT SDKVersion,
+	_Out_opt_ ID3D11Device** ppDevice,
+	_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel,
+	_Out_opt_ ID3D11DeviceContext** ppImmediateContext);
+
 #define ACQUIRE_TIMEOUT_INTERVAL 50
 #define ACCESSDENIED_RETRY_INTERVAL 3000
 
@@ -57,22 +70,42 @@ struct DDuplScreenData
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 	: GrabberBase(parent, context),
 	m_state(Uninitialized),
-	m_accessDeniedLastCheck(0)
+	m_accessDeniedLastCheck(0),
+	m_dxgiDll(NULL),
+	m_d3d11Dll(NULL),
+	m_createDXGIFactory1Func(NULL),
+	m_D3D11CreateDeviceFunc(NULL)
 {
 }
 
 DDuplGrabber::~DDuplGrabber()
 {
+	if (m_dxgiDll)
+		FreeLibrary(m_dxgiDll);
+	if (m_d3d11Dll)
+		FreeLibrary(m_d3d11Dll);
 }
 
-void DDuplGrabber::init()
+bool DDuplGrabber::init()
 {
+	m_state = Unavailable;
+
+	m_dxgiDll = LoadLibrary(L"dxgi.dll");
+	m_d3d11Dll = LoadLibrary(L"d3d11.dll");
+	if (!m_dxgiDll || !m_d3d11Dll)
+		return false;
+
+	m_createDXGIFactory1Func = GetProcAddress(m_dxgiDll, "CreateDXGIFactory1");
+	m_D3D11CreateDeviceFunc = GetProcAddress(m_d3d11Dll, "D3D11CreateDevice");
+	if (!m_createDXGIFactory1Func || !m_D3D11CreateDeviceFunc)
+		return false;
+
 	IDXGIFactory1Ptr factory;
-	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory);
+	HRESULT hr = ((CreateDXGIFactory1Func)m_createDXGIFactory1Func)(__uuidof(IDXGIFactory1), (void**)&factory);
 	if (FAILED(hr))
 	{
 		qCritical(Q_FUNC_INFO " Failed to CreateDXGIFactory1: 0x%X", hr);
-		return;
+		return false;
 	}
 
 	IDXGIAdapter1Ptr adapter;
@@ -82,6 +115,7 @@ void DDuplGrabber::init()
 	}
 
 	m_state = Ready;
+	return true;
 }
 
 bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
@@ -100,12 +134,13 @@ bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWid
 
 QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
 {
+	result->clear();
+
 	if (m_state == Uninitialized)
 	{
-		init();
+		if (!init())
+			return result;
 	}
-
-	result->clear();
 
 	for (IDXGIAdapter1Ptr adapter : m_adapters)
 	{
@@ -180,7 +215,8 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 {
 	if (m_state == Uninitialized)
 	{
-		init();
+		if (!init())
+			return false;
 	}
 
 	freeScreens();
@@ -190,7 +226,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 		ID3D11DevicePtr device;
 		ID3D11DeviceContextPtr context;
 		D3D_FEATURE_LEVEL featureLevel;
-		HRESULT hr = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &device, &featureLevel, &context);
+		HRESULT hr = ((D3D11CreateDeviceFunc)m_D3D11CreateDeviceFunc)(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &device, &featureLevel, &context);
 		if (FAILED(hr))
 		{
 			qCritical(Q_FUNC_INFO " Failed to create D3D11 device: 0x%X", hr);

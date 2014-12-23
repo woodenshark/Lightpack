@@ -140,6 +140,10 @@ bool DDuplGrabber::isReallocationNeeded(const QList< ScreenInfo > &grabScreens) 
 			// retry allocation every ACCESSDENIED_RETRY_INTERVAL ms in case the 3D app closed or the user left the secure desktop
 			return GetTickCount() - m_accessDeniedLastCheck > ACCESSDENIED_RETRY_INTERVAL;
 		}
+		else if (m_state == Unavailable)
+		{
+			return false;
+		}
 		else
 		{
 			return true;
@@ -217,8 +221,14 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 						// fake success, see grabScreens
 						m_state = AccessDenied;
 						m_accessDeniedLastCheck = GetTickCount();
-						qWarning(Q_FUNC_INFO " Desktop Duplication not available, access denied.");
+						qWarning(Q_FUNC_INFO " Desktop Duplication not available, access denied");
 						return true;
+					}
+					else if (hr == E_NOTIMPL || hr == DXGI_ERROR_UNSUPPORTED)
+					{
+						m_state = Unavailable;
+						qCritical(Q_FUNC_INFO " Desktop Duplication not available on this system / in this configuration (desktop 0x%X, code 0x%X)", screenInfo.handle, hr);
+						return false;
 					}
 					else if (FAILED(hr))
 					{

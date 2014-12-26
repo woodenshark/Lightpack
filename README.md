@@ -1,5 +1,6 @@
 Lightpack project with Prismatik flavour
 ---------
+*Modified version which includes various improvements for Windows, esp. a Desktop Duplication API Grabber*
 
 **Table of content:** <br />
 &nbsp;&nbsp;[Short description] (https://github.com/Atarity/Lightpack#lightpack-project-with-prismatik-flavour) <br />

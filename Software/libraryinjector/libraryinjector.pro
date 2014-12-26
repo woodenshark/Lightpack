@@ -13,7 +13,10 @@ LIBS += -luuid -lole32 -ladvapi32 -luser32
 
 DEFINES += LIBRARYINJECTOR_LIBRARY
 CONFIG(msvc) {
+    # This will suppress many MSVC warnings about 'unsecure' CRT functions.
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    # Parallel build
+    QMAKE_CXXFLAGS += /MP
 } else {
     QMAKE_LFLAGS +=-Wl,--kill-at
 }

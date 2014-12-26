@@ -74,7 +74,13 @@ unix:!macx{
 }
 
 win32 {
-    CONFIG(msvc):DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
+        DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+    }
+
     # Windows version using WinAPI for HID
     LIBS    += -lsetupapi
     # For QSerialDevice

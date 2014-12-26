@@ -291,6 +291,7 @@ private slots:
             QList<DWORD> processes = QList<DWORD>();
             getDxProcessesIDs(&processes, m_systemrootPath);
             foreach (DWORD procId, processes) {
+                qDebug() << Q_FUNC_INFO << "Infecting DX process " << procId;
                 m_libraryInjector->Inject(procId, m_hooksLibPath);
             }
         }

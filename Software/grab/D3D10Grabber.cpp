@@ -291,9 +291,15 @@ private slots:
             QList<DWORD> processes = QList<DWORD>();
             getDxProcessesIDs(&processes, m_systemrootPath);
             foreach (DWORD procId, processes) {
-                qDebug() << Q_FUNC_INFO << "Infecting DX process " << procId;
-                m_libraryInjector->Inject(procId, m_hooksLibPath);
+                // Require the process to have run for at least one full timer tick,
+                // hoping when injection happens their swapchain is already setup
+                if (m_lastSeenDxProcesses.contains(procId)) {
+                    qDebug() << Q_FUNC_INFO << "Infecting DX process " << procId;
+                    m_libraryInjector->Inject(procId, m_hooksLibPath);
+                }
             }
+            m_lastSeenDxProcesses.clear();
+            m_lastSeenDxProcesses.append(processes);
         }
     }
 
@@ -483,6 +489,7 @@ private:
     UINT m_lastFrameId;
     MONITORINFO m_monitorInfo;
     QScopedPointer<QTimer> m_processesScanAndInfectTimer;
+	QList<DWORD> m_lastSeenDxProcesses;
     bool m_isInited;
     ILibraryInjector * m_libraryInjector;
     WCHAR m_hooksLibPath[300];

@@ -23,6 +23,7 @@
  *
  */
 
+#include "WinUtils.hpp"
 #include "WinDXUtils.hpp"
 
 #include <QtGlobal>

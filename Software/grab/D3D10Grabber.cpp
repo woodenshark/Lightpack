@@ -35,6 +35,7 @@
 #include <QThread>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QMessageBox>
 #include <cstdlib>
 #include <stdio.h>
 #include "calculations.hpp"
@@ -521,6 +522,16 @@ void D3D10Grabber::init() {
     grabbedScreen.screenInfo.handle = reinterpret_cast<void *>(QApplication::desktop()->primaryScreen());
     grabbedScreen.screenInfo.rect = QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen());
     _screensWithWidgets.append(grabbedScreen);
+
+    if (!WinUtils::IsUserAdmin()) {
+        qWarning() << Q_FUNC_INFO << "DX hooking is enabled but application not running elevated";
+        QMessageBox::warning(
+            NULL,
+            tr("Prismatik"),
+            tr("DX hooking is enabled but will not function properly because the application is not running as local Administrator.\n"\
+                "You can either disable DX hooking or run this program as an Administrator."), 
+            QMessageBox::Ok);
+    }
 }
 
 void D3D10Grabber::startGrabbing() {

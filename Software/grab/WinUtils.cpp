@@ -67,6 +67,32 @@ BOOL AcquirePrivileges() {
     return FALSE;
 }
 
+BOOL IsUserAdmin() {
+    // http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389%28v=vs.85%29.aspx
+
+    BOOL b;
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    PSID AdministratorsGroup;
+    b = AllocateAndInitializeSid(
+        &NtAuthority,
+        2,
+        SECURITY_BUILTIN_DOMAIN_RID,
+        DOMAIN_ALIAS_RID_ADMINS,
+        0, 0, 0, 0, 0, 0,
+        &AdministratorsGroup);
+    if (b)
+    {
+        if (!CheckTokenMembership(NULL, AdministratorsGroup, &b))
+        {
+            b = FALSE;
+        }
+        FreeSid(AdministratorsGroup);
+    }
+
+    return(b);
+}
+
+
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
 
     DWORD aProcesses[1024];

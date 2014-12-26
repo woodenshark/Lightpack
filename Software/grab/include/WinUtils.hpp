@@ -46,6 +46,8 @@ BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable);
 
 BOOL AcquirePrivileges();
 
+BOOL IsUserAdmin(VOID);
+
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
 
 PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);

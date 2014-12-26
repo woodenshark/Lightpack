@@ -68,6 +68,7 @@ enum GrabberType {
     GrabberTypeWinAPIEachWidget,
     GrabberTypeD3D9,
     GrabberTypeMacCoreGraphics,
+    GrabberTypeDDupl,
 
     GrabbersCount,
 

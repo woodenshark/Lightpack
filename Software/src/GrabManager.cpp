@@ -36,6 +36,7 @@
 #include "TimeEvaluations.hpp"
 #include "WinAPIGrabber.hpp"
 #include "WinAPIGrabberEachWidget.hpp"
+#include "DDuplGrabber.hpp"
 #include "QtGrabber.hpp"
 #include "QtGrabberEachWidget.hpp"
 #include "X11Grabber.hpp"
@@ -487,6 +488,10 @@ void GrabManager::initGrabbers()
 
 #ifdef D3D9_GRAB_SUPPORT
     m_grabbers[Grab::GrabberTypeD3D9] = initGrabber(new D3D9Grabber(NULL, m_grabberContext));
+#endif
+
+#ifdef DDUPL_GRAB_SUPPORT
+	m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(new DDuplGrabber(NULL, m_grabberContext));
 #endif
 
 #ifdef X11_GRAB_SUPPORT

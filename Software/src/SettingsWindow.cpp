@@ -222,7 +222,7 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->pushButton_SelectColor, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
+    connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
 
     // Dev tab
     connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -232,6 +232,9 @@ void SettingsWindow::connectSignalsSlots()
 #endif
 #ifdef WINAPI_GRAB_SUPPORT
     connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+#endif
+#ifdef DDUPL_GRAB_SUPPORT
+    connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef WINAPI_EACH_GRAB_SUPPORT
     connect(ui->radioButton_GrabWinAPI_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -756,6 +759,9 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
 #endif
 #ifndef WINAPI_EACH_SUPPORT
     ui->radioButton_GrabWinAPI_EachWidget->setVisible(false);
+#endif
+#ifndef DDUPL_GRAB_SUPPORT
+    ui->radioButton_GrabDDupl->setVisible(false);
 #endif
 #ifndef D3D9_GRAB_SUPPORT
     ui->radioButton_GrabD3D9->setVisible(false);
@@ -1558,7 +1564,7 @@ void SettingsWindow::updateUiFromSettings()
 
     ui->checkBox_SendDataOnlyIfColorsChanges->setChecked             (Settings::isSendDataOnlyIfColorsChanges());
     ui->checkBox_KeepLightsOnAfterExit->setChecked                   (Settings::isKeepLightsOnAfterExit());
-	ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
+    ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
     ui->checkBox_PingDeviceEverySecond->setChecked                   (Settings::isPingDeviceEverySecond());
 
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
@@ -1597,6 +1603,11 @@ void SettingsWindow::updateUiFromSettings()
         break;
     case Grab::GrabberTypeWinAPIEachWidget:
         ui->radioButton_GrabWinAPI_EachWidget->setChecked(true);
+        break;
+#endif
+#ifdef DDUPL_GRAB_SUPPORT
+    case Grab::GrabberTypeDDupl:
+        ui->radioButton_GrabDDupl->setChecked(true);
         break;
 #endif
 #ifdef D3D9_GRAB_SUPPORT
@@ -1645,6 +1656,11 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
     }
     if (ui->radioButton_GrabWinAPI_EachWidget->isChecked()) {
         return Grab::GrabberTypeWinAPIEachWidget;
+    }
+#endif
+#ifdef DDUPL_GRAB_SUPPORT
+    if (ui->radioButton_GrabDDupl->isChecked()) {
+        return Grab::GrabberTypeDDupl;
     }
 #endif
 #ifdef D3D9_GRAB_SUPPORT
@@ -1917,5 +1933,5 @@ void SettingsWindow::on_pbRunConfigurationWizard_clicked()
 
 void SettingsWindow::onKeepLightsAfterLock_Toggled(bool isEnabled)
 {
-	Settings::setKeepLightsOnAfterLock(isEnabled);
+    Settings::setKeepLightsOnAfterLock(isEnabled);
 }

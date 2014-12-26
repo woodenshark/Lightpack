@@ -34,7 +34,10 @@ CONFIG -= rtti
 DEFINES += HOOKSDLL_EXPORTS UNICODE
 
 CONFIG(msvc) {
+    # This will suppress many MSVC warnings about 'unsecure' CRT functions.
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    # Parallel build
+    QMAKE_CXXFLAGS += /MP
 } else {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static

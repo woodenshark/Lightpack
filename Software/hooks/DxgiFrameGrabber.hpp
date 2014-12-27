@@ -10,6 +10,8 @@ class Logger;
 struct ID3D10Texture2D;
 struct ID3D11Texture2D;
 struct IDXGISwapChain;
+struct ID3D10Device;
+struct ID3D11Device;
 
 class DxgiFrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {
@@ -35,6 +37,15 @@ public:
 protected:
     DxgiFrameGrabber(Logger *logger);
     ProxyFuncVFTable *m_dxgiPresentProxyFuncVFTable;
+    ID3D10Texture2D *m_mapTexture10A;
+    ID3D10Device *m_mapDevice10;
+    ID3D10Texture2D *m_mapTexture10B;
+    ID3D11Texture2D *m_mapTexture11A;
+    ID3D11Texture2D *m_mapTexture11B;
+    ID3D11Device *m_mapDevice11;
+    UINT m_mapWidth;
+    UINT m_mapHeight;
+    UINT m_frameCount;
 private:
     void ** calcDxgiPresentPointer();
 };

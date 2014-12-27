@@ -69,18 +69,30 @@ void DxgiFrameGrabber::free() {
         m_dxgiPresentProxyFuncVFTable = NULL;
     }
 
-    if (m_mapTexture10A)
-        m_mapTexture10A->Release();
-    if (m_mapTexture10B)
-        m_mapTexture10B->Release();
-    if (m_mapDevice10)
-        m_mapDevice10->Release();
-    if (m_mapTexture11A)
-        m_mapTexture11A->Release();
-    if (m_mapTexture11B)
-        m_mapTexture11B->Release();
-    if (m_mapDevice11)
-        m_mapDevice11->Release();
+	if (m_mapTexture10A) {
+		m_mapTexture10A->Release();
+		m_mapTexture10A = NULL;
+	}
+	if (m_mapTexture10B) {
+		m_mapTexture10B->Release();
+		m_mapTexture10B = NULL;
+	}
+	if (m_mapDevice10) {
+		m_mapDevice10->Release();
+		m_mapDevice10 = NULL;
+	}
+	if (m_mapTexture11A) {
+		m_mapTexture11A->Release();
+		m_mapTexture11A = NULL;
+	}
+	if (m_mapTexture11B) {
+		m_mapTexture11B->Release();
+		m_mapTexture11B = NULL;
+	}
+	if (m_mapDevice11) {
+		m_mapDevice11->Release();
+		m_mapDevice11 = NULL;
+	}
 }
 
 void ** DxgiFrameGrabber::calcDxgiPresentPointer() {

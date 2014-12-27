@@ -117,7 +117,7 @@ win32 {
                 cp -f \"$${QTDIR}/bin/icuin52.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/icuuc52.dll\" ./
     } else {
-        QMAKE_POST_LINK = cd $(TargetDir) && \
+        QMAKE_POST_LINK = cd $(DESTDIR) && \
                 cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
                 cp -f \"../../lib/libraryinjector.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \

@@ -82,6 +82,10 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
 
             gLog->setLogLevel(gIpcContext->m_memDesc.logLevel);
 
+            gLog->reportLogInfo(L"d3d9 device::present(): 0x%x", gIpcContext->m_memDesc.d3d9PresentFuncOffset);
+            gLog->reportLogInfo(L"d3d9 swapchain::present(): 0x%x", gIpcContext->m_memDesc.d3d9SCPresentFuncOffset);
+            gLog->reportLogInfo(L"dxgi swapchain::present(): 0x%x", gIpcContext->m_memDesc.dxgiPresentFuncOffset);
+
             if (!d3d9FrameGrabber) {
                 d3d9FrameGrabber = D3D9FrameGrabber::getInstance(g_syncRunMutex);
                 d3d9FrameGrabber->setIPCContext(gIpcContext);

@@ -43,10 +43,6 @@ bool IPCContext::init() {
 
     m_memDesc.frameId = 0;
 
-    m_logger->reportLogInfo(L"d3d9 device::present(): 0x%x", m_memDesc.d3d9PresentFuncOffset);
-    m_logger->reportLogInfo(L"d3d9 swapchain::present(): 0x%x", m_memDesc.d3d9SCPresentFuncOffset);
-    m_logger->reportLogInfo(L"dxgi swapchain::present(): 0x%x", m_memDesc.dxgiPresentFuncOffset);
-
     return true;
 }
 

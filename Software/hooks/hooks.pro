@@ -42,6 +42,13 @@ CONFIG(msvc) {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
 }
+CONFIG(msvc) {
+	QMAKE_POST_LINK = cd $(TargetDir) && \
+			cp -f prismatik-hooks.dll ../src/bin/
+} else {
+	QMAKE_POST_LINK = cd $(DESTDIR) && \
+			cp -f prismatik-hooks.dll ../src/bin/
+}
 
 SOURCES += \
     hooks.cpp \

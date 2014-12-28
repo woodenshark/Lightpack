@@ -8,6 +8,8 @@ class Logger;
 class ProxyFuncJmp;
 struct IDirect3DDevice9;
 struct IDirect3DSwapChain9;
+struct IDirect3DSurface9;
+typedef enum _D3DFORMAT D3DFORMAT;
 
 class D3D9FrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {
@@ -38,6 +40,13 @@ protected:
     D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger);
     void ** calcD3d9PresentPointer();
     void ** calcD3d9SCPresentPointer();
+
+	IDirect3DSurface9 *m_pDemultisampledSurf;
+	IDirect3DSurface9 *m_pOffscreenSurf;
+	IDirect3DDevice9 *m_pDev;
+	D3DFORMAT m_surfFormat;
+	UINT m_surfWidth;
+	UINT m_surfHeight;
 };
 
 #endif // D3D9FRAMEGRABBER_HPP

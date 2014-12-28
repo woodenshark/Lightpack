@@ -55,7 +55,7 @@ bool DxgiFrameGrabber::installHooks() {
 }
 
 bool DxgiFrameGrabber::isHooksInstalled() {
-    return m_isInited && m_dxgiPresentProxyFuncVFTable->isHookInstalled();
+    return isGAPILoaded() && m_isInited && m_dxgiPresentProxyFuncVFTable->isHookInstalled();
 }
 
 bool DxgiFrameGrabber::removeHooks() {
@@ -69,30 +69,30 @@ void DxgiFrameGrabber::free() {
         m_dxgiPresentProxyFuncVFTable = NULL;
     }
 
-	if (m_mapTexture10A) {
-		m_mapTexture10A->Release();
-		m_mapTexture10A = NULL;
-	}
-	if (m_mapTexture10B) {
-		m_mapTexture10B->Release();
-		m_mapTexture10B = NULL;
-	}
-	if (m_mapDevice10) {
-		m_mapDevice10->Release();
-		m_mapDevice10 = NULL;
-	}
-	if (m_mapTexture11A) {
-		m_mapTexture11A->Release();
-		m_mapTexture11A = NULL;
-	}
-	if (m_mapTexture11B) {
-		m_mapTexture11B->Release();
-		m_mapTexture11B = NULL;
-	}
-	if (m_mapDevice11) {
-		m_mapDevice11->Release();
-		m_mapDevice11 = NULL;
-	}
+    if (m_mapTexture10A) {
+        m_mapTexture10A->Release();
+        m_mapTexture10A = NULL;
+    }
+    if (m_mapTexture10B) {
+        m_mapTexture10B->Release();
+        m_mapTexture10B = NULL;
+    }
+    if (m_mapDevice10) {
+        m_mapDevice10->Release();
+        m_mapDevice10 = NULL;
+    }
+    if (m_mapTexture11A) {
+        m_mapTexture11A->Release();
+        m_mapTexture11A = NULL;
+    }
+    if (m_mapTexture11B) {
+        m_mapTexture11B->Release();
+        m_mapTexture11B = NULL;
+    }
+    if (m_mapDevice11) {
+        m_mapDevice11->Release();
+        m_mapDevice11 = NULL;
+    }
 }
 
 void ** DxgiFrameGrabber::calcDxgiPresentPointer() {

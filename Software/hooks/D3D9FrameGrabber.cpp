@@ -52,7 +52,7 @@ bool D3D9FrameGrabber::installHooks() {
 }
 
 bool D3D9FrameGrabber::isHooksInstalled() {
-    return m_d3d9PresentProxyFuncJmp->isHookInstalled() && m_d3d9SCPresentProxyFuncJmp->isHookInstalled();
+    return isGAPILoaded() && m_d3d9PresentProxyFuncJmp->isHookInstalled() && m_d3d9SCPresentProxyFuncJmp->isHookInstalled();
 }
 
 bool D3D9FrameGrabber::removeHooks() {

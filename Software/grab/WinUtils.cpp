@@ -37,7 +37,7 @@ namespace WinUtils
 {
 
 const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
-static LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe"};
+static LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe"};
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable) {
 

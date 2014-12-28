@@ -19,6 +19,12 @@ BufferFormat getCompatibleBufferFormat(D3DFORMAT format);
 D3D9FrameGrabber::D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger): GAPIProxyFrameGrabber(syncRunMutex), LoggableTrait(logger) {
     m_isInited = false;
     m_ipcContext = NULL;
+    m_pDemultisampledSurf = NULL;
+    m_pOffscreenSurf = NULL;
+    m_pDev = NULL;
+    m_surfFormat = D3DFMT_UNKNOWN;
+    m_surfWidth = 0;
+    m_surfHeight = 0;
 }
 
 bool D3D9FrameGrabber::init() {
@@ -60,6 +66,19 @@ void D3D9FrameGrabber::free() {
     m_d3d9PresentProxyFuncJmp = NULL;
     m_d3d9SCPresentProxyFuncJmp = NULL;
     m_isInited = false;
+
+    if (m_pDemultisampledSurf) {
+        m_pDemultisampledSurf->Release();
+        m_pDemultisampledSurf = NULL;
+    }
+    if (m_pOffscreenSurf) {
+        m_pOffscreenSurf->Release();
+        m_pDemultisampledSurf = NULL;
+    }
+    if (m_pDev) {
+        m_pDev->Release();
+        m_pDev = NULL;
+    }
 }
 
 void ** D3D9FrameGrabber::calcD3d9PresentPointer() {
@@ -86,7 +105,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         IPCContext *ipcContext = d3d9FrameGrabber->m_ipcContext;
         logger->reportLogDebug(L"D3D9Present");
         HRESULT hRes;
-
+        
         RECT newRect = RECT();
         IDirect3DSurface9 *pBackBuffer = NULL;
         IDirect3DSurface9 *pDemultisampledSurf = NULL;
@@ -111,30 +130,55 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         D3DSURFACE_DESC surfDesc;
         pBackBuffer->GetDesc(&surfDesc);
 
-        hRes = pDev->CreateRenderTarget(
-            surfDesc.Width, surfDesc.Height,
-            surfDesc.Format, D3DMULTISAMPLE_NONE, 0, false,
-            &pDemultisampledSurf, NULL );
-        if (FAILED(hRes))
-        {
-            logger->reportLogError(L"GetFramePrep: FAILED to create demultisampled render target. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
-            goto end;
+        if (d3d9FrameGrabber->m_pDemultisampledSurf &&
+            (d3d9FrameGrabber->m_pDev != pDev
+            || d3d9FrameGrabber->m_surfFormat != surfDesc.Format
+            || d3d9FrameGrabber->m_surfWidth != surfDesc.Width
+            || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
+            d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurf->Release();
+            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pDev->Release();
+            d3d9FrameGrabber->m_pDev = NULL;
         }
+        if (!d3d9FrameGrabber->m_pDemultisampledSurf) {
+            hRes = pDev->CreateRenderTarget(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DMULTISAMPLE_NONE, 0, false,
+                &pDemultisampledSurf, NULL);
+            if (FAILED(hRes))
+            {
+                logger->reportLogError(L"GetFramePrep: FAILED to create demultisampled render target. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pDemultisampledSurf = pDemultisampledSurf;
+            d3d9FrameGrabber->m_pDev = pDev;
+            d3d9FrameGrabber->m_pDev->AddRef();
+            d3d9FrameGrabber->m_surfFormat = surfDesc.Format;
+            d3d9FrameGrabber->m_surfWidth = surfDesc.Width;
+            d3d9FrameGrabber->m_surfHeight = surfDesc.Height;
 
+            hRes = pDev->CreateOffscreenPlainSurface(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DPOOL_SYSTEMMEM,
+                &pOffscreenSurf, NULL);
+            if (FAILED(hRes))
+            {
+                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+                logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pOffscreenSurf = pOffscreenSurf;
+        }
+        pDemultisampledSurf = d3d9FrameGrabber->m_pDemultisampledSurf;
+        pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurf;
+        
         hRes = pDev->StretchRect(pBackBuffer, NULL, pDemultisampledSurf, NULL, D3DTEXF_LINEAR );
         if (FAILED(hRes))
         {
             logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
-            goto end;
-        }
-
-        hRes = pDev->CreateOffscreenPlainSurface(
-            surfDesc.Width, surfDesc.Height,
-            surfDesc.Format, D3DPOOL_SYSTEMMEM,
-            &pOffscreenSurf, NULL );
-        if (FAILED(hRes))
-        {
-            logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
             goto end;
         }
 
@@ -144,7 +188,6 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             logger->reportLogError(L"GetFramePrep: GetRenderTargetData() FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
             goto end;
         }
-
         D3DLOCKED_RECT lockedSrcRect;
         newRect.right = surfDesc.Width;
         newRect.bottom = surfDesc.Height;
@@ -184,11 +227,10 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             logger->reportLogError(L"d3d9 couldn't wait mutex. errocode = 0x%x", errorcode);
         }
         end:
-        if(pOffscreenSurf) pOffscreenSurf->Release();
-        if(pDemultisampledSurf) pDemultisampledSurf->Release();
+        if(pOffscreenSurf) pOffscreenSurf->UnlockRect();
         if(pBackBuffer) pBackBuffer->Release();
         if(pSc) pSc->Release();
-
+        
         ProxyFuncJmp *d3d9PresentProxyFuncJmp = d3d9FrameGrabber->m_d3d9PresentProxyFuncJmp;
         if(!d3d9PresentProxyFuncJmp->removeHook()) {
             int i = GetLastError();
@@ -210,7 +252,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
 }
 
 HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion, DWORD dwFlags) {
-
+    
     D3D9FrameGrabber *d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
     Logger *logger = d3d9FrameGrabber->m_logger;
     DWORD errorcode;
@@ -243,30 +285,56 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             logger->reportLogError(L"GetFramePrep: FAILED to get pDev. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
             goto end;
         }
-        hRes = pDev->CreateRenderTarget(
-            surfDesc.Width, surfDesc.Height,
-            surfDesc.Format, D3DMULTISAMPLE_NONE, 0, false,
-            &pDemultisampledSurf, NULL );
-        if (FAILED(hRes))
-        {
-            logger->reportLogError(L"GetFramePrep: FAILED to create demultisampled render target. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
-            goto end;
+
+        if (d3d9FrameGrabber->m_pDemultisampledSurf &&
+            (d3d9FrameGrabber->m_pDev != pDev
+            || d3d9FrameGrabber->m_surfFormat != surfDesc.Format
+            || d3d9FrameGrabber->m_surfWidth != surfDesc.Width
+            || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
+            d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurf->Release();
+            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pDev->Release();
+            d3d9FrameGrabber->m_pDev = NULL;
         }
+        if (!d3d9FrameGrabber->m_pDemultisampledSurf) {
+            hRes = pDev->CreateRenderTarget(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DMULTISAMPLE_NONE, 0, false,
+                &pDemultisampledSurf, NULL);
+            if (FAILED(hRes))
+            {
+                logger->reportLogError(L"GetFramePrep: FAILED to create demultisampled render target. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pDemultisampledSurf = pDemultisampledSurf;
+            d3d9FrameGrabber->m_pDev = pDev;
+            d3d9FrameGrabber->m_pDev->AddRef();
+            d3d9FrameGrabber->m_surfFormat = surfDesc.Format;
+            d3d9FrameGrabber->m_surfWidth = surfDesc.Width;
+            d3d9FrameGrabber->m_surfHeight = surfDesc.Height;
+
+            hRes = pDev->CreateOffscreenPlainSurface(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DPOOL_SYSTEMMEM,
+                &pOffscreenSurf, NULL);
+            if (FAILED(hRes))
+            {
+                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+                logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pOffscreenSurf = pOffscreenSurf;
+        }
+        pDemultisampledSurf = d3d9FrameGrabber->m_pDemultisampledSurf;
+        pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurf;
 
         hRes = pDev->StretchRect(pBackBuffer, NULL, pDemultisampledSurf, NULL, D3DTEXF_LINEAR );
         if (FAILED(hRes))
         {
             logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
-            goto end;
-        }
-
-        hRes = pDev->CreateOffscreenPlainSurface(
-            surfDesc.Width, surfDesc.Height,
-            surfDesc.Format, D3DPOOL_SYSTEMMEM,
-            &pOffscreenSurf, NULL );
-        if (FAILED(hRes))
-        {
-            logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
             goto end;
         }
 
@@ -316,12 +384,11 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         } else {
             logger->reportLogError(L"d3d9sc couldn't wait mutex. errocode = 0x%x", errorcode);
         }
-end:
-        if(pOffscreenSurf) pOffscreenSurf->Release();
-        if(pDemultisampledSurf) pDemultisampledSurf->Release();
+    end:
+        if (pOffscreenSurf) pOffscreenSurf->UnlockRect();
         if(pBackBuffer) pBackBuffer->Release();
         if(pDev) pDev->Release();
-
+        
         ProxyFuncJmp *d3d9SCPresentProxyFuncJmp = d3d9FrameGrabber->m_d3d9SCPresentProxyFuncJmp;
 
         if(d3d9SCPresentProxyFuncJmp->removeHook()) {

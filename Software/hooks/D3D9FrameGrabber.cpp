@@ -20,11 +20,13 @@ D3D9FrameGrabber::D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger): GAPIPro
     m_isInited = false;
     m_ipcContext = NULL;
     m_pDemultisampledSurf = NULL;
-    m_pOffscreenSurf = NULL;
+    m_pOffscreenSurfA = NULL;
+    m_pOffscreenSurfB = NULL;
     m_pDev = NULL;
     m_surfFormat = D3DFMT_UNKNOWN;
     m_surfWidth = 0;
     m_surfHeight = 0;
+    m_frameCount = 0;
 }
 
 bool D3D9FrameGrabber::init() {
@@ -71,9 +73,13 @@ void D3D9FrameGrabber::free() {
         m_pDemultisampledSurf->Release();
         m_pDemultisampledSurf = NULL;
     }
-    if (m_pOffscreenSurf) {
-        m_pOffscreenSurf->Release();
-        m_pDemultisampledSurf = NULL;
+    if (m_pOffscreenSurfA) {
+        m_pOffscreenSurfA->Release();
+        m_pOffscreenSurfA = NULL;
+    }
+    if (m_pOffscreenSurfB) {
+        m_pOffscreenSurfB->Release();
+        m_pOffscreenSurfB = NULL;
     }
     if (m_pDev) {
         m_pDev->Release();
@@ -100,6 +106,8 @@ void ** D3D9FrameGrabber::calcD3d9SCPresentPointer() {
 HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion) {
     D3D9FrameGrabber *d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
     Logger *logger = d3d9FrameGrabber->m_logger;
+    d3d9FrameGrabber->m_frameCount++;
+
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(d3d9FrameGrabber->m_syncRunMutex, 0))) {
         IPCContext *ipcContext = d3d9FrameGrabber->m_ipcContext;
@@ -137,8 +145,10 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
             d3d9FrameGrabber->m_pDemultisampledSurf->Release();
             d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
-            d3d9FrameGrabber->m_pOffscreenSurf->Release();
-            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurfA->Release();
+            d3d9FrameGrabber->m_pOffscreenSurfA = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurfB->Release();
+            d3d9FrameGrabber->m_pOffscreenSurfB = NULL;
             d3d9FrameGrabber->m_pDev->Release();
             d3d9FrameGrabber->m_pDev = NULL;
         }
@@ -170,31 +180,57 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
                 logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
                 goto end;
             }
-            d3d9FrameGrabber->m_pOffscreenSurf = pOffscreenSurf;
+            d3d9FrameGrabber->m_pOffscreenSurfA = pOffscreenSurf;
+
+            hRes = pDev->CreateOffscreenPlainSurface(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DPOOL_SYSTEMMEM,
+                &pOffscreenSurf, NULL);
+            if (FAILED(hRes))
+            {
+                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+                d3d9FrameGrabber->m_pOffscreenSurfA->Release();
+                d3d9FrameGrabber->m_pOffscreenSurfA = NULL;
+                logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pOffscreenSurfB = pOffscreenSurf;
         }
         pDemultisampledSurf = d3d9FrameGrabber->m_pDemultisampledSurf;
-        pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurf;
+
+        if (d3d9FrameGrabber->m_frameCount % 2 == 0)
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfA;
+        else
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfB;
         
         hRes = pDev->StretchRect(pBackBuffer, NULL, pDemultisampledSurf, NULL, D3DTEXF_LINEAR );
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
+            logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
             goto end;
         }
 
-        hRes = pDev->GetRenderTargetData(pDemultisampledSurf, pOffscreenSurf );
+        hRes = pDev->GetRenderTargetData(pDemultisampledSurf, pOffscreenSurf);
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: GetRenderTargetData() FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
+            logger->reportLogError(L"GetFramePrep: GetRenderTargetData() FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
             goto end;
         }
+
+        // Lock the texture copied in the previous frame to avoid waiting for it
+        if (d3d9FrameGrabber->m_frameCount % 2 == 0)
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfB;
+        else
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfA;
+
         D3DLOCKED_RECT lockedSrcRect;
         newRect.right = surfDesc.Width;
         newRect.bottom = surfDesc.Height;
         hRes = pOffscreenSurf->LockRect( &lockedSrcRect, &newRect, 0);
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes );
+            logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes);
             goto end;
         }
 
@@ -243,7 +279,6 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             logger->reportLogError(L"d3d9 error occured while trying to installHook after original call0x%x", i);
         }
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
-
         return result;
     } else {
         logger->reportLogError(L"d3d9sc present is skipped because mutex is busy");
@@ -251,10 +286,11 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
     }
 }
 
-HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion, DWORD dwFlags) {
-    
+HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion, DWORD dwFlags) {    
     D3D9FrameGrabber *d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
     Logger *logger = d3d9FrameGrabber->m_logger;
+    d3d9FrameGrabber->m_frameCount++;
+
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(d3d9FrameGrabber->m_syncRunMutex, 0))) {
         IPCContext *ipcContext = d3d9FrameGrabber->m_ipcContext;
@@ -293,8 +329,10 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
             d3d9FrameGrabber->m_pDemultisampledSurf->Release();
             d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
-            d3d9FrameGrabber->m_pOffscreenSurf->Release();
-            d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurfA->Release();
+            d3d9FrameGrabber->m_pOffscreenSurfA = NULL;
+            d3d9FrameGrabber->m_pOffscreenSurfB->Release();
+            d3d9FrameGrabber->m_pOffscreenSurfB = NULL;
             d3d9FrameGrabber->m_pDev->Release();
             d3d9FrameGrabber->m_pDev = NULL;
         }
@@ -326,22 +364,47 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
                 logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
                 goto end;
             }
-            d3d9FrameGrabber->m_pOffscreenSurf = pOffscreenSurf;
+            d3d9FrameGrabber->m_pOffscreenSurfA = pOffscreenSurf;
+
+            hRes = pDev->CreateOffscreenPlainSurface(
+                surfDesc.Width, surfDesc.Height,
+                surfDesc.Format, D3DPOOL_SYSTEMMEM,
+                &pOffscreenSurf, NULL);
+            if (FAILED(hRes))
+            {
+                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
+                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
+                d3d9FrameGrabber->m_pOffscreenSurfA->Release();
+                d3d9FrameGrabber->m_pOffscreenSurfA = NULL;
+                logger->reportLogError(L"GetFramePrep: FAILED to create image surface. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
+                goto end;
+            }
+            d3d9FrameGrabber->m_pOffscreenSurfB = pOffscreenSurf;
         }
         pDemultisampledSurf = d3d9FrameGrabber->m_pDemultisampledSurf;
-        pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurf;
 
-        hRes = pDev->StretchRect(pBackBuffer, NULL, pDemultisampledSurf, NULL, D3DTEXF_LINEAR );
+        if (d3d9FrameGrabber->m_frameCount % 2 == 0)
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfA;
+        else
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfB;
+
+        hRes = pDev->StretchRect(pBackBuffer, NULL, pDemultisampledSurf, NULL, D3DTEXF_LINEAR);
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
+            logger->reportLogError(L"GetFramePrep: StretchRect FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
             goto end;
         }
 
-        hRes = pDev->GetRenderTargetData(pDemultisampledSurf, pOffscreenSurf );
+        // Lock the texture copied in the previous frame to avoid waiting for it
+        if (d3d9FrameGrabber->m_frameCount % 2 == 0)
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfB;
+        else
+            pOffscreenSurf = d3d9FrameGrabber->m_pOffscreenSurfA;
+
+        hRes = pDev->GetRenderTargetData(pDemultisampledSurf, pOffscreenSurf);
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: GetRenderTargetData() FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format );
+            logger->reportLogError(L"GetFramePrep: GetRenderTargetData() FAILED for image surfacee. 0x%x, width=%u, height=%u, format=%x", hRes, surfDesc.Width, surfDesc.Height, surfDesc.Format);
             goto end;
         }
 
@@ -352,7 +415,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         hRes = pOffscreenSurf->LockRect( &lockedSrcRect, &newRect, 0);
         if (FAILED(hRes))
         {
-            logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes );
+            logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes);
             goto end;
         }
 

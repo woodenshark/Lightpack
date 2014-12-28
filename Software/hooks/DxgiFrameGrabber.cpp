@@ -272,7 +272,7 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     D3D11_BOX box = {0, 0, tex_desc.Width, tex_desc.Height, 0, 1};
     pDevContext->CopySubresourceRegion(pTexture, 0, 0, 0, 0, pBackBuffer, 0, &box);
 
-    // Use the Texture copied in the previous frame
+    // Map the texture copied in the previous frame to avoid waiting for it
     if (dxgiFrameGrabber->m_frameCount % 2 == 0)
         pTexture = dxgiFrameGrabber->m_mapTexture11B;
     else

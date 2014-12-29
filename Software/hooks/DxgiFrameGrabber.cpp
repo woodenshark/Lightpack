@@ -334,26 +334,35 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
     sc->GetDesc(&desc);
     logger->reportLogDebug(L"d3d10 Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? "windowed" : "fullscreen");
 
-    if (!desc.Windowed) {
-        if (dxgiDevice == DxgiDeviceUnknown || dxgiDevice == DxgiDeviceD3D10 ) {
+	if (dxgiDevice == DxgiDeviceUnknown) {
+		// If the process uses DX10, the device will internally be a DX11 device too
+		// But if the process uses DX11, the device will not be DX10 device
+		ID3D10Device* dev;
+		HRESULT hr = sc->GetDevice(IID_ID3D10Device, (void**)&dev);
+		if (hr == S_OK) {
+			dxgiDevice = DxgiDeviceD3D10;
+			dev->Release();
+		} else {
+			dxgiDevice = DxgiDeviceD3D11;
+		}
+	}
 
-            ID3D10Texture2D *pBackBuffer;
-            HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-
-            if (hr == S_OK) {
-                if (dxgiDevice == DxgiDeviceUnknown) dxgiDevice = DxgiDeviceD3D10;
-                D3D10Grab(pBackBuffer);
-                pBackBuffer->Release();
-            } else {
-                if (dxgiDevice != DxgiDeviceUnknown)
-                    logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
-            }
-        }
-        if (dxgiDevice == DxgiDeviceUnknown || dxgiDevice == DxgiDeviceD3D11 ) {
+	if (!desc.Windowed) {
+		if (dxgiDevice == DxgiDeviceD3D10) {
+			ID3D10Texture2D *pBackBuffer;
+			HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+			if (hr == S_OK) {
+				D3D10Grab(pBackBuffer);
+				pBackBuffer->Release();
+			}
+			else {
+				logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+			}
+		}
+        if (dxgiDevice == DxgiDeviceD3D11) {
             ID3D11Texture2D *pBackBuffer;
             HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-            if(hr == S_OK) {
-                if (dxgiDevice == DxgiDeviceUnknown) dxgiDevice = DxgiDeviceD3D11;
+            if (hr == S_OK) {
                 D3D11Grab(pBackBuffer);
                 pBackBuffer->Release();
             } else {

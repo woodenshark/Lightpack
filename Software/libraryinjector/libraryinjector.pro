@@ -11,6 +11,8 @@ TARGET   = libraryinjector
 TEMPLATE = lib
 LIBS += -luuid -lole32 -ladvapi32 -luser32
 
+include(../build-config.prf)
+
 DEFINES += LIBRARYINJECTOR_LIBRARY
 CONFIG(msvc) {
     # This will suppress many MSVC warnings about 'unsecure' CRT functions.

@@ -40,12 +40,12 @@
 #include <stdio.h>
 #include "calculations.hpp"
 #include "WinUtils.hpp"
-#include "WinDXUtils.hpp"
+#include "../common/WinDXUtils.hpp"
 #include "../../common/D3D10GrabberDefs.hpp"
 #include "../src/debug.h"
 #include "../libraryinjector/ILibraryInjector.h"
 
-#include "../../common/msvcstub.h"
+#include "../common/msvcstub.h"
 #include <D3D10_1.h>
 #include <D3D10.h>
 

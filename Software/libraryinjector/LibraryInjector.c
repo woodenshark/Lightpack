@@ -142,7 +142,27 @@ static ULONG STDMETHODCALLTYPE LibraryInjector_Release(LibraryInjector * this) {
 }
 
 static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this, DWORD ProcessId, LPWSTR ModulePath) {
-    char CodePage[4096] ={
+#ifdef _WIN64
+
+    char CodePage[4096] = {
+        0x90,                                                       // nop
+        0x48, 0x83, 0xEC, 0x28,                                     // sub rsp, 28h       make space on the stack (in theory only 32 bytes, but crashes if it's not 40)
+        0x48, 0xB9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mov rcx 0x0        LibNameArg
+        0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mov rax 0x0        LoadLibProc
+        0xFF, 0xD0,                                                 // call rax
+        0x48, 0x89, 0xc1,                                           // mov rcx, rax       make the thread return the result of LoadLib
+        0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // mov rax 0x0        ExitThreadProc
+        0xFF, 0xD0                                                  // call rax
+    };
+
+#define LIB_NAME_OFFSET 3+4
+#define LOAD_LIB_OFFSET 13+4
+#define EXIT_THREAD_OFFSET 25+4+3
+#define SIZE_OF_CODE 35+4+3
+
+#else
+
+    char CodePage[4096] = {
         0x90,                                     // nop (to replace with int 3h - 0xCC)
         0xC7, 0x04, 0xE4, 0x00, 0x00, 0x00, 0x00, // mov DWORD PTR [esp], 0h | DLLName to inject (DWORD)
         0xB8, 0x00, 0x00, 0x00, 0x00,             // mov eax, LoadLibProc
@@ -152,18 +172,20 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
         0xFF, 0xD0                                // call eax
     };
 
-    UNREFERENCED_PARAMETER(this);
-
 #define LIB_NAME_OFFSET 4
 #define LOAD_LIB_OFFSET 9
 #define EXIT_THREAD_OFFSET 19
 #define SIZE_OF_CODE 25
+
+#endif
+
+    UNREFERENCED_PARAMETER(this);
     reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
         int sizeofCP;
         LPVOID Memory;
         LPWSTR DLLName;
-        DWORD *LoadLibProc, *LibNameArg, *ExitThreadProc;
+        DWORD_PTR *LoadLibProc, *LibNameArg, *ExitThreadProc;
         HANDLE hThread;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
 
@@ -182,23 +204,23 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
             return S_FALSE;
         }
 
-        DLLName = (LPWSTR) ((DWORD) CodePage + SIZE_OF_CODE);
-        LoadLibProc = (DWORD*) (CodePage + LOAD_LIB_OFFSET);
-        LibNameArg = (DWORD*) (CodePage + LIB_NAME_OFFSET);
-        ExitThreadProc = (DWORD*) (CodePage + EXIT_THREAD_OFFSET);
-
+        DLLName = (LPWSTR) ((DWORD_PTR) CodePage + SIZE_OF_CODE);
+        LoadLibProc = (DWORD_PTR*)(CodePage + LOAD_LIB_OFFSET);
+        LibNameArg = (DWORD_PTR*)(CodePage + LIB_NAME_OFFSET);
+        ExitThreadProc = (DWORD_PTR*)(CodePage + EXIT_THREAD_OFFSET);
+        
         wcscpy(DLLName, ModulePath);
-        *LoadLibProc = (DWORD) GetProcAddress(hKernel32, "LoadLibraryW");
-        *ExitThreadProc = (DWORD) GetProcAddress(hKernel32, "ExitThread");
-        *LibNameArg = (DWORD)Memory + SIZE_OF_CODE; // need to do this: *EBX = *EBX + (Section)
+        *LoadLibProc = (DWORD_PTR)GetProcAddress(hKernel32, "LoadLibraryW");
+        *ExitThreadProc = (DWORD_PTR)GetProcAddress(hKernel32, "ExitThread");
+        *LibNameArg = (DWORD_PTR)Memory + SIZE_OF_CODE; // need to do this: *EBX = *EBX + (Section)
         ////////////////////////////
 
-        if(!WriteProcessMemory(Process, Memory, CodePage, sizeofCP, 0)) {
+        if (!WriteProcessMemory(Process, Memory, CodePage, sizeofCP, 0)) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't write loading library code");
             return S_FALSE;
         }
 
-        hThread = CreateRemoteThread(Process, 0, 0, (LPTHREAD_START_ROUTINE) Memory, 0, 0, 0);
+        hThread = CreateRemoteThread(Process, 0, 0, (LPTHREAD_START_ROUTINE)Memory, 0, 0, 0);
         //    hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CodePage, 0, 0, 0);
         if (!hThread) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");

@@ -144,8 +144,7 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
             }
 
             // Get a list of all the modules in this process.
-
-            if( EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+            if(EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
             {
                 bool isDXPresent = false;
                 for ( DWORD j = 0; j < (cbNeeded / sizeof(HMODULE)); j++ )

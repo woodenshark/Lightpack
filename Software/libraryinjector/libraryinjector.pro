@@ -17,6 +17,8 @@ CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
+    # Add export definition for COM methods
+    QMAKE_LFLAGS += /DEF:"LibraryInjector.def"
 } else {
     QMAKE_LFLAGS +=-Wl,--kill-at
 }

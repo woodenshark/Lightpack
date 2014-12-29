@@ -17,6 +17,10 @@ include(../build-config.prf)
 include(configure-grabbers.prf)
 
 LIBS += -lprismatik-math
+CONFIG(msvc) {
+    # Create "fake" project dependencies of the libraries used dynamically
+    LIBS += -lprismatik-hooks -llibraryinjector
+}
 
 INCLUDEPATH += ./include \
                ../src \

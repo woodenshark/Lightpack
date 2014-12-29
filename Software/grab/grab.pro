@@ -111,10 +111,10 @@ win32 {
     HEADERS += \
             ../common/msvcstub.h \
             include/WinUtils.hpp \
-            include/WinDXUtils.hpp
+            ../common/WinDXUtils.hpp
     SOURCES += \
             WinUtils.cpp \
-            WinDXUtils.cpp
+            ../common/WinDXUtils.cpp
 }
 
 macx {

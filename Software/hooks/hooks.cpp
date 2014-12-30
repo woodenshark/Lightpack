@@ -17,10 +17,6 @@ Logger *gLog = Logger::getInstance();
 IPCContext *gIpcContext;
 HANDLE g_syncRunMutex;
 
-DxgiFrameGrabber *dxgiFrameGrabber = NULL;
-D3D9FrameGrabber *d3d9FrameGrabber = NULL;
-
-
 
 void writeBlankFrame(PVOID dest) {
     HOOKSGRABBER_SHARED_MEM_DESC lmemDesc;
@@ -41,9 +37,9 @@ WCHAR *getEventSourceName(char *executableName) {
     WCHAR wstrBuf[MAX_PATH];
     mbstowcs(wstrBuf, executableName, sizeof(wstrBuf));
 #ifdef HOOKS_SYSWOW64
-	wcscpy(wstrResult, L"prismatik-hooks32.dll ");
+    wcscpy(wstrResult, L"prismatik-hooks32.dll ");
 #else
-	wcscpy(wstrResult, L"prismatik-hooks.dll ");
+    wcscpy(wstrResult, L"prismatik-hooks.dll ");
 #endif
     wcscat(wstrResult, wstrBuf);
 
@@ -53,8 +49,11 @@ WCHAR *getEventSourceName(char *executableName) {
 HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lpReserved) {
     UNREFERENCED_PARAMETER(lpReserved);
 
+
     if (fdwReason == DLL_PROCESS_ATTACH /*|| fdwReason == DLL_THREAD_ATTACH*/) // When initializing....
     {
+        DxgiFrameGrabber *dxgiFrameGrabber = NULL;
+        D3D9FrameGrabber *d3d9FrameGrabber = NULL;
 //        __asm__("int $3");
         // We don't need thread notifications for what we're doing.  Thus, get
         // rid of them, thereby eliminating some of the overhead of this DLL
@@ -90,9 +89,11 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
             gLog->reportLogInfo(L"d3d9 swapchain::present(): 0x%x", gIpcContext->m_memDesc.d3d9SCPresentFuncOffset);
             gLog->reportLogInfo(L"dxgi swapchain::present(): 0x%x", gIpcContext->m_memDesc.dxgiPresentFuncOffset);
 
-            if (!d3d9FrameGrabber) {
+            if (!D3D9FrameGrabber::hasInstance()) {
                 d3d9FrameGrabber = D3D9FrameGrabber::getInstance(g_syncRunMutex);
                 d3d9FrameGrabber->setIPCContext(gIpcContext);
+            } else {
+                d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
             }
 
             if (d3d9FrameGrabber->isGAPILoaded()) {
@@ -104,9 +105,11 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
                 }
             }
 
-            if(!dxgiFrameGrabber) {
+            if (!DxgiFrameGrabber::hasInstance()) {
                 dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
                 dxgiFrameGrabber->setIPCContext(gIpcContext);
+            } else {
+                dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
             }
 
             if(dxgiFrameGrabber->isGAPILoaded()) {
@@ -122,13 +125,15 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
         if (gLog != NULL) {
             gLog->reportLogInfo(L"detaching dll...");
             if (WAIT_OBJECT_0 == WaitForSingleObject(g_syncRunMutex, INFINITE)) {
-                if (d3d9FrameGrabber->isHooksInstalled()) {
+                if (D3D9FrameGrabber::hasInstance() && D3D9FrameGrabber::getInstance()->isHooksInstalled()) {
                     gLog->reportLogInfo(L"removing d3d9hooks");
-                    d3d9FrameGrabber->removeHooks();
+                    D3D9FrameGrabber::getInstance()->removeHooks();
+                    delete D3D9FrameGrabber::getInstance();
                 }
-                if (dxgiFrameGrabber->isHooksInstalled()) {
+                if (DxgiFrameGrabber::hasInstance() && DxgiFrameGrabber::getInstance()->isHooksInstalled()) {
                     gLog->reportLogInfo(L"removing dxgihooks");
-                    dxgiFrameGrabber->removeHooks();
+                    DxgiFrameGrabber::getInstance()->removeHooks();
+                    delete DxgiFrameGrabber::getInstance();
                 }
 
                 gLog->reportLogInfo(L"clearing shared memory");

@@ -20,9 +20,14 @@ public:
             m_this = new D3D9FrameGrabber(syncRunMutex, Logger::getInstance());
         return m_this;
     }
-
     static D3D9FrameGrabber *getInstance() {
         return m_this;
+    }
+    static bool hasInstance() {
+        return m_this != NULL;
+    }
+    ~D3D9FrameGrabber() {
+        m_this = NULL;
     }
 
     virtual bool init();
@@ -41,14 +46,14 @@ protected:
     void ** calcD3d9PresentPointer();
     void ** calcD3d9SCPresentPointer();
 
-	IDirect3DSurface9 *m_pDemultisampledSurf;
-	IDirect3DSurface9 *m_pOffscreenSurfA;
-	IDirect3DSurface9 *m_pOffscreenSurfB;
-	IDirect3DDevice9 *m_pDev;
-	D3DFORMAT m_surfFormat;
-	UINT m_surfWidth;
-	UINT m_surfHeight;
-	UINT m_frameCount;
+    IDirect3DSurface9 *m_pDemultisampledSurf;
+    IDirect3DSurface9 *m_pOffscreenSurfA;
+    IDirect3DSurface9 *m_pOffscreenSurfB;
+    IDirect3DDevice9 *m_pDev;
+    D3DFORMAT m_surfFormat;
+    UINT m_surfWidth;
+    UINT m_surfHeight;
+    UINT m_frameCount;
 };
 
 #endif // D3D9FRAMEGRABBER_HPP

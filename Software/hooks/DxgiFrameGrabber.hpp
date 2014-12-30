@@ -22,6 +22,12 @@ public:
             m_this = new DxgiFrameGrabber(Logger::getInstance());
         return m_this;
     }
+    static bool hasInstance() {
+        return m_this != NULL;
+    }
+    ~DxgiFrameGrabber() {
+        m_this = NULL;
+    }
 
     virtual bool init();
     virtual bool isGAPILoaded();

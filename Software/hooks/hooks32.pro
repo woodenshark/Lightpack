@@ -6,17 +6,19 @@
 
 QT       -= core gui
 
-DESTDIR  = ../../lib
+DESTDIR  = ../lib
 TARGET   = prismatik-hooks32
 TEMPLATE = lib
 
-include(../../build-config.prf)
+include(../build-config.prf)
 
 LIBS += -lshlwapi -ladvapi32 -luser32
 
 # The hooks32 is injected into x86 processes when running as x64
 QMAKE_TARGET.arch = x86
 DEFINES += HOOKS_SYSWOW64
+Release:OBJECTS_DIR = release/32
+Debug:OBJECTS_DIR = debug/32
 
 !isEmpty( DIRECTX_SDK_DIR ) {
     # This will suppress gcc warnings in DX headers.
@@ -55,31 +57,31 @@ CONFIG(msvc) {
 }
 
 SOURCES += \
-    ../hooks.cpp \
-    ../ProxyFuncJmp.cpp \
-    ../hooksutils.cpp \
-    ../IPCContext.cpp \
-    ../ProxyFuncVFTable.cpp \
-    ../GAPIProxyFrameGrabber.cpp \
-    ../DxgiFrameGrabber.cpp \
-    ../Logger.cpp \
-    ../D3D9FrameGrabber.cpp
+    hooks.cpp \
+    ProxyFuncJmp.cpp \
+    hooksutils.cpp \
+    IPCContext.cpp \
+    ProxyFuncVFTable.cpp \
+    GAPIProxyFrameGrabber.cpp \
+    DxgiFrameGrabber.cpp \
+    Logger.cpp \
+    D3D9FrameGrabber.cpp
 
 HEADERS += \
-    ../hooks.h \
-    ../../common/D3D10GrabberDefs.hpp \
-    ../../common/defs.h \
-    ../../common/msvcstub.h \
-    ../ProxyFunc.hpp \
-    ../ProxyFuncJmp.hpp \
-    ../hooksutils.h \
-    ../IPCContext.hpp \
-    ../GAPISubstFunctions.hpp \
-    ../ProxyFuncVFTable.hpp \
-    ../res/logmessages.h \
-    ../GAPIProxyFrameGrabber.hpp \
-    ../DxgiFrameGrabber.hpp \
-    ../Logger.hpp \
-    ../LoggableTrait.hpp \
-    ../../common/BufferFormat.h \
-    ../D3D9FrameGrabber.hpp
+    hooks.h \
+    ../common/D3D10GrabberDefs.hpp \
+    ../common/defs.h \
+    ../common/msvcstub.h \
+    ProxyFunc.hpp \
+    ProxyFuncJmp.hpp \
+    hooksutils.h \
+    IPCContext.hpp \
+    GAPISubstFunctions.hpp \
+    ProxyFuncVFTable.hpp \
+    res/logmessages.h \
+    GAPIProxyFrameGrabber.hpp \
+    DxgiFrameGrabber.hpp \
+    Logger.hpp \
+    LoggableTrait.hpp \
+    ../common/BufferFormat.h \
+    D3D9FrameGrabber.hpp

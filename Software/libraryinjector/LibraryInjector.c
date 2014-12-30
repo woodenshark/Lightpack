@@ -24,6 +24,9 @@
  */
 
 #include "LibraryInjector.h"
+#ifdef _WIN64
+#include "../common/D3D10GrabberDefs.hpp"
+#endif
 
 #include <stdarg.h>
 #include <olectl.h>
@@ -142,57 +145,85 @@ static ULONG STDMETHODCALLTYPE LibraryInjector_Release(LibraryInjector * this) {
 }
 
 static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this, DWORD ProcessId, LPWSTR ModulePath) {
-    char CodePage[4096] = {
-        0x90,                                     // nop (to replace with int 3h - 0xCC)
-        0xC7, 0x04, 0xE4, 0x00, 0x00, 0x00, 0x00, // mov DWORD PTR [esp], 0h | DLLName to inject (DWORD)
-        0xB8, 0x00, 0x00, 0x00, 0x00,             // mov eax, LoadLibProc
-        0xFF, 0xD0,                               // call eax
-        0x83, 0xEC, 0x04,                         // sub esp,4
-        0xB8, 0x00, 0x00, 0x00, 0x00,             // mov eax, ExitTheadProc
-        0xFF, 0xD0                                // call eax
-    };
+    char CodePage[2048];
+    WCHAR modulePath[300];
 
+    wcscpy(modulePath, ModulePath);
     UNREFERENCED_PARAMETER(this);
     reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
         int sizeofCP;
         LPVOID Memory;
-        LPWSTR DLLName;
-        DWORD_PTR *LoadLibProc, *LibNameArg, *ExitThreadProc;
         HANDLE hThread;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
 
-        HANDLE Process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+        DWORD_PTR LoadLibAddr = GetProcAddress(hKernel32, "LoadLibraryW");
 
-        if (Process == NULL) {
+        HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+
+        if (hProcess == NULL) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't open process");
             return S_FALSE;
         }
 
-        sizeofCP = wcslen(ModulePath)*2 + 1;
-        Memory = VirtualAllocEx(Process, 0, sizeofCP, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#ifdef _WIN64
+        BOOL isWow64Process = FALSE;
+        IsWow64Process(hProcess, &isWow64Process);
+        if (isWow64Process) {
+
+			HANDLE mapping = OpenFileMapping(FILE_MAP_READ, FALSE, HOOKSGRABBER_SHARED_MEM_NAME);
+            if (NULL == mapping) {
+                return 4;
+            }
+
+            char *memory = (char *)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, HOOKSGRABBER_SHARED_MEM_SIZE);
+            if (memory == NULL) {
+                return 5;
+            }
+
+            size_t len = wcslen(modulePath);
+            wcscpy(modulePath + len - 4, L"32.dll");
+
+            struct HOOKSGRABBER_SHARED_MEM_DESC *desc = (struct HOOKSGRABBER_SHARED_MEM_DESC*)memory;
+
+            LoadLibAddr = desc->loadLibraryWAddress32;
+
+            UnmapViewOfFile(memory);
+            CloseHandle(mapping);
+        }
+#endif
+
+        sizeofCP = wcslen(modulePath)*2 + 1;
+        Memory = VirtualAllocEx(hProcess, 0, sizeofCP, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
         if (!Memory) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't allocate memory");
             return S_FALSE;
         }
 
-        wcscpy(CodePage, ModulePath);
+        wcscpy(CodePage, modulePath);
 
-        if (!WriteProcessMemory(Process, Memory, CodePage, sizeofCP, 0)) {
+        if (!WriteProcessMemory(hProcess, Memory, CodePage, sizeofCP, 0)) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't write loading library code");
             return S_FALSE;
         }
 
-        hThread = CreateRemoteThread(Process, 0, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryW"), Memory, 0, 0);
+        hThread = CreateRemoteThread(hProcess, 0, 0, (LPTHREAD_START_ROUTINE)LoadLibAddr, Memory, 0, 0);
         if (!hThread) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
             return S_FALSE;
-        } else {
-            reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
         }
         WaitForSingleObject(hThread, INFINITE);
+
+        DWORD exitCode = -1;
+        GetExitCodeThread(hThread, &exitCode);
+
+        if (!exitCode) { // LoadLibrary returns 0 on failure
+            reportLog(EVENTLOG_ERROR_TYPE, L"Injection into process failed: %d", exitCode);
+            return S_FALSE;
+        }
         CloseHandle(hThread);
+        reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
 
         return S_OK;
     } else {

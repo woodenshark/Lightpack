@@ -41,6 +41,10 @@
 namespace WinUtils
 {
 extern const WCHAR lightpackHooksDllName[];
+#ifdef _WIN64
+extern const WCHAR lightpackHooksDllName32[];
+extern const WCHAR lightpackOffsetFinderName[];
+#endif
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable);
 

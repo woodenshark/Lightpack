@@ -37,14 +37,28 @@
 
 #define HOOKSGRABBER_BLANK_FRAME_ID 0xffffffff
 
+#ifdef HOOKS_SYSWOW64
+#define HOOKSGRABBER_SYSWOW64_DESC
+#endif
+
 struct HOOKSGRABBER_SHARED_MEM_DESC {
     UINT d3d9PresentFuncOffset;
     UINT d3d9SCPresentFuncOffset;
     UINT dxgiPresentFuncOffset;
+#if defined(_WIN64) || defined(HOOKSGRABBER_SYSWOW64_DESC)
+    UINT d3d9PresentFuncOffset32;
+    UINT d3d9SCPresentFuncOffset32;
+    UINT dxgiPresentFuncOffset32;
+    UINT loadLibraryWAddress32;
+#endif
     UINT width;
     UINT height;
     UINT rowPitch;
-    BufferFormat format;
+#ifdef __cplusplus
+   BufferFormat format;
+#else
+    UINT format;
+#endif
     UINT frameId;
     UINT logLevel;
 };

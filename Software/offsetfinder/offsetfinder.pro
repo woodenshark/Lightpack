@@ -11,7 +11,7 @@ TARGET   = offsetfinder
 LIBS += -ldxguid
 
 QMAKE_LIBS_QT_ENTRY =
-QMAKE_CXXFLAGS += -DNO_QT
+DEFINES += NO_QT
 
 include(../build-config.prf)
 

@@ -207,6 +207,50 @@ public:
 #if 0
         FreeRestrictedSD(ptr);
 #endif
+
+#ifdef _WIN64 // Find the required 32-bit addresses via offsetfinder
+        WCHAR path[300];
+
+        GetModuleFileName(NULL, path, SIZEOF_ARRAY(path));
+        PathRemoveFileSpec(path);
+        wcscat(path, L"\\");
+        wcscat(path, lightpackOffsetFinderName);
+
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+        if (!CreateProcess(path,   // Module name
+            NULL,           // Command line
+            NULL,           // Process handle not inheritable
+            NULL,           // Thread handle not inheritable
+            FALSE,          // Set handle inheritance to FALSE
+            0,              // No creation flags
+            NULL,           // Use parent's environment block
+            NULL,           // Use parent's starting directory
+            &si,            // Pointer to STARTUPINFO structure
+            &pi)            // Pointer to PROCESS_INFORMATION structure
+            ) {
+            qCritical(Q_FUNC_INFO " Can't get 32bit offsets, failed to run offsetfinder: %x. D3D10Grabber wasn't initialised.", GetLastError());
+            return false;
+        }
+
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        DWORD exitCode = -1;
+        GetExitCodeProcess(pi.hProcess, &exitCode);
+        if (exitCode) {
+            qCritical(Q_FUNC_INFO " Can't get 32bit offsets, offsetfinder returned %x. D3D10Grabber wasn't initialised.", exitCode);
+            return false;
+        }
+
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+
+#endif
+
         m_processesScanAndInfectTimer.reset(new QTimer(this));
         m_processesScanAndInfectTimer->setInterval(5000);
         m_processesScanAndInfectTimer->setSingleShot(false);
@@ -490,7 +534,7 @@ private:
     UINT m_lastFrameId;
     MONITORINFO m_monitorInfo;
     QScopedPointer<QTimer> m_processesScanAndInfectTimer;
-	QList<DWORD> m_lastSeenDxProcesses;
+    QList<DWORD> m_lastSeenDxProcesses;
     bool m_isInited;
     ILibraryInjector * m_libraryInjector;
     WCHAR m_hooksLibPath[300];

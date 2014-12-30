@@ -96,10 +96,15 @@ void DxgiFrameGrabber::free() {
 }
 
 void ** DxgiFrameGrabber::calcDxgiPresentPointer() {
+#ifdef HOOKS_SYSWOW64
+    UINT offset = m_ipcContext->m_memDesc.dxgiPresentFuncOffset32;
+#else
+    UINT offset = m_ipcContext->m_memDesc.dxgiPresentFuncOffset;
+#endif
     void * hDxgi = reinterpret_cast<void *>(GetModuleHandleA("dxgi.dll"));
     if (m_logger)
-        m_logger->reportLogDebug(L"gIpcContext.m_memDesc.dxgiPresentFuncOffset = 0x%x, hDxgi = 0x%x", m_ipcContext->m_memDesc.dxgiPresentFuncOffset, hDxgi);
-    void ** result = static_cast<void ** >(incPtr(hDxgi, m_ipcContext->m_memDesc.dxgiPresentFuncOffset));
+        m_logger->reportLogDebug(L"dxgiPresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hDxgi);
+    void ** result = static_cast<void ** >(incPtr(hDxgi, offset));
     if (m_logger)
         m_logger->reportLogDebug(L"dxgi.dll = 0x%x, swapchain::present location = 0x%x", hDxgi, result);
     return result;
@@ -334,31 +339,31 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
     sc->GetDesc(&desc);
     logger->reportLogDebug(L"d3d10 Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? "windowed" : "fullscreen");
 
-	if (dxgiDevice == DxgiDeviceUnknown) {
-		// If the process uses DX10, the device will internally be a DX11 device too
-		// But if the process uses DX11, the device will not be DX10 device
-		ID3D10Device* dev;
-		HRESULT hr = sc->GetDevice(IID_ID3D10Device, (void**)&dev);
-		if (hr == S_OK) {
-			dxgiDevice = DxgiDeviceD3D10;
-			dev->Release();
-		} else {
-			dxgiDevice = DxgiDeviceD3D11;
-		}
-	}
+    if (dxgiDevice == DxgiDeviceUnknown) {
+        // If the process uses DX10, the device will internally be a DX11 device too
+        // But if the process uses DX11, the device will not be a DX10 device
+        ID3D10Device* dev;
+        HRESULT hr = sc->GetDevice(IID_ID3D10Device, (void**)&dev);
+        if (hr == S_OK) {
+            dxgiDevice = DxgiDeviceD3D10;
+            dev->Release();
+        } else {
+            dxgiDevice = DxgiDeviceD3D11;
+        }
+    }
 
-	if (!desc.Windowed) {
-		if (dxgiDevice == DxgiDeviceD3D10) {
-			ID3D10Texture2D *pBackBuffer;
-			HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-			if (hr == S_OK) {
-				D3D10Grab(pBackBuffer);
-				pBackBuffer->Release();
-			}
-			else {
-				logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
-			}
-		}
+    if (!desc.Windowed) {
+        if (dxgiDevice == DxgiDeviceD3D10) {
+            ID3D10Texture2D *pBackBuffer;
+            HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+            if (hr == S_OK) {
+                D3D10Grab(pBackBuffer);
+                pBackBuffer->Release();
+            }
+            else {
+                logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+            }
+        }
         if (dxgiDevice == DxgiDeviceD3D11) {
             ID3D11Texture2D *pBackBuffer;
             HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));

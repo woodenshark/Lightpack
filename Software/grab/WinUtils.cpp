@@ -37,6 +37,10 @@ namespace WinUtils
 {
 
 const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
+#ifdef _WIN64
+const WCHAR lightpackHooksDllName32[] = L"prismatik-hooks32.dll";
+const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
+#endif
 static LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe"};
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable) {
@@ -144,7 +148,11 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
             }
 
             // Get a list of all the modules in this process.
-            if(EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+#ifdef _WIN64
+            if (EnumProcessModulesEx(hProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL))
+#else
+            if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+#endif
             {
                 bool isDXPresent = false;
                 for ( DWORD j = 0; j < (cbNeeded / sizeof(HMODULE)); j++ )
@@ -159,8 +167,12 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
                         ::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf, 255, NULL, NULL);
                         DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf;
 
-                        if(wcsicmp(szModName, lightpackHooksDllName) == 0) {
+                        if (wcsicmp(szModName, lightpackHooksDllName) == 0) {
                             goto nextProcess;
+#ifdef _WIN64
+                        } else if (wcsicmp(szModName, lightpackHooksDllName32) == 0) {
+                            goto nextProcess;
+#endif
                         } else {
                             if (wcsicmp(szModName, L"d3d9.dll") == 0 ||
                                 wcsicmp(szModName, L"dxgi.dll") == 0 )

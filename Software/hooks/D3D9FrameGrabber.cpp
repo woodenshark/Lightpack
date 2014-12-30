@@ -88,17 +88,27 @@ void D3D9FrameGrabber::free() {
 }
 
 void ** D3D9FrameGrabber::calcD3d9PresentPointer() {
+#ifdef HOOKS_SYSWOW64
+    UINT offset = m_ipcContext->m_memDesc.d3d9PresentFuncOffset32;
+#else
+    UINT offset = m_ipcContext->m_memDesc.d3d9PresentFuncOffset;
+#endif
     void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
-    m_logger->reportLogDebug(L"m_ipcContext->m_memDesc.d3d9PresentFuncOffset = 0x%x, hDxgi = 0x%x", m_ipcContext->m_memDesc.d3d9PresentFuncOffset, hD3d9);
-    void ** result = static_cast<void ** >(incPtr(hD3d9 , m_ipcContext->m_memDesc.d3d9PresentFuncOffset));
+    m_logger->reportLogDebug(L"d3d9PresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
+    void ** result = static_cast<void ** >(incPtr(hD3d9, offset));
     m_logger->reportLogDebug(L"d3d9.dll = 0x%x, swapchain::present location = 0x%x", hD3d9, result);
     return result;
 }
 
 void ** D3D9FrameGrabber::calcD3d9SCPresentPointer() {
+#ifdef HOOKS_SYSWOW64
+    UINT offset = m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset32;
+#else
+    UINT offset = m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset;
+#endif
     void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
-    m_logger->reportLogDebug(L"m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset = 0x%x, hDxgi = 0x%x", m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset, hD3d9);
-    void ** result = static_cast<void ** >(incPtr(hD3d9, m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset));
+    m_logger->reportLogDebug(L"d3d9SCPresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
+    void ** result = static_cast<void ** >(incPtr(hD3d9, offset));
     m_logger->reportLogDebug(L"d3d9.dll = 0x%x, swapchain::present location = 0x%x", hD3d9, result);
     return result;
 }

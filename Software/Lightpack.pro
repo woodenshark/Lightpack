@@ -40,4 +40,5 @@ win32:SUBDIRS += libraryinjector hooks tests
 SUBDIRS += src
 contains(QMAKE_TARGET.arch, x86_64) {
     SUBDIRS += offsetfinder
+	SUBDIRS += hooks/hooks32
 }

@@ -40,7 +40,11 @@ WCHAR *getEventSourceName(char *executableName) {
     LPWSTR wstrResult = (LPWSTR)malloc(MAX_PATH*2);
     WCHAR wstrBuf[MAX_PATH];
     mbstowcs(wstrBuf, executableName, sizeof(wstrBuf));
-    wcscpy(wstrResult, L"prismatik-hooks.dll ");
+#ifdef HOOKS_SYSWOW64
+	wcscpy(wstrResult, L"prismatik-hooks32.dll ");
+#else
+	wcscpy(wstrResult, L"prismatik-hooks.dll ");
+#endif
     wcscat(wstrResult, wstrBuf);
 
     return wstrResult;

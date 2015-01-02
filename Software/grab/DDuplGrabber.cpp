@@ -52,7 +52,7 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
     _Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel,
     _Out_opt_ ID3D11DeviceContext** ppImmediateContext);
 
-#define ACQUIRE_TIMEOUT_INTERVAL 50
+#define ACQUIRE_TIMEOUT_INTERVAL 0 // timing is done via the timer freqency, so we don't wait again
 #define ACCESSDENIED_RETRY_INTERVAL 3000
 
 struct DDuplScreenData
@@ -80,6 +80,11 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 
 DDuplGrabber::~DDuplGrabber()
 {
+    freeScreens();
+
+    // release adapters before unloading libraries
+    m_adapters.clear();
+
     if (m_dxgiDll)
         FreeLibrary(m_dxgiDll);
     if (m_d3d11Dll)
@@ -347,6 +352,7 @@ GrabResult DDuplGrabber::grabScreens()
 
     try
     {
+        bool anyUpdate = false;
         for (GrabbedScreen& screen : _screensWithWidgets)
         {
             if (screen.associatedData == NULL)
@@ -360,7 +366,7 @@ GrabResult DDuplGrabber::grabScreens()
             HRESULT hr = screenData->duplication->AcquireNextFrame(ACQUIRE_TIMEOUT_INTERVAL, &frameInfo, &resource);
             if (hr == DXGI_ERROR_WAIT_TIMEOUT)
             {
-                return GrabResultFrameNotReady;
+                continue;
             }
             else if (hr == DXGI_ERROR_ACCESS_LOST || hr == DXGI_ERROR_INVALID_CALL)
             {
@@ -375,6 +381,7 @@ GrabResult DDuplGrabber::grabScreens()
                 qCritical(Q_FUNC_INFO " Failed to AcquireNextFrame: 0x%X", hr);
                 return GrabResultError;
             }
+            anyUpdate = true;
 
             ID3D11Texture2DPtr texture;
             hr = resource->QueryInterface(IID_ID3D11Texture2D, (void**)&texture);
@@ -457,6 +464,9 @@ GrabResult DDuplGrabber::grabScreens()
 
             screenData->duplication->ReleaseFrame();
         }
+
+        if (!anyUpdate)
+            return GrabResultFrameNotReady;
     }
     catch (_com_error e)
     {

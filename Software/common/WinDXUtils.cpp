@@ -57,7 +57,7 @@ HWND GetFirstWindowOfProcess()
 	while (h)
 	{
 		DWORD pid;
-		DWORD dwThreadId = ::GetWindowThreadProcessId(h, &pid);
+		::GetWindowThreadProcessId(h, &pid);
 
 		if (pid == procID)
 		{

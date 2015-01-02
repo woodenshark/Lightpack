@@ -40,6 +40,9 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 
 ####Build process:
 1. build **Prismatik** project
+With MSBuild:
+1. generate solution with `qmake -tp vc -r .`
+2. build with Visual Studio or MSBuild
 
 ---
 

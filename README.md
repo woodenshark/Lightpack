@@ -3,12 +3,12 @@ Lightpack project with Prismatik flavour
 *Modified version which includes various improvements for Windows, esp. a Desktop Duplication API Grabber*
 
 **Table of content:** <br />
-&nbsp;&nbsp;[Short description] (https://github.com/Atarity/Lightpack#lightpack-project-with-prismatik-flavour) <br />
-&nbsp;&nbsp;[Useful URLs] (https://github.com/Atarity/Lightpack#useful-urls) <br />
-&nbsp;&nbsp;[Build Prismatik with Windows] (https://github.com/Atarity/Lightpack#prismatik-build-instructions-for-windows) <br />
-&nbsp;&nbsp;[Build with Linux] (https://github.com/Atarity/Lightpack#build-instructions-for-linux) <br />
-&nbsp;&nbsp;[Build with OS X] (https://github.com/Atarity/Lightpack#build-instructions-for-os-x) <br />
-&nbsp;&nbsp;[Lightpack Firmware building] (https://github.com/Atarity/Lightpack#fimware-building-instructions) <br />
+&nbsp;&nbsp;[Short description] (#lightpack-project-with-prismatik-flavour) <br />
+&nbsp;&nbsp;[Useful URLs] (#useful-urls) <br />
+&nbsp;&nbsp;[Build Prismatik with Windows] (#prismatik-build-instructions-for-windows) <br />
+&nbsp;&nbsp;[Build with Linux] (#build-instructions-for-linux) <br />
+&nbsp;&nbsp;[Build with OS X] (#build-instructions-for-os-x) <br />
+&nbsp;&nbsp;[Lightpack Firmware building] (#fimware-building-instructions) <br />
 
 
 **Lightpack** is an fully open-source and simple hardware implementation of the backlight for any computer. It's USB content-driving ambient lighting system.

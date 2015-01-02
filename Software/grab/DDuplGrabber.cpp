@@ -80,6 +80,8 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 
 DDuplGrabber::~DDuplGrabber()
 {
+    freeScreens();
+
     // release adapters before unloading libraries
     m_adapters.clear();
 

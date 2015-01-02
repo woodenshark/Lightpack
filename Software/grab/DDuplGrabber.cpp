@@ -80,6 +80,9 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 
 DDuplGrabber::~DDuplGrabber()
 {
+    // release adapters before unloading libraries
+    m_adapters.clear();
+
     if (m_dxgiDll)
         FreeLibrary(m_dxgiDll);
     if (m_d3d11Dll)

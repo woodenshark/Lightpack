@@ -15,7 +15,7 @@ bool ProxyFuncJmp::init() {
 
         m_pJmpCode[0] = 0x90; // for debug replace with 0xcc (int 3h)
         m_pJmpCode[1] = 0xe9;
-        int relativeSubstFunc = reinterpret_cast<uintptr_t>(m_pSubstFunc) -
+        size_t relativeSubstFunc = reinterpret_cast<uintptr_t>(m_pSubstFunc) -
                 reinterpret_cast<uintptr_t>(m_pTarget) - kJmpInstructionSize;
         memcpy(m_pJmpCode+2, &relativeSubstFunc, sizeof(relativeSubstFunc));
 

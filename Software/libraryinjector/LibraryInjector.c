@@ -153,7 +153,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
     UNREFERENCED_PARAMETER(this);
     reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
-        int sizeofCP;
+        size_t sizeofCP;
         LPVOID Memory;
         HANDLE hThread;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");

@@ -48,8 +48,8 @@ MonitorConfigurationPage::~MonitorConfigurationPage()
 void MonitorConfigurationPage::initializePage()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-    size_t screenCount = QApplication::desktop()->screenCount();
-    for(size_t i = 0; i < screenCount; i++) {
+    int screenCount = QApplication::desktop()->screenCount();
+    for (int i = 0; i < screenCount; i++) {
         QRect geom = QApplication::desktop()->screenGeometry(i);
         MonitorIdForm *monitorIdForm = new MonitorIdForm();
 

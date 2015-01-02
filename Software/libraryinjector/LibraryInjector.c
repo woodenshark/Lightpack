@@ -131,17 +131,18 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_QueryInterface(ILibraryInjector
     return(NOERROR);
 }
 
-static ULONG STDMETHODCALLTYPE LibraryInjector_AddRef(LibraryInjector * this) {
-    return InterlockedIncrement(&(this->refCount));
+static ULONG STDMETHODCALLTYPE LibraryInjector_AddRef(ILibraryInjector * this) {
+    return InterlockedIncrement(&(((LibraryInjector*)this)->refCount));
 }
 
-static ULONG STDMETHODCALLTYPE LibraryInjector_Release(LibraryInjector * this) {
-    InterlockedDecrement(&(this->refCount));
-    if ((this->refCount) == 0) {
-        freeLibraryInjector(this);
+static ULONG STDMETHODCALLTYPE LibraryInjector_Release(ILibraryInjector * this) {
+    LibraryInjector * _this = (LibraryInjector*)this;
+    InterlockedDecrement(&(_this->refCount));
+    if ((_this->refCount) == 0) {
+        freeLibraryInjector(_this);
         return(0);
     }
-    return (this->refCount);
+    return (_this->refCount);
 }
 
 static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this, DWORD ProcessId, LPWSTR ModulePath) {
@@ -157,7 +158,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
         HANDLE hThread;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
 
-        DWORD_PTR LoadLibAddr = GetProcAddress(hKernel32, "LoadLibraryW");
+        DWORD_PTR LoadLibAddr = (DWORD_PTR)GetProcAddress(hKernel32, "LoadLibraryW");
 
         HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
 
@@ -171,7 +172,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
         IsWow64Process(hProcess, &isWow64Process);
         if (isWow64Process) {
 
-			HANDLE mapping = OpenFileMapping(FILE_MAP_READ, FALSE, HOOKSGRABBER_SHARED_MEM_NAME);
+            HANDLE mapping = OpenFileMapping(FILE_MAP_READ, FALSE, HOOKSGRABBER_SHARED_MEM_NAME);
             if (NULL == mapping) {
                 return 4;
             }
@@ -201,7 +202,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
             return S_FALSE;
         }
 
-        wcscpy(CodePage, modulePath);
+        wcscpy((wchar_t*)CodePage, modulePath);
 
         if (!WriteProcessMemory(hProcess, Memory, CodePage, sizeofCP, 0)) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't write loading library code");
@@ -232,8 +233,8 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
     }
 }
 
-static ULONG STDMETHODCALLTYPE ClassFactory_AddRef(ClassFactory * this) {
-    return InterlockedIncrement(&(this->refCount));
+static ULONG STDMETHODCALLTYPE ClassFactory_AddRef(IClassFactory * this) {
+    return InterlockedIncrement(&(((ClassFactory*)this)->refCount));
 }
 
 // IClassFactory's QueryInterface()
@@ -249,13 +250,14 @@ static HRESULT STDMETHODCALLTYPE ClassFactory_QueryInterface(IClassFactory * thi
     return(E_NOINTERFACE);
 }
 
-static ULONG STDMETHODCALLTYPE ClassFactory_Release(ClassFactory * this) {
-    InterlockedDecrement(&(this->refCount));
-    if ((this->refCount) == 0) {
-        freeClassFactory(this);
+static ULONG STDMETHODCALLTYPE ClassFactory_Release(IClassFactory * this) {
+    ClassFactory * _this = (ClassFactory*)this;
+    InterlockedDecrement(&(_this->refCount));
+    if ((_this->refCount) == 0) {
+        freeClassFactory(_this);
         return (0);
     }
-    return (this->refCount);
+    return (_this->refCount);
 }
 
 static HRESULT STDMETHODCALLTYPE ClassFactory_CreateInstance(IClassFactory * this, IUnknown *punkOuter, REFIID vTableGuid, void **objHandle) {
@@ -297,7 +299,7 @@ static HRESULT STDMETHODCALLTYPE ClassFactory_CreateInstance(IClassFactory * thi
 
 // IClassFactory's LockServer(). It is called by someone
 // who wants to lock this DLL in memory
-static HRESULT STDMETHODCALLTYPE ClassFactory_LockServer(ClassFactory * this, BOOL flock) {
+static HRESULT STDMETHODCALLTYPE ClassFactory_LockServer(IClassFactory * this, BOOL flock) {
     UNREFERENCED_PARAMETER(this);
 
     if (flock) InterlockedIncrement(&locksCount);

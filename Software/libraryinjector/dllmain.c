@@ -77,7 +77,7 @@ STDAPI DllRegisterServer(void) {
 
                 // Create an "InprocServer32" key whose default value is the path of this DLL
                 if (!RegCreateKeyEx(hKey2, &InprocServer32Name[0], 0, 0, REG_OPTION_NON_VOLATILE, KEY_WRITE, 0, &hkExtra, &disposition)) {
-                    if (!RegSetValueEx(hkExtra, 0, 0, REG_SZ, (const BYTE *)&filename[0], wcslen(&filename[0]) * 2 + 2)) {
+                    if (!RegSetValueEx(hkExtra, 0, 0, REG_SZ, (const BYTE *)&filename[0], (DWORD)wcslen(&filename[0]) * 2 + 2)) {
                         // Create a "ThreadingModel" value set to the string "both" (ie, we don't need to restrict an
                         // application to calling this DLL's functions only from a single thread. We don't use global
                         // data in our IExample functions, so we're thread-safe)

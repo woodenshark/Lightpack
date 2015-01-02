@@ -25,7 +25,6 @@ HWND createWindow(HINSTANCE hInstance)
 {
     WNDCLASSEX wc;
     HWND hwnd;
-    MSG Msg;
 
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
@@ -63,6 +62,10 @@ int CALLBACK WinMain(
     int         nCmdShow
     )
 {
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
+
     HWND hWnd = createWindow(hInstance);
     if (!hWnd) {
         return 1;

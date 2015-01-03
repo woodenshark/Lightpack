@@ -166,8 +166,6 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
 #endif
 
     pDev->CopyResource(pTexture, pBackBuffer);
-    D3D10_BOX box = {0, 0, tex_desc.Width, tex_desc.Height, 0, 1};
-    pDev->CopySubresourceRegion(pTexture, 0, 0, 0, 0, pBackBuffer, 0, &box);
 
     // Use the Texture copied in the previous frame
     if (dxgiFrameGrabber->m_frameCount % 2 == 0)
@@ -215,7 +213,7 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
         logger->reportLogError(L"d3d10 couldn't wait mutex. errocode = 0x%x", errorcode);
     }
 
-    pBackBuffer->Unmap(D3D10CalcSubresource(0, 0, 1));
+    pTexture->Unmap(D3D10CalcSubresource(0, 0, 1));
 end:
     pDev->Release();
 }
@@ -274,8 +272,6 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
 //    reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 pDev->CreateTexture2D 0x%x", hr);
 
     pDevContext->CopyResource(pTexture, pBackBuffer);
-    D3D11_BOX box = {0, 0, tex_desc.Width, tex_desc.Height, 0, 1};
-    pDevContext->CopySubresourceRegion(pTexture, 0, 0, 0, 0, pBackBuffer, 0, &box);
 
     // Map the texture copied in the previous frame to avoid waiting for it
     if (dxgiFrameGrabber->m_frameCount % 2 == 0)

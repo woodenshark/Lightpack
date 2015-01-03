@@ -291,6 +291,7 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     ipcContext->m_memDesc.width = tex_desc.Width;
     ipcContext->m_memDesc.height = tex_desc.Height;
     ipcContext->m_memDesc.rowPitch = mappedTexture.RowPitch;
+    ipcContext->m_memDesc.format = BufferFormatAbgr;
     ipcContext->m_memDesc.frameId++;
 
 //    reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 texture description. width: %u, height: %u, pitch: %u", tex_desc.Width, tex_desc.Height, mappedTexture.RowPitch);

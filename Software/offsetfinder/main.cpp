@@ -103,7 +103,7 @@ int CALLBACK WinMain(
 
     UnmapViewOfFile(memory);
     CloseHandle(mapping);
-
+	
     CloseWindow(hWnd);
     DestroyWindow(hWnd);
 

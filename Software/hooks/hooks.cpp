@@ -20,7 +20,7 @@ HANDLE g_syncRunMutex;
 
 void writeBlankFrame(PVOID dest) {
     HOOKSGRABBER_SHARED_MEM_DESC lmemDesc;
-    memcpy(&lmemDesc, &gIpcContext->m_memDesc, sizeof (lmemDesc));
+    memcpy(&lmemDesc, &gIpcContext->m_pMemDesc, sizeof (lmemDesc));
     lmemDesc.frameId = HOOKSGRABBER_BLANK_FRAME_ID;
     lmemDesc.width = lmemDesc.height = lmemDesc.rowPitch = 0;
     DWORD errorcode;
@@ -83,11 +83,11 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
             if (NULL == (g_syncRunMutex = CreateMutex(NULL, false, NULL))) {
             }
 
-            gLog->setLogLevel(gIpcContext->m_memDesc.logLevel);
+            gLog->setLogLevel(gIpcContext->m_pMemDesc->logLevel);
 
-            gLog->reportLogInfo(L"d3d9 device::present(): 0x%x", gIpcContext->m_memDesc.d3d9PresentFuncOffset);
-            gLog->reportLogInfo(L"d3d9 swapchain::present(): 0x%x", gIpcContext->m_memDesc.d3d9SCPresentFuncOffset);
-            gLog->reportLogInfo(L"dxgi swapchain::present(): 0x%x", gIpcContext->m_memDesc.dxgiPresentFuncOffset);
+            gLog->reportLogInfo(L"d3d9 device::present(): 0x%x", gIpcContext->m_pMemDesc->d3d9PresentFuncOffset);
+            gLog->reportLogInfo(L"d3d9 swapchain::present(): 0x%x", gIpcContext->m_pMemDesc->d3d9SCPresentFuncOffset);
+            gLog->reportLogInfo(L"dxgi swapchain::present(): 0x%x", gIpcContext->m_pMemDesc->dxgiPresentFuncOffset);
 
             if (!D3D9FrameGrabber::hasInstance()) {
                 d3d9FrameGrabber = D3D9FrameGrabber::getInstance(g_syncRunMutex);

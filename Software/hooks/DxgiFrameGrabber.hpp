@@ -42,9 +42,9 @@ public:
 protected:
     DxgiFrameGrabber(Logger *logger);
     void D3D10Grab(ID3D10Texture2D* pBackBuffer);
-    void D3D10Map();
+    bool D3D10Map();
     void D3D11Grab(ID3D11Texture2D *pBackBuffer);
-    void D3D11Map();
+	bool D3D11Map();
 
     ProxyFuncVFTable *m_dxgiPresentProxyFuncVFTable;
     ID3D10Texture2D *m_mapTexture10;
@@ -56,6 +56,7 @@ protected:
     UINT m_mapHeight;
     UINT m_frameCount;
     bool m_mapPending;
+	UINT m_lastGrab;
 private:
     void ** calcDxgiPresentPointer();
 };

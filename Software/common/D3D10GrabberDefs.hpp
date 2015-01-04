@@ -61,6 +61,7 @@ struct HOOKSGRABBER_SHARED_MEM_DESC {
 #endif
     UINT frameId;
     UINT logLevel;
+    UINT grabDelay;
 };
 
 

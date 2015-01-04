@@ -302,7 +302,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             newRect.right = width;
             newRect.bottom = height;
 
-            hRes = pOffscreenSurf->LockRect(&lockedSrcRect, &newRect, 0);
+            hRes = pOffscreenSurf->LockRect(&lockedSrcRect, &newRect, D3DLOCK_DONOTWAIT);
             if (hRes == D3DERR_WASSTILLDRAWING) {
                 goto stillWaiting;
             } else if (FAILED(hRes)) {

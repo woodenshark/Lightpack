@@ -160,7 +160,10 @@ bool DxgiFrameGrabber::D3D10Map() {
     D3D10_MAPPED_TEXTURE2D mappedTexture;
     HRESULT hr;
 
-    if (S_OK != (hr = m_mapTexture10->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_READ, 0, &mappedTexture))) {
+    hr = m_mapTexture10->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_READ, D3D10_MAP_FLAG_DO_NOT_WAIT, &mappedTexture);
+    if (hr == DXGI_ERROR_WAS_STILL_DRAWING) {
+        return false;
+    } else if (S_OK != hr) {
         logger->reportLogError(L"d3d10 couldn't map texture, hresult = 0x%x", hr);
         return false;
     }
@@ -333,8 +336,7 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
                 }
                 if (done)
                     dxgiFrameGrabber->m_mapPending = false;
-            }
-            else if (GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
+            } else if (GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
                 // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
                 if (dxgiDevice == DxgiDeviceD3D10) {
                     ID3D10Texture2D *pBackBuffer;
@@ -363,12 +365,12 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
             }
         }
 
-		DXGISCPresentFunc originalFunc = reinterpret_cast<DXGISCPresentFunc>(dxgiFrameGrabber->m_dxgiPresentProxyFuncVFTable->getOriginalFunc());
-		HRESULT res = originalFunc(sc, b, c);
+        DXGISCPresentFunc originalFunc = reinterpret_cast<DXGISCPresentFunc>(dxgiFrameGrabber->m_dxgiPresentProxyFuncVFTable->getOriginalFunc());
+        HRESULT res = originalFunc(sc, b, c);
         ReleaseMutex(dxgiFrameGrabber->m_syncRunMutex);
-		return res;
-	} else {
-		return S_OK; // assume it would have worked if we weren't being unloaded
-	}
+        return res;
+    } else {
+        return S_OK; // assume it would have worked if we weren't being unloaded
+    }
 
 }

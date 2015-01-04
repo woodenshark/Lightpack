@@ -187,7 +187,7 @@ void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
             if (Settings::isDx1011GrabberEnabled()) {
                 m_grabber->stopGrabbing();
                 grabber->startGrabbing();
-				grabber->setGrabInterval(Settings::getGrabSlowdown());
+                grabber->setGrabInterval(Settings::getGrabSlowdown());
             }
         } else {
             m_grabber->startGrabbing();
@@ -492,7 +492,7 @@ void GrabManager::initGrabbers()
 #endif
 
 #ifdef DDUPL_GRAB_SUPPORT
-	m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(new DDuplGrabber(NULL, m_grabberContext));
+    m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(new DDuplGrabber(NULL, m_grabberContext));
 #endif
 
 #ifdef X11_GRAB_SUPPORT

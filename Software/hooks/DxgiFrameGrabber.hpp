@@ -17,10 +17,13 @@ struct ID3D11DeviceContext;
 class DxgiFrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {
 public:
-    static DxgiFrameGrabber *m_this;
+	static DxgiFrameGrabber *m_this;
+	static DxgiFrameGrabber *getInstance(HANDLE syncRunMutex) {
+		if (!m_this)
+			m_this = new DxgiFrameGrabber(syncRunMutex, Logger::getInstance());
+		return m_this;
+	}
     static DxgiFrameGrabber *getInstance() {
-        if (!m_this)
-            m_this = new DxgiFrameGrabber(Logger::getInstance());
         return m_this;
     }
     static bool hasInstance() {
@@ -40,7 +43,7 @@ public:
     friend HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c);
 
 protected:
-    DxgiFrameGrabber(Logger *logger);
+	DxgiFrameGrabber(HANDLE syncRunMutex, Logger *logger);
     void D3D10Grab(ID3D10Texture2D* pBackBuffer);
     bool D3D10Map();
     void D3D11Grab(ID3D11Texture2D *pBackBuffer);

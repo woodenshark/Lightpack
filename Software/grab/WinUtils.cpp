@@ -37,11 +37,14 @@ namespace WinUtils
 {
 
 const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
+const WCHAR lightpackUnhookDllName[] = L"prismatik-unhook.dll";
 #ifdef _WIN64
 const WCHAR lightpackHooksDllName32[] = L"prismatik-hooks32.dll";
 const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
 #endif
-static LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe"};
+static LPCWSTR pwstrExcludeProcesses[] = { L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe" };
+static LPCWSTR pwstrDxModules[] = { L"d3d9.dll", L"dxgi.dll" };
+static LPCWSTR pwstrHookModules[] = { L"prismatik-hooks.dll", L"prismatik-hooks32.dll" };
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable) {
 
@@ -96,8 +99,7 @@ BOOL IsUserAdmin() {
     return(b);
 }
 
-
-QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
+QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], UINT withModuleCount, LPCWSTR withoutModule[], UINT withoutModuleCount, LPCWSTR wstrSystemRootPath) {
 
     DWORD aProcesses[1024];
     HMODULE hMods[1024];
@@ -110,7 +112,7 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
     //     Get the list of process identifiers.
     processes->clear();
 
-    if ( !EnumProcesses( aProcesses, sizeof(aProcesses), &cbNeeded ) )
+    if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
         return NULL;
 
     // Calculate how many process identifiers were returned.
@@ -119,17 +121,17 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
 
     // Print the names of the modules for each process.
 
-    for ( i = 0; i < cProcesses; i++ )
+    for (i = 0; i < cProcesses; i++)
     {
         if (aProcesses[i] != GetCurrentProcessId()) {
             HANDLE hProcess;
-            hProcess = OpenProcess( PROCESS_QUERY_INFORMATION |
-                                    PROCESS_VM_READ,
-                                    FALSE, aProcesses[i] );
+            hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+                PROCESS_VM_READ,
+                FALSE, aProcesses[i]);
             if (NULL == hProcess)
                 goto nextProcess;
 
-            GetModuleFileNameExW(hProcess, 0, executableName, sizeof (executableName));
+            GetModuleFileNameExW(hProcess, 0, executableName, sizeof(executableName));
 
             if (wcsstr(executableName, wstrSystemRootPath) != NULL) {
                 goto nextProcess;
@@ -140,9 +142,9 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
             ::WideCharToMultiByte(CP_ACP, 0, executableName, -1, debug_buf, 255, NULL, NULL);
             DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf;
 
-            for (unsigned k=0; k < SIZEOF_ARRAY(pwstrExcludeProcesses); k++) {
-                if (wcsicmp(executableName, pwstrExcludeProcesses[k])== 0) {
-                    DEBUG_MID_LEVEL << Q_FUNC_INFO << "skipping " << pwstrExcludeProcesses;
+            for (unsigned k = 0; k < SIZEOF_ARRAY(pwstrExcludeProcesses); k++) {
+                if (wcsicmp(executableName, pwstrExcludeProcesses[k]) == 0) {
+                    DEBUG_MID_LEVEL << Q_FUNC_INFO << "skipping " << pwstrExcludeProcesses[k];
                     goto nextProcess;
                 }
             }
@@ -154,43 +156,52 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
             if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
 #endif
             {
-                bool isDXPresent = false;
-                for ( DWORD j = 0; j < (cbNeeded / sizeof(HMODULE)); j++ )
+                bool isModulePresent = false;
+                for (DWORD j = 0; j < (cbNeeded / sizeof(HMODULE)); j++)
                 {
                     WCHAR szModName[MAX_PATH];
 
-                    if ( GetModuleFileNameExW( hProcess, hMods[j], szModName,
-                                              sizeof(szModName) / sizeof(WCHAR)))
+                    if (GetModuleFileNameExW(hProcess, hMods[j], szModName,
+                        sizeof(szModName) / sizeof(WCHAR)))
                     {
 
                         PathStripPathW(szModName);
                         ::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf, 255, NULL, NULL);
                         DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf;
 
-                        if (wcsicmp(szModName, lightpackHooksDllName) == 0) {
-                            goto nextProcess;
-#ifdef _WIN64
-                        } else if (wcsicmp(szModName, lightpackHooksDllName32) == 0) {
-                            goto nextProcess;
-#endif
-                        } else {
-                            if (wcsicmp(szModName, L"d3d9.dll") == 0 ||
-                                wcsicmp(szModName, L"dxgi.dll") == 0 )
-                                isDXPresent = true;
+                        for (unsigned k = 0; k < withoutModuleCount; k++) {
+                            if (wcsicmp(szModName, withoutModule[k]) == 0) {
+                                goto nextProcess;
+                            }
+                        }
+
+                        for (unsigned k = 0; k < withModuleCount; k++) {
+                            if (wcsicmp(szModName, withModule[k]) == 0) {
+                                isModulePresent = true;
+                                break;
+                            }
                         }
                     }
                 }
-                if (isDXPresent)
+                if (isModulePresent)
                     processes->append(aProcesses[i]);
 
             }
-nextProcess:
+        nextProcess:
             // Release the handle to the process.
-            CloseHandle( hProcess );
+            CloseHandle(hProcess);
         }
     }
 
     return processes;
+}
+
+QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
+    return getProcessesIDs(processes, pwstrDxModules, SIZEOF_ARRAY(pwstrDxModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath);
+}
+
+QList<DWORD> * getHookedProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
+    return getProcessesIDs(processes, pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), NULL, 0, wstrSystemRootPath);
 }
 
 

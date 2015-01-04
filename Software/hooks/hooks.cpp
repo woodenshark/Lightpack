@@ -49,7 +49,6 @@ WCHAR *getEventSourceName(char *executableName) {
 HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lpReserved) {
     UNREFERENCED_PARAMETER(lpReserved);
 
-
     if (fdwReason == DLL_PROCESS_ATTACH /*|| fdwReason == DLL_THREAD_ATTACH*/) // When initializing....
     {
         DxgiFrameGrabber *dxgiFrameGrabber = NULL;
@@ -106,7 +105,7 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
             }
 
             if (!DxgiFrameGrabber::hasInstance()) {
-                dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
+				dxgiFrameGrabber = DxgiFrameGrabber::getInstance(g_syncRunMutex);
                 dxgiFrameGrabber->setIPCContext(gIpcContext);
             } else {
                 dxgiFrameGrabber = DxgiFrameGrabber::getInstance();

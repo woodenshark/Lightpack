@@ -47,13 +47,13 @@ protected:
     void ** calcD3d9SCPresentPointer();
 
     IDirect3DSurface9 *m_pDemultisampledSurf;
-    IDirect3DSurface9 *m_pOffscreenSurfA;
-    IDirect3DSurface9 *m_pOffscreenSurfB;
+    IDirect3DSurface9 *m_pOffscreenSurf;
     IDirect3DDevice9 *m_pDev;
     D3DFORMAT m_surfFormat;
     UINT m_surfWidth;
     UINT m_surfHeight;
     UINT m_frameCount;
+    bool m_mapPending;
 };
 
 #endif // D3D9FRAMEGRABBER_HPP

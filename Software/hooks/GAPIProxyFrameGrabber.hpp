@@ -11,6 +11,8 @@
 #include <windows.h>
 #include "ProxyFunc.hpp"
 
+#define FRAME_CAPTURE_RATE 2
+
 class IPCContext;
 
 class GAPIProxyFrameGrabber {

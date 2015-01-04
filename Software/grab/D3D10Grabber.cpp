@@ -163,10 +163,16 @@ public:
             return true;
 
         AcquirePrivileges();
+
         GetModuleFileName(NULL, m_hooksLibPath, SIZEOF_ARRAY(m_hooksLibPath));
         PathRemoveFileSpec(m_hooksLibPath);
         wcscat(m_hooksLibPath, L"\\");
         wcscat(m_hooksLibPath, lightpackHooksDllName);
+
+        GetModuleFileName(NULL, m_unhookLibPath, SIZEOF_ARRAY(m_hooksLibPath));
+        PathRemoveFileSpec(m_unhookLibPath);
+        wcscat(m_unhookLibPath, L"\\");
+        wcscat(m_unhookLibPath, lightpackUnhookDllName);
 
         GetWindowsDirectoryW(m_systemrootPath, SIZEOF_ARRAY(m_systemrootPath));
 
@@ -178,6 +184,9 @@ public:
             qCritical() << Q_FUNC_INFO << "Can't create libraryinjector. D3D10Grabber wasn't initialised. Please try to register server: regsvr32 libraryinjector.dll";
             return false;
         }
+
+        // Remove any injections from previous runs
+        sanitizeProcesses();
 
 #if 0
         // TODO: Remove this code or use |sa| in initIPC()
@@ -277,9 +286,13 @@ public:
     bool isStarted() const { return m_isStarted; }
 
     void setGrabInterval(int msec) {
-        memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
-        m_memDesc.grabDelay = msec;
-        copyMemDesc(m_memDesc);
+        if (m_memMap) {
+            memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
+            m_memDesc.grabDelay = msec;
+            copyMemDesc(m_memDesc);
+        } else {
+            m_memDesc.grabDelay = msec;
+        }
     }
 
     QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
@@ -365,6 +378,15 @@ private slots:
     }
 
 private:
+    void sanitizeProcesses() {
+        QList<DWORD> processes = QList<DWORD>();
+        getHookedProcessesIDs(&processes, m_systemrootPath);
+        foreach(DWORD procId, processes) {
+            qDebug() << Q_FUNC_INFO << "Sanitizing process " << procId;
+            m_libraryInjector->Inject(procId, m_unhookLibPath);
+        }
+    }
+
     QRgb getColor(const QRect &widgetRect)
     {
         static const QRgb kBlackColor = qRgb(0,0,0);
@@ -527,6 +549,8 @@ private:
         if (!m_isInited)
             return;
 
+        sanitizeProcesses();
+
         disconnect(this, SLOT(handleIfFrameGrabbed()));
         if (m_libraryInjector)
             m_libraryInjector->Release();
@@ -546,6 +570,7 @@ private:
     bool m_isInited;
     ILibraryInjector * m_libraryInjector;
     WCHAR m_hooksLibPath[300];
+    WCHAR m_unhookLibPath[300];
     WCHAR m_systemrootPath[300];
     bool m_isFrameGrabbedDuringLastSecond;
     GrabberContext *m_context;

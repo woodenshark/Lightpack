@@ -24,7 +24,7 @@ typedef HRESULT (WINAPI *DXGISCPresentFunc)(IDXGISwapChain *, UINT, UINT);
 
 HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c);
 
-DxgiFrameGrabber::DxgiFrameGrabber(Logger *logger): GAPIProxyFrameGrabber(NULL), LoggableTrait(logger) {
+DxgiFrameGrabber::DxgiFrameGrabber(HANDLE syncRunMutex, Logger *logger) : GAPIProxyFrameGrabber(syncRunMutex), LoggableTrait(logger) {
     m_isInited = false;
     m_ipcContext = NULL;
     m_mapTexture10 = NULL;
@@ -302,60 +302,73 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
 
     Logger *logger = dxgiFrameGrabber->m_logger;
 
-    DXGI_SWAP_CHAIN_DESC desc;
-    sc->GetDesc(&desc);
-    logger->reportLogDebug(L"d3d10 Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? "windowed" : "fullscreen");
+    if (WAIT_OBJECT_0 == WaitForSingleObject(dxgiFrameGrabber->m_syncRunMutex, 0)) {
 
-    if (dxgiDevice == DxgiDeviceUnknown) {
-        // If the process uses DX10, the device will internally be a DX11 device too
-        // But if the process uses DX11, the device will not be a DX10 device
-        ID3D10Device* dev;
-        HRESULT hr = sc->GetDevice(IID_ID3D10Device, (void**)&dev);
-        if (hr == S_OK) {
-            dxgiDevice = DxgiDeviceD3D10;
-            dev->Release();
-        } else {
-            dxgiDevice = DxgiDeviceD3D11;
+        DXGI_SWAP_CHAIN_DESC desc;
+        sc->GetDesc(&desc);
+        logger->reportLogDebug(L"d3d10 Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? "windowed" : "fullscreen");
+
+        if (dxgiDevice == DxgiDeviceUnknown) {
+            // If the process uses DX10, the device will internally be a DX11 device too
+            // But if the process uses DX11, the device will not be a DX10 device
+            ID3D10Device* dev;
+            HRESULT hr = sc->GetDevice(IID_ID3D10Device, (void**)&dev);
+            if (hr == S_OK) {
+                dxgiDevice = DxgiDeviceD3D10;
+                dev->Release();
+            }
+            else {
+                dxgiDevice = DxgiDeviceD3D11;
+            }
         }
-    }
 
-    if (!desc.Windowed) {
-        if (dxgiFrameGrabber->m_mapPending) {
-            bool done = false;
-            if (dxgiDevice == DxgiDeviceD3D10) {
-                done = dxgiFrameGrabber->D3D10Map();
-            } else if (dxgiDevice == DxgiDeviceD3D11) {
-                done = dxgiFrameGrabber->D3D11Map();
-            }
-            if (done)
-				dxgiFrameGrabber->m_mapPending = false;
-        } else if (GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
-			// only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
-            if (dxgiDevice == DxgiDeviceD3D10) {
-                ID3D10Texture2D *pBackBuffer;
-                HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-                if (hr == S_OK) {
-                    dxgiFrameGrabber->D3D10Grab(pBackBuffer);
-                    pBackBuffer->Release();
-                } else {
-                    logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+        if (!desc.Windowed) {
+            if (dxgiFrameGrabber->m_mapPending) {
+                bool done = false;
+                if (dxgiDevice == DxgiDeviceD3D10) {
+                    done = dxgiFrameGrabber->D3D10Map();
                 }
-            }
-            if (dxgiDevice == DxgiDeviceD3D11) {
-                ID3D11Texture2D *pBackBuffer;
-                HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-                if (hr == S_OK) {
-                    dxgiFrameGrabber->D3D11Grab(pBackBuffer);
-                    pBackBuffer->Release();
-                } else {
-                    logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
+                else if (dxgiDevice == DxgiDeviceD3D11) {
+                    done = dxgiFrameGrabber->D3D11Map();
                 }
+                if (done)
+                    dxgiFrameGrabber->m_mapPending = false;
             }
-            dxgiFrameGrabber->m_lastGrab = GetTickCount();
-            dxgiFrameGrabber->m_mapPending = true;
+            else if (GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
+                // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
+                if (dxgiDevice == DxgiDeviceD3D10) {
+                    ID3D10Texture2D *pBackBuffer;
+                    HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                    if (hr == S_OK) {
+                        dxgiFrameGrabber->D3D10Grab(pBackBuffer);
+                        pBackBuffer->Release();
+                    }
+                    else {
+                        logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+                    }
+                }
+                if (dxgiDevice == DxgiDeviceD3D11) {
+                    ID3D11Texture2D *pBackBuffer;
+                    HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                    if (hr == S_OK) {
+                        dxgiFrameGrabber->D3D11Grab(pBackBuffer);
+                        pBackBuffer->Release();
+                    }
+                    else {
+                        logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
+                    }
+                }
+                dxgiFrameGrabber->m_lastGrab = GetTickCount();
+                dxgiFrameGrabber->m_mapPending = true;
+            }
         }
-    }
 
-    DXGISCPresentFunc originalFunc = reinterpret_cast<DXGISCPresentFunc>(dxgiFrameGrabber->m_dxgiPresentProxyFuncVFTable->getOriginalFunc());
-    return originalFunc(sc,b,c);
+		DXGISCPresentFunc originalFunc = reinterpret_cast<DXGISCPresentFunc>(dxgiFrameGrabber->m_dxgiPresentProxyFuncVFTable->getOriginalFunc());
+		HRESULT res = originalFunc(sc, b, c);
+        ReleaseMutex(dxgiFrameGrabber->m_syncRunMutex);
+		return res;
+	} else {
+		return S_OK; // assume it would have worked if we weren't being unloaded
+	}
+
 }

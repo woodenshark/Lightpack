@@ -43,6 +43,8 @@ static volatile LONG locksCount = 0;
 #define REPORT_LOG_BUF_SIZE 2048
 static HANDLE hEventSrc = NULL;
 
+#define INJECT_WAIT_DELAY 2000
+
 typedef struct {
     const ILibraryInjectorVtbl *lpVtbl;
     volatile LONG refCount;
@@ -214,16 +216,22 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
             return S_FALSE;
         }
-        WaitForSingleObject(hThread, INFINITE);
+        
+
+        HRESULT hr = (WaitForSingleObject(hThread, INJECT_WAIT_DELAY));
+        if (hr != WAIT_OBJECT_0) {
+            CloseHandle(hThread);
+            return S_FALSE;
+        }
 
         DWORD exitCode = -1;
         GetExitCodeThread(hThread, &exitCode);
+        CloseHandle(hThread);
 
         if (!exitCode) { // LoadLibrary returns 0 on failure
             reportLog(EVENTLOG_ERROR_TYPE, L"Injection into process failed: %d", exitCode);
             return S_FALSE;
         }
-        CloseHandle(hThread);
         reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
 
         return S_OK;

@@ -44,6 +44,7 @@ class LightpackApplication : public QtSingleApplication
     Q_OBJECT
 public:
     LightpackApplication(int &argc, char **argv);
+    ~LightpackApplication();
 
     void initializeAll(const QString & appDirPath);
 #ifdef Q_OS_WIN

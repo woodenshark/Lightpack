@@ -54,6 +54,24 @@ LightpackApplication::LightpackApplication(int &argc, char **argv)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 }
 
+LightpackApplication::~LightpackApplication()
+{
+	m_EventFilters.clear();
+
+	// the QObjects seem to be deleted at this point already
+	// so just clean up the rest
+
+	delete m_settingsWindow;
+	delete m_ledDeviceManager;
+	delete m_LedDeviceManagerThread;
+	delete m_apiServerThread;
+	delete m_grabManager;
+	delete m_moodlampManager;
+
+	delete m_pluginManager;
+	delete m_pluginInterface;
+}
+
 void LightpackApplication::initializeAll(const QString & appDirPath)
 {
     setApplicationName("Prismatik");

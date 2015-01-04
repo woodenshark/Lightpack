@@ -161,9 +161,6 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
         pTexture = dxgiFrameGrabber->m_mapTexture10A;
     else
         pTexture = dxgiFrameGrabber->m_mapTexture10B;
-#ifdef DEBUG
-    reportLog(EVENTLOG_INFORMATION_TYPE, L"pDev->CreateTexture2D 0x%x", hr);
-#endif
 
     pDev->CopyResource(pTexture, pBackBuffer);
 
@@ -187,14 +184,9 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
     ipcContext->m_memDesc.format = BufferFormatAbgr;
     ipcContext->m_memDesc.frameId++;
 
-//    reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d10 texture description. width: %u, height: %u, pitch: %u", tex_desc.Width, tex_desc.Height, mappedTexture.RowPitch);
-
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-        //            __asm__("int $3");
-//        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d10 writing description to mem mapped file");
         memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof (ipcContext->m_memDesc));
-//        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d10 writing data to mem mapped file");
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
         if (mappedTexture.RowPitch == tex_desc.Width * 4) {
             memcpy(pMemDataMap, mappedTexture.pData, tex_desc.Width * tex_desc.Height * 4);
@@ -269,7 +261,6 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
         pTexture = dxgiFrameGrabber->m_mapTexture11A;
     else
         pTexture = dxgiFrameGrabber->m_mapTexture11B;
-//    reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 pDev->CreateTexture2D 0x%x", hr);
 
     pDevContext->CopyResource(pTexture, pBackBuffer);
 
@@ -282,7 +273,6 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     IPCContext *ipcContext = dxgiFrameGrabber->m_ipcContext;
     Logger *logger = dxgiFrameGrabber->m_logger;
 
-    //        __asm__("int $3");
     if (S_OK != (hr = pDevContext->Map(pTexture, D3D11CalcSubresource(0, 0, 1), D3D11_MAP_READ, 0, &mappedTexture))) {
         logger->reportLogError(L"d3d11 couldn't map texture, hresult = 0x%x", hr);
         goto end;
@@ -294,14 +284,9 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     ipcContext->m_memDesc.format = BufferFormatAbgr;
     ipcContext->m_memDesc.frameId++;
 
-//    reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 texture description. width: %u, height: %u, pitch: %u", tex_desc.Width, tex_desc.Height, mappedTexture.RowPitch);
-
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-        //            __asm__("int $3");
-//        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 writing description to mem mapped file");
         memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof (ipcContext->m_memDesc));
-//        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d11 writing data to mem mapped file");
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
         if (mappedTexture.RowPitch == tex_desc.Width * 4) {
             memcpy(pMemDataMap, mappedTexture.pData, tex_desc.Width * tex_desc.Height * 4);

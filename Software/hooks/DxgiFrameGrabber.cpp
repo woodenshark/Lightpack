@@ -27,13 +27,13 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c);
 DxgiFrameGrabber::DxgiFrameGrabber(Logger *logger): GAPIProxyFrameGrabber(NULL), LoggableTrait(logger) {
     m_isInited = false;
     m_ipcContext = NULL;
-    m_mapTexture10A = NULL;
-    m_mapTexture10B = NULL;
+    m_mapTexture10 = NULL;
     m_mapDevice10 = NULL;
-    m_mapTexture11A = NULL;
-    m_mapTexture11B = NULL;
+    m_mapTexture11 = NULL;
+    m_mapDeviceContext11 = NULL;
     m_mapDevice11 = NULL;
     m_frameCount = 0;
+    m_mapPending = false;
 }
 
 bool DxgiFrameGrabber::init() {
@@ -69,25 +69,21 @@ void DxgiFrameGrabber::free() {
         m_dxgiPresentProxyFuncVFTable = NULL;
     }
 
-    if (m_mapTexture10A) {
-        m_mapTexture10A->Release();
-        m_mapTexture10A = NULL;
-    }
-    if (m_mapTexture10B) {
-        m_mapTexture10B->Release();
-        m_mapTexture10B = NULL;
+    if (m_mapTexture10) {
+        m_mapTexture10->Release();
+        m_mapTexture10 = NULL;
     }
     if (m_mapDevice10) {
         m_mapDevice10->Release();
         m_mapDevice10 = NULL;
     }
-    if (m_mapTexture11A) {
-        m_mapTexture11A->Release();
-        m_mapTexture11A = NULL;
+    if (m_mapTexture11) {
+        m_mapTexture11->Release();
+        m_mapTexture11 = NULL;
     }
-    if (m_mapTexture11B) {
-        m_mapTexture11B->Release();
-        m_mapTexture11B = NULL;
+    if (m_mapDeviceContext11) {
+        m_mapDeviceContext11->Release();
+        m_mapDeviceContext11 = NULL;
     }
     if (m_mapDevice11) {
         m_mapDevice11->Release();
@@ -110,10 +106,7 @@ void ** DxgiFrameGrabber::calcDxgiPresentPointer() {
     return result;
 }
 
-void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
-    DxgiFrameGrabber *dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
-    dxgiFrameGrabber->m_frameCount++;
-
+void DxgiFrameGrabber::D3D10Grab(ID3D10Texture2D* pBackBuffer) {
     D3D10_TEXTURE2D_DESC tex_desc;
     pBackBuffer->GetDesc(&tex_desc);
 
@@ -122,64 +115,57 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
 
     ID3D10Texture2D * pTexture;
 
-    D3D10_MAPPED_TEXTURE2D mappedTexture;
-    tex_desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
-    tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    tex_desc.ArraySize = 1;
-    tex_desc.MipLevels = 1;
-    tex_desc.BindFlags = 0;
-    tex_desc.SampleDesc.Count = 1;
-    tex_desc.SampleDesc.Quality = 0;
-    tex_desc.Usage = D3D10_USAGE_STAGING;
-    tex_desc.MiscFlags = 0;
-
     HRESULT hr = S_OK;
 
-    if (dxgiFrameGrabber->m_mapTexture10A &&
-        (dxgiFrameGrabber->m_mapDevice10 != pDev
-        || dxgiFrameGrabber->m_mapWidth != tex_desc.Width
-        || dxgiFrameGrabber->m_mapHeight != tex_desc.Height)) {
-        dxgiFrameGrabber->m_mapTexture10A->Release();
-        dxgiFrameGrabber->m_mapTexture10A = NULL;
-        dxgiFrameGrabber->m_mapTexture10B->Release();
-        dxgiFrameGrabber->m_mapTexture10B = NULL;
-        dxgiFrameGrabber->m_mapDevice10->Release();
-        dxgiFrameGrabber->m_mapDevice10 = NULL;
+    if (m_mapTexture10 &&
+        (m_mapDevice10 != pDev
+        || m_mapWidth != tex_desc.Width
+        || m_mapHeight != tex_desc.Height)) {
+        m_mapTexture10->Release();
+        m_mapTexture10 = NULL;
+        m_mapDevice10->Release();
+        m_mapDevice10 = NULL;
     }
-    if (!dxgiFrameGrabber->m_mapTexture10A) {
-        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
-        dxgiFrameGrabber->m_mapTexture10A = pTexture;
-        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
-        dxgiFrameGrabber->m_mapTexture10B = pTexture;
-        dxgiFrameGrabber->m_mapDevice10 = pDev;
-        dxgiFrameGrabber->m_mapDevice10->AddRef();
-        dxgiFrameGrabber->m_mapWidth = tex_desc.Width;
-        dxgiFrameGrabber->m_mapHeight = tex_desc.Height;
-    }
+    if (!m_mapTexture10) {
+        tex_desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
+        tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        tex_desc.ArraySize = 1;
+        tex_desc.MipLevels = 1;
+        tex_desc.BindFlags = 0;
+        tex_desc.SampleDesc.Count = 1;
+        tex_desc.SampleDesc.Quality = 0;
+        tex_desc.Usage = D3D10_USAGE_STAGING;
+        tex_desc.MiscFlags = 0;
 
-    if (dxgiFrameGrabber->m_frameCount % 2 == 0)
-        pTexture = dxgiFrameGrabber->m_mapTexture10A;
-    else
-        pTexture = dxgiFrameGrabber->m_mapTexture10B;
+        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
+        m_mapTexture10 = pTexture;
+        m_mapDevice10 = pDev;
+        m_mapDevice10->AddRef();
+        m_mapWidth = tex_desc.Width;
+        m_mapHeight = tex_desc.Height;
+    }
+    pTexture = m_mapTexture10;
 
     pDev->CopyResource(pTexture, pBackBuffer);
 
-    // Use the Texture copied in the previous frame
-    if (dxgiFrameGrabber->m_frameCount % 2 == 0)
-        pTexture = dxgiFrameGrabber->m_mapTexture10B;
-    else
-        pTexture = dxgiFrameGrabber->m_mapTexture10A;
+    pDev->Release();
+}
 
-    IPCContext *ipcContext = dxgiFrameGrabber->m_ipcContext;
-    Logger *logger = dxgiFrameGrabber->m_logger;
+void DxgiFrameGrabber::D3D10Map() {
+    IPCContext *ipcContext = m_ipcContext;
+    Logger *logger = m_logger;
+    UINT width = m_mapWidth;
+    UINT height = m_mapHeight;
+    D3D10_MAPPED_TEXTURE2D mappedTexture;
+    HRESULT hr;
 
-    if (S_OK != (hr = pTexture->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_READ, 0, &mappedTexture))) {
+    if (S_OK != (hr = m_mapTexture10->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_READ, 0, &mappedTexture))) {
         logger->reportLogError(L"d3d10 couldn't map texture, hresult = 0x%x", hr);
-        goto end;
+        return;
     }
 
-    ipcContext->m_memDesc.width = tex_desc.Width;
-    ipcContext->m_memDesc.height = tex_desc.Height;
+    ipcContext->m_memDesc.width = width;
+    ipcContext->m_memDesc.height = height;
     ipcContext->m_memDesc.rowPitch = mappedTexture.RowPitch;
     ipcContext->m_memDesc.format = BufferFormatAbgr;
     ipcContext->m_memDesc.frameId++;
@@ -188,13 +174,13 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
         memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof (ipcContext->m_memDesc));
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
-        if (mappedTexture.RowPitch == tex_desc.Width * 4) {
-            memcpy(pMemDataMap, mappedTexture.pData, tex_desc.Width * tex_desc.Height * 4);
+        if (mappedTexture.RowPitch == width * 4) {
+            memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
         } else {
             UINT cleanOffset = 0, pitchOffset = 0, i = 0;
-            while (i < tex_desc.Height) {
-                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), tex_desc.Width * 4);
-                cleanOffset += tex_desc.Width * 4;
+            while (i < height) {
+                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), width * 4);
+                cleanOffset += width * 4;
                 pitchOffset += mappedTexture.RowPitch;
                 i++;
             }
@@ -205,81 +191,76 @@ void D3D10Grab(ID3D10Texture2D* pBackBuffer) {
         logger->reportLogError(L"d3d10 couldn't wait mutex. errocode = 0x%x", errorcode);
     }
 
-    pTexture->Unmap(D3D10CalcSubresource(0, 0, 1));
-end:
-    pDev->Release();
+    m_mapTexture10->Unmap(D3D10CalcSubresource(0, 0, 1));
 }
 
-void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
-    DxgiFrameGrabber *dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
-    dxgiFrameGrabber->m_frameCount++;
-
+void DxgiFrameGrabber::D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     D3D11_TEXTURE2D_DESC tex_desc;
     pBackBuffer->GetDesc(&tex_desc);
 
     ID3D11Device *pDev;
     pBackBuffer->GetDevice(&pDev);
     ID3D11DeviceContext * pDevContext;
-    pDev->GetImmediateContext(&pDevContext);
 
     ID3D11Texture2D * pTexture;
-    D3D11_MAPPED_SUBRESOURCE mappedTexture;
-    tex_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-    tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    tex_desc.ArraySize = 1;
-    tex_desc.MipLevels = 1;
-    tex_desc.BindFlags = 0;
-    tex_desc.SampleDesc.Count = 1;
-    tex_desc.SampleDesc.Quality = 0;
-    tex_desc.Usage = D3D11_USAGE_STAGING;
-    tex_desc.MiscFlags = 0;
 
     HRESULT hr = S_OK;
-    if (dxgiFrameGrabber->m_mapTexture11A &&
-        (dxgiFrameGrabber->m_mapDevice11 != pDev
-        || dxgiFrameGrabber->m_mapWidth != tex_desc.Width
-        || dxgiFrameGrabber->m_mapHeight != tex_desc.Height)) {
-        dxgiFrameGrabber->m_mapTexture11A->Release();
-        dxgiFrameGrabber->m_mapTexture11A = NULL;
-        dxgiFrameGrabber->m_mapTexture11B->Release();
-        dxgiFrameGrabber->m_mapTexture11B = NULL;
-        dxgiFrameGrabber->m_mapDevice11->Release();
-        dxgiFrameGrabber->m_mapDevice11 = NULL;
+    if (m_mapTexture11 &&
+        (m_mapDevice11 != pDev
+        || m_mapWidth != tex_desc.Width
+        || m_mapHeight != tex_desc.Height)) {
+        m_mapTexture11->Release();
+        m_mapTexture11 = NULL;
+        m_mapDeviceContext11->Release();
+        m_mapDeviceContext11 = NULL;
+        m_mapDevice11->Release();
+        m_mapDevice11 = NULL;
     }
-    if (!dxgiFrameGrabber->m_mapTexture11A) {
-        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
-        dxgiFrameGrabber->m_mapTexture11A = pTexture;
-        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
-        dxgiFrameGrabber->m_mapTexture11B = pTexture;
-        dxgiFrameGrabber->m_mapDevice11 = pDev;
-        dxgiFrameGrabber->m_mapDevice11->AddRef();
-        dxgiFrameGrabber->m_mapWidth = tex_desc.Width;
-        dxgiFrameGrabber->m_mapHeight = tex_desc.Height;
-    }
+    if (!m_mapTexture11) {
+        tex_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        tex_desc.ArraySize = 1;
+        tex_desc.MipLevels = 1;
+        tex_desc.BindFlags = 0;
+        tex_desc.SampleDesc.Count = 1;
+        tex_desc.SampleDesc.Quality = 0;
+        tex_desc.Usage = D3D11_USAGE_STAGING;
+        tex_desc.MiscFlags = 0;
 
-    if (dxgiFrameGrabber->m_frameCount % 2 == 0)
-        pTexture = dxgiFrameGrabber->m_mapTexture11A;
-    else
-        pTexture = dxgiFrameGrabber->m_mapTexture11B;
+        hr = pDev->CreateTexture2D(&tex_desc, NULL, &pTexture);
+        m_mapTexture11 = pTexture;
+        m_mapDevice11 = pDev;
+        m_mapDevice11->AddRef();
+        pDev->GetImmediateContext(&pDevContext);
+        m_mapDeviceContext11 = pDevContext;
+        m_mapDeviceContext11->AddRef();
+        m_mapWidth = tex_desc.Width;
+        m_mapHeight = tex_desc.Height;
+    }
+    pDevContext = m_mapDeviceContext11;
+    pTexture = m_mapTexture11;
 
     pDevContext->CopyResource(pTexture, pBackBuffer);
 
-    // Map the texture copied in the previous frame to avoid waiting for it
-    if (dxgiFrameGrabber->m_frameCount % 2 == 0)
-        pTexture = dxgiFrameGrabber->m_mapTexture11B;
-    else
-        pTexture = dxgiFrameGrabber->m_mapTexture11A;
+    pDevContext->Release();
+    pDev->Release();
+}
 
-    IPCContext *ipcContext = dxgiFrameGrabber->m_ipcContext;
-    Logger *logger = dxgiFrameGrabber->m_logger;
+void DxgiFrameGrabber::D3D11Map() {
+    IPCContext *ipcContext = m_ipcContext;
+    Logger *logger = m_logger;
+    UINT width = m_mapWidth;
+    UINT height = m_mapHeight;
+    D3D11_MAPPED_SUBRESOURCE mappedTexture;
+    HRESULT hr;
 
-    if (S_OK != (hr = pDevContext->Map(pTexture, D3D11CalcSubresource(0, 0, 1), D3D11_MAP_READ, 0, &mappedTexture))) {
+    if (S_OK != (hr = m_mapDeviceContext11->Map(m_mapTexture11, D3D11CalcSubresource(0, 0, 1), D3D11_MAP_READ, 0, &mappedTexture))) {
         logger->reportLogError(L"d3d11 couldn't map texture, hresult = 0x%x", hr);
-        goto end;
+        return;
     }
 
-    ipcContext->m_memDesc.width = tex_desc.Width;
-    ipcContext->m_memDesc.height = tex_desc.Height;
+    ipcContext->m_memDesc.width = width;
+    ipcContext->m_memDesc.height = height;
     ipcContext->m_memDesc.rowPitch = mappedTexture.RowPitch;
     ipcContext->m_memDesc.format = BufferFormatAbgr;
     ipcContext->m_memDesc.frameId++;
@@ -288,13 +269,13 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
         memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof (ipcContext->m_memDesc));
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
-        if (mappedTexture.RowPitch == tex_desc.Width * 4) {
-            memcpy(pMemDataMap, mappedTexture.pData, tex_desc.Width * tex_desc.Height * 4);
+        if (mappedTexture.RowPitch == width * 4) {
+            memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
         } else {
             UINT i = 0, cleanOffset = 0, pitchOffset = 0;
-            while (i < tex_desc.Height) {
-                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), tex_desc.Width * 4);
-                cleanOffset += tex_desc.Width * 4;
+            while (i < height) {
+                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), width * 4);
+                cleanOffset += width * 4;
                 pitchOffset += mappedTexture.RowPitch;
                 i++;
             }
@@ -305,15 +286,13 @@ void D3D11Grab(ID3D11Texture2D *pBackBuffer) {
         logger->reportLogError(L"d3d11 couldn't wait mutex. errocode = 0x%x", errorcode);
     }
 
-    pDevContext->Unmap(pTexture, D3D10CalcSubresource(0, 0, 1));
-end:
-    pDevContext->Release();
-    pDev->Release();
+    m_mapDeviceContext11->Unmap(m_mapTexture11, D3D10CalcSubresource(0, 0, 1));
 }
 
 HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
 
     DxgiFrameGrabber *dxgiFrameGrabber = DxgiFrameGrabber::getInstance();
+    dxgiFrameGrabber->m_frameCount++;
 
     Logger *logger = dxgiFrameGrabber->m_logger;
 
@@ -335,26 +314,37 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
     }
 
     if (!desc.Windowed) {
-        if (dxgiDevice == DxgiDeviceD3D10) {
-            ID3D10Texture2D *pBackBuffer;
-            HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-            if (hr == S_OK) {
-                D3D10Grab(pBackBuffer);
-                pBackBuffer->Release();
+        if (dxgiFrameGrabber->m_mapPending) {
+            if (dxgiDevice == DxgiDeviceD3D10) {
+                dxgiFrameGrabber->D3D10Map();
+            } else if (dxgiDevice == DxgiDeviceD3D11) {
+                dxgiFrameGrabber->D3D11Map();
             }
-            else {
-                logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
-            }
+            dxgiFrameGrabber->m_mapPending = false;
         }
-        if (dxgiDevice == DxgiDeviceD3D11) {
-            ID3D11Texture2D *pBackBuffer;
-            HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-            if (hr == S_OK) {
-                D3D11Grab(pBackBuffer);
-                pBackBuffer->Release();
-            } else {
-                logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
+
+        if (dxgiFrameGrabber->m_frameCount % FRAME_CAPTURE_RATE == 0) {
+            if (dxgiDevice == DxgiDeviceD3D10) {
+                ID3D10Texture2D *pBackBuffer;
+                HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                if (hr == S_OK) {
+                    dxgiFrameGrabber->D3D10Grab(pBackBuffer);
+                    pBackBuffer->Release();
+                } else {
+                    logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+                }
             }
+            if (dxgiDevice == DxgiDeviceD3D11) {
+                ID3D11Texture2D *pBackBuffer;
+                HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                if (hr == S_OK) {
+                    dxgiFrameGrabber->D3D11Grab(pBackBuffer);
+                    pBackBuffer->Release();
+                } else {
+                    logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
+                }
+            }
+            dxgiFrameGrabber->m_mapPending = true;
         }
     }
 

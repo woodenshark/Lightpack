@@ -54,6 +54,7 @@ protected:
     UINT m_surfHeight;
     UINT m_frameCount;
     bool m_mapPending;
+	UINT m_lastGrab;
 };
 
 #endif // D3D9FRAMEGRABBER_HPP

@@ -186,6 +186,7 @@ void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
             if (Settings::isDx1011GrabberEnabled()) {
                 m_grabber->stopGrabbing();
                 grabber->startGrabbing();
+				grabber->setGrabInterval(Settings::getGrabSlowdown());
             }
         } else {
             m_grabber->startGrabbing();

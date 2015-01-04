@@ -276,6 +276,12 @@ public:
     void stop() { m_isStarted = false; }
     bool isStarted() const { return m_isStarted; }
 
+    void setGrabInterval(int msec) {
+        memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
+        m_memDesc.grabDelay = msec;
+        copyMemDesc(m_memDesc);
+    }
+
     QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
     {
         Q_UNUSED(grabWidgets);
@@ -481,7 +487,9 @@ private:
         memDesc->dxgiPresentFuncOffset = GetDxgiPresentOffset(wnd);
 
         //converting logLevel from our app's level to EventLog's level
-        memDesc->logLevel =  Debug::HighLevel - g_debugLevel;
+        memDesc->logLevel = Debug::HighLevel - g_debugLevel;
+        memDesc->frameId = 0;
+        memDesc->grabDelay = 50; // will be overriden by setGrabInterval
         return true;
     }
 
@@ -590,7 +598,7 @@ void D3D10Grabber::stopGrabbing() {
 
 void D3D10Grabber::setGrabInterval(int msec) {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
-    Q_UNUSED(msec);
+    m_impl->setGrabInterval(msec);
 }
 
 /*!

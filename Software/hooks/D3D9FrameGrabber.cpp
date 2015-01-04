@@ -27,6 +27,7 @@ D3D9FrameGrabber::D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger): GAPIPro
     m_surfHeight = 0;
     m_frameCount = 0;
     m_mapPending = false;
+    m_lastGrab = 0;
 }
 
 bool D3D9FrameGrabber::init() {
@@ -85,9 +86,9 @@ void D3D9FrameGrabber::free() {
 
 void ** D3D9FrameGrabber::calcD3d9PresentPointer() {
 #ifdef HOOKS_SYSWOW64
-    UINT offset = m_ipcContext->m_memDesc.d3d9PresentFuncOffset32;
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9PresentFuncOffset32;
 #else
-    UINT offset = m_ipcContext->m_memDesc.d3d9PresentFuncOffset;
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9PresentFuncOffset;
 #endif
     void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
     m_logger->reportLogDebug(L"d3d9PresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
@@ -98,9 +99,9 @@ void ** D3D9FrameGrabber::calcD3d9PresentPointer() {
 
 void ** D3D9FrameGrabber::calcD3d9SCPresentPointer() {
 #ifdef HOOKS_SYSWOW64
-    UINT offset = m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset32;
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9SCPresentFuncOffset32;
 #else
-    UINT offset = m_ipcContext->m_memDesc.d3d9SCPresentFuncOffset;
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9SCPresentFuncOffset;
 #endif
     void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
     m_logger->reportLogDebug(L"d3d9SCPresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
@@ -129,23 +130,24 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             D3DLOCKED_RECT lockedSrcRect;
             newRect.right = width;
             newRect.bottom = height;
-            hRes = pOffscreenSurf->LockRect(&lockedSrcRect, &newRect, 0);
-            if (FAILED(hRes))
+            hRes = pOffscreenSurf->LockRect(&lockedSrcRect, &newRect, D3DLOCK_DONOTWAIT);
+            if (hRes == D3DERR_WASSTILLDRAWING)
             {
+                goto stillWaiting;
+            } else if (FAILED(hRes)) {
                 logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes);
                 goto endMap;
             }
 
-            ipcContext->m_memDesc.width = width;
-            ipcContext->m_memDesc.height = height;
-            ipcContext->m_memDesc.rowPitch = lockedSrcRect.Pitch;
-            ipcContext->m_memDesc.frameId++;
-            ipcContext->m_memDesc.format = getCompatibleBufferFormat(d3d9FrameGrabber->m_surfFormat);
+            ipcContext->m_pMemDesc->width = width;
+            ipcContext->m_pMemDesc->height = height;
+            ipcContext->m_pMemDesc->rowPitch = lockedSrcRect.Pitch;
+            ipcContext->m_pMemDesc->frameId++;
+            ipcContext->m_pMemDesc->format = getCompatibleBufferFormat(d3d9FrameGrabber->m_surfFormat);
 
             DWORD errorcode;
             if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-                memcpy(ipcContext->m_pMemMap, &(ipcContext->m_memDesc), sizeof(ipcContext->m_memDesc));
-                PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof(ipcContext->m_memDesc));
+                PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof(*ipcContext->m_pMemDesc));
                 if (static_cast<UINT>(lockedSrcRect.Pitch) == width * 4) {
                     memcpy(pMemDataMap, lockedSrcRect.pBits, width * height * 4);
                 } else {
@@ -164,11 +166,13 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             }
 
         endMap:
-            if (pOffscreenSurf) pOffscreenSurf->UnlockRect();
+            pOffscreenSurf->UnlockRect();
             d3d9FrameGrabber->m_mapPending = false;
         }
+    stillWaiting:
 
-        if (d3d9FrameGrabber->m_frameCount % FRAME_CAPTURE_RATE == 0) {
+        // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
+        if (!d3d9FrameGrabber->m_mapPending && (GetTickCount() - d3d9FrameGrabber->m_lastGrab >= d3d9FrameGrabber->m_ipcContext->m_pMemDesc->grabDelay)) {
             IDirect3DSurface9 *pBackBuffer = NULL;
             IDirect3DSurface9 *pDemultisampledSurf = NULL;
             IDirect3DSurface9 *pOffscreenSurf = NULL;
@@ -252,6 +256,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             }
 
             d3d9FrameGrabber->m_mapPending = true;
+            d3d9FrameGrabber->m_lastGrab = GetTickCount();
 
         end:
             if (pBackBuffer) pBackBuffer->Release();
@@ -277,7 +282,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
     }
 }
 
-HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion, DWORD dwFlags) {    
+HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion, DWORD dwFlags) {
     D3D9FrameGrabber *d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
     Logger *logger = d3d9FrameGrabber->m_logger;
     d3d9FrameGrabber->m_frameCount++;
@@ -298,21 +303,21 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             newRect.bottom = height;
 
             hRes = pOffscreenSurf->LockRect(&lockedSrcRect, &newRect, 0);
-            if (FAILED(hRes))
-            {
+            if (hRes == D3DERR_WASSTILLDRAWING) {
+                goto stillWaiting;
+            } else if (FAILED(hRes)) {
                 logger->reportLogError(L"GetFramePrep: FAILED to lock source rect. (0x%x)", hRes);
                 goto endMap;
             }
 
-            ipcContext->m_memDesc.width = width;
-            ipcContext->m_memDesc.height = height;
-            ipcContext->m_memDesc.rowPitch = lockedSrcRect.Pitch;
-            ipcContext->m_memDesc.frameId++;
-            ipcContext->m_memDesc.format = getCompatibleBufferFormat(d3d9FrameGrabber->m_surfFormat);
+            ipcContext->m_pMemDesc->width = width;
+            ipcContext->m_pMemDesc->height = height;
+            ipcContext->m_pMemDesc->rowPitch = lockedSrcRect.Pitch;
+            ipcContext->m_pMemDesc->frameId++;
+            ipcContext->m_pMemDesc->format = getCompatibleBufferFormat(d3d9FrameGrabber->m_surfFormat);
 
             if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-                memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof(ipcContext->m_memDesc));
-                PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof(ipcContext->m_memDesc));
+                PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof(*ipcContext->m_pMemDesc));
                 if (static_cast<UINT>(lockedSrcRect.Pitch) == width * 4) {
                     memcpy(pMemDataMap, lockedSrcRect.pBits, width * height * 4);
                 } else {
@@ -330,11 +335,13 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
                 logger->reportLogError(L"d3d9sc couldn't wait mutex. errocode = 0x%x", errorcode);
             }
         endMap:
-            if (pOffscreenSurf) pOffscreenSurf->UnlockRect();
+            pOffscreenSurf->UnlockRect();
             d3d9FrameGrabber->m_mapPending = false;
         }
+    stillWaiting:
 
-        if (d3d9FrameGrabber->m_frameCount % FRAME_CAPTURE_RATE == 0) {
+        // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
+        if (!d3d9FrameGrabber->m_mapPending && (GetTickCount() - d3d9FrameGrabber->m_lastGrab >= d3d9FrameGrabber->m_ipcContext->m_pMemDesc->grabDelay)) {
             IDirect3DSurface9 *pBackBuffer = NULL;
             D3DPRESENT_PARAMETERS params;
             IDirect3DSurface9 *pDemultisampledSurf = NULL;
@@ -420,6 +427,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             }
 
             d3d9FrameGrabber->m_mapPending = true;
+            d3d9FrameGrabber->m_lastGrab = GetTickCount();
 
         end:
             if (pBackBuffer) pBackBuffer->Release();

@@ -308,7 +308,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Grab delay:</string>
+                 <string>Grab interval:</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

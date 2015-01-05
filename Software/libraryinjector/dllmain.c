@@ -47,14 +47,14 @@ static HMODULE GetCurrentModule() {
 }
 
 STDAPI DllRegisterServer(void) {
-    HKEY		rootKey;
-    HKEY		hKey;
-    HKEY		hKey2;
-    HKEY		hkExtra;
-    WCHAR		buffer[GUID_BUFFER_SIZE];
-    DWORD		disposition;
-    HRESULT		result;
-    WCHAR		filename[MAX_PATH];
+    HKEY        rootKey;
+    HKEY        hKey;
+    HKEY        hKey2;
+    HKEY        hkExtra;
+    WCHAR       buffer[GUID_BUFFER_SIZE];
+    DWORD       disposition;
+    HRESULT     result;
+    WCHAR       filename[MAX_PATH];
 
     GetModuleFileNameW(GetCurrentModule(), filename, sizeof(filename));
 
@@ -102,10 +102,10 @@ STDAPI DllRegisterServer(void) {
 }
 
 STDAPI DllUnregisterServer(void) {
-    HKEY		rootKey;
-    HKEY		hKey;
-    HKEY		hKey2;
-    WCHAR		buffer[GUID_BUFFER_SIZE];
+    HKEY        rootKey;
+    HKEY        hKey;
+    HKEY        hKey2;
+    WCHAR       buffer[GUID_BUFFER_SIZE];
 
     StringFromGUID2(&CLSID_ILibraryInjector, buffer, _countof(buffer));
 
@@ -143,7 +143,7 @@ STDAPI DllUnregisterServer(void) {
  */
 
 LIBRARYINJECTORSHARED_EXPORT HRESULT PASCAL DllGetClassObject(REFCLSID objGuid, REFIID factoryGuid, void **factoryHandle) {
-    register HRESULT		hr;
+    register HRESULT        hr;
 
 #ifdef DEBUG
     WCHAR guid[GUID_BUFFER_SIZE];
@@ -158,17 +158,17 @@ LIBRARYINJECTORSHARED_EXPORT HRESULT PASCAL DllGetClassObject(REFCLSID objGuid, 
         IClassFactory * classFactory = allocClassFactory();
         if (classFactory)
         {
-	        classFactory->lpVtbl->AddRef(classFactory);
-	        // Fill in the caller's handle with a pointer to our IClassFactory object.
-	        // We'll let our IClassFactory's QueryInterface do that, because it also
-	        // checks the IClassFactory GUID and does other book-keeping
-	        hr = classFactory->lpVtbl->QueryInterface(classFactory, factoryGuid, factoryHandle);
-	        classFactory->lpVtbl->Release(classFactory);
-	    }
-	    else
-	    {
-	    	hr = E_OUTOFMEMORY;
-	    }
+            classFactory->lpVtbl->AddRef(classFactory);
+            // Fill in the caller's handle with a pointer to our IClassFactory object.
+            // We'll let our IClassFactory's QueryInterface do that, because it also
+            // checks the IClassFactory GUID and does other book-keeping
+            hr = classFactory->lpVtbl->QueryInterface(classFactory, factoryGuid, factoryHandle);
+            classFactory->lpVtbl->Release(classFactory);
+        }
+        else
+        {
+            hr = E_OUTOFMEMORY;
+        }
     }
     else
     {
@@ -215,14 +215,16 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD fdwReason, LPVOID lpvReserved) {
     {
         case DLL_PROCESS_ATTACH:
         {
-        	libraryInjectorInit();
+            libraryInjectorInit();
 
             // We don't need to do any thread initialization
             DisableThreadLibraryCalls(instance);
+            break;
         }
         case DLL_PROCESS_DETACH:
         {
-        	libraryInjectorShutdown();
+            libraryInjectorShutdown();
+            break;
         }
     }
 

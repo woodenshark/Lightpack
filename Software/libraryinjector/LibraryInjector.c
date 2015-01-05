@@ -153,7 +153,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
 
     wcscpy(modulePath, ModulePath);
     UNREFERENCED_PARAMETER(this);
-    reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
+    //reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
         size_t sizeofCP;
         LPVOID Memory = NULL;
@@ -225,11 +225,11 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
         HRESULT hr = (WaitForSingleObject(hThread, INJECT_WAIT_DELAY));
         if (hr != WAIT_OBJECT_0) {
             TerminateThread(hThread, E_FAIL);
-            reportLog(EVENTLOG_ERROR_TYPE, L"thread did not terminated within expected timeout");
+            reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
             goto end;
         }
 
-        reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
+        //reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
         result = S_OK;
 
     end:

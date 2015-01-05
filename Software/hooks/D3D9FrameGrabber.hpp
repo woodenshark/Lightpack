@@ -6,6 +6,7 @@
 
 class Logger;
 class ProxyFuncJmp;
+class ProxyFuncJmpToVFTable;
 struct IDirect3DDevice9;
 struct IDirect3DSwapChain9;
 struct IDirect3DSurface9;
@@ -40,8 +41,8 @@ public:
     friend HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9*, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
 
 protected:
-    ProxyFuncJmp *m_d3d9PresentProxyFuncJmp;
-    ProxyFuncJmp *m_d3d9SCPresentProxyFuncJmp;
+	ProxyFuncJmpToVFTable *m_d3d9PresentProxyFunc;
+	ProxyFuncJmpToVFTable *m_d3d9SCPresentProxyFunc;
     D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger);
     void ** calcD3d9PresentPointer();
     void ** calcD3d9SCPresentPointer();

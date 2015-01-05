@@ -156,9 +156,10 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
     reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
         size_t sizeofCP;
-        LPVOID Memory;
-        HANDLE hThread;
+        LPVOID Memory = NULL;
+        HANDLE hThread = NULL;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
+        HRESULT result = E_FAIL;
 
         DWORD_PTR LoadLibAddr = (DWORD_PTR)GetProcAddress(hKernel32, "LoadLibraryW");
 
@@ -166,7 +167,7 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
 
         if (hProcess == NULL) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't open process");
-            return S_FALSE;
+            goto end;
         }
 
 #ifdef _WIN64
@@ -176,12 +177,15 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
 
             HANDLE mapping = OpenFileMapping(FILE_MAP_READ, FALSE, HOOKSGRABBER_SHARED_MEM_NAME);
             if (NULL == mapping) {
-                return 4;
+                reportLog(EVENTLOG_ERROR_TYPE, L"couldn't open shared memory");
+                goto end;
             }
 
             char *memory = (char *)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, HOOKSGRABBER_SHARED_MEM_SIZE);
             if (memory == NULL) {
-                return 5;
+                reportLog(EVENTLOG_ERROR_TYPE, L"couldn't map shared memory");
+                CloseHandle(mapping);
+                goto end;
             }
 
             size_t len = wcslen(modulePath);
@@ -201,40 +205,42 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this,
 
         if (!Memory) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't allocate memory");
-            return S_FALSE;
+            goto end;
         }
 
         wcscpy((wchar_t*)CodePage, modulePath);
 
         if (!WriteProcessMemory(hProcess, Memory, CodePage, sizeofCP, 0)) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't write loading library code");
-            return S_FALSE;
+            goto end;
         }
 
         hThread = CreateRemoteThread(hProcess, 0, 0, (LPTHREAD_START_ROUTINE)LoadLibAddr, Memory, 0, 0);
         if (!hThread) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
-            return S_FALSE;
+            goto end;
         }
         
 
         HRESULT hr = (WaitForSingleObject(hThread, INJECT_WAIT_DELAY));
         if (hr != WAIT_OBJECT_0) {
-            CloseHandle(hThread);
-            return S_FALSE;
+            TerminateThread(hThread, E_FAIL);
+            reportLog(EVENTLOG_ERROR_TYPE, L"thread did not terminated within expected timeout");
+            goto end;
         }
 
-        DWORD exitCode = -1;
-        GetExitCodeThread(hThread, &exitCode);
-        CloseHandle(hThread);
-
-        if (!exitCode) { // LoadLibrary returns 0 on failure
-            reportLog(EVENTLOG_ERROR_TYPE, L"Injection into process failed: %d", exitCode);
-            return S_FALSE;
-        }
         reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
+        result = S_OK;
 
-        return S_OK;
+    end:
+        if (Memory)
+            VirtualFreeEx(hProcess, Memory, 0, MEM_RELEASE);
+        if (hThread)
+            CloseHandle(hThread);
+        if (hProcess)
+            CloseHandle(hProcess);
+
+        return result;
     } else {
         reportLog(EVENTLOG_ERROR_TYPE, L"couldn't acquire privileges to inject");
         return S_FALSE;

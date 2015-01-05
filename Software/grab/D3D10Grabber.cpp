@@ -287,11 +287,15 @@ public:
 
     void setGrabInterval(int msec) {
         if (m_memMap) {
-            memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
-            m_memDesc.grabDelay = msec;
-            copyMemDesc(m_memDesc);
-        } else {
-            m_memDesc.grabDelay = msec;
+            DWORD errorcode;
+            if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(m_mutex, INFINITE))) {
+                memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
+                m_memDesc.grabDelay = msec;
+                copyMemDesc(m_memDesc);
+                ReleaseMutex(m_mutex);
+            } else {
+                qWarning(Q_FUNC_INFO " couldn't set grab interval: ", errorcode);
+            }
         }
     }
 

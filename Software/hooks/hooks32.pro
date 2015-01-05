@@ -59,9 +59,10 @@ CONFIG(msvc) {
 SOURCES += \
     hooks.cpp \
     ProxyFuncJmp.cpp \
+    ProxyFuncVFTable.cpp \
+    ProxyFuncJmpToVFTable.cpp \
     hooksutils.cpp \
     IPCContext.cpp \
-    ProxyFuncVFTable.cpp \
     GAPIProxyFrameGrabber.cpp \
     DxgiFrameGrabber.cpp \
     Logger.cpp \
@@ -74,10 +75,11 @@ HEADERS += \
     ../common/msvcstub.h \
     ProxyFunc.hpp \
     ProxyFuncJmp.hpp \
+    ProxyFuncJmpToVFTable.hpp \
+    ProxyFuncVFTable.hpp \
     hooksutils.h \
     IPCContext.hpp \
     GAPISubstFunctions.hpp \
-    ProxyFuncVFTable.hpp \
     res/logmessages.h \
     GAPIProxyFrameGrabber.hpp \
     DxgiFrameGrabber.hpp \

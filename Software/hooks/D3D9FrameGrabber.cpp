@@ -7,12 +7,17 @@
 #include "d3d9types.h"
 #include "d3d9.h"
 
-#include "ProxyFuncJmp.hpp"
+#include "ProxyFuncJmpToVFTable.hpp"
+
+#define D3D9_PRESENT_FUNC_ORD 17
+#define D3D9_SCPRESENT_FUNC_ORD 3
 
 D3D9FrameGrabber *D3D9FrameGrabber::m_this = NULL;
 
-HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*,CONST RECT*,HWND,CONST RGNDATA*);
-HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *, CONST RECT*,CONST RECT*,HWND,CONST RGNDATA*, DWORD);
+HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*);
+typedef HRESULT(WINAPI *D3D9PresentFunc)(IDirect3DDevice9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*);
+HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
+typedef HRESULT (WINAPI *D3D9SCPresentFunc)(IDirect3DSwapChain9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
 
 BufferFormat getCompatibleBufferFormat(D3DFORMAT format);
 
@@ -33,10 +38,9 @@ D3D9FrameGrabber::D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger): GAPIPro
 bool D3D9FrameGrabber::init() {
     if (!m_isInited) {
         if (m_ipcContext) {
-
-            m_d3d9PresentProxyFuncJmp = new ProxyFuncJmp(this->calcD3d9PresentPointer(), reinterpret_cast<void*>(D3D9Present), m_logger);
-            m_d3d9SCPresentProxyFuncJmp = new ProxyFuncJmp(this->calcD3d9SCPresentPointer(), reinterpret_cast<void*>(D3D9SCPresent), m_logger);
-            m_isInited = m_d3d9PresentProxyFuncJmp->init() && m_d3d9SCPresentProxyFuncJmp->init();
+            m_d3d9PresentProxyFunc = new ProxyFuncJmpToVFTable(this->calcD3d9PresentPointer(), reinterpret_cast<void*>(D3D9Present), m_logger);
+            m_d3d9SCPresentProxyFunc = new ProxyFuncJmpToVFTable(this->calcD3d9SCPresentPointer(), reinterpret_cast<void*>(D3D9SCPresent), m_logger);
+            m_isInited = m_d3d9PresentProxyFunc->init() && m_d3d9SCPresentProxyFunc->init();
         }
     }
     return m_isInited;
@@ -47,27 +51,27 @@ bool D3D9FrameGrabber::isGAPILoaded() {
 }
 
 bool D3D9FrameGrabber::installHooks() {
-    m_d3d9PresentProxyFuncJmp->installHook();
-    m_d3d9SCPresentProxyFuncJmp->installHook();
+    m_d3d9PresentProxyFunc->installHook();
+    m_d3d9SCPresentProxyFunc->installHook();
     return this->isHooksInstalled();
 }
 
 bool D3D9FrameGrabber::isHooksInstalled() {
-    return isGAPILoaded() && m_isInited && m_d3d9PresentProxyFuncJmp->isHookInstalled() && m_d3d9SCPresentProxyFuncJmp->isHookInstalled();
+	return isGAPILoaded() && m_isInited && m_d3d9PresentProxyFunc->isHookInstalled() && m_d3d9SCPresentProxyFunc->isHookInstalled();
 }
 
 bool D3D9FrameGrabber::removeHooks() {
-    m_d3d9PresentProxyFuncJmp->removeHook();
-    m_d3d9SCPresentProxyFuncJmp->removeHook();
+    m_d3d9PresentProxyFunc->removeHook();
+    m_d3d9SCPresentProxyFunc->removeHook();
 
-    return !m_d3d9PresentProxyFuncJmp->isHookInstalled() && !m_d3d9SCPresentProxyFuncJmp->isHookInstalled();
+	return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled();
 }
 
 void D3D9FrameGrabber::free() {
-    delete m_d3d9PresentProxyFuncJmp;
-    delete m_d3d9SCPresentProxyFuncJmp;
-    m_d3d9PresentProxyFuncJmp = NULL;
-    m_d3d9SCPresentProxyFuncJmp = NULL;
+    delete m_d3d9PresentProxyFunc;
+    delete m_d3d9SCPresentProxyFunc;
+    m_d3d9PresentProxyFunc = NULL;
+    m_d3d9SCPresentProxyFunc = NULL;
     m_isInited = false;
 
     if (m_pDemultisampledSurf) {
@@ -262,17 +266,19 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             if (pBackBuffer) pBackBuffer->Release();
             if (pSc) pSc->Release();
         }
-        
-        ProxyFuncJmp *d3d9PresentProxyFuncJmp = d3d9FrameGrabber->m_d3d9PresentProxyFuncJmp;
-        if(!d3d9PresentProxyFuncJmp->removeHook()) {
-            int i = GetLastError();
-            logger->reportLogError(L"d3d9 error occured while trying to removeHook before original call0x%x", i);
-        }
-        HRESULT result = pDev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
-        if(!d3d9PresentProxyFuncJmp->installHook()) {
-            int i = GetLastError();
-            logger->reportLogError(L"d3d9 error occured while trying to installHook after original call0x%x", i);
+        HRESULT result;
+        if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->isSwitched()) {
+            // find the VFT in this process and use it in the future
+            uintptr_t * pvtbl = *((uintptr_t**)(pDev));
+            uintptr_t* presentFuncPtr = &pvtbl[D3D9_PRESENT_FUNC_ORD];
+            if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9Present)) {
+                logger->reportLogError(L"d3d9 failed to switch from jmp to vft proxy");
+            }
+            result = pDev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+        } else {
+            D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
+            result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
         }
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;
@@ -434,17 +440,19 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             if (pDev) pDev->Release();
         }
 
-        ProxyFuncJmp *d3d9SCPresentProxyFuncJmp = d3d9FrameGrabber->m_d3d9SCPresentProxyFuncJmp;
-
-        if(d3d9SCPresentProxyFuncJmp->removeHook()) {
-            int i = GetLastError();
-            logger->reportLogError(L"d3d9sc error occured while trying to removeHook before original call0x%x", i);
+        HRESULT result;
+        if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->isSwitched()) {
+            // find the VFT in this process and use it in the future
+            uintptr_t * pvtbl = *((uintptr_t**)(pSc));
+            uintptr_t* presentFuncPtr = &pvtbl[D3D9_SCPRESENT_FUNC_ORD];
+            if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9SCPresent)) {
+                logger->reportLogError(L"d3d9sc failed to switch from jmp to vft proxy");
+            }
+            result = pSc->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
         }
-        HRESULT result = pSc->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
-
-        if(d3d9SCPresentProxyFuncJmp->installHook()) {
-            int i = GetLastError();
-            logger->reportLogError(L"d3d9sc error occured while trying to installHook after original call0x%x", i);
+        else {
+            D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
+            result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
         }
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);

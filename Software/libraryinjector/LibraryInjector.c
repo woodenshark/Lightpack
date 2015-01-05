@@ -43,7 +43,11 @@ static volatile LONG locksCount = 0;
 #define REPORT_LOG_BUF_SIZE 2048
 static HANDLE hEventSrc = NULL;
 
+#ifdef _DEBUG
+#define INJECT_WAIT_DELAY INFINITE
+#else
 #define INJECT_WAIT_DELAY 2000
+#endif
 
 typedef struct {
     const ILibraryInjectorVtbl *lpVtbl;

@@ -19,13 +19,12 @@ HANDLE g_syncRunMutex;
 
 
 void writeBlankFrame(PVOID dest) {
-    HOOKSGRABBER_SHARED_MEM_DESC lmemDesc;
-    memcpy(&lmemDesc, &gIpcContext->m_pMemDesc, sizeof (lmemDesc));
-    lmemDesc.frameId = HOOKSGRABBER_BLANK_FRAME_ID;
-    lmemDesc.width = lmemDesc.height = lmemDesc.rowPitch = 0;
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(gIpcContext->m_hMutex, 0))) {
-        memcpy(dest, &lmemDesc, sizeof (lmemDesc));
+        gIpcContext->m_pMemDesc->frameId = HOOKSGRABBER_BLANK_FRAME_ID;
+        gIpcContext->m_pMemDesc->width = 0;
+        gIpcContext->m_pMemDesc->height = 0;
+        gIpcContext->m_pMemDesc->rowPitch = 0;
         ReleaseMutex(gIpcContext->m_hMutex);
     } else {
         gLog->reportLogError(L"couldn't wait mutex while writing blank frame. errocode = 0x%x", errorcode);
@@ -105,7 +104,7 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
             }
 
             if (!DxgiFrameGrabber::hasInstance()) {
-				dxgiFrameGrabber = DxgiFrameGrabber::getInstance(g_syncRunMutex);
+                dxgiFrameGrabber = DxgiFrameGrabber::getInstance(g_syncRunMutex);
                 dxgiFrameGrabber->setIPCContext(gIpcContext);
             } else {
                 dxgiFrameGrabber = DxgiFrameGrabber::getInstance();

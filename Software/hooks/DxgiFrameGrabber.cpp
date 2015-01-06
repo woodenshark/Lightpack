@@ -70,6 +70,13 @@ void DxgiFrameGrabber::free() {
         m_dxgiPresentProxyFuncVFTable = NULL;
     }
 
+    freeDeviceData10();
+    freeDeviceData11();
+}
+
+void DxgiFrameGrabber::freeDeviceData10() {
+    m_mapPending = false;
+
     if (m_mapTexture10) {
         m_mapTexture10->Release();
         m_mapTexture10 = NULL;
@@ -78,6 +85,11 @@ void DxgiFrameGrabber::free() {
         m_mapDevice10->Release();
         m_mapDevice10 = NULL;
     }
+}
+
+void DxgiFrameGrabber::freeDeviceData11() {
+    m_mapPending = false;
+
     if (m_mapTexture11) {
         m_mapTexture11->Release();
         m_mapTexture11 = NULL;
@@ -122,10 +134,7 @@ void DxgiFrameGrabber::D3D10Grab(ID3D10Texture2D* pBackBuffer) {
         (m_mapDevice10 != pDev
         || m_mapWidth != tex_desc.Width
         || m_mapHeight != tex_desc.Height)) {
-        m_mapTexture10->Release();
-        m_mapTexture10 = NULL;
-        m_mapDevice10->Release();
-        m_mapDevice10 = NULL;
+        freeDeviceData10();
     }
     if (!m_mapTexture10) {
         tex_desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
@@ -214,12 +223,7 @@ void DxgiFrameGrabber::D3D11Grab(ID3D11Texture2D *pBackBuffer) {
         (m_mapDevice11 != pDev
         || m_mapWidth != tex_desc.Width
         || m_mapHeight != tex_desc.Height)) {
-        m_mapTexture11->Release();
-        m_mapTexture11 = NULL;
-        m_mapDeviceContext11->Release();
-        m_mapDeviceContext11 = NULL;
-        m_mapDevice11->Release();
-        m_mapDevice11 = NULL;
+        freeDeviceData11();
     }
     if (!m_mapTexture11) {
         tex_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;

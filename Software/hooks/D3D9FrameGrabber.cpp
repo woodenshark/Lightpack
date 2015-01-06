@@ -57,14 +57,14 @@ bool D3D9FrameGrabber::installHooks() {
 }
 
 bool D3D9FrameGrabber::isHooksInstalled() {
-	return isGAPILoaded() && m_isInited && m_d3d9PresentProxyFunc->isHookInstalled() && m_d3d9SCPresentProxyFunc->isHookInstalled();
+    return isGAPILoaded() && m_isInited && m_d3d9PresentProxyFunc->isHookInstalled() && m_d3d9SCPresentProxyFunc->isHookInstalled();
 }
 
 bool D3D9FrameGrabber::removeHooks() {
     m_d3d9PresentProxyFunc->removeHook();
     m_d3d9SCPresentProxyFunc->removeHook();
 
-	return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled();
+    return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled();
 }
 
 void D3D9FrameGrabber::free() {
@@ -73,6 +73,12 @@ void D3D9FrameGrabber::free() {
     m_d3d9PresentProxyFunc = NULL;
     m_d3d9SCPresentProxyFunc = NULL;
     m_isInited = false;
+
+    freeDeviceData();
+}
+
+void D3D9FrameGrabber::freeDeviceData() {
+    m_mapPending = false;
 
     if (m_pDemultisampledSurf) {
         m_pDemultisampledSurf->Release();
@@ -205,12 +211,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
                 || d3d9FrameGrabber->m_surfFormat != surfDesc.Format
                 || d3d9FrameGrabber->m_surfWidth != surfDesc.Width
                 || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
-                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
-                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
-                d3d9FrameGrabber->m_pOffscreenSurf->Release();
-                d3d9FrameGrabber->m_pOffscreenSurf = NULL;
-                d3d9FrameGrabber->m_pDev->Release();
-                d3d9FrameGrabber->m_pDev = NULL;
+                d3d9FrameGrabber->freeDeviceData();
             }
             if (!d3d9FrameGrabber->m_pDemultisampledSurf) {
                 hRes = pDev->CreateRenderTarget(
@@ -280,6 +281,11 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
             result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
         }
+
+        if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
+            d3d9FrameGrabber->freeDeviceData();
+        }
+
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;
     } else {
@@ -379,12 +385,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
                 || d3d9FrameGrabber->m_surfFormat != surfDesc.Format
                 || d3d9FrameGrabber->m_surfWidth != surfDesc.Width
                 || d3d9FrameGrabber->m_surfHeight != surfDesc.Height)) {
-                d3d9FrameGrabber->m_pDemultisampledSurf->Release();
-                d3d9FrameGrabber->m_pDemultisampledSurf = NULL;
-                d3d9FrameGrabber->m_pOffscreenSurf->Release();
-                d3d9FrameGrabber->m_pOffscreenSurf = NULL;
-                d3d9FrameGrabber->m_pDev->Release();
-                d3d9FrameGrabber->m_pDev = NULL;
+                d3d9FrameGrabber->freeDeviceData();
             }
             if (!d3d9FrameGrabber->m_pDemultisampledSurf) {
                 hRes = pDev->CreateRenderTarget(
@@ -453,6 +454,10 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         else {
             D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
             result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
+        }
+
+        if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
+            d3d9FrameGrabber->freeDeviceData();
         }
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);

@@ -37,12 +37,13 @@ public:
     virtual bool installHooks();
     virtual bool removeHooks();
     virtual void free();
+    void freeDeviceData();
     friend HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*,CONST RECT*,HWND,CONST RGNDATA*);
     friend HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9*, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
 
 protected:
-	ProxyFuncJmpToVFTable *m_d3d9PresentProxyFunc;
-	ProxyFuncJmpToVFTable *m_d3d9SCPresentProxyFunc;
+    ProxyFuncJmpToVFTable *m_d3d9PresentProxyFunc;
+    ProxyFuncJmpToVFTable *m_d3d9SCPresentProxyFunc;
     D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger);
     void ** calcD3d9PresentPointer();
     void ** calcD3d9SCPresentPointer();
@@ -55,7 +56,7 @@ protected:
     UINT m_surfHeight;
     UINT m_frameCount;
     bool m_mapPending;
-	UINT m_lastGrab;
+    UINT m_lastGrab;
 };
 
 #endif // D3D9FRAMEGRABBER_HPP

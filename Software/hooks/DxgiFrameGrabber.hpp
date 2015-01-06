@@ -39,6 +39,8 @@ public:
     virtual bool installHooks();
     virtual bool removeHooks();
     virtual void free();
+    void freeDeviceData10();
+    void freeDeviceData11();
 
     friend HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c);
 

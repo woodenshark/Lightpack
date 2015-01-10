@@ -11,7 +11,7 @@ struct IDirect3DDevice9;
 struct IDirect3DSwapChain9;
 struct IDirect3DSurface9;
 typedef enum _D3DFORMAT D3DFORMAT;
-#include "d3d9.h" //PRESENT_PARAMETERS
+typedef struct _D3DPRESENT_PARAMETERS_ D3DPRESENT_PARAMETERS;
 
 class D3D9FrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {

@@ -298,11 +298,10 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9Present)) {
                 logger->reportLogError(L"d3d9 failed to switch from jmp to vft proxy");
             }
-            result = pDev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-        } else {
-            D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
-            result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
         }
+
+        D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
+        result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;
@@ -467,11 +466,10 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9SCPresent)) {
                 logger->reportLogError(L"d3d9sc failed to switch from jmp to vft proxy");
             }
-            result = pSc->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
-        } else {
-            D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
-            result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
         }
+
+        D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
+        result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;
@@ -495,11 +493,10 @@ HRESULT WINAPI D3D9Reset(IDirect3DDevice9* pDev, D3DPRESENT_PARAMETERS* pPresent
         if (!d3d9FrameGrabber->m_d3d9ResetProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9Reset)) {
             logger->reportLogError(L"d3d9 failed to switch from jmp to vft proxy");
         }
-        result = pDev->Reset(pPresentationParameters);
-    } else {
-        D3D9ResetFunc orig = reinterpret_cast<D3D9ResetFunc>(d3d9FrameGrabber->m_d3d9ResetProxyFunc->getOriginalFunc());
-        result = orig(pDev, pPresentationParameters);
     }
+
+    D3D9ResetFunc orig = reinterpret_cast<D3D9ResetFunc>(d3d9FrameGrabber->m_d3d9ResetProxyFunc->getOriginalFunc());
+    result = orig(pDev, pPresentationParameters);
 
     if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
         d3d9FrameGrabber->freeDeviceData();

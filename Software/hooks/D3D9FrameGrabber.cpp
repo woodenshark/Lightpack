@@ -13,6 +13,8 @@
 #define D3D9_SCPRESENT_FUNC_ORD 3
 #define D3D9_RESET_FUNC_ORD 16
 
+//#define SWITCH_TO_VMT
+
 D3D9FrameGrabber *D3D9FrameGrabber::m_this = NULL;
 
 HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*);
@@ -291,7 +293,8 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         }
 
         HRESULT result;
-        /* // This method would be more elegant, but leads to crashes when combined with FRAPS (maybe steam overlay is part of the mess, too)
+#ifdef SWITCH_TO_VMT
+        // This method would be more elegant, but leads to crashes when combined with FRAPS (maybe steam overlay is part of the mess, too)
         if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->isSwitched()) {
             // find the VFT in this process and use it in the future
             uintptr_t * pvtbl = *((uintptr_t**)(pDev));
@@ -302,11 +305,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         }
         D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
         result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-        */
-        /*d3d9FrameGrabber->m_d3d9PresentProxyFunc->removeHook();
-        result = pDev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-        d3d9FrameGrabber->m_d3d9PresentProxyFunc->installHook();*/
-
+#else
         if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->removeHook()) {
             int i = GetLastError();
             logger->reportLogError(L"d3d9 error occured while trying to removeHook before original call 0x%x", i);
@@ -316,6 +315,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             int i = GetLastError();
             logger->reportLogError(L"d3d9 error occured while trying to installHook after original call 0x%x", i);
         }
+#endif
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;
@@ -473,7 +473,8 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         }
 
         HRESULT result;
-        /* // This method would be more elegant, but leads to crashes when combined with FRAPS (maybe steam overlay is part of the mess, too)
+#ifdef SWITCH_TO_VMT
+        // This method would be more elegant, but leads to crashes when combined with FRAPS (maybe steam overlay is part of the mess, too)
         if (!d3d9FrameGrabber->m_d3d9PresentProxyFunc->isSwitched()) {
             // find the VFT in this process and use it in the future
             uintptr_t * pvtbl = *((uintptr_t**)(pSc));
@@ -484,8 +485,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         }
         D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
         result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
-        */
-
+#else
         if (d3d9FrameGrabber->m_d3d9SCPresentProxyFunc->removeHook()) {
             int i = GetLastError();
             logger->reportLogError(L"d3d9sc error occured while trying to removeHook before original call 0x%x", i);
@@ -495,6 +495,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             int i = GetLastError();
             logger->reportLogError(L"d3d9sc error occured while trying to installHook after original call 0x%x", i);
         }
+#endif
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
         return result;

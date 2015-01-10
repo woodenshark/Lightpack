@@ -18,7 +18,7 @@ IPCContext *gIpcContext;
 HANDLE g_syncRunMutex;
 
 
-void writeBlankFrame(PVOID dest) {
+void writeBlankFrame() {
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(gIpcContext->m_hMutex, 0))) {
         gIpcContext->m_pMemDesc->frameId = HOOKSGRABBER_BLANK_FRAME_ID;
@@ -135,7 +135,7 @@ HOOKSDLL_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID lp
                 }
 
                 gLog->reportLogInfo(L"clearing shared memory");
-                writeBlankFrame(gIpcContext->m_pMemMap);
+                writeBlankFrame();
 
                 gLog->reportLogInfo(L"clearing IPC context");
                 if (gIpcContext) delete gIpcContext;

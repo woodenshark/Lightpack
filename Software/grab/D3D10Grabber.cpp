@@ -510,6 +510,7 @@ private:
         HWND wnd = (HWND)m_getHwndCb();
         memDesc->d3d9PresentFuncOffset = GetD3D9PresentOffset(wnd);
         memDesc->d3d9SCPresentFuncOffset = GetD3D9SCPresentOffset(wnd);
+        memDesc->d3d9ResetFuncOffset = GetD3D9ResetOffset(wnd);
         memDesc->dxgiPresentFuncOffset = GetDxgiPresentOffset(wnd);
 
         //converting logLevel from our app's level to EventLog's level

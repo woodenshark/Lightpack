@@ -44,10 +44,12 @@
 struct HOOKSGRABBER_SHARED_MEM_DESC {
     UINT d3d9PresentFuncOffset;
     UINT d3d9SCPresentFuncOffset;
+    UINT d3d9ResetFuncOffset;
     UINT dxgiPresentFuncOffset;
 #if defined(_WIN64) || defined(HOOKSGRABBER_SYSWOW64_DESC)
     UINT d3d9PresentFuncOffset32;
     UINT d3d9SCPresentFuncOffset32;
+    UINT d3d9ResetFuncOffset32;
     UINT dxgiPresentFuncOffset32;
     UINT loadLibraryWAddress32;
 #endif

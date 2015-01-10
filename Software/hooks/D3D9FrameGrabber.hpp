@@ -11,6 +11,7 @@ struct IDirect3DDevice9;
 struct IDirect3DSwapChain9;
 struct IDirect3DSurface9;
 typedef enum _D3DFORMAT D3DFORMAT;
+#include "d3d9.h" //PRESENT_PARAMETERS
 
 class D3D9FrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {
@@ -40,13 +41,16 @@ public:
     void freeDeviceData();
     friend HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*,CONST RECT*,HWND,CONST RGNDATA*);
     friend HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9*, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
+	friend HRESULT WINAPI D3D9Reset(IDirect3DDevice9* pDev, D3DPRESENT_PARAMETERS* pPresentationParameters);
 
 protected:
-    ProxyFuncJmpToVFTable *m_d3d9PresentProxyFunc;
-    ProxyFuncJmpToVFTable *m_d3d9SCPresentProxyFunc;
+	ProxyFuncJmpToVFTable *m_d3d9PresentProxyFunc;
+	ProxyFuncJmpToVFTable *m_d3d9SCPresentProxyFunc;
+	ProxyFuncJmpToVFTable *m_d3d9ResetProxyFunc;
     D3D9FrameGrabber(HANDLE syncRunMutex, Logger *logger);
     void ** calcD3d9PresentPointer();
     void ** calcD3d9SCPresentPointer();
+	void ** calcD3d9ResetPointer();
 
     IDirect3DSurface9 *m_pDemultisampledSurf;
     IDirect3DSurface9 *m_pOffscreenSurf;

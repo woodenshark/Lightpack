@@ -76,6 +76,7 @@ int CALLBACK WinMain(
     }
     UINT d3d9PresentOffset = WinUtils::GetD3D9PresentOffset(hWnd);
     UINT d3d9SCPresentOffset = WinUtils::GetD3D9SCPresentOffset(hWnd);
+    UINT d3d9ResetOffset = WinUtils::GetD3D9ResetOffset(hWnd);
     UINT dxgiPresentOffset = WinUtils::GetDxgiPresentOffset(hWnd);
     if (!d3d9PresentOffset || !d3d9SCPresentOffset || !dxgiPresentOffset) {
         return 3;
@@ -98,12 +99,13 @@ int CALLBACK WinMain(
 
     desc->d3d9PresentFuncOffset32 = d3d9PresentOffset;
     desc->d3d9SCPresentFuncOffset32 = d3d9SCPresentOffset;
+    desc->d3d9ResetFuncOffset32 = d3d9ResetOffset;
     desc->dxgiPresentFuncOffset32 = dxgiPresentOffset;
     desc->loadLibraryWAddress32 = loadLibraryWAddr;
 
     UnmapViewOfFile(memory);
     CloseHandle(mapping);
-	
+    
     CloseWindow(hWnd);
     DestroyWindow(hWnd);
 

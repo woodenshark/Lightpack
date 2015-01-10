@@ -11,6 +11,7 @@
 
 #define D3D9_PRESENT_FUNC_ORD 17
 #define D3D9_SCPRESENT_FUNC_ORD 3
+#define D3D9_RESET_FUNC_ORD 16
 
 D3D9FrameGrabber *D3D9FrameGrabber::m_this = NULL;
 
@@ -18,6 +19,9 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *, CONST RECT*, CONST RECT*, HWND, C
 typedef HRESULT(WINAPI *D3D9PresentFunc)(IDirect3DDevice9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*);
 HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
 typedef HRESULT (WINAPI *D3D9SCPresentFunc)(IDirect3DSwapChain9 *, CONST RECT*, CONST RECT*, HWND, CONST RGNDATA*, DWORD);
+
+HRESULT WINAPI D3D9Reset(IDirect3DDevice9 *, D3DPRESENT_PARAMETERS*);
+typedef HRESULT(WINAPI *D3D9ResetFunc)(IDirect3DDevice9 *, D3DPRESENT_PARAMETERS*);
 
 BufferFormat getCompatibleBufferFormat(D3DFORMAT format);
 
@@ -40,7 +44,8 @@ bool D3D9FrameGrabber::init() {
         if (m_ipcContext) {
             m_d3d9PresentProxyFunc = new ProxyFuncJmpToVFTable(this->calcD3d9PresentPointer(), reinterpret_cast<void*>(D3D9Present), m_logger);
             m_d3d9SCPresentProxyFunc = new ProxyFuncJmpToVFTable(this->calcD3d9SCPresentPointer(), reinterpret_cast<void*>(D3D9SCPresent), m_logger);
-            m_isInited = m_d3d9PresentProxyFunc->init() && m_d3d9SCPresentProxyFunc->init();
+            m_d3d9ResetProxyFunc = new ProxyFuncJmpToVFTable(this->calcD3d9ResetPointer(), reinterpret_cast<void*>(D3D9Reset), m_logger);
+            m_isInited = m_d3d9PresentProxyFunc->init() && m_d3d9SCPresentProxyFunc->init() && m_d3d9ResetProxyFunc->init();
         }
     }
     return m_isInited;
@@ -53,6 +58,7 @@ bool D3D9FrameGrabber::isGAPILoaded() {
 bool D3D9FrameGrabber::installHooks() {
     m_d3d9PresentProxyFunc->installHook();
     m_d3d9SCPresentProxyFunc->installHook();
+    m_d3d9ResetProxyFunc->installHook();
     return this->isHooksInstalled();
 }
 
@@ -63,6 +69,7 @@ bool D3D9FrameGrabber::isHooksInstalled() {
 bool D3D9FrameGrabber::removeHooks() {
     m_d3d9PresentProxyFunc->removeHook();
     m_d3d9SCPresentProxyFunc->removeHook();
+    m_d3d9ResetProxyFunc->removeHook();
 
     return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled();
 }
@@ -70,8 +77,10 @@ bool D3D9FrameGrabber::removeHooks() {
 void D3D9FrameGrabber::free() {
     delete m_d3d9PresentProxyFunc;
     delete m_d3d9SCPresentProxyFunc;
+    delete m_d3d9ResetProxyFunc;
     m_d3d9PresentProxyFunc = NULL;
     m_d3d9SCPresentProxyFunc = NULL;
+    m_d3d9ResetProxyFunc = NULL;
     m_isInited = false;
 
     freeDeviceData();
@@ -103,7 +112,7 @@ void ** D3D9FrameGrabber::calcD3d9PresentPointer() {
     void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
     m_logger->reportLogDebug(L"d3d9PresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
     void ** result = static_cast<void ** >(incPtr(hD3d9, offset));
-    m_logger->reportLogDebug(L"d3d9.dll = 0x%x, swapchain::present location = 0x%x", hD3d9, result);
+    m_logger->reportLogDebug(L"d3d9.dll = 0x%x, device::present location = 0x%x", hD3d9, result);
     return result;
 }
 
@@ -117,6 +126,19 @@ void ** D3D9FrameGrabber::calcD3d9SCPresentPointer() {
     m_logger->reportLogDebug(L"d3d9SCPresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
     void ** result = static_cast<void ** >(incPtr(hD3d9, offset));
     m_logger->reportLogDebug(L"d3d9.dll = 0x%x, swapchain::present location = 0x%x", hD3d9, result);
+    return result;
+}
+
+void ** D3D9FrameGrabber::calcD3d9ResetPointer() {
+#ifdef HOOKS_SYSWOW64
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9ResetFuncOffset32;
+#else
+    UINT offset = m_ipcContext->m_pMemDesc->d3d9ResetFuncOffset;
+#endif
+    void * hD3d9 = reinterpret_cast<void *>(GetModuleHandleA("d3d9.dll"));
+    m_logger->reportLogDebug(L"d3d9PresentFuncOffset = 0x%x, hDxgi = 0x%x", offset, hD3d9);
+    void ** result = static_cast<void ** >(incPtr(hD3d9, offset));
+    m_logger->reportLogDebug(L"d3d9.dll = 0x%x, device::reset location = 0x%x", hD3d9, result);
     return result;
 }
 
@@ -280,10 +302,6 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         } else {
             D3D9PresentFunc orig = reinterpret_cast<D3D9PresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
             result = orig(pDev, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-        }
-
-        if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
-            d3d9FrameGrabber->freeDeviceData();
         }
 
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
@@ -450,23 +468,45 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
                 logger->reportLogError(L"d3d9sc failed to switch from jmp to vft proxy");
             }
             result = pSc->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
-        }
-        else {
+        } else {
             D3D9SCPresentFunc orig = reinterpret_cast<D3D9SCPresentFunc>(d3d9FrameGrabber->m_d3d9PresentProxyFunc->getOriginalFunc());
             result = orig(pSc, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
         }
 
-        if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
-            d3d9FrameGrabber->freeDeviceData();
-        }
-
         ReleaseMutex(d3d9FrameGrabber->m_syncRunMutex);
-
         return result;
     } else {
         logger->reportLogError(L"d3d9sc present is skipped because mutex is busy");
         return S_FALSE;
     }
+}
+
+HRESULT WINAPI D3D9Reset(IDirect3DDevice9* pDev, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+    D3D9FrameGrabber *d3d9FrameGrabber = D3D9FrameGrabber::getInstance();
+    Logger *logger = d3d9FrameGrabber->m_logger;
+
+    d3d9FrameGrabber->freeDeviceData();
+
+    HRESULT result;
+    if (!d3d9FrameGrabber->m_d3d9ResetProxyFunc->isSwitched()) {
+        // find the VFT in this process and use it in the future
+        uintptr_t * pvtbl = *((uintptr_t**)(pDev));
+        uintptr_t* presentFuncPtr = &pvtbl[D3D9_RESET_FUNC_ORD];
+        if (!d3d9FrameGrabber->m_d3d9ResetProxyFunc->switchToVFTHook((void**)presentFuncPtr, D3D9Reset)) {
+            logger->reportLogError(L"d3d9 failed to switch from jmp to vft proxy");
+        }
+        result = pDev->Reset(pPresentationParameters);
+    } else {
+        D3D9ResetFunc orig = reinterpret_cast<D3D9ResetFunc>(d3d9FrameGrabber->m_d3d9ResetProxyFunc->getOriginalFunc());
+        result = orig(pDev, pPresentationParameters);
+    }
+
+    if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET) {
+        d3d9FrameGrabber->freeDeviceData();
+    }
+
+    return result;
+
 }
 
 BufferFormat getCompatibleBufferFormat(D3DFORMAT format) {

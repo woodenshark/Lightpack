@@ -40,6 +40,7 @@
 #define DXGI_PRESENT_FUNC_ORD 8
 #define D3D9_SCPRESENT_FUNC_ORD 3
 #define D3D9_PRESENT_FUNC_ORD 17
+#define D3D9_RESET_FUNC_ORD 16
 
 namespace WinUtils
 {
@@ -51,22 +52,22 @@ static D3D10CREATEDEVICEANDSWAPCHAIN pD3D10CreateDeviceAndSwapChain = NULL;
 
 HWND GetFirstWindowOfProcess()
 {
-	HWND h = ::GetTopWindow(0);
-	DWORD procID = GetCurrentProcessId();
+    HWND h = ::GetTopWindow(0);
+    DWORD procID = GetCurrentProcessId();
 
-	while (h)
-	{
-		DWORD pid;
-		::GetWindowThreadProcessId(h, &pid);
+    while (h)
+    {
+        DWORD pid;
+        ::GetWindowThreadProcessId(h, &pid);
 
-		if (pid == procID)
-		{
-			return h;
-		}
-		h = ::GetNextWindow(h, GW_HWNDNEXT);
-	}
+        if (pid == procID)
+        {
+            return h;
+        }
+        h = ::GetNextWindow(h, GW_HWNDNEXT);
+    }
 
-	return (HWND)INVALID_HANDLE_VALUE;
+    return (HWND)INVALID_HANDLE_VALUE;
 }
 
 BOOL LoadD3DandDXGI()
@@ -90,16 +91,16 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 #endif
     IDXGIFactory1 * factory = NULL;
     IDXGIAdapter * adapter;
-	pCreateDXGIFactory = (CREATEDXGIFACTORY)GetProcAddress(GetModuleHandle(L"dxgi.dll"), "CreateDXGIFactory");
+    pCreateDXGIFactory = (CREATEDXGIFACTORY)GetProcAddress(GetModuleHandle(L"dxgi.dll"), "CreateDXGIFactory");
     HRESULT hresult = pCreateDXGIFactory(IID_IDXGIFactory, reinterpret_cast<void **>(&factory));
-	if (hresult != S_OK) {
+    if (hresult != S_OK) {
 #ifndef NO_QT
         qCritical() << "Can't create DXGIFactory. " << hresult;
 #endif
         return 0;
     }
     hresult = factory->EnumAdapters(0, &adapter);
-	if (hresult != S_OK) {
+    if (hresult != S_OK) {
 #ifndef NO_QT
         qCritical() << "Can't enumerate adapters. " << hresult;
 #endif
@@ -130,7 +131,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 
     IDXGISwapChain * pSc;
     ID3D10Device  * pDev;
-	pD3D10CreateDeviceAndSwapChain = (D3D10CREATEDEVICEANDSWAPCHAIN)GetProcAddress(GetModuleHandle(L"d3d10.dll"), "D3D10CreateDeviceAndSwapChain");
+    pD3D10CreateDeviceAndSwapChain = (D3D10CREATEDEVICEANDSWAPCHAIN)GetProcAddress(GetModuleHandle(L"d3d10.dll"), "D3D10CreateDeviceAndSwapChain");
     hresult = pD3D10CreateDeviceAndSwapChain(adapter, D3D10_DRIVER_TYPE_HARDWARE, NULL, 0, D3D10_SDK_VERSION, &dxgiSwapChainDesc, &pSc, &pDev);
     if (S_OK != hresult) {
 #ifndef NO_QT
@@ -172,7 +173,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     Direct3DCreate9Func createDev = reinterpret_cast<Direct3DCreate9Func>(GetProcAddress(hD3d9, "Direct3DCreate9"));
     pD3D = createDev(D3D_SDK_VERSION);
     if ( !pD3D)
-	{
+    {
 #ifndef NO_QT
         qCritical() << "Test_DirectX9 Direct3DCreate9(%d) call FAILED" << D3D_SDK_VERSION ;
 #endif
@@ -183,7 +184,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     D3DDISPLAYMODE d3ddm;
     HRESULT hRes = pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm );
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x").arg( hRes);
 #endif
@@ -199,12 +200,12 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     IDirect3DDevice9 *pD3DDevice;
     hRes = pD3D->CreateDevice(
         D3DADAPTER_DEFAULT,
-        D3DDEVTYPE_HAL,	// the device we suppose any app would be using.
+        D3DDEVTYPE_HAL,    // the device we suppose any app would be using.
         hWnd,
         D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
         &d3dpp, &pD3DDevice);
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 CreateDevice failed. 0x%x").arg(hRes);
 #endif
@@ -214,7 +215,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     IDirect3DSwapChain9 *pD3DSwapChain;
     hRes = pD3DDevice->GetSwapChain( 0, &pD3DSwapChain);
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 GetSwapChain failed. 0x%x").arg(hRes);
 #endif
@@ -223,7 +224,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     else
     {
         uintptr_t * pvtbl = *((uintptr_t**)(pD3DDevice));
-		uintptr_t presentFuncPtr = pvtbl[D3D9_PRESENT_FUNC_ORD];
+        uintptr_t presentFuncPtr = pvtbl[D3D9_PRESENT_FUNC_ORD];
 #ifndef NO_QT
         char buf[100];
         sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
@@ -251,7 +252,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     Direct3DCreate9Func createDev = reinterpret_cast<Direct3DCreate9Func>(GetProcAddress(hD3d9, "Direct3DCreate9"));
     pD3D = createDev(D3D_SDK_VERSION);
     if ( !pD3D)
-	{
+    {
 #ifndef NO_QT
         qCritical() << "Test_DirectX9 Direct3DCreate9(%d) call FAILED" << D3D_SDK_VERSION ;
 #endif
@@ -262,7 +263,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     D3DDISPLAYMODE d3ddm;
     HRESULT hRes = pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm );
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x").arg( hRes);
 #endif
@@ -278,12 +279,12 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     IDirect3DDevice9 *pD3DDevice;
     hRes = pD3D->CreateDevice(
         D3DADAPTER_DEFAULT,
-        D3DDEVTYPE_HAL,	// the device we suppose any app would be using.
+        D3DDEVTYPE_HAL,    // the device we suppose any app would be using.
         hWnd,
         D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
         &d3dpp, &pD3DDevice);
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 CreateDevice failed. 0x%x").arg(hRes);
 #endif
@@ -293,7 +294,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     IDirect3DSwapChain9 *pD3DSwapChain;
     hRes = pD3DDevice->GetSwapChain( 0, &pD3DSwapChain);
     if (FAILED(hRes))
-	{
+    {
 #ifndef NO_QT
         qCritical() << QString("Test_DirectX9 GetSwapChain failed. 0x%x").arg(hRes);
 #endif
@@ -302,7 +303,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     else
     {
         uintptr_t * pvtbl = *((uintptr_t**)(pD3DSwapChain));
-		uintptr_t presentFuncPtr = pvtbl[D3D9_SCPRESENT_FUNC_ORD];
+        uintptr_t presentFuncPtr = pvtbl[D3D9_SCPRESENT_FUNC_ORD];
 #ifndef NO_QT
         char buf[100];
         sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
@@ -325,4 +326,83 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     }
 }
 
+
+UINT GetD3D9ResetOffset(HWND hWnd){
+    IDirect3D9 *pD3D = NULL;
+    HINSTANCE hD3d9 = LoadLibrary(L"d3d9.dll");
+    Direct3DCreate9Func createDev = reinterpret_cast<Direct3DCreate9Func>(GetProcAddress(hD3d9, "Direct3DCreate9"));
+    pD3D = createDev(D3D_SDK_VERSION);
+    if (!pD3D)
+    {
+#ifndef NO_QT
+        qCritical() << "Test_DirectX9 Direct3DCreate9(%d) call FAILED" << D3D_SDK_VERSION;
+#endif
+        return 0;
+    }
+
+    // step 3: Get IDirect3DDevice9
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hRes = pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    if (FAILED(hRes))
+    {
+#ifndef NO_QT
+        qCritical() << QString("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x").arg(hRes);
+#endif
+        return 0;
+    }
+
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = true;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat = d3ddm.Format;
+
+    IDirect3DDevice9 *pD3DDevice;
+    hRes = pD3D->CreateDevice(
+        D3DADAPTER_DEFAULT,
+        D3DDEVTYPE_HAL,    // the device we suppose any app would be using.
+        hWnd,
+        D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
+        &d3dpp, &pD3DDevice);
+    if (FAILED(hRes))
+    {
+#ifndef NO_QT
+        qCritical() << QString("Test_DirectX9 CreateDevice failed. 0x%x").arg(hRes);
+#endif
+        return 0;
+    }
+
+    IDirect3DSwapChain9 *pD3DSwapChain;
+    hRes = pD3DDevice->GetSwapChain(0, &pD3DSwapChain);
+    if (FAILED(hRes))
+    {
+#ifndef NO_QT
+        qCritical() << QString("Test_DirectX9 GetSwapChain failed. 0x%x").arg(hRes);
+#endif
+        return 0;
+    }
+    else
+    {
+        uintptr_t * pvtbl = *((uintptr_t**)(pD3DDevice));
+        uintptr_t resetFuncPtr = pvtbl[D3D9_RESET_FUNC_ORD];
+#ifndef NO_QT
+        char buf[100];
+        sprintf(buf, "resetFuncPtr=%x", resetFuncPtr);
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+#endif
+
+        UINT resetFuncOffset = (resetFuncPtr - reinterpret_cast<UINT>(hD3d9));
+
+#ifndef NO_QT
+        sprintf(buf, "resetFuncOffset=%x", resetFuncOffset);
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+#endif
+
+        pD3DSwapChain->Release();
+        pD3DDevice->Release();
+        pD3D->Release();
+
+        return resetFuncOffset;
+    }
+}
 } // namespace WinUtils

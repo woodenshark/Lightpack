@@ -65,7 +65,10 @@ bool D3D9FrameGrabber::installHooks() {
 }
 
 bool D3D9FrameGrabber::isHooksInstalled() {
-    return isGAPILoaded() && m_isInited && m_d3d9PresentProxyFunc->isHookInstalled() && m_d3d9SCPresentProxyFunc->isHookInstalled();
+    return isGAPILoaded() && m_isInited
+        && (m_d3d9PresentProxyFunc->isHookInstalled()
+        || m_d3d9SCPresentProxyFunc->isHookInstalled()
+        || m_d3d9ResetProxyFunc->isHookInstalled());
 }
 
 bool D3D9FrameGrabber::removeHooks() {
@@ -73,7 +76,7 @@ bool D3D9FrameGrabber::removeHooks() {
     m_d3d9SCPresentProxyFunc->removeHook();
     m_d3d9ResetProxyFunc->removeHook();
 
-    return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled();
+    return !m_d3d9PresentProxyFunc->isHookInstalled() && !m_d3d9SCPresentProxyFunc->isHookInstalled() && !m_d3d9ResetProxyFunc->isHookInstalled();
 }
 
 void D3D9FrameGrabber::free() {

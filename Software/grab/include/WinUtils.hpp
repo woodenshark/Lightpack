@@ -41,12 +41,20 @@
 namespace WinUtils
 {
 extern const WCHAR lightpackHooksDllName[];
+extern const WCHAR lightpackUnhookDllName[];
+#ifdef _WIN64
+extern const WCHAR lightpackHooksDllName32[];
+extern const WCHAR lightpackOffsetFinderName[];
+#endif
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable);
 
 BOOL AcquirePrivileges();
 
+BOOL IsUserAdmin(VOID);
+
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
+QList<DWORD> * getHookedProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
 
 PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);
 

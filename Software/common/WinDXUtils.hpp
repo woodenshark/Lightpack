@@ -49,6 +49,7 @@ BOOL LoadD3DandDXGI();
 UINT GetDxgiPresentOffset(HWND hWnd);
 UINT GetD3D9PresentOffset(HWND hWnd);
 UINT GetD3D9SCPresentOffset(HWND hWnd);
+UINT GetD3D9ResetOffset(HWND hWnd);
 }
 
 #endif // WINDXUTILS_HPP

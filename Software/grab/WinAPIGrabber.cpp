@@ -177,7 +177,7 @@ GrabResult WinAPIGrabber::grabScreens()
                 screenRect.left(), screenRect.top(), SRCCOPY );
 
         // Get the actual RGB data and put it into pbPixelsBuff
-        GetBitmapBits( d->hBitmap, screen.imgDataSize, screen.imgData );
+        GetBitmapBits( d->hBitmap, (LONG)screen.imgDataSize, screen.imgData );
     }
     return GrabResultOk;
 }

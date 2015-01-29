@@ -151,7 +151,8 @@ private slots:
     void onDeviceGammaCorrection_valueChanged(double value);
     void onSliderDeviceGammaCorrection_valueChanged(int value);
     void onDeviceSendDataOnlyIfColorsChanged_toggled(bool state);
-    void onDx1011CaptureEnabledChanged(bool isEnabled);
+	void onDx1011CaptureEnabledChanged(bool isEnabled);
+	void onDx9CaptureEnabledChanged(bool isEnabled);
 
     void onDontShowLedWidgets_Toggled(bool checked);
     void onSetColoredLedWidgets(bool checked);
@@ -269,5 +270,7 @@ private:
 
     QList<Plugin*> _plugins;
     static bool toPriority(Plugin* s1 , Plugin* s2 );
+
+	bool updatingFromSettings = false;
 };
 

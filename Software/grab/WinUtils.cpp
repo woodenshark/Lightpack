@@ -44,6 +44,7 @@ const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
 #endif
 static LPCWSTR pwstrExcludeProcesses[] = { L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe" };
 static LPCWSTR pwstrDxModules[] = { L"d3d9.dll", L"dxgi.dll" };
+static LPCWSTR pwstrDxgiModules[] = { L"dxgi.dll" };
 static LPCWSTR pwstrHookModules[] = { L"prismatik-hooks.dll", L"prismatik-hooks32.dll" };
 
 
@@ -240,7 +241,11 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
 }
 
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
-    return getProcessesIDs(processes, pwstrDxModules, SIZEOF_ARRAY(pwstrDxModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
+	return getProcessesIDs(processes, pwstrDxModules, SIZEOF_ARRAY(pwstrDxModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
+}
+
+QList<DWORD> * getDxgiProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
+	return getProcessesIDs(processes, pwstrDxgiModules, SIZEOF_ARRAY(pwstrDxgiModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
 }
 
 QList<DWORD> * getHookedProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {

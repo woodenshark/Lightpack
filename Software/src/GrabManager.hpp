@@ -80,7 +80,10 @@ private slots:
 private:
     GrabberBase *queryGrabber(Grab::GrabberType grabber);
     void initGrabbers();
-    GrabberBase *initGrabber(GrabberBase *grabber);
+	GrabberBase *initGrabber(GrabberBase *grabber);
+#ifdef D3D10_GRAB_SUPPORT
+	void reinitDx1011Grabber();
+#endif
     void initColorLists(int numberOfLeds);
     void clearColorsNew();
     void clearColorsCurrent();

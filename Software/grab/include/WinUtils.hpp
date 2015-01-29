@@ -54,6 +54,7 @@ BOOL AcquirePrivileges();
 BOOL IsUserAdmin(VOID);
 
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
+QList<DWORD> * getDxgiProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
 QList<DWORD> * getHookedProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
 
 PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);

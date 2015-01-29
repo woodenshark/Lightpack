@@ -53,6 +53,12 @@ struct HOOKSGRABBER_SHARED_MEM_DESC {
     UINT dxgiPresentFuncOffset32;
     UINT loadLibraryWAddress32;
 #endif
+    UINT logLevel;
+    UINT grabDelay;
+    UINT grabbingStarted;
+
+    // Variables below are written by the hook when frames are captured
+    UINT frameId;
     UINT width;
     UINT height;
     UINT rowPitch;
@@ -61,9 +67,6 @@ struct HOOKSGRABBER_SHARED_MEM_DESC {
 #else
     UINT format;
 #endif
-    UINT frameId;
-    UINT logLevel;
-    UINT grabDelay;
 };
 
 

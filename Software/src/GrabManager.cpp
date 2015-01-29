@@ -154,6 +154,7 @@ void GrabManager::start(bool isGrabEnabled)
 void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << grabberType;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
 
     bool isStartNeeded = false;
     if (m_grabber != NULL) {
@@ -166,6 +167,8 @@ void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
 
     m_grabber = queryGrabber(grabberType);
 
+    reinitDx1011Grabber();
+
     if (isStartNeeded) {
 #ifdef D3D10_GRAB_SUPPORT
         if (Settings::isDx1011GrabberEnabled())
@@ -176,6 +179,8 @@ void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
         m_grabber->startGrabbing();
 #endif
     }
+
+    QApplication::restoreOverrideCursor();
 }
 
 void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
@@ -506,9 +511,13 @@ void GrabManager::initGrabbers()
     m_grabbers[Grab::GrabberTypeWinAPIEachWidget] = initGrabber(new WinAPIGrabberEachWidget(NULL, m_grabberContext));
 #endif
 #ifdef D3D10_GRAB_SUPPORT
-    m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle)));
-    connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
-    connect(getLightpackApp(), SIGNAL(postInitialization()), m_d3d10Grabber,  SLOT(init()));
+    if (Settings::isDx1011GrabberEnabled()) {
+        m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
+        connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
+        connect(getLightpackApp(), SIGNAL(postInitialization()), m_d3d10Grabber, SLOT(init()));
+    } else {
+        m_d3d10Grabber = NULL;
+    }
 #endif
 }
 
@@ -520,6 +529,21 @@ GrabberBase *GrabManager::initGrabber(GrabberBase * grabber) {
 
     return grabber;
 }
+
+#ifdef D3D10_GRAB_SUPPORT
+void GrabManager::reinitDx1011Grabber() {
+    if (m_d3d10Grabber) {
+        delete m_d3d10Grabber;
+        m_d3d10Grabber = NULL;
+    }
+
+    if (Settings::isDx1011GrabberEnabled()) {
+        m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
+        connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
+        m_d3d10Grabber->init();
+    }
+}
+#endif
 
 GrabberBase *GrabManager::queryGrabber(Grab::GrabberType grabberType)
 {

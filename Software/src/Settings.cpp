@@ -150,6 +150,7 @@ static const QString Slowdown = "Grab/Slowdown";
 static const QString LuminosityThreshold = "Grab/LuminosityThreshold";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
+static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
 }
 // [MoodLamp]
 namespace MoodLamp
@@ -1132,6 +1133,13 @@ bool Settings::isDx1011GrabberEnabled() {
 void Settings::setDx1011GrabberEnabled(bool isEnabled) {
     setValue(Profile::Key::Grab::IsDx1011GrabberEnabled, isEnabled);
     m_this->dx1011GrabberEnabledChanged(isEnabled);
+}
+bool Settings::isDx9GrabbingEnabled() {
+    return value(Profile::Key::Grab::IsDx9GrabbingEnabled).toBool();
+}
+
+void Settings::setDx9GrabbingEnabled(bool isEnabled) {
+    setValue(Profile::Key::Grab::IsDx9GrabbingEnabled, isEnabled);
 }
 #endif
 

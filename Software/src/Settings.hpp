@@ -166,8 +166,10 @@ public:
     static void setGrabberType(Grab::GrabberType grabMode);
 
 #ifdef D3D10_GRAB_SUPPORT
-    static bool isDx1011GrabberEnabled();
-    static void setDx1011GrabberEnabled(bool isEnabled);
+	static bool isDx1011GrabberEnabled();
+	static void setDx1011GrabberEnabled(bool isEnabled);
+	static bool isDx9GrabbingEnabled();
+	static void setDx9GrabbingEnabled(bool isEnabled);
 #endif
 
     static Lightpack::Mode getLightpackMode();

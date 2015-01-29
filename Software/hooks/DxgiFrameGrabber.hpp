@@ -30,6 +30,9 @@ public:
         return m_this != NULL;
     }
     ~DxgiFrameGrabber() {
+        if (this->isHooksInstalled())
+            this->removeHooks();
+        this->free();
         m_this = NULL;
     }
 

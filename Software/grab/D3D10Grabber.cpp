@@ -68,7 +68,8 @@ signals:
 public slots:
     void runLoop();
 
-
+public:
+    bool stop = false;
 };
 
 const unsigned kBytesPerPixel = 4;
@@ -85,7 +86,7 @@ D3D10GrabberWorker::~D3D10GrabberWorker() {
 }
 
 void D3D10GrabberWorker::runLoop() {
-    while(1) {
+    while(!stop) {
         if (WAIT_OBJECT_0 == WaitForSingleObject(m_frameGrabbedEvent, 50)) {
             emit frameGrabbed();
             if (!ResetEvent(m_frameGrabbedEvent)) {
@@ -101,7 +102,7 @@ class D3D10GrabberImpl: public QObject
     Q_OBJECT
 
 public:
-    D3D10GrabberImpl(D3D10Grabber &owner, GrabberContext *context, GetHwndCallback_t getHwndCb)
+    D3D10GrabberImpl(D3D10Grabber &owner, GrabberContext *context, GetHwndCallback_t getHwndCb, bool injectD3D9)
         : m_sharedMem(NULL),
           m_mutex(NULL),
           m_isStarted(false),
@@ -112,7 +113,8 @@ public:
           m_isFrameGrabbedDuringLastSecond(false),
           m_context(context),
           m_getHwndCb(getHwndCb),
-          m_owner(owner)
+          m_owner(owner),
+          m_injectD3D9(injectD3D9)
     {}
 
     ~D3D10GrabberImpl()
@@ -388,7 +390,10 @@ private slots:
     void infectCleanDxProcesses(void) {
         if (m_isInited && m_libraryInjector) {
             QList<DWORD> processes = QList<DWORD>();
-            getDxProcessesIDs(&processes, m_systemrootPath);
+            if (m_injectD3D9)
+                getDxProcessesIDs(&processes, m_systemrootPath);
+            else
+                getDxgiProcessesIDs(&processes, m_systemrootPath);
             foreach (DWORD procId, processes) {
                 // Require the process to have run for at least one full timer tick,
                 // hoping when injection happens their swapchain is already setup
@@ -585,6 +590,9 @@ private:
         if (!m_isInited)
             return;
 
+        disconnect(m_worker.data());
+        m_worker->stop = true;
+
         sanitizeProcesses();
 
         disconnect(this, SLOT(handleIfFrameGrabbed()));
@@ -617,14 +625,15 @@ private:
     QScopedPointer<QThread> m_workerThread;
     HOOKSGRABBER_SHARED_MEM_DESC m_memDesc;
     D3D10Grabber &m_owner;
+    bool m_injectD3D9;
 };
 
 // This will force qmake and moc to process internal classes in this file.
 #include "D3D10Grabber.moc"
 
-D3D10Grabber::D3D10Grabber(QObject *parent, GrabberContext *context, GetHwndCallback_t getHwndCb)
+D3D10Grabber::D3D10Grabber(QObject *parent, GrabberContext *context, GetHwndCallback_t getHwndCb, bool injectD3D9)
     : GrabberBase(parent, context) {
-    m_impl.reset(new D3D10GrabberImpl(*this, context, getHwndCb));
+    m_impl.reset(new D3D10GrabberImpl(*this, context, getHwndCb, injectD3D9));
 }
 
 void D3D10Grabber::init() {

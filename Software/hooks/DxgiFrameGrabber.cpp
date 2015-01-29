@@ -177,14 +177,14 @@ bool DxgiFrameGrabber::D3D10Map() {
         return false;
     }
 
-    ipcContext->m_pMemDesc->width = width;
-    ipcContext->m_pMemDesc->height = height;
-    ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
-    ipcContext->m_pMemDesc->format = BufferFormatAbgr;
-    ipcContext->m_pMemDesc->frameId++;
-
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
+        ipcContext->m_pMemDesc->width = width;
+        ipcContext->m_pMemDesc->height = height;
+        ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
+        ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+        ipcContext->m_pMemDesc->frameId++;
+
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (*ipcContext->m_pMemDesc));
         if (mappedTexture.RowPitch == width * 4) {
             memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
@@ -271,14 +271,14 @@ bool DxgiFrameGrabber::D3D11Map() {
         return false;
     }
 
-    ipcContext->m_pMemDesc->width = width;
-    ipcContext->m_pMemDesc->height = height;
-    ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
-    ipcContext->m_pMemDesc->format = BufferFormatAbgr;
-    ipcContext->m_pMemDesc->frameId++;
-
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
+        ipcContext->m_pMemDesc->width = width;
+        ipcContext->m_pMemDesc->height = height;
+        ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
+        ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+        ipcContext->m_pMemDesc->frameId++;
+
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (*ipcContext->m_pMemDesc));
         if (mappedTexture.RowPitch == width * 4) {
             memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
@@ -340,32 +340,41 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
                 }
                 if (done)
                     dxgiFrameGrabber->m_mapPending = false;
-            } else if (GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
+            } else if (dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabbingStarted
+                && GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
                 // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
-                if (dxgiDevice == DxgiDeviceD3D10) {
-                    ID3D10Texture2D *pBackBuffer;
-                    HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-                    if (hr == S_OK) {
-                        dxgiFrameGrabber->D3D10Grab(pBackBuffer);
-                        pBackBuffer->Release();
+                if (!dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabbingStarted) {
+                    dxgiFrameGrabber->m_ipcContext->m_pMemDesc->frameId = HOOKSGRABBER_BLANK_FRAME_ID;
+                    SetEvent(dxgiFrameGrabber->m_ipcContext->m_hFrameGrabbedEvent);
+                } else {
+                    if (dxgiDevice == DxgiDeviceD3D10) {
+                        ID3D10Texture2D *pBackBuffer;
+                        HRESULT hr = sc->GetBuffer(0, IID_ID3D10Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                        if (hr == S_OK) {
+                            dxgiFrameGrabber->D3D10Grab(pBackBuffer);
+                            pBackBuffer->Release();
+                        }
+                        else {
+                            logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+                        }
                     }
-                    else {
-                        logger->reportLogError(L"couldn't get d3d10 buffer. returned 0x%x", hr);
+                    if (dxgiDevice == DxgiDeviceD3D11) {
+                        ID3D11Texture2D *pBackBuffer;
+                        HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
+                        if (hr == S_OK) {
+                            dxgiFrameGrabber->D3D11Grab(pBackBuffer);
+                            pBackBuffer->Release();
+                        }
+                        else {
+                            logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
+                        }
                     }
+                    dxgiFrameGrabber->m_lastGrab = GetTickCount();
+                    dxgiFrameGrabber->m_mapPending = true;
                 }
-                if (dxgiDevice == DxgiDeviceD3D11) {
-                    ID3D11Texture2D *pBackBuffer;
-                    HRESULT hr = sc->GetBuffer(0, IID_ID3D11Texture2D, reinterpret_cast<LPVOID*> (&pBackBuffer));
-                    if (hr == S_OK) {
-                        dxgiFrameGrabber->D3D11Grab(pBackBuffer);
-                        pBackBuffer->Release();
-                    }
-                    else {
-                        logger->reportLogError(L"couldn't get d3d11 buffer. returned 0x%x", hr);
-                    }
-                }
-                dxgiFrameGrabber->m_lastGrab = GetTickCount();
-                dxgiFrameGrabber->m_mapPending = true;
+            } else if (!dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabbingStarted) {
+                dxgiFrameGrabber->m_ipcContext->m_pMemDesc->frameId = HOOKSGRABBER_BLANK_FRAME_ID;
+                SetEvent(dxgiFrameGrabber->m_ipcContext->m_hFrameGrabbedEvent);
             }
         }
 

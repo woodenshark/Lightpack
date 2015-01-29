@@ -281,8 +281,39 @@ public:
         m_isInited = true;
         return m_isInited;
     }
-    void start() { m_isStarted = true; }
-    void stop() { m_isStarted = false; }
+
+    void start()
+    {
+        m_isStarted = true;
+        if (m_memMap) {
+            DWORD errorcode;
+            if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(m_mutex, INFINITE))) {
+                memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
+                m_memDesc.grabbingStarted = TRUE;
+                copyMemDesc(m_memDesc);
+                ReleaseMutex(m_mutex);
+            } else {
+                qWarning(Q_FUNC_INFO " couldn't start grabbing: ", errorcode);
+            }
+        }
+    }
+
+    void stop()
+    {
+        m_isStarted = false;
+        if (m_memMap) {
+            DWORD errorcode;
+            if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(m_mutex, INFINITE))) {
+                memcpy(&m_memDesc, m_memMap, sizeof(m_memDesc));
+                m_memDesc.grabbingStarted = FALSE;
+                copyMemDesc(m_memDesc);
+                ReleaseMutex(m_mutex);
+            } else {
+                qWarning(Q_FUNC_INFO " couldn't stop grabbing: ", errorcode);
+            }
+        }
+    }
+
     bool isStarted() const { return m_isStarted; }
 
     void setGrabInterval(int msec) {

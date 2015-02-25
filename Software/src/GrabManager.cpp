@@ -85,6 +85,7 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
     m_isPauseGrabWhileResizeOrMoving = false;
     m_isGrabWidgetsVisible = false;
+    m_isGrabbingStarted = false;
 
     initColorLists(MaximumNumberOfLeds::Default);
     initLedWidgets(MaximumNumberOfLeds::Default);
@@ -139,6 +140,8 @@ void GrabManager::start(bool isGrabEnabled)
 
     clearColorsNew();
 
+    m_isGrabbingStarted = isGrabEnabled;
+
     if (m_grabber != NULL) {
         if (isGrabEnabled) {
             m_timerUpdateFPS->start();
@@ -189,7 +192,7 @@ void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
     D3D10Grabber *grabber = static_cast<D3D10Grabber *>(sender());
     if (grabber != m_grabber) {
         if (isStartRequested) {
-            if (Settings::isDx1011GrabberEnabled()) {
+            if (m_isGrabbingStarted && Settings::isDx1011GrabberEnabled()) {
                 m_grabber->stopGrabbing();
                 grabber->startGrabbing();
                 grabber->setGrabInterval(Settings::getGrabSlowdown());

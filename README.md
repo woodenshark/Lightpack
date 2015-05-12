@@ -2,12 +2,12 @@ Lightpack project with Prismatik flavour
 ---------
 
 **Table of content:** <br />
-&nbsp;&nbsp;[Short description] (https://github.com/Atarity/Lightpack#lightpack-project-with-prismatik-flavour) <br />
-&nbsp;&nbsp;[Useful URLs] (https://github.com/Atarity/Lightpack#useful-urls) <br />
-&nbsp;&nbsp;[Build Prismatik with Windows] (https://github.com/Atarity/Lightpack#prismatik-build-instructions-for-windows) <br />
-&nbsp;&nbsp;[Build with Linux] (https://github.com/Atarity/Lightpack#build-instructions-for-linux) <br />
-&nbsp;&nbsp;[Build with OS X] (https://github.com/Atarity/Lightpack#build-instructions-for-os-x) <br />
-&nbsp;&nbsp;[Lightpack Firmware building] (https://github.com/Atarity/Lightpack#fimware-building-instructions) <br />
+&nbsp;&nbsp;[Short description] (https://github.com/woodenshark/Lightpack#lightpack-project-with-prismatik-flavour) <br />
+&nbsp;&nbsp;[Useful URLs] (https://github.com/woodenshark/Lightpack#useful-urls) <br />
+&nbsp;&nbsp;[Build Prismatik with Windows] (https://github.com/woodenshark/Lightpack#prismatik-build-instructions-for-windows) <br />
+&nbsp;&nbsp;[Build with Linux] (https://github.com/woodenshark/Lightpack#build-instructions-for-linux) <br />
+&nbsp;&nbsp;[Build with OS X] (https://github.com/woodenshark/Lightpack#build-instructions-for-os-x) <br />
+&nbsp;&nbsp;[Lightpack Firmware building] (https://github.com/woodenshark/Lightpack#firmware-building-instructions) <br />
 
 
 **Lightpack** is an fully open-source and simple hardware implementation of the backlight for any computer. It's USB content-driving ambient lighting system.
@@ -23,11 +23,12 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 * The device is simple to build (just Do-It-Yourself) 
 
 #####Useful URLs:
-* [Project mothership] (http://code.google.com/p/lightpack/)
-* [Binary downloads] (http://code.google.com/p/lightpack/downloads/list)
+* [Project mothership] (https://github.com/woodenshark/Lightpack/)
+* [Original project mothership] (https://code.google.com/p/lightpack/)
+* [Binary downloads] (https://github.com/woodenshark/Lightpack/releases)
 * Wiki with DIY and documentation [ENG] (http://code.google.com/p/light-pack/w/list) / [RUS] (http://code.google.com/p/lightpack/w/list)
-* [Post new issue] (http://code.google.com/p/lightpack/issues/list)
-* [Team] (http://code.google.com/p/lightpack/people/list)
+* [Post new issue] (https://github.com/woodenshark/Lightpack/issues)
+* [Team] (https://github.com/woodenshark/Lightpack/graphs/contributors)
 
 ---
 
@@ -81,7 +82,7 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 
 ---
 
-###Fimware build instructions
+###Firmware build instructions
 1. Install [AVR GCC Toolchain] (http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain)
 2. Install **dfu-programmer** for firmware upload with `$ sudo apt-get install dfu-programmer`
 3. Compile Prismatik using command line:
@@ -92,4 +93,4 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 ---
 
 Please let us know if you find mistakes, bugs or errors.<br />
-Post new issue : http://code.google.com/p/lightpack/issues/list
+Post new issue : https://github.com/woodenshark/Lightpack/issues

@@ -138,7 +138,6 @@ void DxgiFrameGrabber::D3D10Grab(ID3D10Texture2D* pBackBuffer) {
     }
     if (!m_mapTexture10) {
         tex_desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
-        tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
         tex_desc.BindFlags = 0;
@@ -153,6 +152,7 @@ void DxgiFrameGrabber::D3D10Grab(ID3D10Texture2D* pBackBuffer) {
         m_mapDevice10->AddRef();
         m_mapWidth = tex_desc.Width;
         m_mapHeight = tex_desc.Height;
+        m_mapFormat = tex_desc.Format;
     }
     pTexture = m_mapTexture10;
 
@@ -164,8 +164,6 @@ void DxgiFrameGrabber::D3D10Grab(ID3D10Texture2D* pBackBuffer) {
 bool DxgiFrameGrabber::D3D10Map() {
     IPCContext *ipcContext = m_ipcContext;
     Logger *logger = m_logger;
-    UINT width = m_mapWidth;
-    UINT height = m_mapHeight;
     D3D10_MAPPED_TEXTURE2D mappedTexture;
     HRESULT hr;
 
@@ -179,20 +177,30 @@ bool DxgiFrameGrabber::D3D10Map() {
 
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-        ipcContext->m_pMemDesc->width = width;
-        ipcContext->m_pMemDesc->height = height;
+        ipcContext->m_pMemDesc->width = m_mapWidth;
+        ipcContext->m_pMemDesc->height = m_mapHeight;
         ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
-        ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+        switch (m_mapFormat)
+        {
+            case DXGI_FORMAT_R8G8B8A8_UNORM:
+                ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+                break;
+            case DXGI_FORMAT_B8G8R8A8_UNORM:
+                ipcContext->m_pMemDesc->format = BufferFormatArgb;
+                break;
+            default:
+                ipcContext->m_pMemDesc->format = BufferFormatUnknown;
+        }
         ipcContext->m_pMemDesc->frameId++;
 
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (*ipcContext->m_pMemDesc));
-        if (mappedTexture.RowPitch == width * 4) {
-            memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
+        if (mappedTexture.RowPitch == m_mapWidth * 4) {
+            memcpy(pMemDataMap, mappedTexture.pData, m_mapWidth * m_mapHeight * 4);
         } else {
             UINT cleanOffset = 0, pitchOffset = 0, i = 0;
-            while (i < height) {
-                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), width * 4);
-                cleanOffset += width * 4;
+            while (i < m_mapHeight) {
+                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), m_mapWidth * 4);
+                cleanOffset += m_mapWidth * 4;
                 pitchOffset += mappedTexture.RowPitch;
                 i++;
             }
@@ -227,7 +235,6 @@ void DxgiFrameGrabber::D3D11Grab(ID3D11Texture2D *pBackBuffer) {
     }
     if (!m_mapTexture11) {
         tex_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
         tex_desc.BindFlags = 0;
@@ -245,6 +252,7 @@ void DxgiFrameGrabber::D3D11Grab(ID3D11Texture2D *pBackBuffer) {
         m_mapDeviceContext11->AddRef();
         m_mapWidth = tex_desc.Width;
         m_mapHeight = tex_desc.Height;
+        m_mapFormat = tex_desc.Format;
     }
     pDevContext = m_mapDeviceContext11;
     pTexture = m_mapTexture11;
@@ -258,8 +266,6 @@ void DxgiFrameGrabber::D3D11Grab(ID3D11Texture2D *pBackBuffer) {
 bool DxgiFrameGrabber::D3D11Map() {
     IPCContext *ipcContext = m_ipcContext;
     Logger *logger = m_logger;
-    UINT width = m_mapWidth;
-    UINT height = m_mapHeight;
     D3D11_MAPPED_SUBRESOURCE mappedTexture;
     HRESULT hr;
 
@@ -273,20 +279,30 @@ bool DxgiFrameGrabber::D3D11Map() {
 
     DWORD errorcode;
     if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(ipcContext->m_hMutex, 0))) {
-        ipcContext->m_pMemDesc->width = width;
-        ipcContext->m_pMemDesc->height = height;
+        ipcContext->m_pMemDesc->width = m_mapWidth;
+        ipcContext->m_pMemDesc->height = m_mapHeight;
         ipcContext->m_pMemDesc->rowPitch = mappedTexture.RowPitch;
-        ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+        switch (m_mapFormat)
+        {
+            case DXGI_FORMAT_R8G8B8A8_UNORM:
+                ipcContext->m_pMemDesc->format = BufferFormatAbgr;
+                break;
+            case DXGI_FORMAT_B8G8R8A8_UNORM:
+                ipcContext->m_pMemDesc->format = BufferFormatArgb;
+                break;
+            default:
+                ipcContext->m_pMemDesc->format = BufferFormatUnknown;
+        }
         ipcContext->m_pMemDesc->frameId++;
 
         PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (*ipcContext->m_pMemDesc));
-        if (mappedTexture.RowPitch == width * 4) {
-            memcpy(pMemDataMap, mappedTexture.pData, width * height * 4);
+        if (mappedTexture.RowPitch == m_mapWidth * 4) {
+            memcpy(pMemDataMap, mappedTexture.pData, m_mapWidth * m_mapHeight * 4);
         } else {
             UINT i = 0, cleanOffset = 0, pitchOffset = 0;
-            while (i < height) {
-                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), width * 4);
-                cleanOffset += width * 4;
+            while (i < m_mapHeight) {
+                memcpy(incPtr(pMemDataMap, cleanOffset), incPtr(mappedTexture.pData, pitchOffset), m_mapWidth * 4);
+                cleanOffset += m_mapWidth * 4;
                 pitchOffset += mappedTexture.RowPitch;
                 i++;
             }

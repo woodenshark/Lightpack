@@ -44,16 +44,18 @@ CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
+    # Layout changes in the injected dll are potentially harmful (fraps)
+    QMAKE_LFLAGS += /INCREMENTAL:NO
 } else {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
 }
 CONFIG(msvc) {
-	QMAKE_POST_LINK = cd $(TargetDir) && \
-			cp -f prismatik-hooks32.dll ../src/bin/
+    QMAKE_POST_LINK = cd $(TargetDir) && \
+            cp -f prismatik-hooks32.dll ../src/bin/
 } else {
-	QMAKE_POST_LINK = cd $(DESTDIR) && \
-			cp -f prismatik-hooks32.dll ../src/bin/
+    QMAKE_POST_LINK = cd $(DESTDIR) && \
+            cp -f prismatik-hooks32.dll ../src/bin/
 }
 
 SOURCES += \

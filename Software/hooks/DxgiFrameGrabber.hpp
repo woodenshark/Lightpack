@@ -13,6 +13,7 @@ struct IDXGISwapChain;
 struct ID3D10Device;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+enum DXGI_FORMAT;
 
 class DxgiFrameGrabber : public GAPIProxyFrameGrabber, LoggableTrait
 {
@@ -62,9 +63,10 @@ protected:
     ID3D11DeviceContext *m_mapDeviceContext11;
     UINT m_mapWidth;
     UINT m_mapHeight;
+    DXGI_FORMAT m_mapFormat;
     UINT m_frameCount;
-    bool m_mapPending;
     UINT m_lastGrab;
+    bool m_mapPending;
 private:
     void ** calcDxgiPresentPointer();
 };

@@ -243,7 +243,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -2264,6 +2264,13 @@
                 <widget class="QRadioButton" name="radioButton_GrabWinAPI_EachWidget">
                  <property name="text">
                   <string notr="true">WinAPI (Each widget)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioButton_GrabDDupl">
+                 <property name="text">
+                  <string>Win8 Desktop Duplication</string>
                  </property>
                 </widget>
                </item>

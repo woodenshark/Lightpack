@@ -99,7 +99,7 @@ win32 {
     LIBS    += -lwtsapi32
 
     CONFIG(msvc) {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
+        QMAKE_POST_LINK = cd $(TargetDir) && \
                 cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
                 cp -f \"../../lib/libraryinjector.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
@@ -107,11 +107,11 @@ win32 {
                 cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./
+                cp -f \"$${QTDIR}/bin/icudt52.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuin52.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuuc52.dll\" ./
     } else {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
+        QMAKE_POST_LINK = cd $(TargetDir) && \
                 cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
                 cp -f \"../../lib/libraryinjector.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
@@ -119,9 +119,9 @@ win32 {
                 cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icudt52.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuin52.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuuc52.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./

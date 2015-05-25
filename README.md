@@ -56,10 +56,11 @@ You will need the following packages, usually all of them are in distro's reposi
 * if you are using Ubuntu: libappindicator-dev
 
 ####Build process:
-1. go to `<repo>/Software`
-2. run ```qmake -r && make```
-3. Add a rule for **UDEV**. See comments from `<repo>/Software/dist_linux/deb/etc/udev/rules.d/93-lightpack.rules` for how to do it.
-4. Make sure `<repo>/Software/qtserialport/libQt5SerialPort.so.5` is available for loading by *Prismatik* (place it in appropriate dir or use *LD_LIBRARY_PATH* variable)
+1. go to `cd ~`
+2. Download `wget https://github.com/woodenshark/Lightpack/releases/download/5.11.1/prismatik_5.11.1_i386.deb`
+3. Run `sudo apt-get update && sudo apt-get install libqt5serialport5 -y && dpkg -i prismatik_5.11.1_i386.deb -y`
+4. ?????
+5. PROFIT
 
 ---
 

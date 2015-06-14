@@ -183,13 +183,16 @@ bool DxgiFrameGrabber::D3D10Map() {
         switch (m_mapFormat)
         {
             case DXGI_FORMAT_R8G8B8A8_UNORM:
+            case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
                 ipcContext->m_pMemDesc->format = BufferFormatAbgr;
                 break;
             case DXGI_FORMAT_B8G8R8A8_UNORM:
+            case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
                 ipcContext->m_pMemDesc->format = BufferFormatArgb;
                 break;
             default:
                 ipcContext->m_pMemDesc->format = BufferFormatUnknown;
+                logger->reportLogWarning(L"d3d10 unkown buffer format: 0x%x", m_mapFormat);
         }
         ipcContext->m_pMemDesc->frameId++;
 
@@ -285,13 +288,16 @@ bool DxgiFrameGrabber::D3D11Map() {
         switch (m_mapFormat)
         {
             case DXGI_FORMAT_R8G8B8A8_UNORM:
+            case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
                 ipcContext->m_pMemDesc->format = BufferFormatAbgr;
                 break;
             case DXGI_FORMAT_B8G8R8A8_UNORM:
+            case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
                 ipcContext->m_pMemDesc->format = BufferFormatArgb;
                 break;
             default:
                 ipcContext->m_pMemDesc->format = BufferFormatUnknown;
+                logger->reportLogWarning(L"d3d11 unkown buffer format: 0x%x", m_mapFormat);
         }
         ipcContext->m_pMemDesc->frameId++;
 
@@ -329,7 +335,7 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
 
         DXGI_SWAP_CHAIN_DESC desc;
         sc->GetDesc(&desc);
-        logger->reportLogDebug(L"d3d10 Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? "windowed" : "fullscreen");
+        logger->reportLogDebug(L"dxgi present: Buffers count: %u, Output hwnd: %u, %s", desc.BufferCount, desc.OutputWindow, desc.Windowed ? L"windowed" : L"fullscreen");
 
         if (dxgiDevice == DxgiDeviceUnknown) {
             // If the process uses DX10, the device will internally be a DX11 device too
@@ -354,8 +360,10 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
                 else if (dxgiDevice == DxgiDeviceD3D11) {
                     done = dxgiFrameGrabber->D3D11Map();
                 }
-                if (done)
+                if (done) {
                     dxgiFrameGrabber->m_mapPending = false;
+                    logger->reportLogDebug(L"Map succeeded");
+                }
             } else if (dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabbingStarted
                 && GetTickCount() - dxgiFrameGrabber->m_lastGrab >= dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabDelay) {
                 // only capture a new frame if the old one was processed to shared memory and the delay has passed since the last grab
@@ -387,10 +395,12 @@ HRESULT WINAPI DXGIPresent(IDXGISwapChain * sc, UINT b, UINT c) {
                     }
                     dxgiFrameGrabber->m_lastGrab = GetTickCount();
                     dxgiFrameGrabber->m_mapPending = true;
+                    logger->reportLogDebug(L"Grabbed...");
                 }
             } else if (!dxgiFrameGrabber->m_ipcContext->m_pMemDesc->grabbingStarted) {
                 dxgiFrameGrabber->m_ipcContext->m_pMemDesc->frameId = HOOKSGRABBER_BLANK_FRAME_ID;
                 SetEvent(dxgiFrameGrabber->m_ipcContext->m_hFrameGrabbedEvent);
+                logger->reportLogDebug(L"Sending blank frame because grabbing not started");
             }
         }
 

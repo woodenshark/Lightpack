@@ -40,7 +40,7 @@
 
 namespace
 {
-inline const WBAdjustment getLedAdjustment(size_t ledIndex)
+inline const WBAdjustment getLedAdjustment(int ledIndex)
 {
     using namespace SettingsScope;
 
@@ -150,6 +150,7 @@ static const QString Slowdown = "Grab/Slowdown";
 static const QString LuminosityThreshold = "Grab/LuminosityThreshold";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
+static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
 }
 // [MoodLamp]
 namespace MoodLamp
@@ -1133,6 +1134,13 @@ void Settings::setDx1011GrabberEnabled(bool isEnabled) {
     setValue(Profile::Key::Grab::IsDx1011GrabberEnabled, isEnabled);
     m_this->dx1011GrabberEnabledChanged(isEnabled);
 }
+bool Settings::isDx9GrabbingEnabled() {
+    return value(Profile::Key::Grab::IsDx9GrabbingEnabled).toBool();
+}
+
+void Settings::setDx9GrabbingEnabled(bool isEnabled) {
+    setValue(Profile::Key::Grab::IsDx9GrabbingEnabled, isEnabled);
+}
 #endif
 
 Lightpack::Mode Settings::getLightpackMode()
@@ -1220,9 +1228,9 @@ void Settings::setMoodLampSpeed(int value)
 QList<WBAdjustment> Settings::getLedCoefs()
 {
     QList<WBAdjustment> result;
-    const size_t numOfLeds = getNumberOfLeds(getConnectedDevice());
+    const int numOfLeds = getNumberOfLeds(getConnectedDevice());
 
-    for(size_t led = 0; led < numOfLeds; ++led)
+    for (int led = 0; led < numOfLeds; ++led)
         result.append(getLedAdjustment(led));
 
     return result;
@@ -1610,9 +1618,9 @@ void Settings::migrateSettings()
 
             int remap[] = {3, 4, 2, 1, 0, 5, 6, 7, 8, 9};
 
-            size_t ledCount = getNumberOfLeds(SupportedDevices::DeviceTypeLightpack);
+            int ledCount = getNumberOfLeds(SupportedDevices::DeviceTypeLightpack);
             QMap<int, LedInfo> ledInfoMap;
-            for(size_t i = 0; i < ledCount; i++){
+            for (int i = 0; i < ledCount; i++){
                 LedInfo ledInfo;
                 ledInfo.isEnabled = isLedEnabled(i);
                 ledInfo.position = getLedPosition(i);

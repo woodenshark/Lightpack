@@ -6,29 +6,34 @@
 
 QT -= core gui
 
-DESTDIR  = ../lib
-TARGET   = libraryinjector
-TEMPLATE = lib
-LIBS += -luuid -lole32 -ladvapi32 -luser32
+DESTDIR  = ../src/bin
+TARGET   = offsetfinder
+LIBS += -ldxguid
+
+QMAKE_LIBS_QT_ENTRY =
+DEFINES += NO_QT
 
 include(../build-config.prf)
 
-DEFINES += LIBRARYINJECTOR_LIBRARY
+# The offsetfinder is used to get the x86 offsets when running as x64
+QMAKE_TARGET.arch = x86
+
 CONFIG(msvc) {
     # This will suppress many MSVC warnings about 'unsecure' CRT functions.
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
-    # Add export definition for COM methods
-    QMAKE_LFLAGS += /DEF:"LibraryInjector.def"
 } else {
     QMAKE_LFLAGS +=-Wl,--kill-at
 }
 
 SOURCES += \
-    LibraryInjector.c \
-    dllmain.c
+	main.cpp \
+    ../common/WinDXUtils.cpp
 
 HEADERS += \
-    ILibraryInjector.h \
-    LibraryInjector.h
+    ../common/D3D10GrabberDefs.hpp \
+    ../common/WinDXUtils.hpp \
+    ../common/defs.h \
+    ../common/msvcstub.h \
+    ../common/BufferFormat.h

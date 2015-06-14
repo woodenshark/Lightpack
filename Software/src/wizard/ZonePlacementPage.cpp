@@ -73,10 +73,10 @@ void ZonePlacementPage::initializePage()
     _ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 
     if (_isInitFromSettings) {
-        size_t ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
+        int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
         _ui->sbNumberOfLeds->setValue(ledCount);
 
-        for(size_t i = 0; i < ledCount; i++) {
+        for (int i = 0; i < ledCount; i++) {
             QPoint topLeft = Settings::getLedPosition(i);
             QSize size = Settings::getLedSize(i);
             QRect r(topLeft, size);

@@ -226,6 +226,7 @@ void SettingsWindow::connectSignalsSlots()
 
     // Dev tab
     connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+    connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #ifdef QT_GRAB_SUPPORT
     connect(ui->radioButton_GrabQt, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
     connect(ui->radioButton_GrabQt_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -247,6 +248,7 @@ void SettingsWindow::connectSignalsSlots()
 #endif
 #ifdef D3D10_GRAB_SUPPORT
     connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onDx1011CaptureEnabledChanged(bool)));
+    connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onDx9CaptureEnabledChanged(bool)));
 #endif
 
 
@@ -557,9 +559,15 @@ void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, 
 
 void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-
 #ifdef D3D10_GRAB_SUPPORT
     Settings::setDx1011GrabberEnabled(isEnabled);
+    ui->checkBox_EnableDx9Capture->setEnabled(isEnabled);
+#endif
+}
+void SettingsWindow::onDx9CaptureEnabledChanged(bool isEnabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+#ifdef D3D10_GRAB_SUPPORT
+    Settings::setDx9GrabbingEnabled(isEnabled);
 #endif
 }
 void SettingsWindow::setModeChanged(Lightpack::Mode mode)
@@ -762,6 +770,7 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
 #endif
 #ifndef D3D10_GRAB_SUPPORT
     ui->checkBox_EnableDx1011Capture->setVisible(false);
+    ui->checkBox_EnableDx9Capture->setVisible(false);
 #endif
 #ifndef X11_GRAB_SUPPORT
     ui->radioButton_GrabX11->setVisible(false);
@@ -1037,11 +1046,13 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 
 void SettingsWindow::onGrabberChanged()
 {
-    Grab::GrabberType grabberType = getSelectedGrabberType();
+    if (!updatingFromSettings) {
+        Grab::GrabberType grabberType = getSelectedGrabberType();
 
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
 
-    Settings::setGrabberType(grabberType);
+        Settings::setGrabberType(grabberType);
+    }
 }
 
 void SettingsWindow::onGrabSlowdown_valueChanged(int value)
@@ -1546,6 +1557,7 @@ void SettingsWindow::createTrayIcon()
 void SettingsWindow::updateUiFromSettings()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    updatingFromSettings = true;
 
     profilesLoadAll();
 
@@ -1624,12 +1636,14 @@ void SettingsWindow::updateUiFromSettings()
 
 #ifdef D3D10_GRAB_SUPPORT
     ui->checkBox_EnableDx1011Capture->setChecked(Settings::isDx1011GrabberEnabled());
+    ui->checkBox_EnableDx9Capture->setChecked(Settings::isDx9GrabbingEnabled());
 #endif
 
     onMoodLampLiquidMode_Toggled(ui->radioButton_LiquidColorMoodLampMode->isChecked());
     updateExpertModeWidgetsVisibility();
     onGrabberChanged();
     settingsProfileChanged_UpdateUI(Settings::getCurrentProfileName());
+    updatingFromSettings = false;
 }
 
 Grab::GrabberType SettingsWindow::getSelectedGrabberType()

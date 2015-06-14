@@ -81,6 +81,9 @@ private:
     GrabberBase *queryGrabber(Grab::GrabberType grabber);
     void initGrabbers();
     GrabberBase *initGrabber(GrabberBase *grabber);
+#ifdef D3D10_GRAB_SUPPORT
+    void reinitDx1011Grabber();
+#endif
     void initColorLists(int numberOfLeds);
     void clearColorsNew();
     void clearColorsCurrent();
@@ -113,6 +116,7 @@ private:
     bool m_isPauseGrabWhileResizeOrMoving;
     bool m_isSendDataOnlyIfColorsChanged;
     bool m_avgColorsOnAllLeds;
+    bool m_isGrabbingStarted;
 
     // Store last grabbing time in milliseconds
     double m_fpsMs;

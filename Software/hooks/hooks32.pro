@@ -7,12 +7,18 @@
 QT       -= core gui
 
 DESTDIR  = ../lib
-TARGET   = prismatik-hooks
+TARGET   = prismatik-hooks32
 TEMPLATE = lib
 
 include(../build-config.prf)
 
 LIBS += -lshlwapi -ladvapi32 -luser32
+
+# The hooks32 is injected into x86 processes when running as x64
+QMAKE_TARGET.arch = x86
+DEFINES += HOOKS_SYSWOW64
+Release:OBJECTS_DIR = release/32
+Debug:OBJECTS_DIR = debug/32
 
 !isEmpty( DIRECTX_SDK_DIR ) {
     # This will suppress gcc warnings in DX headers.
@@ -46,10 +52,10 @@ CONFIG(msvc) {
 }
 CONFIG(msvc) {
     QMAKE_POST_LINK = cd $(TargetDir) && \
-            cp -f prismatik-hooks.dll ../src/bin/
+            cp -f prismatik-hooks32.dll ../src/bin/
 } else {
     QMAKE_POST_LINK = cd $(DESTDIR) && \
-            cp -f prismatik-hooks.dll ../src/bin/
+            cp -f prismatik-hooks32.dll ../src/bin/
 }
 
 SOURCES += \

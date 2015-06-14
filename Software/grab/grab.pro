@@ -97,18 +97,30 @@ win32 {
         }
     }
 
-    # This will suppress many MSVC warnings about 'unsecure' CRT functions.
     CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
         DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+        # Create "fake" project dependencies of the libraries used dynamically
+        LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
+        contains(QMAKE_TARGET.arch, x86_64) {
+            # workaround for qmake not being able to support win32 projects in a x64 sln
+            # this results in "Project not selected to build for this solution configuration"
+            # thus build them manually as post-build step of grab
+            QMAKE_POST_LINK = MSBuild.exe ..\hooks\prismatik-hooks32.vcxproj /p:Configuration=$(Configuration)\
+                                && MSBuild.exe ..\offsetfinder\offsetfinder.vcxproj /p:Configuration=$(Configuration)\
+                                && MSBuild.exe ..\unhook\prismatik-unhook32.vcxproj /p:Configuration=$(Configuration)
+        }
     }
 
     HEADERS += \
             ../common/msvcstub.h \
             include/WinUtils.hpp \
-            include/WinDXUtils.hpp
+            ../common/WinDXUtils.hpp
     SOURCES += \
             WinUtils.cpp \
-            WinDXUtils.cpp
+            ../common/WinDXUtils.cpp
 }
 
 macx {

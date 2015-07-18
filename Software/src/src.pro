@@ -113,9 +113,9 @@ win32 {
                 cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt52.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin52.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc52.dll\" ./
+                cp -f \"$${QTDIR}/bin/icudt54.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuin54.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuuc54.dll\" ./
     } else {
         QMAKE_POST_LINK = cd $(DESTDIR) && \
                 cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
@@ -125,9 +125,9 @@ win32 {
                 cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt52.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin52.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc52.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icudt54.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuin54.dll\" ./ && \
+                cp -f \"$${QTDIR}/bin/icuuc54.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./

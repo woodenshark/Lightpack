@@ -36,12 +36,12 @@
 #define VER_FILEVERSION_STR         VERSION_STR "\0"
 #define VER_PRODUCTVERSION_STR      VER_FILEVERSION_STR
 
-#define VER_PRODUCTNAME_STR         "Prismatik"
-#define VER_COMPANYNAME_STR         "Woodenshark LLC"
+#define VER_PRODUCTNAME_STR         "Prismatik (unofficial)"
+#define VER_COMPANYNAME_STR         "Patrick Siegler"
 #define VER_FILEDESCRIPTION_STR     "Lightpack Software"
 #define VER_INTERNALNAME_STR        "Prismatik"
 #define VER_LEGALCOPYRIGHT_STR      "Copyright (c) 2014 Woodenshark LLC"
-#define VER_ORIGINALFILENAME_STR    "Prismatik_sw" VERSION_STR ".exe"
+#define VER_ORIGINALFILENAME_STR    "Prismatik.exe"
 
 
 // Lightpack API version

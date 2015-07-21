@@ -24,11 +24,12 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 * The device is simple to build (just Do-It-Yourself) 
 
 #####Useful URLs:
-* [Project mothership] (http://code.google.com/p/lightpack/)
-* [Binary downloads] (http://code.google.com/p/lightpack/downloads/list)
+* [Project mothership] (https://github.com/woodenshark/Lightpack/)
+* [Original project mothership] (https://code.google.com/p/lightpack/)
+* [Binary downloads] (https://github.com/woodenshark/Lightpack/releases)
 * Wiki with DIY and documentation [ENG] (http://code.google.com/p/light-pack/w/list) / [RUS] (http://code.google.com/p/lightpack/w/list)
-* [Post new issue] (http://code.google.com/p/lightpack/issues/list)
-* [Team] (http://code.google.com/p/lightpack/people/list)
+* [Post new issue] (https://github.com/woodenshark/Lightpack/issues)
+* [Team] (https://github.com/woodenshark/Lightpack/graphs/contributors)
 
 ---
 
@@ -85,7 +86,7 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 
 ---
 
-###Fimware build instructions
+###Firmware build instructions
 1. Install [AVR GCC Toolchain] (http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain)
 2. Install **dfu-programmer** for firmware upload with `$ sudo apt-get install dfu-programmer`
 3. Compile Prismatik using command line:
@@ -96,4 +97,4 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 ---
 
 Please let us know if you find mistakes, bugs or errors.<br />
-Post new issue : http://code.google.com/p/lightpack/issues/list
+Post new issue : https://github.com/woodenshark/Lightpack/issues

@@ -171,7 +171,9 @@ void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
 
     m_grabber = queryGrabber(grabberType);
 
+#ifdef D3D10_GRAB_SUPPORT
     reinitDx1011Grabber();
+#endif
 
     if (isStartNeeded) {
 #ifdef D3D10_GRAB_SUPPORT

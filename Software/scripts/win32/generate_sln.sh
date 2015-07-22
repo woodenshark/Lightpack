@@ -9,11 +9,11 @@ $QTDIR/bin/qmake -recursive -tp vc Lightpack.pro
 function fix_static {
 	for f in $1
 	do
-	  if [ -f $f -a -r $f ]; then
-	   sed "s/MultiThreadedDLL/MultiThreaded/g" "$f" | sed "s/MultiThreadedDebugDLL/MultiThreadedDebug/g" > "$f.tmp" && mv "$f.tmp" "$f"
-	  else
-	   echo "Error: Cannot read $f"
-	  fi
+		if [ -f $f -a -r $f ]; then
+			sed "s/MultiThreadedDLL/MultiThreaded/g" "$f" | sed "s/MultiThreadedDebugDLL/MultiThreadedDebug/g" > "$f.tmp" && mv "$f.tmp" "$f"
+		else
+			echo "Error: Cannot read $f"
+		fi
 	done
 }
 
@@ -27,8 +27,10 @@ PATHS=("unhook/prismatik-unhook32.vcxproj" "hooks/prismatik-hooks32.vcxproj" "of
 	SLN="$(cat Lightpack.sln)"
 	for f in ${PATHS[*]}
 	do
-		GUID=$(sed -n 's/.*\({[0-9A-Z\-]*}\).*/\1/p' "$f")
-		SLN=$(echo "$SLN" | sed "s/\($GUID.*\)|x64/\1|Win32/g")
-		echo "$GUID rewritten to Win32"
+		if [ -e $f ]; then
+			GUID=$(sed -n 's/.*\({[0-9A-Z\-]*}\).*/\1/p' "$f")
+			SLN=$(echo "$SLN" | sed "s/\($GUID.*\)|x64/\1|Win32/g")
+			echo "$GUID rewritten to Win32"
+		fi
 	done
 	echo "$SLN" > Lightpack.sln

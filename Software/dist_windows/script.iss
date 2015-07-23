@@ -12,7 +12,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppID={{2175EE1B-0160-4862-9096-C522B1B99042}
+AppID={{ABD88CE7-1FFA-416C-96CA-CCC6F2B34236}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
@@ -45,7 +45,8 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{cm:StartupGroup}"; Flags: unchecked
+Name: "adminstartuptask"; Description: "{cm:CreateAdminStartupTask}"; GroupDescription: "{cm:StartupGroup}"; Flags: unchecked
 
 [Files]
 Source: "content/Prismatik.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -83,16 +84,28 @@ Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "https://github.com/woodenshark/Lightpack-docs"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser 
+Filename: "https://github.com/psieg/Lightpack/wiki"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser
+Filename: "schtasks"; Parameters: "/create /f /RU Administrators /RL HIGHEST /SC onlogon /TN ""Prismatik with Admin Rights"" /TR ""{app}\{#MyAppExeName}"""; Tasks: adminstartuptask; Flags: runhidden skipifsilent
+
+[UninstallRun]
+Filename: "schtasks"; Parameters: "/delete /f /TN ""Prismatik with Admin Rights"""; Flags: runhidden
 
 [UninstallDelete]
 Name: "{app}\*.*"; Type: filesandordirs
 Name: (app); Type: dirifempty
 
 [CustomMessages]
+; Startup group name
+russian.StartupGroup =Ђвтоматический запуск:
+english.StartupGroup =Automatic Startup:
+
 ; Startup icon name
 russian.CreateStartupIcon=Добавить в автозагрузку
 english.CreateStartupIcon=Add to startup folder
+
+; Admin task name
+russian.CreateAdminStartupTask =Ђвтоматический запуск с правами администратора
+english.CreateAdminStartupTask =Automatically launch with admin rights
 
 ; Uninstall name
 russian.UninstallName =Prismatik (только удаление)

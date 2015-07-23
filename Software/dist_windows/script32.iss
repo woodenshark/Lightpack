@@ -45,7 +45,8 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "startupicon"; Description: "{cm:CreateStartupIcon}"; GroupDescription: "{cm:StartupGroup}"; Flags: unchecked
+Name: "adminstartuptask"; Description: "{cm:CreateAdminStartupTask}"; GroupDescription: "{cm:StartupGroup}"; Flags: unchecked
 
 [Files]
 Source: "content/Prismatik.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -59,11 +60,7 @@ Source: "gpl-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/icudt54.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/icuin54.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/icuuc54.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "content/D3Dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "content/libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "content/libGLESV2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libraryinjector.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit regserver ignoreversion
-;Source: "content/opengl32sw.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/prismatik-unhook.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
@@ -84,16 +81,28 @@ Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "https://github.com/woodenshark/Lightpack-docs"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser 
+Filename: "https://github.com/psieg/Lightpack/wiki"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser
+Filename: "schtasks"; Parameters: "/create /f /RU Administrators /RL HIGHEST /SC onlogon /TN ""Prismatik with Admin Rights"" /TR ""{app}\{#MyAppExeName}"""; Tasks: adminstartuptask; Flags: runhidden skipifsilent
+
+[UninstallRun]
+Filename: "schtasks"; Parameters: "/delete /f /TN ""Prismatik with Admin Rights"""; Flags: runhidden
 
 [UninstallDelete]
 Name: "{app}\*.*"; Type: filesandordirs
 Name: (app); Type: dirifempty
 
 [CustomMessages]
+; Startup group name
+russian.StartupGroup =Ђвтоматический запуск:
+english.StartupGroup =Automatic Startup:
+
 ; Startup icon name
 russian.CreateStartupIcon=Добавить в автозагрузку
 english.CreateStartupIcon=Add to startup folder
+
+; Admin task name
+russian.CreateAdminStartupTask =Ђвтоматический запуск с правами администратора
+english.CreateAdminStartupTask =Automatically launch with admin rights
 
 ; Uninstall name
 russian.UninstallName =Prismatik (только удаление)

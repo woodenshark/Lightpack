@@ -10,6 +10,7 @@ function fix_static {
 	for f in $1
 	do
 		if [ -f $f -a -r $f ]; then
+			echo "rewriting to staic linkage: $f"
 			sed "s/MultiThreadedDLL/MultiThreaded/g" "$f" | sed "s/MultiThreadedDebugDLL/MultiThreadedDebug/g" > "$f.tmp" && mv "$f.tmp" "$f"
 		else
 			echo "Error: Cannot read $f"
@@ -29,8 +30,8 @@ PATHS=("unhook/prismatik-unhook32.vcxproj" "hooks/prismatik-hooks32.vcxproj" "of
 	do
 		if [ -e $f ]; then
 			GUID=$(sed -n 's/.*\({[0-9A-Z\-]*}\).*/\1/p' "$f")
+			echo "rewriting to Win32: $GUID ($f)"
 			SLN=$(echo "$SLN" | sed "s/\($GUID.*\)|x64/\1|Win32/g")
-			echo "$GUID rewritten to Win32"
 		fi
 	done
 	echo "$SLN" > Lightpack.sln

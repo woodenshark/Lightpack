@@ -10,10 +10,8 @@ function fix_static {
 	for f in $1
 	do
 		if [ -f $f -a -r $f ]; then
-			echo "rewriting to staic linkage: $f"
+			echo "rewriting to static linkage: $f"
 			sed "s/MultiThreadedDLL/MultiThreaded/g" "$f" | sed "s/MultiThreadedDebugDLL/MultiThreadedDebug/g" > "$f.tmp" && mv "$f.tmp" "$f"
-		else
-			echo "Error: Cannot read $f"
 		fi
 	done
 }

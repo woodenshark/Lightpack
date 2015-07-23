@@ -29,7 +29,7 @@ SetupIconFile=Prismatik.ico
 Compression=lzma/Max
 SolidCompression=true
 AppCopyright=Woodenshark LLC
-UninstallDisplayName={cm:UninstallName}
+UninstallDisplayName={#MyAppName} {cm:RemoveOnly}
 UninstallDisplayIcon={app}\Prismatik.exe
 VersionInfoDescription=Lightpack Software 
 AppMutex=LightpackAppMutex
@@ -108,8 +108,8 @@ russian.CreateAdminStartupTask =Ђвтоматический запуск с правами администратора
 english.CreateAdminStartupTask =Automatically launch with admin rights
 
 ; Uninstall name
-russian.UninstallName =Prismatik (только удаление)
-english.UninstallName =Prismatik (remove only)
+russian.RemoveOnly =(только удаление)
+english.RemoveOnly =(remove only)
 
 ; Docs link name
 russian.OpenWiki =Открыть страницу с документацией

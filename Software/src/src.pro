@@ -104,11 +104,13 @@ win32 {
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
-	QMAKE_POST_LINK = cd $(TargetDir)$$escape_expand(\r\n)\
+	QMAKE_POST_LINK = $${QTDIR}/bin/lrelease src.pro$$escape_expand(\r\n)\
+		cd $(TargetDir)$$escape_expand(\r\n)\
 		set VCINSTALLDIR=$(VcInstallDir)$$escape_expand(\r\n)\
 		$${QTDIR}/bin/windeployqt --no-angle --no-plugins --no-svg \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
 		del opengl32sw.dll$$escape_expand(\r\n)\
-		copy /y ..\\..\\lib\\libraryinjector.dll .\\
+		copy /y ..\\..\\lib\\libraryinjector.dll .\\$$escape_expand(\r\n)\
+		copy /y ..\\..\\res\\translations\\*.qm translations
 }
 
 unix:!macx{

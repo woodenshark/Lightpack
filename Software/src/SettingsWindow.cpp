@@ -1330,10 +1330,10 @@ void SettingsWindow::profileSwitch(const QString & configName)
 
     ui->comboBox_Profiles->setCurrentIndex(index);
 
+    Settings::loadOrCreateProfile(configName);
+
     if (m_trayIcon)
         m_trayIcon->updateProfiles();
-
-    Settings::loadOrCreateProfile(configName);
 
 }
 

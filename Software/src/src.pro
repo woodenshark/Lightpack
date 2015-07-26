@@ -104,34 +104,10 @@ win32 {
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
-    CONFIG(msvc) {
-        QMAKE_POST_LINK = cd $(TargetDir) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt54.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin54.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc54.dll\" ./
-    } else {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt54.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin54.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc54.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./
-    }
+	QMAKE_POST_LINK = cd $(TargetDir)$$escape_expand(\r\n)\
+		set VCINSTALLDIR=$(VcInstallDir)$$escape_expand(\r\n)\
+		$${QTDIR}/bin/windeployqt --no-angle --no-svg \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
+		del opengl32sw.dll
 }
 
 unix:!macx{

@@ -3,15 +3,7 @@
 cp src/bin/*.dll dist_windows/content/
 cp src/bin/*.exe dist_windows/content/
 
-# Use windeployqt to copy Qt dependencies for running Prismatik on Windows
-$QTDIR/bin/windeployqt --release --no-angle dist_windows/content/Prismatik.exe
-
-# This assumes the build happens on a x64 machine
-if [ "$1" = "x86" ]
-then
-	cp $WINDIR/SysWOW64/msvcr120.dll dist_windows/content/
-	cp $WINDIR/SysWOW64/msvcp120.dll dist_windows/content/
-else
-	cp $WINDIR/System32/msvcr120.dll dist_windows/content/
-	cp $WINDIR/System32/msvcp120.dll dist_windows/content/
-fi
+cp -r src/bin/bearer dist_windows/content/
+cp -r src/bin/imageformats dist_windows/content/
+cp -r src/bin/platforms dist_windows/content/
+cp -r src/bin/translations dist_windows/content/

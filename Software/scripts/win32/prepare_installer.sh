@@ -3,7 +3,4 @@
 cp src/bin/*.dll dist_windows/content/
 cp src/bin/*.exe dist_windows/content/
 
-cp -r src/bin/bearer dist_windows/content/
-cp -r src/bin/imageformats dist_windows/content/
-cp -r src/bin/platforms dist_windows/content/
 cp -r src/bin/translations dist_windows/content/

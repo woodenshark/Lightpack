@@ -107,7 +107,8 @@ win32 {
 	QMAKE_POST_LINK = cd $(TargetDir)$$escape_expand(\r\n)\
 		set VCINSTALLDIR=$(VcInstallDir)$$escape_expand(\r\n)\
 		$${QTDIR}/bin/windeployqt --no-angle --no-svg \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
-		del opengl32sw.dll
+		del opengl32sw.dll$$escape_expand(\r\n)\
+		copy /y ..\\..\\lib\\libraryinjector.dll .\\
 }
 
 unix:!macx{

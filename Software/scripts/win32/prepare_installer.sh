@@ -2,10 +2,10 @@
 # call this from $repo/Software
 cp src/bin/*.dll dist_windows/content/
 cp src/bin/*.exe dist_windows/content/
-mkdir -p dist_windows/content/translations
-cp res/translations/*.qm dist_windows/content/translations
-mkdir -p dist_windows/content/platforms
-cp $QTDIR/plugins/platforms/qwindows.dll dist_windows/content/platforms/
+
+# Use windeployqt to copy Qt dependencies for running Prismatik on Windows
+$QTDIR/bin/windeployqt --release --no-angle dist_windows/content/Prismatik.exe
+
 # This assumes the build happens on a x64 machine
 if [ "$1" = "x86" ]
 then

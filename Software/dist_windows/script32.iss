@@ -60,7 +60,6 @@ Source: "gpl-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libraryinjector.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit regserver ignoreversion
 Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/prismatik-unhook.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
-Source: "content/translations/*.qm"; DestDir: "{app}\translations"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 ; Visual Studio redistributable package
 Source: "content/vcredist_x86.exe"; DestDir: {tmp}; Flags: deleteafterinstall

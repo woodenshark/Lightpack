@@ -50,6 +50,9 @@ TRANSLATIONS += ../res/translations/ru_RU.ts \
 RESOURCES    = ../res/LightpackResources.qrc
 RC_FILE      = ../res/Lightpack.rc
 
+# Generate .qm language files
+system($$[QT_INSTALL_BINS]/lrelease src.pro)
+
 include(../build-config.prf)
 
 # Grabber types configuration
@@ -104,13 +107,11 @@ win32 {
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
-	QMAKE_POST_LINK = $${QTDIR}/bin/lrelease src.pro$$escape_expand(\r\n)\
-		cd $(TargetDir)$$escape_expand(\r\n)\
+	QMAKE_POST_LINK = cd $(TargetDir)$$escape_expand(\r\n)\
 		set VCINSTALLDIR=$(VcInstallDir)$$escape_expand(\r\n)\
-		$${QTDIR}/bin/windeployqt --no-angle --no-plugins --no-svg \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
+		$$[QT_INSTALL_BINS]/windeployqt --no-angle --no-plugins --no-svg --no-translations \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
 		del opengl32sw.dll$$escape_expand(\r\n)\
-		copy /y ..\\..\\lib\\libraryinjector.dll .\\$$escape_expand(\r\n)\
-		copy /y ..\\..\\res\\translations\\*.qm translations
+		copy /y ..\\..\\lib\\libraryinjector.dll .\\
 }
 
 unix:!macx{

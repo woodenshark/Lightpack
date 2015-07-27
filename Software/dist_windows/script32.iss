@@ -62,8 +62,9 @@ Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; F
 Source: "content/prismatik-unhook.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
-; Visual Studio redistributable package
-Source: "content/vcredist_x86.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+; These files are needed only when building with MSVC - otherwise just comment them
+Source: "content/msvcr*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/msvcp*.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -75,7 +76,6 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
-Filename: "{tmp}\vcredist_x86.exe"; Parameters: "/q /norestart"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 Filename: "https://github.com/psieg/Lightpack/wiki"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser
 Filename: "schtasks"; Parameters: "/create /f /RU Administrators /RL HIGHEST /SC onlogon /TN ""Prismatik with Admin Rights"" /TR ""{app}\{#MyAppExeName}"""; Tasks: adminstartuptask; Flags: runhidden skipifsilent

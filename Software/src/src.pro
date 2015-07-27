@@ -107,12 +107,14 @@ win32 {
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
-    QMAKE_POST_LINK = cd $(TargetDir)$$escape_expand(\r\n)\
-        set VCINSTALLDIR=$(VcInstallDir)$$escape_expand(\r\n)\
-        $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations \"$(TargetName)$(TargetExt)\"$$escape_expand(\r\n)\
-        del opengl32sw.dll$$escape_expand(\r\n)\
-        rd /s /q bearer $$escape_expand(\r\n)\
-        rd /s /q imageformats $$escape_expand(\r\n)\
+    QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
+        $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)\
+        if exist opengl32sw.dll ( del opengl32sw.dll ) $$escape_expand(\r\n)\
+        if exist vcredist_$(PlatformTarget).exe ( del vcredist_$(PlatformTarget).exe ) $$escape_expand(\r\n)\
+        if exist bearer ( rd /s /q bearer ) $$escape_expand(\r\n)\
+        if exist imageformats ( rd /s /q imageformats ) $$escape_expand(\r\n)\
+        copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcr$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+        copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
         copy /y ..\\..\\lib\\libraryinjector.dll .\\
 }
 

@@ -1,17 +1,26 @@
-include( build-vars.prf )
+include(build-vars.prf.default)
+include(build-vars.prf)
+
 #------------------------------------------------------------------------------
-# Warnings
+# Parsing configuration
 #------------------------------------------------------------------------------
-    win32: {
-        isEmpty( QTDIR ) {
-            error("QTDIR is empty, please make sure you have correctly defined QTDIR in your build-vars.prf")
-        }
-        isEmpty( DIRECTX_SDK_DIR ):isEmpty( WIN81_SDK_DIR ) {
-            error("please make sure you have defined DIRECTX_SDK_DIR or WIN81_SDK_DIR in your build-vars.prf file")
-        }
-        CONFIG(debug, debug|release) {
-            DEBUG_EXT = d
-        } else {
-            DEBUG_EXT =
-        }
+win32: {
+    # DirectX SDK directory
+    _DIRECTX_SDK_DIR = $$(DIRECTX_SDK_DIR)
+    !isEmpty(_DIRECTX_SDK_DIR) {
+        DIRECTX_SDK_DIR = _DIRECTX_SDK_DIR
     }
+
+    # Target architecture
+    QMAKE_TARGET.arch = $$TARGET_ARCH
+    _TARGET_ARCH = $$(TARGET_ARCH)
+    !isEmpty(_TARGET_ARCH) {
+        QMAKE_TARGET.arch = _TARGET_ARCH
+    }
+
+    CONFIG(debug, debug|release) {
+        DEBUG_EXT = d
+    } else {
+        DEBUG_EXT =
+    }
+}

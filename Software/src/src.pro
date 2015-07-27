@@ -121,7 +121,7 @@ win32 {
             rm -f opengl32sw.dll && \
             rm -rf bearer && \
             rm -rf imageformats
-	}
+    }
 }
 
 unix:!macx{

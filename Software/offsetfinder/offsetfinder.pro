@@ -28,7 +28,7 @@ CONFIG(msvc) {
 }
 
 SOURCES += \
-	main.cpp \
+    main.cpp \
     ../common/WinDXUtils.cpp
 
 HEADERS += \

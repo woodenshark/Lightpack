@@ -3,9 +3,9 @@
 # This includes the sln and vcxproj's which VS doesn't know are generated
 # This script should clean all temporary and final products of the build process (on windows)
 # call this from $repo/Software
-rm -rf src/bin
-rm -rf src/stuff
+rm -rf bin
 rm -rf lib
+rm -rf src/stuff
 rm -rf */debug
 rm -rf */release
 rm -rf dist_windows/content/*.dll

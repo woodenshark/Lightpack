@@ -6,7 +6,7 @@
 
 QT -= core gui
 
-DESTDIR  = ../src/bin
+DESTDIR  = ../bin
 TARGET   = offsetfinder
 LIBS += -ldxguid
 

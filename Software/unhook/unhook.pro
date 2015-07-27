@@ -27,19 +27,18 @@ CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
+    # Copy output to ../bin
+    QMAKE_POST_LINK = cd $(TargetDir) && \
+        copy /y prismatik-unhook.dll ..\\bin\\
 } else {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
-}
-CONFIG(msvc) {
-	QMAKE_POST_LINK = cd $(TargetDir) && \
-			cp -f prismatik-unhook.dll ../src/bin/
-} else {
-	QMAKE_POST_LINK = cd $(DESTDIR) && \
-			cp -f prismatik-unhook.dll ../src/bin/
+    # Copy output to ../bin
+    QMAKE_POST_LINK = cd $$DESTDIR && \
+        cp -f prismatik-unhook.dll ../bin/
 }
 
 SOURCES += \
-    main.cpp 
+    main.cpp
 
 HEADERS +=

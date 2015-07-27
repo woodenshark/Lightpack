@@ -12,7 +12,7 @@ CONFIG(msvc) {
 } else {
     PRE_TARGETDEPS += ../lib/libgrab.a
 }
-DESTDIR     = bin
+DESTDIR     = ../bin
 TEMPLATE    = app
 QT         += network widgets
 win32 {
@@ -107,14 +107,21 @@ win32 {
     LIBS    += -lpsapi
     LIBS    += -lwtsapi32
 
-    QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
-        $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations --no-compiler-runtime \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)\
-        if exist opengl32sw.dll ( del opengl32sw.dll ) $$escape_expand(\r\n)\
-        if exist bearer ( rd /s /q bearer ) $$escape_expand(\r\n)\
-        if exist imageformats ( rd /s /q imageformats ) $$escape_expand(\r\n)\
-        copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcr$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
-        copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
-        copy /y ..\\..\\lib\\libraryinjector.dll .\\
+    CONFIG(msvc) {
+        QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
+            $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations --no-compiler-runtime \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)\
+            if exist opengl32sw.dll ( del opengl32sw.dll ) $$escape_expand(\r\n)\
+            if exist bearer ( rd /s /q bearer ) $$escape_expand(\r\n)\
+            if exist imageformats ( rd /s /q imageformats ) $$escape_expand(\r\n)\
+            copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcr$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+            copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp$(PlatformToolsetVersion).dll\" .\
+	} else {
+        QMAKE_POST_LINK = cd $$DESTDIR && \
+            $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations \"$(TargetName)$(TargetExt)\" && \
+            rm -f opengl32sw.dll && \
+            rm -rf bearer && \
+            rm -rf imageformats
+	}
 }
 
 unix:!macx{

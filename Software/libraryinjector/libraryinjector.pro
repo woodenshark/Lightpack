@@ -21,8 +21,14 @@ CONFIG(msvc) {
     QMAKE_CXXFLAGS += /MP
     # Add export definition for COM methods
     QMAKE_LFLAGS += /DEF:"LibraryInjector.def"
+    # Copy output to ../bin
+    QMAKE_POST_LINK = cd $(TargetDir) && \
+        copy /y libraryinjector.dll ..\\bin\\
 } else {
     QMAKE_LFLAGS +=-Wl,--kill-at
+    # Copy output to ../bin
+    QMAKE_POST_LINK = cd $$DESTDIR && \
+        cp -f libraryinjector.dll ../bin/
 }
 
 SOURCES += \

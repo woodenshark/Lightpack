@@ -24,3 +24,11 @@ win32: {
         DEBUG_EXT =
     }
 }
+
+macx {
+    # Mac SDK override
+    _QMAKE_MAC_SDK_OVERRIDE = $$(QMAKE_MAC_SDK_OVERRIDE)
+    !isEmpty(QMAKE_MAC_SDK_OVERRIDE) {
+        QMAKE_MAC_SDK_OVERRIDE = _QMAKE_MAC_SDK_OVERRIDE
+    }
+}

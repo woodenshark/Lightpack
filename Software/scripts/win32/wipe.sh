@@ -11,6 +11,8 @@ rm -rf */release
 rm -rf dist_windows/content/*.dll
 rm -rf dist_windows/content/*.exe
 rm -rf dist_windows/content/platforms
-rm -rf dist_windows/content/translations
 rm -f Lightpack.sln
+rm -f Lightpack.sdf
+rm -f Lightpack.*.suo
 rm -rf */*.vcxproj
+rm -rf */*.vcxproj.filters

@@ -1,0 +1,21 @@
+# This file contains the default values for qmake
+# If you want custom values, you can do this in two ways:
+#  - Create build-vars.prf and modify the respective variables
+#  - Use environment variables, e.g. DIRECTX_SDK_DIR
+
+#------------------------------------------------------------------------------
+# General
+#------------------------------------------------------------------------------
+win32: {
+    # Windows 8.1 SDK is preferred above DirectX SDK, and will be used instead
+    # if it's available, otherwise, specify the DirectX SDK folder
+    # DIRECTX_SDK_DIR = "C:\Program Files\Microsoft DirectX SDK (June 2010)"
+
+    # Set this to x86 to compile 32-bit
+    TARGET_ARCH = x86_64
+}
+
+# You can override QMAKE_MAC_SDK value by setting this variable.
+# macx {
+#     QMAKE_MAC_SDK_OVERRIDE = macosx10.8
+# }

@@ -6,7 +6,7 @@
 
 QT -= core gui
 
-DESTDIR  = ../lib
+DESTDIR  = ../bin
 TARGET   = libraryinjector
 TEMPLATE = lib
 LIBS += -luuid -lole32 -ladvapi32 -luser32
@@ -19,8 +19,8 @@ CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
-    # Add export definition for COM methods
-    QMAKE_LFLAGS += /DEF:"LibraryInjector.def"
+    # Add export definition for COM methods and place *.lib and *.exp files in ../lib
+    QMAKE_LFLAGS += /DEF:"LibraryInjector.def" /IMPLIB:..\\lib\\$(TargetName).lib
 } else {
     QMAKE_LFLAGS +=-Wl,--kill-at
 }

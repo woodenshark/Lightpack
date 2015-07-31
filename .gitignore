@@ -8,6 +8,7 @@ Firmware/.project
 Firmware/.cproject
 Software/[^.]*Makefile
 Software/res/qrc_[^.]+.cpp
+Software/res/translations/*.qm
 Software/[^.]+.pro.user
 .metadata/
 Software/apiexamples/.+\.pyc

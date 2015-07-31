@@ -6,7 +6,7 @@
 
 QT -= core gui
 
-DESTDIR  = ../src/bin
+DESTDIR  = ../bin
 TARGET   = offsetfinder
 LIBS += -ldxguid
 
@@ -28,7 +28,7 @@ CONFIG(msvc) {
 }
 
 SOURCES += \
-	main.cpp \
+    main.cpp \
     ../common/WinDXUtils.cpp
 
 HEADERS += \

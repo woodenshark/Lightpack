@@ -6,7 +6,7 @@
 
 QT       -= core gui
 
-DESTDIR  = ../lib
+DESTDIR  = ../bin
 TARGET   = prismatik-hooks32
 TEMPLATE = lib
 
@@ -45,17 +45,11 @@ CONFIG(msvc) {
     # Parallel build
     QMAKE_CXXFLAGS += /MP
     # Layout changes in the injected dll are potentially harmful (fraps)
-    QMAKE_LFLAGS += /INCREMENTAL:NO
+    # Place *.lib and *.exp files in ../lib
+    QMAKE_LFLAGS += /INCREMENTAL:NO /IMPLIB:..\\lib\\$(TargetName).lib
 } else {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
-}
-CONFIG(msvc) {
-    QMAKE_POST_LINK = cd $(TargetDir) && \
-            cp -f prismatik-hooks32.dll ../src/bin/
-} else {
-    QMAKE_POST_LINK = cd $(DESTDIR) && \
-            cp -f prismatik-hooks32.dll ../src/bin/
 }
 
 SOURCES += \

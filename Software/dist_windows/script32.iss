@@ -31,7 +31,7 @@ SolidCompression=true
 AppCopyright=Woodenshark LLC
 UninstallDisplayName={#MyAppName} {cm:RemoveOnly}
 UninstallDisplayIcon={app}\Prismatik.exe
-VersionInfoDescription=Lightpack Software 
+VersionInfoDescription=Lightpack Software
 AppMutex=LightpackAppMutex
 VersionInfoVersion={#MyAppVersion}
 VersionInfoProductName=Prismatik
@@ -57,18 +57,14 @@ Source: "content/Qt5Network.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5SerialPort.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/Qt5Widgets.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gpl-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icudt54.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icuin54.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/icuuc54.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libraryinjector.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit regserver ignoreversion
 Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/prismatik-unhook.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
-Source: "content/translations/*.qm"; DestDir: "{app}\translations"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 ; These files are needed only when building with MSVC - otherwise just comment them
-Source: "content/msvcr120.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "content/msvcp120.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/msvcr*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "content/msvcp*.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

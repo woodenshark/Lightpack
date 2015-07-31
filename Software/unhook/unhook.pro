@@ -6,7 +6,7 @@
 
 QT       -= core gui
 
-DESTDIR  = ../lib
+DESTDIR  = ../bin
 TARGET   = prismatik-unhook
 TEMPLATE = lib
 
@@ -27,19 +27,14 @@ CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Parallel build
     QMAKE_CXXFLAGS += /MP
+    # Place *.lib and *.exp files in ../lib
+    QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
 } else {
     QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
 }
-CONFIG(msvc) {
-	QMAKE_POST_LINK = cd $(TargetDir) && \
-			cp -f prismatik-unhook.dll ../src/bin/
-} else {
-	QMAKE_POST_LINK = cd $(DESTDIR) && \
-			cp -f prismatik-unhook.dll ../src/bin/
-}
 
 SOURCES += \
-    main.cpp 
+    main.cpp
 
 HEADERS +=

@@ -393,6 +393,8 @@ void GrabManager::timeoutUpdateFPS()
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
     emit ambilightTimeOfUpdatingColors(m_fpsMs);
+    // If this is not reset by handleGrabbedColors, there was no grabbing
+    m_fpsMs = 0;
 }
 
 void GrabManager::pauseWhileResizeOrMoving()

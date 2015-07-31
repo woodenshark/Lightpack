@@ -1,3 +1,6 @@
+# For some reason infile still gets called even when config.pri does not exist.
+# But since config.pri does not exist in our repo, it will cause an error when using qmake.
+# For that reason, it's currently disabled.
 #exists(config.pri):infile(config.pri, SOLUTIONS_LIBRARY, yes): CONFIG += qtsingleapplication-uselib
 
 TEMPLATE += fakelib

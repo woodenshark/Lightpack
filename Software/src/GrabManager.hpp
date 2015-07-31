@@ -99,10 +99,8 @@ private:
     D3D10Grabber *m_d3d10Grabber;
 #endif
 
-    QTimer *m_timerGrab;
     QTimer *m_timerUpdateFPS;
     QTimer *m_timerFakeGrab;
-    QThread *m_grabbersThread;
     QWidget *m_parentWidget;
     QList<GrabWidget *> m_ledWidgets;
     QList<QRgb> m_grabResult;

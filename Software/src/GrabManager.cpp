@@ -68,7 +68,6 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
     m_parentWidget = parent;
 
-    m_timerGrab = new QTimer(this);
     m_timeEval = new TimeEvaluations();
 
     m_fpsMs = 0;
@@ -77,7 +76,6 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
-//    m_grabbersThread = new QThread();
     initGrabbers();
     m_grabber = queryGrabber(Settings::getGrabberType());
 
@@ -98,7 +96,6 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
     initColorLists(MaximumNumberOfLeds::Default);
     initLedWidgets(MaximumNumberOfLeds::Default);
 
-//    connect(m_timerGrab, SIGNAL(timeout()), this, SLOT(handleGrabbedColors()));
     connect(QApplication::desktop(), SIGNAL(resized(int)), this, SLOT(scaleLedWidgets(int)));
     connect(QApplication::desktop(), SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
 
@@ -114,9 +111,10 @@ GrabManager::~GrabManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    delete m_timerGrab;
     delete m_timeEval;
     m_grabber = NULL;
+    delete m_timerFakeGrab;
+    delete m_timerUpdateFPS;
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
@@ -325,7 +323,6 @@ void GrabManager::handleGrabbedColors()
     // if one of LED widgets resizing or moving
     if (m_isPauseGrabWhileResizeOrMoving)
     {
-        m_timerGrab->start(50); // check in 50 ms
         return;
     }    
 
@@ -361,22 +358,6 @@ void GrabManager::handleGrabbedColors()
             }
         }
     }
-
-//    // White balance
-//    for (int i = 0; i < m_ledWidgets.size(); i++)
-//    {
-//        QRgb rgb = m_colorsNew[i];
-
-//        unsigned r = qRed(rgb)   * m_ledWidgets[i]->getCoefRed();
-//        unsigned g = qGreen(rgb) * m_ledWidgets[i]->getCoefGreen();
-//        unsigned b = qBlue(rgb)  * m_ledWidgets[i]->getCoefBlue();
-
-//        if (r > 0xff) r = 0xff;
-//        if (g > 0xff) g = 0xff;
-//        if (b > 0xff) b = 0xff;
-
-//        m_colorsNew[i] = qRgb(r, g, b);
-//    }
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {

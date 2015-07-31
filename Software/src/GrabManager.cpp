@@ -47,6 +47,9 @@
 
 using namespace SettingsScope;
 
+#define FPS_UPDATE_INTERVAL 500
+#define FAKE_GRAB_INTERVAL 2000
+
 #ifdef D3D10_GRAB_SUPPORT
 
 #include "LightpackApplication.hpp"
@@ -81,7 +84,12 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
     m_timerUpdateFPS = new QTimer(this);
     connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
     m_timerUpdateFPS->setSingleShot(false);
-    m_timerUpdateFPS->start(500);
+    m_timerUpdateFPS->start(FPS_UPDATE_INTERVAL);
+
+    m_timerFakeGrab = new QTimer(this);
+    connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
+    m_timerFakeGrab->setSingleShot(false);
+    m_timerFakeGrab->setInterval(FAKE_GRAB_INTERVAL);
 
     m_isPauseGrabWhileResizeOrMoving = false;
     m_isGrabWidgetsVisible = false;
@@ -387,6 +395,18 @@ void GrabManager::handleGrabbedColors()
     m_fpsMs = m_timeEval->howLongItEnd();
     m_timeEval->howLongItStart();
 
+    if (m_isSendDataOnlyIfColorsChanged == false)
+    {
+        m_timerFakeGrab->start();
+    }
+}
+
+void GrabManager::timeoutFakeGrab()
+{
+    if (m_isSendDataOnlyIfColorsChanged == false)
+    {
+        emit updateLedsColors(m_colorsCurrent);
+    }
 }
 
 void GrabManager::timeoutUpdateFPS()

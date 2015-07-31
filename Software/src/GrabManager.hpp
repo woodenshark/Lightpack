@@ -69,6 +69,7 @@ public slots:
 
 private slots:
     void handleGrabbedColors();
+    void timeoutFakeGrab();
     void timeoutUpdateFPS();
     void pauseWhileResizeOrMoving();
     void resumeAfterResizeOrMoving();
@@ -100,6 +101,7 @@ private:
 
     QTimer *m_timerGrab;
     QTimer *m_timerUpdateFPS;
+    QTimer *m_timerFakeGrab;
     QThread *m_grabbersThread;
     QWidget *m_parentWidget;
     QList<GrabWidget *> m_ledWidgets;

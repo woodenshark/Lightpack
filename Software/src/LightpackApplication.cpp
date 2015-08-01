@@ -56,20 +56,20 @@ LightpackApplication::LightpackApplication(int &argc, char **argv)
 
 LightpackApplication::~LightpackApplication()
 {
-	m_EventFilters.clear();
+    m_EventFilters.clear();
 
-	// the QObjects seem to be deleted at this point already
-	// so just clean up the rest
+    // the QObjects seem to be deleted at this point already
+    // so just clean up the rest
 
-	delete m_settingsWindow;
-	delete m_ledDeviceManager;
-	delete m_LedDeviceManagerThread;
-	delete m_apiServerThread;
-	delete m_grabManager;
-	delete m_moodlampManager;
+    delete m_settingsWindow;
+    delete m_ledDeviceManager;
+    delete m_LedDeviceManagerThread;
+    delete m_apiServerThread;
+    delete m_grabManager;
+    delete m_moodlampManager;
 
-	delete m_pluginManager;
-	delete m_pluginInterface;
+    delete m_pluginManager;
+    delete m_pluginInterface;
 }
 
 void LightpackApplication::initializeAll(const QString & appDirPath)
@@ -631,6 +631,7 @@ void LightpackApplication::initGrabManager()
     connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)), m_grabManager, SLOT(onGrabberTypeChanged(const Grab::GrabberType &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabSlowdownChanged(int)), m_grabManager, SLOT(onGrabSlowdownChanged(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)), m_grabManager, SLOT(onGrabAvgColorsEnabledChanged(bool)), Qt::QueuedConnection);
+    connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)), m_grabManager, SLOT(onSendDataOnlyIfColorsEnabledChanged(bool)), Qt::QueuedConnection);
 
     connect(settings(), SIGNAL(profileLoaded(const QString &)),        m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
@@ -639,8 +640,6 @@ void LightpackApplication::initGrabManager()
     // Connections to signals which will be connected to ILedDevice
     if (!m_noGui)
     {
-//        connect(m_settingsWindow, SIGNAL(settingsChanged()), this, SLOT(settingsChanged()));
-
         connect(m_settingsWindow, SIGNAL(showLedWidgets(bool)), this, SLOT(showLedWidgets(bool)));
         connect(m_settingsWindow, SIGNAL(setColoredLedWidget(bool)), this, SLOT(setColoredLedWidget(bool)));
 

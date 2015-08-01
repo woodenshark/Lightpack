@@ -390,6 +390,10 @@ void GrabManager::timeoutFakeGrab()
     {
         emit updateLedsColors(m_colorsCurrent);
     }
+    else
+    {
+        m_timerFakeGrab->stop();
+    }
 }
 
 void GrabManager::timeoutUpdateFPS()

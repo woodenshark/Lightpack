@@ -48,7 +48,7 @@
 using namespace SettingsScope;
 
 #define FPS_UPDATE_INTERVAL 500
-#define FAKE_GRAB_INTERVAL 2000
+#define FAKE_GRAB_INTERVAL 900
 
 #ifdef D3D10_GRAB_SUPPORT
 

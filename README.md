@@ -24,12 +24,12 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 * The device is simple to build (just Do-It-Yourself) 
 
 #####Useful URLs:
-* [Project mothership] (https://github.com/woodenshark/Lightpack/)
-* [Original project mothership] (https://code.google.com/p/lightpack/)
-* [Binary downloads] (https://github.com/woodenshark/Lightpack/releases)
+* [Project mothership] (https://github.com/psieg/Lightpack/)
+* [Original project mothership] (https://github.com/woodenshark/Lightpack/)
+* [Binary downloads] (https://github.com/psieg/Lightpack/releases)
 * Wiki with DIY and documentation [ENG] (http://code.google.com/p/light-pack/w/list) / [RUS] (http://code.google.com/p/lightpack/w/list)
-* [Post new issue] (https://github.com/woodenshark/Lightpack/issues)
-* [Team] (https://github.com/woodenshark/Lightpack/graphs/contributors)
+* [Post new issue] (https://github.com/psieg/Lightpack/issues)
+* [Team] (https://github.com/psieg/Lightpack/graphs/contributors)
 
 ---
 
@@ -108,5 +108,5 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 
 ---
 
-Please let us know if you find mistakes, bugs or errors.<br />
-Post new issue : https://github.com/woodenshark/Lightpack/issues
+Please let us know if you find mistakes, bugs or errors. Contributions are welcome.<br />
+Post new issue : https://github.com/psieg/Lightpack/issues

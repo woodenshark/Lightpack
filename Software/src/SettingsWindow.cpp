@@ -1055,9 +1055,11 @@ void SettingsWindow::onGrabberChanged()
     if (!updatingFromSettings) {
         Grab::GrabberType grabberType = getSelectedGrabberType();
 
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
+        if (grabberType != Settings::getGrabberType()) {
+            DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
 
-        Settings::setGrabberType(grabberType);
+            Settings::setGrabberType(grabberType);
+        }
     }
 }
 

@@ -47,6 +47,9 @@
 
 using namespace SettingsScope;
 
+#define FPS_UPDATE_INTERVAL 500
+#define FAKE_GRAB_INTERVAL 900
+
 #ifdef D3D10_GRAB_SUPPORT
 
 #include "LightpackApplication.hpp"
@@ -65,23 +68,27 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
     m_parentWidget = parent;
 
-    m_timerGrab = new QTimer(this);
     m_timeEval = new TimeEvaluations();
 
     m_fpsMs = 0;
+    m_noGrabCount = 0;
 
     m_grabberContext = new GrabberContext();
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
-//    m_grabbersThread = new QThread();
     initGrabbers();
     m_grabber = queryGrabber(Settings::getGrabberType());
 
     m_timerUpdateFPS = new QTimer(this);
     connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
     m_timerUpdateFPS->setSingleShot(false);
-    m_timerUpdateFPS->start(500);
+    m_timerUpdateFPS->start(FPS_UPDATE_INTERVAL);
+
+    m_timerFakeGrab = new QTimer(this);
+    connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
+    m_timerFakeGrab->setSingleShot(false);
+    m_timerFakeGrab->setInterval(FAKE_GRAB_INTERVAL);
 
     m_isPauseGrabWhileResizeOrMoving = false;
     m_isGrabWidgetsVisible = false;
@@ -90,7 +97,6 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
     initColorLists(MaximumNumberOfLeds::Default);
     initLedWidgets(MaximumNumberOfLeds::Default);
 
-//    connect(m_timerGrab, SIGNAL(timeout()), this, SLOT(handleGrabbedColors()));
     connect(QApplication::desktop(), SIGNAL(resized(int)), this, SLOT(scaleLedWidgets(int)));
     connect(QApplication::desktop(), SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
 
@@ -106,9 +112,10 @@ GrabManager::~GrabManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    delete m_timerGrab;
     delete m_timeEval;
     m_grabber = NULL;
+    delete m_timerFakeGrab;
+    delete m_timerUpdateFPS;
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
@@ -317,7 +324,6 @@ void GrabManager::handleGrabbedColors()
     // if one of LED widgets resizing or moving
     if (m_isPauseGrabWhileResizeOrMoving)
     {
-        m_timerGrab->start(50); // check in 50 ms
         return;
     }    
 
@@ -354,22 +360,6 @@ void GrabManager::handleGrabbedColors()
         }
     }
 
-//    // White balance
-//    for (int i = 0; i < m_ledWidgets.size(); i++)
-//    {
-//        QRgb rgb = m_colorsNew[i];
-
-//        unsigned r = qRed(rgb)   * m_ledWidgets[i]->getCoefRed();
-//        unsigned g = qGreen(rgb) * m_ledWidgets[i]->getCoefGreen();
-//        unsigned b = qBlue(rgb)  * m_ledWidgets[i]->getCoefBlue();
-
-//        if (r > 0xff) r = 0xff;
-//        if (g > 0xff) g = 0xff;
-//        if (b > 0xff) b = 0xff;
-
-//        m_colorsNew[i] = qRgb(r, g, b);
-//    }
-
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
         if (m_colorsCurrent[i] != m_colorsNew[i])
@@ -385,13 +375,28 @@ void GrabManager::handleGrabbedColors()
     }
 
     m_fpsMs = m_timeEval->howLongItEnd();
+    m_noGrabCount = 0;
     m_timeEval->howLongItStart();
 
+    if (m_isSendDataOnlyIfColorsChanged == false)
+    {
+        m_timerFakeGrab->start();
+    }
+}
+
+void GrabManager::timeoutFakeGrab()
+{
+    if (m_isSendDataOnlyIfColorsChanged == false)
+    {
+        emit updateLedsColors(m_colorsCurrent);
+    }
 }
 
 void GrabManager::timeoutUpdateFPS()
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_noGrabCount++;
+    if (m_noGrabCount > 2) m_fpsMs = 0;
     emit ambilightTimeOfUpdatingColors(m_fpsMs);
 }
 

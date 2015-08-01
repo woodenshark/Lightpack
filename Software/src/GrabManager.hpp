@@ -69,6 +69,7 @@ public slots:
 
 private slots:
     void handleGrabbedColors();
+    void timeoutFakeGrab();
     void timeoutUpdateFPS();
     void pauseWhileResizeOrMoving();
     void resumeAfterResizeOrMoving();
@@ -98,9 +99,8 @@ private:
     D3D10Grabber *m_d3d10Grabber;
 #endif
 
-    QTimer *m_timerGrab;
     QTimer *m_timerUpdateFPS;
-    QThread *m_grabbersThread;
+    QTimer *m_timerFakeGrab;
     QWidget *m_parentWidget;
     QList<GrabWidget *> m_ledWidgets;
     QList<QRgb> m_grabResult;
@@ -120,6 +120,7 @@ private:
 
     // Store last grabbing time in milliseconds
     double m_fpsMs;
+    int m_noGrabCount;
 
     bool m_isGrabWidgetsVisible;
     GrabberContext * m_grabberContext;

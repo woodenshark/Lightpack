@@ -120,6 +120,7 @@ private:
 
     // Store last grabbing time in milliseconds
     double m_fpsMs;
+    int m_noGrabCount;
 
     bool m_isGrabWidgetsVisible;
     GrabberContext * m_grabberContext;

@@ -71,6 +71,7 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
     m_timeEval = new TimeEvaluations();
 
     m_fpsMs = 0;
+    m_noGrabCount = 0;
 
     m_grabberContext = new GrabberContext();
 
@@ -374,6 +375,7 @@ void GrabManager::handleGrabbedColors()
     }
 
     m_fpsMs = m_timeEval->howLongItEnd();
+    m_noGrabCount = 0;
     m_timeEval->howLongItStart();
 
     if (m_isSendDataOnlyIfColorsChanged == false)
@@ -393,9 +395,9 @@ void GrabManager::timeoutFakeGrab()
 void GrabManager::timeoutUpdateFPS()
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_noGrabCount++;
+    if (m_noGrabCount > 2) m_fpsMs = 0;
     emit ambilightTimeOfUpdatingColors(m_fpsMs);
-    // If this is not reset by handleGrabbedColors, there was no grabbing
-    m_fpsMs = 0;
 }
 
 void GrabManager::pauseWhileResizeOrMoving()

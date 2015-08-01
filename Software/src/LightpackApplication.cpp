@@ -632,6 +632,10 @@ void LightpackApplication::initGrabManager()
     connect(settings(), SIGNAL(grabSlowdownChanged(int)), m_grabManager, SLOT(onGrabSlowdownChanged(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)), m_grabManager, SLOT(onGrabAvgColorsEnabledChanged(bool)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)), m_grabManager, SLOT(onSendDataOnlyIfColorsEnabledChanged(bool)), Qt::QueuedConnection);
+#ifdef D3D10_GRAB_SUPPORT
+    connect(settings(), SIGNAL(dx1011GrabberEnabledChanged(bool)), m_grabManager, SLOT(onDx1011GrabberEnabledChanged(bool)), Qt::QueuedConnection);
+    connect(settings(), SIGNAL(dx9GrabberEnabledChanged(bool)), m_grabManager, SLOT(onDx9GrabberEnabledChanged(bool)), Qt::QueuedConnection);
+#endif
 
     connect(settings(), SIGNAL(profileLoaded(const QString &)),        m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);

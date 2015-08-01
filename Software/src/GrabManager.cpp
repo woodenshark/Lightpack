@@ -178,10 +178,6 @@ void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
 
     m_grabber = queryGrabber(grabberType);
 
-#ifdef D3D10_GRAB_SUPPORT
-    reinitDx1011Grabber();
-#endif
-
     if (isStartNeeded) {
 #ifdef D3D10_GRAB_SUPPORT
         if (Settings::isDx1011GrabberEnabled())
@@ -238,6 +234,20 @@ void GrabManager::onSendDataOnlyIfColorsEnabledChanged(bool state)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
     m_isSendDataOnlyIfColorsChanged = state;
 }
+
+#ifdef D3D10_GRAB_SUPPORT
+void GrabManager::onDx1011GrabberEnabledChanged(bool state)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    reinitDx1011Grabber();
+}
+
+void GrabManager::onDx9GrabberEnabledChanged(bool state)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    reinitDx1011Grabber();
+}
+#endif
 
 void GrabManager::setNumberOfLeds(int numberOfLeds)
 {
@@ -551,6 +561,8 @@ GrabberBase *GrabManager::initGrabber(GrabberBase * grabber) {
 
 #ifdef D3D10_GRAB_SUPPORT
 void GrabManager::reinitDx1011Grabber() {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     if (m_d3d10Grabber) {
         delete m_d3d10Grabber;
         m_d3d10Grabber = NULL;
@@ -561,6 +573,8 @@ void GrabManager::reinitDx1011Grabber() {
         connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
         m_d3d10Grabber->init();
     }
+
+    QApplication::restoreOverrideCursor();
 }
 #endif
 

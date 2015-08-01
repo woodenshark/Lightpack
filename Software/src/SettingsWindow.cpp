@@ -225,8 +225,6 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
 
     // Dev tab
-    connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-    connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #ifdef QT_GRAB_SUPPORT
     connect(ui->radioButton_GrabQt, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
     connect(ui->radioButton_GrabQt_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -560,19 +558,6 @@ void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, 
     startBacklight();
 }
 
-void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-#ifdef D3D10_GRAB_SUPPORT
-    Settings::setDx1011GrabberEnabled(isEnabled);
-    ui->checkBox_EnableDx9Capture->setEnabled(isEnabled);
-#endif
-}
-void SettingsWindow::onDx9CaptureEnabledChanged(bool isEnabled) {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-#ifdef D3D10_GRAB_SUPPORT
-    Settings::setDx9GrabbingEnabled(isEnabled);
-#endif
-}
 void SettingsWindow::setModeChanged(Lightpack::Mode mode)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << mode;
@@ -1057,9 +1042,27 @@ void SettingsWindow::onGrabberChanged()
 
         if (grabberType != Settings::getGrabberType()) {
             DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
-
             Settings::setGrabberType(grabberType);
         }
+    }
+}
+
+void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+    if (!updatingFromSettings) {
+#ifdef D3D10_GRAB_SUPPORT
+        Settings::setDx1011GrabberEnabled(isEnabled);
+#endif
+    }
+    ui->checkBox_EnableDx9Capture->setEnabled(isEnabled);
+}
+
+void SettingsWindow::onDx9CaptureEnabledChanged(bool isEnabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+    if (!updatingFromSettings) {
+#ifdef D3D10_GRAB_SUPPORT
+        Settings::setDx9GrabbingEnabled(isEnabled);
+#endif
     }
 }
 

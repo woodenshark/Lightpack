@@ -60,6 +60,10 @@ public slots:
     void onGrabSlowdownChanged(int ms);
     void onGrabAvgColorsEnabledChanged(bool state);
     void onSendDataOnlyIfColorsEnabledChanged(bool state);
+#ifdef D3D10_GRAB_SUPPORT
+    void onDx1011GrabberEnabledChanged(bool state);
+    void onDx9GrabberEnabledChanged(bool state);
+#endif
     void start(bool isGrabEnabled);
     void settingsProfileChanged(const QString &profileName);
     void setVisibleLedWidgets(bool state);

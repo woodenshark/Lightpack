@@ -1147,12 +1147,14 @@ void Settings::setDx1011GrabberEnabled(bool isEnabled) {
     setValue(Profile::Key::Grab::IsDx1011GrabberEnabled, isEnabled);
     m_this->dx1011GrabberEnabledChanged(isEnabled);
 }
+
 bool Settings::isDx9GrabbingEnabled() {
     return value(Profile::Key::Grab::IsDx9GrabbingEnabled).toBool();
 }
 
 void Settings::setDx9GrabbingEnabled(bool isEnabled) {
     setValue(Profile::Key::Grab::IsDx9GrabbingEnabled, isEnabled);
+    m_this->dx9GrabberEnabledChanged(isEnabled);
 }
 #endif
 

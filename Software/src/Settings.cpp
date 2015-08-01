@@ -1470,6 +1470,8 @@ void Settings::initCurrentProfile(bool isResetDefault)
     setNewOption(Profile::Key::Grab::Slowdown,      Profile::Grab::SlowdownDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::LuminosityThreshold, Profile::Grab::MinimumLevelOfSensitivityDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled, Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled, Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled, Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
     // [MoodLamp]
     setNewOption(Profile::Key::MoodLamp::IsLiquidMode,  Profile::MoodLamp::IsLiquidMode, isResetDefault);
     setNewOption(Profile::Key::MoodLamp::Color,         Profile::MoodLamp::ColorDefault, isResetDefault);

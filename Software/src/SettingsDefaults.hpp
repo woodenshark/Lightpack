@@ -37,7 +37,10 @@
 #   define SUPPORTED_DEVICES            "Lightpack,Adalight,Ardulight,Virtual"
 #endif
 
-#ifdef WINAPI_GRAB_SUPPORT
+#ifdef DDUPL_GRAB_SUPPORT
+#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeDDupl
+#   define GRABMODE_DEFAULT_STR     "DDupl"
+#elif defined(WINAPI_GRAB_SUPPORT)
 #   define GRABMODE_DEFAULT         ::Grab::GrabberTypeWinAPI
 #   define GRABMODE_DEFAULT_STR     "WinAPI"
 #elif defined(X11_GRAB_SUPPORT)
@@ -139,6 +142,8 @@ static const QString GrabberDefaultString = GRABMODE_DEFAULT_STR;
 static const bool IsAvgColorsEnabledDefault = false;
 static const bool IsSendDataOnlyIfColorsChangesDefault = true;
 static const bool IsMinimumLuminosityEnabledDefault = true;
+static const bool IsDx1011GrabberEnabledDefault = false;
+static const bool IsDx9GrabbingEnabledDefault = false;
 static const int SlowdownMin = 1;
 static const int SlowdownDefault = 50;
 static const int SlowdownMax = 1000;

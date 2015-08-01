@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Prismatik (unofficial) 32bit"
-#define MyAppVersion "5.11.2.1"
+#define MyAppVersion "5.11.2.2"
 #define MyAppPublisher "Patrick Siegler"
 #define MyAppURL "https://github.com/psieg/Lightpack"
 #define MyAppExeName "Prismatik.exe"

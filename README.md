@@ -36,14 +36,17 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 ###Prismatik build instructions for Windows
 ####Prerequisites:
 * [Qt SDK](http://qt-project.org/downloads)
-* [Microsoft DirectX SDK](http://www.microsoft.com/en-us/download/details.aspx?id=6812)
-* POSIX shell utilities [MSYS for example](http://www.mingw.org/wiki/MSYS). Make sure `PATH` environment variable is set for the utilities (Run &rarr; sysdm.cpl &rarr; Advanced &rarr; Environment Variable &rarr; Edit `PATH` system variable (`C:\MinGW\msys\1.0\bin;` for example), path should points directly on the utilities so utilities are available without any subdirectories)
+* [Windows SDK](https://msdn.microsoft.com/en-us/windows/desktop/ff851942.aspx) or [Microsoft DirectX SDK](http://www.microsoft.com/en-us/download/details.aspx?id=6812)
+* POSIX shell utilities [MSYS for example](http://www.mingw.org/wiki/MSYS). It may help to have the `PATH` environment variable set for the utilities (Run &rarr; sysdm.cpl &rarr; Advanced &rarr; Environment Variable &rarr; Edit `PATH` system variable (`C:\MinGW\msys\1.0\bin;` for example)
 
 ####Build process:
-1. build **Prismatik** project
-With MSBuild:
-1. generate solution with `qmake -tp vc -r .`
-2. build with Visual Studio or MSBuild
+1. go to `<repo>/Software`
+2. run `scripts/win32/generate_sln.sh`
+3. build `Lightpack.sln` with MSBuild / VisualStudio
+
+####Building an installer:
+1. run `scripts/win32/prepare_installer.sh`
+2. build `dist_windows/script.iss` (64bit) or `script32.iss` (32bit) with ISCC (the InnoSetup compiler)
 
 ---
 
@@ -61,9 +64,18 @@ You will need the following packages, usually all of them are in distro's reposi
 
 ####Build process:
 1. go to `<repo>/Software`
-2. run ```qmake -r && make```
-3. Add a rule for **UDEV**. See comments from `<repo>/Software/dist_linux/deb/etc/udev/rules.d/93-lightpack.rules` for how to do it.
-4. Make sure `<repo>/Software/qtserialport/libQt5SerialPort.so.5` is available for loading by *Prismatik* (place it in appropriate dir or use *LD_LIBRARY_PATH* variable)
+2. run `qmake -r`
+3. run `make`
+
+####Building a deb package:
+1. run `scripts/linux/prepare_installer.sh`
+2. `cd dist_linux` and run `build-deb.sh`
+
+####Manual deployment:
+Instead of building a deb package, you can:
+
+1. Add a rule for **UDEV**. See comments from `<repo>/Software/dist_linux/deb/etc/udev/rules.d/93-lightpack.rules` for how to do it.
+2. Make sure `<repo>/Software/qtserialport/libQt5SerialPort.so.5` is available for loading by *Prismatik* (place it in appropriate dir or use *LD_LIBRARY_PATH* variable)
 
 ---
 

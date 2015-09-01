@@ -12,6 +12,13 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.3
+---------------
+September 1, 2015
+
+* Fix constant color shutting off (regression from #10)
+* Fix DX admin message prematurely creating a message loop
+
 Version 5.11.2.2
 ---------------
 August 1, 2015

@@ -647,13 +647,19 @@ void D3D10Grabber::init() {
 
     if (!WinUtils::IsUserAdmin()) {
         qWarning() << Q_FUNC_INFO << "DX hooking is enabled but application not running elevated";
-        QMessageBox::warning(
-            NULL,
-            tr("Prismatik"),
-            tr("DX hooking is enabled but will not function properly because the application is not running as local Administrator.\n"\
-                "You can either disable DX hooking or run this program as an Administrator."), 
-            QMessageBox::Ok);
+        // Do not show the message box during initialization (creating a unwanted message loop)
+        // Show as soon as the message loop is established
+        QTimer::singleShot(0, this, SLOT(showAdminMessage()));
     }
+}
+
+void D3D10Grabber::showAdminMessage() {
+    QMessageBox::warning(
+        NULL,
+        tr("Prismatik"),
+        tr("DX hooking is enabled but will not function properly because the application is not running as local Administrator.\n"\
+        "You can either disable DX hooking or run this program as an Administrator."),
+        QMessageBox::Ok);
 }
 
 void D3D10Grabber::startGrabbing() {

@@ -55,6 +55,7 @@ public slots:
 protected slots:
     virtual GrabResult grabScreens();
     virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
+    virtual void showAdminMessage();
 
     virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 

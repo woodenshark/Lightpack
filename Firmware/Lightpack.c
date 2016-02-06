@@ -159,6 +159,10 @@ int main(void)
 
     sei();
 
+#ifdef ENCLOSURE_LED_OFF
+    CLR(USBLED);
+#endif
+
     for (;;)
     {
         wdt_reset();

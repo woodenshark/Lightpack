@@ -54,6 +54,10 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
 
 #define ACQUIRE_TIMEOUT_INTERVAL 0 // timing is done via the timer freqency, so we don't wait again
 #define ACCESSDENIED_RETRY_INTERVAL 3000
+#define THREAD_DESTRUCTION_WAIT_TIMEOUT 3000
+
+#define DDUPL_THREAD_EVENT_NAME L"Lightpack.DDuplGrabber.Event.Thread"
+#define DDUPL_THREADRETURN_EVENT_NAME L"Lightpack.DDuplGrabber.Event.ThreadReturn"
 
 struct DDuplScreenData
 {
@@ -74,7 +78,11 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
     m_dxgiDll(NULL),
     m_d3d11Dll(NULL),
     m_createDXGIFactory1Func(NULL),
-    m_D3D11CreateDeviceFunc(NULL)
+    m_D3D11CreateDeviceFunc(NULL),
+    m_thread(NULL),
+    m_threadEvent(NULL),
+    m_threadReturnEvent(NULL),
+    m_threadReallocateArg()
 {
 }
 
@@ -82,8 +90,18 @@ DDuplGrabber::~DDuplGrabber()
 {
     freeScreens();
 
+    if (m_thread) {
+        m_threadCommand = Exit;
+        runThreadCommand(THREAD_DESTRUCTION_WAIT_TIMEOUT);
+    }
+
     // release adapters before unloading libraries
     m_adapters.clear();
+
+    if (m_threadEvent)
+        CloseHandle(m_threadEvent);
+    if (m_threadReturnEvent)
+        CloseHandle(m_threadReturnEvent);
 
     if (m_dxgiDll)
         FreeLibrary(m_dxgiDll);
@@ -119,8 +137,67 @@ bool DDuplGrabber::init()
         m_adapters.push_back(adapter);
     }
 
+    if (NULL == (m_threadEvent = CreateEventW(NULL, false, false, DDUPL_THREAD_EVENT_NAME))) {
+        qCritical(Q_FUNC_INFO " unable to create threadEvent");
+        return false;
+    }
+
+    if (NULL == (m_threadReturnEvent = CreateEventW(NULL, false, false, DDUPL_THREADRETURN_EVENT_NAME))) {
+        qCritical(Q_FUNC_INFO " unable to create threadReturnEvent");
+        return false;
+    }
+
+    if (NULL == (m_thread = CreateThread(NULL, 0, DDuplGrabberThreadProc, this, 0, NULL))) {
+        qCritical(Q_FUNC_INFO " unable to create thread");
+        return false;
+    }
+
     m_state = Ready;
     return true;
+}
+
+DWORD WINAPI DDuplGrabberThreadProc(LPVOID arg) {
+    DDuplGrabber* _this = (DDuplGrabber*)arg;
+    DWORD errorcode;
+
+    while (true) {
+        if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(_this->m_threadEvent, INFINITE))) {
+            switch (_this->m_threadCommand) {
+            case Exit:
+                SetEvent(_this->m_threadReturnEvent);
+                return 0;
+            case Reallocate:
+                HDESK screensaverDesk = OpenInputDesktop(0, true, DESKTOP_SWITCHDESKTOP);
+                if (!screensaverDesk) {
+                    qWarning(Q_FUNC_INFO " Failed to open input desktop: %x", GetLastError());
+                    break;
+                }
+                BOOL success = SetThreadDesktop(screensaverDesk);
+                if (!success) {
+                    qWarning(Q_FUNC_INFO " Failed to set grab desktop: %x", GetLastError());
+                    _this->m_threadReallocateResult = false;
+                    break;
+                }
+
+                _this->m_threadReallocateResult = _this->_reallocate(_this->m_threadReallocateArg);
+                break;
+            }
+            SetEvent(_this->m_threadReturnEvent);
+        }
+    }
+}
+
+bool DDuplGrabber::runThreadCommand(DWORD timeout) {
+    DWORD errorcode;
+    SetEvent(m_threadEvent);
+
+    if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(m_threadReturnEvent, timeout))) {
+        return true;
+    }
+    else {
+        qWarning(Q_FUNC_INFO " couldn't execute thread command: %x %x", m_threadCommand, errorcode);
+        return false;
+    }
 }
 
 bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWidgets)
@@ -217,6 +294,19 @@ void DDuplGrabber::freeScreens()
 }
 
 bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
+{
+    // Reallocate on the dedicated thread to be able to SetThreadDesktop to the currently active input desktop
+    // once the duplication is created, it seems like it can be used from the normal thread.
+    m_threadCommand = Reallocate;
+    m_threadReallocateArg = grabScreens;
+    if (runThreadCommand(INFINITE)) {
+        return m_threadReallocateResult;
+    } else {
+        return false;
+    }
+}
+
+bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
 {
     if (m_state == Uninitialized)
     {

@@ -295,7 +295,7 @@ public:
                 copyMemDesc(m_memDesc);
                 ReleaseMutex(m_mutex);
             } else {
-                qWarning(Q_FUNC_INFO " couldn't start grabbing: ", errorcode);
+                qWarning() << Q_FUNC_INFO << "couldn't start grabbing: " << errorcode;
             }
         }
     }
@@ -311,7 +311,7 @@ public:
                 copyMemDesc(m_memDesc);
                 ReleaseMutex(m_mutex);
             } else {
-                qWarning(Q_FUNC_INFO " couldn't stop grabbing: ", errorcode);
+                qWarning() << Q_FUNC_INFO << "couldn't stop grabbing: " << errorcode;
             }
         }
     }

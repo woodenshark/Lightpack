@@ -51,6 +51,12 @@ enum DDuplGrabberState
     AccessDenied,
     Unavailable
 };
+enum DDuplGrabberThreadCommand
+{
+    Exit,
+    Reallocate
+};
+
 
 class DDuplGrabber : public GrabberBase
 {
@@ -64,6 +70,7 @@ public:
 protected slots:
     virtual GrabResult grabScreens();
     virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
+    virtual bool _reallocate(const QList< ScreenInfo > &grabScreens);
 
     virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
@@ -73,6 +80,7 @@ protected:
     bool init();
     void freeScreens();
     GrabResult returnBlackBuffer();
+    bool runThreadCommand(DWORD timeout);
 
 private:
     QList<IDXGIAdapter1Ptr> m_adapters;
@@ -84,6 +92,12 @@ private:
     HMODULE m_dxgiDll;
     HMODULE m_d3d11Dll;
 
+    friend DWORD WINAPI DDuplGrabberThreadProc(LPVOID arg);
+    HANDLE m_thread;
+    HANDLE m_threadEvent, m_threadReturnEvent;
+    DDuplGrabberThreadCommand m_threadCommand;
+    QList<ScreenInfo> m_threadReallocateArg;
+    bool m_threadReallocateResult;
 };
 
 

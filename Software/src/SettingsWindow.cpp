@@ -1934,8 +1934,6 @@ QString SettingsWindow::getPluginName(const Plugin *plugin) const
 
 void SettingsWindow::on_pbRunConfigurationWizard_clicked()
 {
-    getLightpackApp()->free();
-
 #ifdef Q_OS_WIN
     QString cmdLine;
     cmdLine.append("\"");

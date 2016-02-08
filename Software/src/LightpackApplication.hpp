@@ -71,7 +71,6 @@ signals:
 public slots:
     void setStatusChanged(Backlight::Status);
     void setBacklightChanged(Lightpack::Mode);
-    void free();
 
 private slots:
     void requestBacklightStatus();
@@ -107,12 +106,10 @@ private:
     SettingsWindow *m_settingsWindow;
     ApiServer *m_apiServer;
     LedDeviceManager *m_ledDeviceManager;
-    QThread *m_LedDeviceManagerThread;
+    QThread *m_ledDeviceManagerThread;
     QThread *m_apiServerThread;
     GrabManager *m_grabManager;
     MoodLampManager *m_moodlampManager;
-    QThread *m_grabManagerThread;
-    QThread *m_moodlampManagerThread;
 
     PluginsManager *m_pluginManager;
     LightpackPluginInterface *m_pluginInterface;

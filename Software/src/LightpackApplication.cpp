@@ -528,14 +528,17 @@ void LightpackApplication::startApiServer()
     connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),  m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(ardulightNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)),   m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
 
     if (!m_noGui)
     {
         connect(m_apiServer, SIGNAL(errorOnStartListening(QString)), m_settingsWindow, SLOT(onApiServer_ErrorOnStartListening(QString)));
     }
 
-    connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_pluginInterface,    SLOT(updateColors(QList<QRgb>)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)), m_pluginInterface, SLOT(updateSmoothCache(int)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)), m_pluginInterface, SLOT(updateGammaCache(double)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)), m_pluginInterface, SLOT(updateBrightnessCache(int)), Qt::QueuedConnection);
 
     m_apiServer->firstStart();
 
@@ -669,8 +672,6 @@ void LightpackApplication::initGrabManager()
 
     connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
-    connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
     connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
     connect(m_grabManager,SIGNAL(changeScreen(QRect)),m_pluginInterface,SLOT(refreshScreenRect(QRect)));
 

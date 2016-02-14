@@ -113,7 +113,6 @@ private:
 
     PluginsManager *m_pluginManager;
     LightpackPluginInterface *m_pluginInterface;
-    QThread* m_PluginThread;
     QWidget *consolePlugin;
 
     QString m_applicationDirPath;

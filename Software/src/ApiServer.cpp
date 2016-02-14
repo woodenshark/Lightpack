@@ -182,6 +182,11 @@ ApiServer::ApiServer(quint16 port, QObject *parent)
     }
 }
 
+ApiServer::~ApiServer() {
+    m_apiSetColorTaskThread->quit();
+    m_apiSetColorTaskThread->wait();
+}
+
 void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
 {
     QString test = lightpack->Version();

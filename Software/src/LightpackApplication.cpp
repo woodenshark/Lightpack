@@ -65,9 +65,10 @@ LightpackApplication::~LightpackApplication()
 
     m_EventFilters.clear();
 
-    m_ledDeviceManagerThread->exit(0);
-    m_apiServerThread->exit(0);
-
+    m_ledDeviceManagerThread->quit();
+    m_apiServerThread->quit();
+    m_ledDeviceManagerThread->wait();
+    m_apiServerThread->wait();
 
     delete m_settingsWindow;
     m_settingsWindow = NULL;
@@ -631,10 +632,6 @@ void LightpackApplication::startPluginManager()
 
     m_pluginManager->LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
     m_pluginManager->StartPlugins();
-
-    //m_PluginThread = new QThread();
-    //m_pluginManager->moveToThread(m_PluginThread);
-    //m_PluginThread->start();
 
 }
 

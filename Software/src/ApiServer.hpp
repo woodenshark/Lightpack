@@ -56,6 +56,7 @@ class ApiServer : public QTcpServer
 public:
     ApiServer(QObject *parent = 0);
     ApiServer(quint16 port, QObject *parent = 0);
+    ~ApiServer();
 
     void setInterface(LightpackPluginInterface *lightpackInterface);
     void firstStart();

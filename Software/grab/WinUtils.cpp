@@ -42,7 +42,16 @@ const WCHAR lightpackUnhookDllName[] = L"prismatik-unhook.dll";
 const WCHAR lightpackHooksDllName32[] = L"prismatik-hooks32.dll";
 const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
 #endif
-static LPCWSTR pwstrExcludeProcesses[] = { L"skype.exe", L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe" };
+static LPCWSTR pwstrExcludeProcesses[] = {
+    // Windows
+    L"dwm.exe", L"ShellExperienceHost.exe", L"ApplicationFrameHost.exe", L"LockAppHost.exe", L"explorer.exe", L"SearchUI.exe"
+    // Graphics Drivers
+    L"igfxEM.exe", L"igfxTray.exe", L"nvxdsync.exe", L"nvvsvc.exe",
+    // Browsers
+    L"chrome.exe", L"firefox.exe", L"iexplore.exe",
+    // Apps
+    L"skype.exe", L"SkypeHost.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe", L"Steam.exe"
+};
 static LPCWSTR pwstrDxModules[] = { L"d3d9.dll", L"dxgi.dll" };
 static LPCWSTR pwstrDxgiModules[] = { L"dxgi.dll" };
 static LPCWSTR pwstrHookModules[] = { L"prismatik-hooks.dll", L"prismatik-hooks32.dll" };
@@ -133,9 +142,12 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
     HMODULE hMods[1024];
     DWORD cbNeeded;
     DWORD cProcesses;
-    char debug_buf[255];
+    char debug_buf_process[255];
+    char debug_buf_module[255];
     WCHAR executableName[MAX_PATH];
     unsigned int i;
+
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << "scanning";
 
     //     Get the list of process identifiers.
     processes->clear();
@@ -167,12 +179,12 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
 
             PathStripPathW(executableName);
 
-            ::WideCharToMultiByte(CP_ACP, 0, executableName, -1, debug_buf, 255, NULL, NULL);
-            DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf;
+            ::WideCharToMultiByte(CP_ACP, 0, executableName, -1, debug_buf_process, 255, NULL, NULL);
+            DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "evaluating process" << debug_buf_process;
 
             for (unsigned k = 0; k < SIZEOF_ARRAY(pwstrExcludeProcesses); k++) {
                 if (wcsicmp(executableName, pwstrExcludeProcesses[k]) == 0) {
-                    DEBUG_MID_LEVEL << Q_FUNC_INFO << "skipping " << pwstrExcludeProcesses[k];
+                    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "skipping" << debug_buf_process;
                     goto nextProcess;
                 }
             }
@@ -194,8 +206,8 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
                     {
 
                         PathStripPathW(szModName);
-                        ::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf, 255, NULL, NULL);
-                        DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf;
+                        ::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf_module, 255, NULL, NULL);
+                        //DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf_process << "has module" << debug_buf_module;
 
                         for (unsigned k = 0; k < withoutModuleCount; k++) {
                             if (wcsicmp(szModName, withoutModule[k]) == 0) {
@@ -220,11 +232,19 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
                             RECT rcWindow;
                             GetWindowRect(wnd, &rcWindow);
                             if ((w == (rcWindow.right - rcWindow.left)) &&
-                                (h == (rcWindow.bottom - rcWindow.top)))
-                                processes->append(aProcesses[i]);
+                                (h == (rcWindow.bottom - rcWindow.top))) {
 
+                                DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf_process << "has required module and fullscreen window";
+                                processes->append(aProcesses[i]);
+                            } else {
+                                DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf_process << "has required module and non-fullscreen window";
+                            }
+                        } else {
+                            DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf_process << "has required module and no window";
                         }
-                    } else {
+                    }
+                    else {
+                        DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf_process << "has required module";
                         processes->append(aProcesses[i]);
                     }
 
@@ -241,11 +261,11 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
 }
 
 QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
-	return getProcessesIDs(processes, pwstrDxModules, SIZEOF_ARRAY(pwstrDxModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
+    return getProcessesIDs(processes, pwstrDxModules, SIZEOF_ARRAY(pwstrDxModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
 }
 
 QList<DWORD> * getDxgiProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {
-	return getProcessesIDs(processes, pwstrDxgiModules, SIZEOF_ARRAY(pwstrDxgiModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
+    return getProcessesIDs(processes, pwstrDxgiModules, SIZEOF_ARRAY(pwstrDxgiModules), pwstrHookModules, SIZEOF_ARRAY(pwstrHookModules), wstrSystemRootPath, true);
 }
 
 QList<DWORD> * getHookedProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath) {

@@ -13,13 +13,19 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.5
+---------------
+February 14, 2016
+
+* Implement missing API get methods (#16)
+* Move DirectX Grabber to dedicated thread (#17)
+
 Version 5.11.2.4
 ---------------
 February 7, 2016
 
 * Enable Desktop Duplication grabber to grab screensavers
 * Fix crash when launching configuration wizard
-
 
 Version 5.11.2.3
 ---------------

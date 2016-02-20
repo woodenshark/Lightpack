@@ -61,6 +61,7 @@ You will need the following packages, usually all of them are in distro's reposi
 * libusb-1.0-0-dev
 * libnotify-dev
 * libudev-dev
+* qttools5-dev-tools
 * if you are using Ubuntu: libappindicator-dev
 
 ####Build process:

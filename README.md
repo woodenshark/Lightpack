@@ -41,8 +41,9 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 
 ####Build process:
 1. go to `<repo>/Software`
-2. run `scripts/win32/generate_sln.sh`
-3. build `Lightpack.sln` with MSBuild / VisualStudio
+2. run `update_locales.bat`
+3. run `scripts/win32/generate_sln.sh`
+4. build `Lightpack.sln` with MSBuild / VisualStudio
 
 ####Building an installer:
 1. run `scripts/win32/prepare_installer.sh`
@@ -64,8 +65,9 @@ You will need the following packages, usually all of them are in distro's reposi
 
 ####Build process:
 1. go to `<repo>/Software`
-2. run `qmake -r`
-3. run `make`
+2. run `./update_locales.sh`
+3. run `qmake -r`
+4. run `make`
 
 ####Building a deb package:
 1. run `scripts/linux/prepare_installer.sh`

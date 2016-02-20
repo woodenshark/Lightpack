@@ -262,10 +262,6 @@ public:
 
 #endif
 
-        m_thread.reset(new QThread());
-        m_thread->start();
-        this->moveToThread(m_thread.data());
-
         m_processesScanAndInfectTimer.reset(new QTimer(this));
         m_processesScanAndInfectTimer->setInterval(5000);
         m_processesScanAndInfectTimer->setSingleShot(false);
@@ -597,9 +593,7 @@ private:
         disconnect(m_worker.data());
         m_worker->stop = true;
 
-        m_thread->quit();
         m_workerThread->quit();
-        m_thread->wait();
         m_workerThread->wait();
 
         sanitizeProcesses();
@@ -632,7 +626,6 @@ private:
     QScopedPointer<QTimer> m_checkIfFrameGrabbedTimer;
     QScopedPointer<D3D10GrabberWorker> m_worker;
     QScopedPointer<QThread> m_workerThread;
-    QScopedPointer<QThread> m_thread;
     HOOKSGRABBER_SHARED_MEM_DESC m_memDesc;
     D3D10Grabber &m_owner;
     bool m_injectD3D9;

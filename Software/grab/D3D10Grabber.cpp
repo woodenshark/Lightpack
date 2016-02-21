@@ -55,46 +55,152 @@ using namespace std;
 using namespace WinUtils;
 
 namespace {
-class D3D10GrabberWorker: public QObject {
-    Q_OBJECT
+    class D3D10GrabberWorker : public QObject {
+        Q_OBJECT
 
-public:
-    D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa);
-    ~D3D10GrabberWorker();
-private:
-    HANDLE m_frameGrabbedEvent;
-signals:
-    void frameGrabbed();
-public slots:
-    void runLoop();
+    public:
+        D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa);
+        bool init();
+        ~D3D10GrabberWorker();
+    private:
+        HANDLE m_frameGrabbedEvent;
+    signals:
+        void frameGrabbed();
+    public slots:
+        void runLoop();
 
-public:
-    bool stop = false;
-};
+    public:
+        bool stop = false;
+    private:
+        LPSECURITY_ATTRIBUTES m_lpsa;
+    };
 
-const unsigned kBytesPerPixel = 4;
+    const unsigned kBytesPerPixel = 4;
 
-D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) : QObject(parent) {
-    if (NULL == (m_frameGrabbedEvent = CreateEventW(lpsa, false, false, HOOKSGRABBER_FRAMEGRABBED_EVENT_NAME))) {
-        qCritical() << Q_FUNC_INFO << "unable to create frameGrabbedEvent";
+    D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) : 
+        QObject(parent),
+        m_lpsa(lpsa)
+    {
     }
-}
 
-D3D10GrabberWorker::~D3D10GrabberWorker() {
-    if (m_frameGrabbedEvent)
-        CloseHandle(m_frameGrabbedEvent);
-}
+    bool D3D10GrabberWorker::init() {
+        if (NULL == (m_frameGrabbedEvent = CreateEventW(m_lpsa, false, false, HOOKSGRABBER_FRAMEGRABBED_EVENT_NAME))) {
+            qCritical() << Q_FUNC_INFO << "unable to create frameGrabbedEvent";
+            return false;
+        }
 
-void D3D10GrabberWorker::runLoop() {
-    while(!stop) {
-        if (WAIT_OBJECT_0 == WaitForSingleObject(m_frameGrabbedEvent, 50)) {
-            emit frameGrabbed();
-            if (!ResetEvent(m_frameGrabbedEvent)) {
-                qCritical() << Q_FUNC_INFO << "couldn't reset frameGrabbedEvent";
+        return true;
+    }
+
+    D3D10GrabberWorker::~D3D10GrabberWorker() {
+        if (m_frameGrabbedEvent)
+            CloseHandle(m_frameGrabbedEvent);
+    }
+
+    void D3D10GrabberWorker::runLoop() {
+        while (!stop) {
+            if (WAIT_OBJECT_0 == WaitForSingleObject(m_frameGrabbedEvent, 50)) {
+                emit frameGrabbed();
+                if (!ResetEvent(m_frameGrabbedEvent)) {
+                    qCritical() << Q_FUNC_INFO << "couldn't reset frameGrabbedEvent";
+                }
             }
         }
     }
-}
+} // namespace
+
+namespace {
+    class D3D10GrabberInjector : public QObject {
+        Q_OBJECT
+
+    public:
+        D3D10GrabberInjector(QObject *parent, bool injectD3D9);
+        bool init();
+        ~D3D10GrabberInjector();
+    public slots:
+        void infectCleanDxProcesses();
+    public:
+        void sanitizeProcesses();
+    private:
+        QList<DWORD> m_lastSeenDxProcesses;
+        ILibraryInjector * m_libraryInjector;
+        WCHAR m_hooksLibPath[300];
+        WCHAR m_unhookLibPath[300];
+        WCHAR m_systemrootPath[300];
+        bool m_injectD3D9;
+    };
+
+    D3D10GrabberInjector::D3D10GrabberInjector(QObject *parent, bool injectD3D9) : QObject(parent),
+        m_libraryInjector(NULL),
+        m_injectD3D9(injectD3D9)
+    {
+    }
+
+    bool D3D10GrabberInjector::init() {
+        AcquirePrivileges();
+
+        GetModuleFileName(NULL, m_hooksLibPath, SIZEOF_ARRAY(m_hooksLibPath));
+        PathRemoveFileSpec(m_hooksLibPath);
+        wcscat(m_hooksLibPath, L"\\");
+        wcscat(m_hooksLibPath, lightpackHooksDllName);
+
+        GetModuleFileName(NULL, m_unhookLibPath, SIZEOF_ARRAY(m_hooksLibPath));
+        PathRemoveFileSpec(m_unhookLibPath);
+        wcscat(m_unhookLibPath, L"\\");
+        wcscat(m_unhookLibPath, lightpackUnhookDllName);
+
+        GetWindowsDirectoryW(m_systemrootPath, SIZEOF_ARRAY(m_systemrootPath));
+
+        HRESULT hr = CoInitialize(0);
+        //        hr = InitComSecurity();
+        //        hr = CoCreateInstanceAsAdmin(NULL, CLSID_ILibraryInjector, IID_ILibraryInjector, reinterpret_cast<void **>(&m_libraryInjector));
+        hr = CoCreateInstance(CLSID_ILibraryInjector, NULL, CLSCTX_INPROC_SERVER, IID_ILibraryInjector, reinterpret_cast<void **>(&m_libraryInjector));
+        if (FAILED(hr)) {
+            qCritical() << Q_FUNC_INFO << "Can't create libraryinjector. D3D10Grabber wasn't initialised. Please try to register server: regsvr32 libraryinjector.dll";
+            CoUninitialize();
+            return false;
+        }
+
+        // Remove any injections from previous runs
+        sanitizeProcesses();
+
+        return true;
+    }
+
+    D3D10GrabberInjector::~D3D10GrabberInjector() {
+        if (m_libraryInjector) {
+            m_libraryInjector->Release();
+            CoUninitialize();
+        }    
+    }
+
+    void D3D10GrabberInjector::infectCleanDxProcesses() {
+        QList<DWORD> processes = QList<DWORD>();
+        if (m_injectD3D9)
+            getDxProcessesIDs(&processes, m_systemrootPath);
+        else
+            getDxgiProcessesIDs(&processes, m_systemrootPath);
+        foreach(DWORD procId, processes) {
+            // Require the process to have run for at least one full timer tick,
+            // hoping when injection happens their swapchain is already setup
+            if (m_lastSeenDxProcesses.contains(procId)) {
+                DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Infecting DX process " << procId;
+                m_libraryInjector->Inject(procId, m_hooksLibPath);
+            }
+        }
+        m_lastSeenDxProcesses.clear();
+        m_lastSeenDxProcesses.append(processes);
+    }
+
+    void D3D10GrabberInjector::sanitizeProcesses() {
+        QList<DWORD> processes = QList<DWORD>();
+        getHookedProcessesIDs(&processes, m_systemrootPath);
+        foreach(DWORD procId, processes) {
+            DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Sanitizing process " << procId;
+            m_libraryInjector->Inject(procId, m_unhookLibPath);
+        }
+    }
+
 } // namespace
 
 class D3D10GrabberImpl: public QObject
@@ -109,7 +215,6 @@ public:
           m_memMap(NULL),
           m_lastFrameId(0),
           m_isInited(false),
-          m_libraryInjector(NULL),
           m_isFrameGrabbedDuringLastSecond(false),
           m_context(context),
           m_getHwndCb(getHwndCb),
@@ -163,32 +268,6 @@ public:
     bool init() {
         if(m_isInited)
             return true;
-
-        AcquirePrivileges();
-
-        GetModuleFileName(NULL, m_hooksLibPath, SIZEOF_ARRAY(m_hooksLibPath));
-        PathRemoveFileSpec(m_hooksLibPath);
-        wcscat(m_hooksLibPath, L"\\");
-        wcscat(m_hooksLibPath, lightpackHooksDllName);
-
-        GetModuleFileName(NULL, m_unhookLibPath, SIZEOF_ARRAY(m_hooksLibPath));
-        PathRemoveFileSpec(m_unhookLibPath);
-        wcscat(m_unhookLibPath, L"\\");
-        wcscat(m_unhookLibPath, lightpackUnhookDllName);
-
-        GetWindowsDirectoryW(m_systemrootPath, SIZEOF_ARRAY(m_systemrootPath));
-
-        HRESULT hr = CoInitialize(0);
-        //        hr = InitComSecurity();
-        //        hr = CoCreateInstanceAsAdmin(NULL, CLSID_ILibraryInjector, IID_ILibraryInjector, reinterpret_cast<void **>(&m_libraryInjector));
-        hr = CoCreateInstance(CLSID_ILibraryInjector, NULL, CLSCTX_INPROC_SERVER, IID_ILibraryInjector, reinterpret_cast<void **>(&m_libraryInjector));
-        if (FAILED(hr)) {
-            qCritical() << Q_FUNC_INFO << "Can't create libraryinjector. D3D10Grabber wasn't initialised. Please try to register server: regsvr32 libraryinjector.dll";
-            return false;
-        }
-
-        // Remove any injections from previous runs
-        sanitizeProcesses();
 
 #if 0
         // TODO: Remove this code or use |sa| in initIPC()
@@ -262,22 +341,39 @@ public:
 
 #endif
 
-        m_thread.reset(new QThread());
-        m_thread->start();
-        this->moveToThread(m_thread.data());
-
-        m_processesScanAndInfectTimer.reset(new QTimer(this));
-        m_processesScanAndInfectTimer->setInterval(5000);
-        m_processesScanAndInfectTimer->setSingleShot(false);
-        connect(m_processesScanAndInfectTimer.data(), SIGNAL(timeout()), this, SLOT(infectCleanDxProcesses()) );
-        m_processesScanAndInfectTimer->start();
+        m_injectorThread.reset(new QThread());
+        m_injector.reset(new D3D10GrabberInjector(NULL, m_injectD3D9));
+        if (!m_injector->init()) {
+            qCritical(Q_FUNC_INFO " Init D3D10GrabberInjector failed. D3D10Grabber wasn't initialised.");
+            m_injector.reset();
+            return false;
+        }
+        m_injector->moveToThread(m_injectorThread.data());
+        m_injectorThread->start();
+        //TODO:
+        //connect(m_worker.data(), SIGNAL(frameGrabbed()), this, SIGNAL(frameGrabbed()), Qt::QueuedConnection);
 
         m_workerThread.reset(new QThread());
         m_worker.reset(new D3D10GrabberWorker(NULL, NULL));
+        if (!m_worker->init()) {
+            qCritical(Q_FUNC_INFO " Init D3D10GrabberWorker failed. D3D10Grabber wasn't initialised.");
+            m_worker.reset();
+            m_injector.reset();
+            m_injectorThread->quit();
+            m_injectorThread->wait();
+            m_injectorThread.reset();
+            return false;
+        }
         m_worker->moveToThread(m_workerThread.data());
         m_workerThread->start();
         connect(m_worker.data(), SIGNAL(frameGrabbed()), this, SIGNAL(frameGrabbed()), Qt::QueuedConnection);
         QMetaObject::invokeMethod(m_worker.data(), "runLoop", Qt::QueuedConnection);
+
+        m_processesScanAndInfectTimer.reset(new QTimer(this));
+        m_processesScanAndInfectTimer->setInterval(5000);
+        m_processesScanAndInfectTimer->setSingleShot(false);
+        connect(m_processesScanAndInfectTimer.data(), SIGNAL(timeout()), m_injector.data(), SLOT(infectCleanDxProcesses()));
+        m_processesScanAndInfectTimer->start();
 
         m_checkIfFrameGrabbedTimer.reset(new QTimer());
         m_checkIfFrameGrabbedTimer->setSingleShot(false);
@@ -391,26 +487,6 @@ signals:
     void frameGrabbed();
 
 private slots:
-    void infectCleanDxProcesses(void) {
-        if (m_isInited && m_libraryInjector) {
-            QList<DWORD> processes = QList<DWORD>();
-            if (m_injectD3D9)
-                getDxProcessesIDs(&processes, m_systemrootPath);
-            else
-                getDxgiProcessesIDs(&processes, m_systemrootPath);
-            foreach (DWORD procId, processes) {
-                // Require the process to have run for at least one full timer tick,
-                // hoping when injection happens their swapchain is already setup
-                if (m_lastSeenDxProcesses.contains(procId)) {
-                    qDebug() << Q_FUNC_INFO << "Infecting DX process " << procId;
-                    m_libraryInjector->Inject(procId, m_hooksLibPath);
-                }
-            }
-            m_lastSeenDxProcesses.clear();
-            m_lastSeenDxProcesses.append(processes);
-        }
-    }
-
     void handleIfFrameGrabbed() {
         if (!m_isFrameGrabbedDuringLastSecond) {
             if (m_isStarted) {
@@ -422,14 +498,6 @@ private slots:
     }
 
 private:
-    void sanitizeProcesses() {
-        QList<DWORD> processes = QList<DWORD>();
-        getHookedProcessesIDs(&processes, m_systemrootPath);
-        foreach(DWORD procId, processes) {
-            qDebug() << Q_FUNC_INFO << "Sanitizing process " << procId;
-            m_libraryInjector->Inject(procId, m_unhookLibPath);
-        }
-    }
 
     QRgb getColor(const QRect &widgetRect)
     {
@@ -597,16 +665,15 @@ private:
         disconnect(m_worker.data());
         m_worker->stop = true;
 
-        m_thread->quit();
-        m_workerThread->quit();
-        m_thread->wait();
-        m_workerThread->wait();
+        m_injector->sanitizeProcesses();
 
-        sanitizeProcesses();
+        m_workerThread->quit();
+        m_injectorThread->quit();
+        m_workerThread->wait();
+        m_injectorThread->wait();
+
 
         disconnect(this, SLOT(handleIfFrameGrabbed()));
-        if (m_libraryInjector)
-            m_libraryInjector->Release();
         freeIPC();
         CoUninitialize();
         m_isInited = false;
@@ -619,12 +686,7 @@ private:
     UINT m_lastFrameId;
     MONITORINFO m_monitorInfo;
     QScopedPointer<QTimer> m_processesScanAndInfectTimer;
-    QList<DWORD> m_lastSeenDxProcesses;
     bool m_isInited;
-    ILibraryInjector * m_libraryInjector;
-    WCHAR m_hooksLibPath[300];
-    WCHAR m_unhookLibPath[300];
-    WCHAR m_systemrootPath[300];
     bool m_isFrameGrabbedDuringLastSecond;
     GrabberContext *m_context;
     GetHwndCallback_t m_getHwndCb;
@@ -632,7 +694,8 @@ private:
     QScopedPointer<QTimer> m_checkIfFrameGrabbedTimer;
     QScopedPointer<D3D10GrabberWorker> m_worker;
     QScopedPointer<QThread> m_workerThread;
-    QScopedPointer<QThread> m_thread;
+    QScopedPointer<D3D10GrabberInjector> m_injector;
+    QScopedPointer<QThread> m_injectorThread;
     HOOKSGRABBER_SHARED_MEM_DESC m_memDesc;
     D3D10Grabber &m_owner;
     bool m_injectD3D9;

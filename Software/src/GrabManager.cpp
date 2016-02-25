@@ -83,7 +83,7 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
     m_timerUpdateFPS = new QTimer(this);
     connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
     m_timerUpdateFPS->setSingleShot(false);
-    m_timerUpdateFPS->start(FPS_UPDATE_INTERVAL);
+    m_timerUpdateFPS->setInterval(FPS_UPDATE_INTERVAL);
 
     m_timerFakeGrab = new QTimer(this);
     connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
@@ -156,6 +156,7 @@ void GrabManager::start(bool isGrabEnabled)
         } else {
             clearColorsCurrent();
             m_timerUpdateFPS->stop();
+            m_timerFakeGrab->stop();
             m_grabber->stopGrabbing();
             emit ambilightTimeOfUpdatingColors(0);
         }
@@ -396,7 +397,7 @@ void GrabManager::handleGrabbedColors()
 
 void GrabManager::timeoutFakeGrab()
 {
-    if (m_isSendDataOnlyIfColorsChanged == false)
+    if (m_isSendDataOnlyIfColorsChanged == false && m_isGrabbingStarted)
     {
         emit updateLedsColors(m_colorsCurrent);
     }

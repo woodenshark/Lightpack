@@ -56,20 +56,37 @@ LightpackApplication::LightpackApplication(int &argc, char **argv)
 
 LightpackApplication::~LightpackApplication()
 {
+
+    m_moodlampManager->start(false);
+    m_grabManager->start(false);
+    m_pluginManager->StopPlugins();
+
+    QApplication::processEvents(QEventLoop::AllEvents, 1000);
+
     m_EventFilters.clear();
 
-    // the QObjects seem to be deleted at this point already
-    // so just clean up the rest
+    m_ledDeviceManagerThread->quit();
+    m_apiServerThread->quit();
+    m_ledDeviceManagerThread->wait();
+    m_apiServerThread->wait();
 
     delete m_settingsWindow;
+    m_settingsWindow = NULL;
     delete m_ledDeviceManager;
-    delete m_LedDeviceManagerThread;
+    m_ledDeviceManager = NULL;
+    delete m_ledDeviceManagerThread;
+    m_ledDeviceManagerThread = NULL;
     delete m_apiServerThread;
+    m_apiServerThread = NULL;
     delete m_grabManager;
+    m_grabManager = NULL;
     delete m_moodlampManager;
+    m_moodlampManager = NULL;
 
     delete m_pluginManager;
+    m_pluginManager = NULL;
     delete m_pluginInterface;
+    m_pluginInterface = NULL;
 }
 
 void LightpackApplication::initializeAll(const QString & appDirPath)
@@ -512,14 +529,17 @@ void LightpackApplication::startApiServer()
     connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),  m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(ardulightNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)),   m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
 
     if (!m_noGui)
     {
         connect(m_apiServer, SIGNAL(errorOnStartListening(QString)), m_settingsWindow, SLOT(onApiServer_ErrorOnStartListening(QString)));
     }
 
-    connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_pluginInterface,    SLOT(updateColors(QList<QRgb>)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)), m_pluginInterface, SLOT(updateSmoothCache(int)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)), m_pluginInterface, SLOT(updateGammaCache(double)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)), m_pluginInterface, SLOT(updateBrightnessCache(int)), Qt::QueuedConnection);
 
     m_apiServer->firstStart();
 
@@ -531,7 +551,7 @@ void LightpackApplication::startLedDeviceManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     m_ledDeviceManager = new LedDeviceManager();
-    m_LedDeviceManagerThread = new QThread();
+    m_ledDeviceManagerThread = new QThread();
 
 //    connect(settings(), SIGNAL(connectedDeviceChanged(const SupportedDevices::DeviceType)), this, SLOT(handleConnectedDeviceChange(const SupportedDevices::DeviceType)), Qt::DirectConnection);
 //    connect(settings(), SIGNAL(adalightSerialPortNameChanged(QString)),               m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
@@ -589,8 +609,8 @@ void LightpackApplication::startLedDeviceManager()
         connect(m_ledDeviceManager, SIGNAL(firmwareVersionUnofficial(int)), m_settingsWindow, SLOT(ledDeviceFirmwareVersionUnofficialResult(int)), Qt::QueuedConnection);
         connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)), Qt::QueuedConnection);
     }
-    m_ledDeviceManager->moveToThread(m_LedDeviceManagerThread);
-    m_LedDeviceManagerThread->start();
+    m_ledDeviceManager->moveToThread(m_ledDeviceManagerThread);
+    m_ledDeviceManagerThread->start();
     QMetaObject::invokeMethod(m_ledDeviceManager, "init", Qt::QueuedConnection);
 
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "end";
@@ -614,10 +634,6 @@ void LightpackApplication::startPluginManager()
 
     m_pluginManager->LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
     m_pluginManager->StartPlugins();
-
-    //m_PluginThread = new QThread();
-    //m_pluginManager->moveToThread(m_PluginThread);
-    //m_PluginThread->start();
 
 }
 
@@ -655,8 +671,6 @@ void LightpackApplication::initGrabManager()
 
     connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
-    connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
     connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
     connect(m_grabManager,SIGNAL(changeScreen(QRect)),m_pluginInterface,SLOT(refreshScreenRect(QRect)));
 
@@ -744,27 +758,4 @@ void LightpackApplication::requestBacklightStatus()
 {
     //m_apiServer->resultBacklightStatus(m_backlightStatus);
     m_pluginInterface->resultBacklightStatus(m_backlightStatus);
-}
-
-void LightpackApplication::free()
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-
-    m_moodlampManager->start(false);
-    m_grabManager->start(false);
-    m_pluginManager->StopPlugins();
-
-    QApplication::processEvents(QEventLoop::AllEvents, 1000);
-
-    delete m_pluginManager;
-    delete m_moodlampManager;
-    delete m_grabManager;
-    delete m_ledDeviceManager;
-
-    m_pluginManager = NULL;
-    m_moodlampManager = NULL;
-    m_grabManager = NULL;
-    m_ledDeviceManager = NULL;
-
-    QApplication::processEvents(QEventLoop::AllEvents, 1000);
 }

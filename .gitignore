@@ -64,3 +64,4 @@ Software/lib
 *.suo
 *.sdf
 *.opensdf
+vc*.pdb

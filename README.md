@@ -35,14 +35,16 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 
 ###Prismatik build instructions for Windows
 ####Prerequisites:
-* [Qt SDK](http://qt-project.org/downloads)
+* [Qt SDK](http://qt-project.org/downloads), you may need to set `%QTDIR%`
 * [Windows SDK](https://msdn.microsoft.com/en-us/windows/desktop/ff851942.aspx) or [Microsoft DirectX SDK](http://www.microsoft.com/en-us/download/details.aspx?id=6812)
 * POSIX shell utilities [MSYS for example](http://www.mingw.org/wiki/MSYS). It may help to have the `PATH` environment variable set for the utilities (Run &rarr; sysdm.cpl &rarr; Advanced &rarr; Environment Variable &rarr; Edit `PATH` system variable (`C:\MinGW\msys\1.0\bin;` for example)
 
 ####Build process:
 1. go to `<repo>/Software`
-2. run `scripts/win32/generate_sln.sh`
-3. build `Lightpack.sln` with MSBuild / VisualStudio
+2. copy and edit `build-vars.prf` accoring to your machine
+2. optional, if locales changed: run `update_locales.bat` or `./update_locales.sh` (slow on Windows)
+3. run `scripts/win32/generate_sln.sh`
+4. build `Lightpack.sln` with MSBuild / VisualStudio
 
 ####Building an installer:
 1. run `scripts/win32/prepare_installer.sh`
@@ -60,12 +62,14 @@ You will need the following packages, usually all of them are in distro's reposi
 * libusb-1.0-0-dev
 * libnotify-dev
 * libudev-dev
+* qttools5-dev-tools
 * if you are using Ubuntu: libappindicator-dev
 
 ####Build process:
 1. go to `<repo>/Software`
-2. run `qmake -r`
-3. run `make`
+2. optional, if locales changed: run `./update_locales.sh`
+3. run `qmake -r`
+4. run `make`
 
 ####Building a deb package:
 1. run `scripts/linux/prepare_installer.sh`

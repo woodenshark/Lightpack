@@ -101,6 +101,15 @@ const char * ApiServer::CmdGetBacklight = "getmode";
 const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
 const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
 
+const char * ApiServer::CmdGetGamma = "getgamma";
+const char * ApiServer::CmdResultGamma = "gamma:";
+
+const char * ApiServer::CmdGetBrightness = "getbrightness";
+const char * ApiServer::CmdResultBrightness = "brightness:";
+
+const char * ApiServer::CmdGetSmooth = "getsmooth";
+const char * ApiServer::CmdResultSmooth = "smooth:";
+
 const char * ApiServer::CmdGuid = "guid:";
 
 const char * ApiServer::CmdLockStatus = "getlockstatus";
@@ -171,6 +180,11 @@ ApiServer::ApiServer(quint16 port, QObject *parent)
     {
         qFatal("%s listen(Any, %d) fail", Q_FUNC_INFO, m_apiPort);
     }
+}
+
+ApiServer::~ApiServer() {
+    m_apiSetColorTaskThread->quit();
+    m_apiSetColorTaskThread->wait();
 }
 
 void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
@@ -528,6 +542,24 @@ void ApiServer::clientProcessCommands()
                 result = CmdSetResult_Error;
                 break;
             }
+        }
+        else if (cmdBuffer == CmdGetGamma)
+        {
+            API_DEBUG_OUT << CmdGetGamma;
+
+            result = QString("%1%2\r\n").arg(CmdResultGamma).arg(lightpack->GetGamma());
+        }
+        else if (cmdBuffer == CmdGetBrightness)
+        {
+            API_DEBUG_OUT << CmdGetBrightness;
+
+            result = QString("%1%2\r\n").arg(CmdResultBrightness).arg(lightpack->GetBrightness());
+        }
+        else if (cmdBuffer == CmdGetSmooth)
+        {
+            API_DEBUG_OUT << CmdGetSmooth;
+
+            result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
         }
         else if (cmdBuffer.startsWith(CmdGuid))
         {
@@ -1258,6 +1290,21 @@ void ApiServer::initHelpMessage()
                 "Get mode of the current profile",
                 formatHelp(CmdResultBacklight_Ambilight) +
                 formatHelp(CmdResultBacklight_Moodlamp)
+                );
+    m_helpMessage += formatHelp(
+                CmdGetGamma,
+                "Get the current gamma correction value",
+                formatHelp(CmdResultGamma + QString("2.004"))
+                );
+    m_helpMessage += formatHelp(
+                CmdGetBrightness,
+                "Get the current brightness value",
+                formatHelp(CmdResultBrightness + QString("100"))
+                );
+    m_helpMessage += formatHelp(
+                CmdGetSmooth,
+                "Get the current smooth value",
+                formatHelp(CmdResultSmooth + QString("1"))
                 );
 
     // Set-commands

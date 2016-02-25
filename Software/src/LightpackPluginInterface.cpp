@@ -15,6 +15,10 @@ LightpackPluginInterface::LightpackPluginInterface(QObject *parent) :
 {
     m_isRequestBacklightStatusDone = true;
     m_backlightStatusResult = Backlight::StatusUnknown;
+    m_gamma = SettingsScope::Profile::Device::GammaDefault;
+    m_brightness = SettingsScope::Profile::Device::BrightnessDefault;
+    m_smooth = SettingsScope::Profile::Device::SmoothDefault;
+    
     initColors(10);
     m_timerLock = new QTimer(this);
     m_timerLock->start(5000); // check in 5000 ms
@@ -152,10 +156,29 @@ void LightpackPluginInterface::refreshScreenRect(QRect rect)
     screen = rect;
 }
 
-void LightpackPluginInterface::updateColors(const QList<QRgb> & colors)
+void LightpackPluginInterface::updateColorsCache(const QList<QRgb> & colors)
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
     m_curColors = colors;
+}
+
+
+void LightpackPluginInterface::updateGammaCache(double value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_gamma = value;
+}
+
+void LightpackPluginInterface::updateBrightnessCache(int value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_brightness = value;
+}
+
+void LightpackPluginInterface::updateSmoothCache(int value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_smooth = value;
 }
 
 QString LightpackPluginInterface::Version()
@@ -580,6 +603,21 @@ int LightpackPluginInterface::GetBacklight()
         // TODO: use more suitable value.
         return 0;
     }
+}
+
+double LightpackPluginInterface::GetGamma()
+{
+    return m_gamma;
+}
+
+int LightpackPluginInterface::GetBrightness()
+{
+    return m_brightness;
+}
+
+int LightpackPluginInterface::GetSmooth()
+{
+    return m_smooth;
 }
 
 QString LightpackPluginInterface::GetPluginsDir()

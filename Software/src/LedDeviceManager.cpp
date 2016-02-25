@@ -59,7 +59,9 @@ LedDeviceManager::LedDeviceManager(QObject *parent)
 
 LedDeviceManager::~LedDeviceManager()
 {
-    m_ledDeviceThread->deleteLater();
+    m_ledDeviceThread->quit();
+    m_ledDeviceThread->wait();
+
     for (int i = 0; i < m_ledDevices.size(); i++) {
         if(m_ledDevices[i])
             m_ledDevices[i]->close();

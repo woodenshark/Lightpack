@@ -40,7 +40,7 @@ enum COMMANDS{
     CMD_NOP = 0x0F,
 
     // Unofficial commands
-    CMD_UNOFFICIAL_SET_USBLED,
+    CMD_UNOFFICIAL_SET_USBLED = 0x81,
 };
 
 enum PRESCALLERS{

@@ -45,6 +45,7 @@ signals:
     void openDeviceSuccess(bool isSuccess);
     void ioDeviceSuccess(bool isSuccess);
     void firmwareVersion(const QString & fwVersion);
+    void firmwareVersionUnofficial(const int version);
 
     /*!
       This signal must be sent at the completion of each command

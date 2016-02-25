@@ -87,6 +87,7 @@ public slots:
     void ledDeviceOpenSuccess(bool isSuccess);
     void ledDeviceCallSuccess(bool isSuccess);
     void ledDeviceFirmwareVersionResult(const QString & fwVersion);
+    void ledDeviceFirmwareVersionUnofficialResult(const int version);
     void refreshAmbilightEvaluated(double updateResultMs);
     void updateUiFromSettings();
 
@@ -145,6 +146,7 @@ private slots:
     void onGrabIsAvgColors_toggled(bool state);
 
     void onDeviceRefreshDelay_valueChanged(int value);
+    void onDisableUsbPowerLed_toggled(bool state);
     void onDeviceSmooth_valueChanged(int value);
     void onDeviceBrightness_valueChanged(int value);
     void onDeviceColorDepth_valueChanged(int value);

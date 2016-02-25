@@ -115,6 +115,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     statusBar()->addWidget(labelFPS, 4);
     statusBar()->addWidget(m_labelStatusIcon, 0);
 
+    ui->checkBox_DisableUsbPowerLed->setVisible(false);
+
     updateStatusBar();
 
     initGrabbersRadioButtonsVisibility();
@@ -195,6 +197,7 @@ void SettingsWindow::connectSignalsSlots()
 
     // Device options
     connect(ui->spinBox_DeviceRefreshDelay, SIGNAL(valueChanged(int)), this, SLOT(onDeviceRefreshDelay_valueChanged(int)));
+    connect(ui->checkBox_DisableUsbPowerLed, SIGNAL(toggled(bool)), this, SLOT(onDisableUsbPowerLed_toggled(bool)));
     connect(ui->spinBox_DeviceSmooth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceSmooth_valueChanged(int)));
     connect(ui->spinBox_DeviceBrightness, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightness_valueChanged(int)));
     connect(ui->spinBox_DeviceColorDepth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceColorDepth_valueChanged(int)));
@@ -1015,6 +1018,13 @@ void SettingsWindow::ledDeviceFirmwareVersionResult(const QString & fwVersion)
     updateDeviceTabWidgetsVisibility();
 }
 
+void SettingsWindow::ledDeviceFirmwareVersionUnofficialResult(const int version) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << version;
+
+    // Here we handle certain options that have to be hidden/made visible depending on our version
+    ui->checkBox_DisableUsbPowerLed->setVisible(version >= 1);
+}
+
 void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 {    
     DEBUG_MID_LEVEL << Q_FUNC_INFO << updateResultMs;
@@ -1099,6 +1109,12 @@ void SettingsWindow::onDeviceRefreshDelay_valueChanged(int value)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
     Settings::setDeviceRefreshDelay(value);
+}
+
+void SettingsWindow::onDisableUsbPowerLed_toggled(bool state) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+
+    Settings::setDeviceUsbPowerLedDisabled(state);
 }
 
 void SettingsWindow::onDeviceSmooth_valueChanged(int value)
@@ -1598,6 +1614,7 @@ void SettingsWindow::updateUiFromSettings()
     ui->pushButton_SelectColor->setColor                             (Settings::getMoodLampColor());
     ui->horizontalSlider_MoodLampSpeed->setValue                     (Settings::getMoodLampSpeed());
 
+    ui->checkBox_DisableUsbPowerLed->setChecked                      (Settings::isDeviceUsbPowerLedDisabled());
     ui->horizontalSlider_DeviceRefreshDelay->setValue                (Settings::getDeviceRefreshDelay());
     ui->horizontalSlider_DeviceBrightness->setValue                  (Settings::getDeviceBrightness());
     ui->horizontalSlider_DeviceSmooth->setValue                      (Settings::getDeviceSmooth());

@@ -153,6 +153,8 @@ public:
     // [Device]
     static int getDeviceRefreshDelay();
     static void setDeviceRefreshDelay(int value);
+    static bool isDeviceUsbPowerLedDisabled();
+    static void setDeviceUsbPowerLedDisabled(bool isDisabled);
     static int getDeviceBrightness();
     static void setDeviceBrightness(int value);
     static int getDeviceSmooth();
@@ -263,6 +265,7 @@ signals:
     void luminosityThresholdChanged(int value);
     void minimumLuminosityEnabledChanged(bool value);
     void deviceRefreshDelayChanged(int value);
+    void deviceUsbPowerLedDisabledChanged(bool isDisabled);
     void deviceBrightnessChanged(int value);
     void deviceSmoothChanged(int value);
     void deviceColorDepthChanged(int value);

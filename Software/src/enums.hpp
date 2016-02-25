@@ -145,6 +145,7 @@ namespace LedDeviceCommands
 enum Cmd {
     OffLeds,
     SetColors,
+    SetUsbPowerLedDisabled,
     SetRefreshDelay,
     SetColorDepth,
     SetSmoothSlowdown,

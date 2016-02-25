@@ -23,7 +23,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 
 #ifndef COMMANDS_H_INCLUDED
 #define COMMANDS_H_INCLUDED
@@ -37,7 +37,10 @@ enum COMMANDS{
     CMD_SET_SMOOTH_SLOWDOWN,
     CMD_SET_BRIGHTNESS,
 
-    CMD_NOP = 0x0F
+    CMD_NOP = 0x0F,
+
+    // Unofficial commands
+    CMD_UNOFFICIAL_SET_USBLED,
 };
 
 enum PRESCALLERS{
@@ -52,6 +55,7 @@ enum PRESCALLERS{
 enum DATA_VERSION_INDEXES{
     INDEX_FW_VER_MAJOR = 1,
     INDEX_FW_VER_MINOR,
+    INDEX_FW_VER_UNOFFICIAL = 5 // Use index 5 just in case the official firmware gets updated to use index 3 and 4 (0.0.0.0 version format)
 };
 
 #endif /* COMMANDS_H_INCLUDED */

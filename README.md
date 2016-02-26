@@ -8,20 +8,20 @@ Lightpack project with Prismatik flavour
 &nbsp;&nbsp;[Build Prismatik with Windows] (#prismatik-build-instructions-for-windows) <br />
 &nbsp;&nbsp;[Build with Linux] (#build-instructions-for-linux) <br />
 &nbsp;&nbsp;[Build with OS X] (#build-instructions-for-os-x) <br />
-&nbsp;&nbsp;[Lightpack Firmware building] (#fimware-building-instructions) <br />
+&nbsp;&nbsp;[Build firmware] (#firmware-build-instructions) <br />
 
 
 **Lightpack** is an fully open-source and simple hardware implementation of the backlight for any computer. It's USB content-driving ambient lighting system.
 
 **Prismatik** is an open-source software we buid to control Lightpack device. It grabs screen, analize picture,
-calculate resulting colors and provide soft and gentle lighting with Lightpack device. Moreother, you can 
+calculate resulting colors and provide soft and gentle lighting with Lightpack device. Moreother, you can
 handle another devices with Prismatik such as Adalight, Ardulight or even Alienware LightFX system.
 
 #####Main features:
 * Fully open-source under GPLv3 (hardware, software, firmware)
 * Cross-platform GUI (Qt)
 * USB HID (no need to install any drivers)
-* The device is simple to build (just Do-It-Yourself) 
+* The device is simple to build (just Do-It-Yourself)
 
 #####Useful URLs:
 * [Project mothership] (https://github.com/psieg/Lightpack/)
@@ -98,17 +98,28 @@ Instead of building a deb package, you can:
 1. Download and unpack 5.0+ **Qt SDK** from www.qt-project.org
 4. Build **Prismatik** project
 
-to run Prismatik please make sure PythonQt libs are available for load at runtime 
+to run Prismatik please make sure PythonQt libs are available for load at runtime
 
 ---
 
 ###Firmware build instructions
-1. Install [AVR GCC Toolchain] (http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain)
-2. Install **dfu-programmer** for firmware upload with `$ sudo apt-get install dfu-programmer`
-3. Compile Prismatik using command line:
-    * cd $Lightpack/Firmware
-    * make LIGHTPACK_HW=7
-4. Reboot device to bootloader and type `make dfu`
+
+*Please note that these instructions are for Debian based systems.*
+
+**Compiling firmware only:**
+1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain): `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude`
+2. Compile the firmware:
+  * `cd Firmware`
+  * `make LIGHTPACK_HW=7` (or any other hardware version 4-7)
+  * Alternatively, you can do `./build_batch.sh` to build the firmware for all hardware versions
+3. The firmware can be found in the same directory (individual build) or *Firmware/hex* (batch build).
+
+**Compiling and uploading firmware to device:**
+1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain) and **dfu-programmer**: `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude dfu-programmer`
+2. Reboot device to bootloader (via the secret button on the device)
+3. Compile and upload the firmware:
+  * `cd Firmware`
+  * `make LIGHTPACK_HW=7 && make dfu LIGHTPACK_HW=7` (or any other hardware version 4-7)
 
 ---
 

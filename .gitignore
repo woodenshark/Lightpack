@@ -6,7 +6,7 @@ Firmware/.dep/
 Firmware/.settings
 Firmware/.project
 Firmware/.cproject
-Software/[^.]*Makefile
+Software/**/Makefile*
 Software/res/qrc_[^.]+.cpp
 Software/res/translations/*.qm
 Software/[^.]+.pro.user
@@ -53,7 +53,6 @@ stuff/
 *.sym
 Software/dmg/contents
 build-vars.prf
-Makefile*
 debug/
 release/
 Software/dist_windows/content

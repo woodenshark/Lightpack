@@ -107,6 +107,7 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 *Please note that these instructions are for Debian based systems.*
 
 **Compiling firmware only:**
+
 1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain): `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude`
 2. Compile the firmware:
   * `cd Firmware`
@@ -115,6 +116,7 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 3. The firmware can be found in the same directory (individual build) or *Firmware/hex* (batch build).
 
 **Compiling and uploading firmware to device:**
+
 1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain) and **dfu-programmer**: `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude dfu-programmer`
 2. Reboot device to bootloader (via the secret button on the device)
 3. Compile and upload the firmware:

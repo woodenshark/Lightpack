@@ -28,7 +28,8 @@ EndSessionDetector::EndSessionDetector()
 {
 #ifdef Q_OS_WIN
 	if (WTSRegisterSessionNotification(getLightpackApp()->getMainWindowHandle(), NOTIFY_FOR_THIS_SESSION) == FALSE)
-        throw register_exception();
+		throw register_exception();
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Event Filter is set up";
 #endif
 }
 
@@ -46,6 +47,7 @@ bool EndSessionDetector::nativeEventFilter(const QByteArray& eventType, void* me
 
 	if (msg->message == WM_QUERYENDSESSION)
 	{
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is ending";
 		if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
 		{
 			Destroy();
@@ -54,13 +56,18 @@ bool EndSessionDetector::nativeEventFilter(const QByteArray& eventType, void* me
 	}
 	else if (msg->message == WM_WTSSESSION_CHANGE)
 	{
-		if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+		if (msg->wParam == WTS_SESSION_LOCK)
 		{
-			if (msg->wParam == WTS_SESSION_LOCK)
+			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is locking";
+			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
 			{
 				isSessionEnding = true;
 			}
-			else if (msg->wParam == WTS_SESSION_UNLOCK)
+		}
+		else if (msg->wParam == WTS_SESSION_UNLOCK)
+		{
+			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is resuming";
+			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
 			{
 				isSessionResuming = true;
 			}

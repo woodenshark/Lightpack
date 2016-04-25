@@ -83,6 +83,7 @@ private slots:
 //    void handleConnectedDeviceChange(const SupportedDevices::DeviceType);
     void onFocusChanged(QWidget *, QWidget *);
     void quitFromWizard(int result);
+    void onSessionChange(int change);
 
 private:
     void processCommandLineArguments();

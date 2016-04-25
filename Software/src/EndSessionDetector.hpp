@@ -26,11 +26,21 @@
 
 #ifndef END_SESSION_DETECTOR
 #define END_SESSION_DETECTOR
+#include "QObject"
 #include "QAbstractNativeEventFilter"
 
+enum SessionChange : int {
+    Ending,
+    Locking,
+    Unlocking
+};
+
 class EndSessionDetector :
+    public QObject,
     public QAbstractNativeEventFilter
 {
+    Q_OBJECT
+
 public:
     EndSessionDetector();
 
@@ -38,9 +48,12 @@ public:
 
     ~EndSessionDetector();
 
-private:
-	void Destroy();
+signals:
+    void sessionChangeDetected(int change);
 
-	bool m_isDestroyed;
+private:
+    void Destroy();
+
+    bool m_isDestroyed;
 };
 #endif

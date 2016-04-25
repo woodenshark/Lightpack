@@ -522,7 +522,9 @@ void GrabManager::initGrabbers()
 #endif
 
 #ifdef DDUPL_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(new DDuplGrabber(NULL, m_grabberContext));
+    DDuplGrabber* dDuplGrabber = new DDuplGrabber(NULL, m_grabberContext);
+    m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(dDuplGrabber);
+    connect(this, SIGNAL(onSessionChange(int)), dDuplGrabber, SLOT(onSessionChange(int)));
 #endif
 
 #ifdef X11_GRAB_SUPPORT

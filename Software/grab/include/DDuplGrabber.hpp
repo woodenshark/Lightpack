@@ -48,7 +48,8 @@ enum DDuplGrabberState
     Ready,
     Allocated,
     LostAccess,
-    AccessDenied,
+    AccessDeniedDesktop,
+    AccessDeniedDuplication,
     Unavailable
 };
 enum DDuplGrabberThreadCommand
@@ -66,6 +67,9 @@ public:
     virtual ~DDuplGrabber();
 
     DECLARE_GRABBER_NAME("DDuplGrabber")
+
+public slots:
+    void onSessionChange(int change);
 
 protected slots:
     virtual GrabResult grabScreens();
@@ -98,6 +102,7 @@ private:
     DDuplGrabberThreadCommand m_threadCommand;
     QList<ScreenInfo> m_threadReallocateArg;
     bool m_threadReallocateResult;
+    bool m_sessionIsLocked;
 };
 
 

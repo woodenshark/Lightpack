@@ -34,6 +34,7 @@
 #include "PluginsManager.hpp"
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
+#include "EndSessionDetector.hpp"
 
 #include <stdio.h>
 #include <iostream>
@@ -166,7 +167,10 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
     startPluginManager();
 
-    m_EventFilters.push_back(QSharedPointer<QAbstractNativeEventFilter>(new EndSessionDetector()));
+    QSharedPointer<EndSessionDetector> endSessionDetector(new EndSessionDetector());
+    connect(endSessionDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
+    connect(endSessionDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
+    m_EventFilters.push_back(endSessionDetector);
 
     for (EventFilters::const_iterator it = m_EventFilters.begin(); it != m_EventFilters.end(); ++it)
         this->installNativeEventFilter(it->data());
@@ -319,6 +323,31 @@ void LightpackApplication::quitFromWizard(int result)
 {
     Q_UNUSED(result);
     quit();
+}
+
+void LightpackApplication::onSessionChange(int change)
+{
+    switch (change)
+    {
+        case SessionChange::Ending:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
+            {
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+            }
+            break;
+        case SessionChange::Locking:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+            {
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+            }
+            break;
+        case SessionChange::Unlocking:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+            {
+                getLightpackApp()->settingsWnd()->switchOnLeds();
+            }
+            break;
+    }
 }
 
 void LightpackApplication::processCommandLineArguments()
@@ -476,11 +505,11 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
         case QSysInfo::WV_2000:     qDebug() << "Windows 2000 (operating system version 5.0)"; break;
         case QSysInfo::WV_XP:       qDebug() << "Windows XP (operating system version 5.1)"; break;
         case QSysInfo::WV_2003:     qDebug() << "Windows Server 2003, Windows Server 2003 R2, Windows Home Server, Windows XP Professional x64 Edition (operating system version 5.2)"; break;
-		case QSysInfo::WV_VISTA:    qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
-		case QSysInfo::WV_WINDOWS7: qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
-		case QSysInfo::WV_WINDOWS8: qDebug() << "Windows 8 (operating system version 6.2)"; break;
-		case QSysInfo::WV_WINDOWS8_1: qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
-		case QSysInfo::WV_WINDOWS10: qDebug() << "Windows 10 (operating system version 10.0)"; break;
+        case QSysInfo::WV_VISTA:    qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
+        case QSysInfo::WV_WINDOWS7: qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
+        case QSysInfo::WV_WINDOWS8: qDebug() << "Windows 8 (operating system version 6.2)"; break;
+        case QSysInfo::WV_WINDOWS8_1: qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
+        case QSysInfo::WV_WINDOWS10: qDebug() << "Windows 10 (operating system version 10.0)"; break;
         default:                    qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
         }
 #       elif defined(Q_OS_LINUX)

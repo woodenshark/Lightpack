@@ -24,6 +24,7 @@
 */
 
 #include "DDuplGrabber.hpp"
+#include "EndSessionDetector.hpp"
 
 #ifdef DDUPL_GRAB_SUPPORT
 #include <comdef.h>
@@ -53,7 +54,8 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
     _Out_opt_ ID3D11DeviceContext** ppImmediateContext);
 
 #define ACQUIRE_TIMEOUT_INTERVAL 0 // timing is done via the timer freqency, so we don't wait again
-#define ACCESSDENIED_RETRY_INTERVAL 3000
+#define ACCESSDENIED_DESKTOP_RETRY_INTERVAL 1000
+#define ACCESSDENIED_DUPLICATION_RETRY_INTERVAL 5000
 #define THREAD_DESTRUCTION_WAIT_TIMEOUT 3000
 
 #define DDUPL_THREAD_EVENT_NAME L"Lightpack.DDuplGrabber.Event.Thread"
@@ -82,7 +84,9 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
     m_thread(NULL),
     m_threadEvent(NULL),
     m_threadReturnEvent(NULL),
-    m_threadReallocateArg()
+    m_threadReallocateArg(),
+    m_threadReallocateResult(false),
+    m_sessionIsLocked(false)
 {
 }
 
@@ -167,18 +171,6 @@ DWORD WINAPI DDuplGrabberThreadProc(LPVOID arg) {
                 SetEvent(_this->m_threadReturnEvent);
                 return 0;
             case Reallocate:
-                HDESK screensaverDesk = OpenInputDesktop(0, true, DESKTOP_SWITCHDESKTOP);
-                if (!screensaverDesk) {
-                    qWarning(Q_FUNC_INFO " Failed to open input desktop: %x", GetLastError());
-                    break;
-                }
-                BOOL success = SetThreadDesktop(screensaverDesk);
-                if (!success) {
-                    qWarning(Q_FUNC_INFO " Failed to set grab desktop: %x", GetLastError());
-                    _this->m_threadReallocateResult = false;
-                    break;
-                }
-
                 _this->m_threadReallocateResult = _this->_reallocate(_this->m_threadReallocateArg);
                 break;
             }
@@ -248,14 +240,24 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
     return result;
 }
 
+void DDuplGrabber::onSessionChange(int change)
+{
+    m_sessionIsLocked = ((SessionChange)change == SessionChange::Locking);
+}
+
 bool DDuplGrabber::isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const
 {
     if (m_state != Allocated)
     {
-        if (m_state == AccessDenied)
+        if (m_state == AccessDeniedDesktop)
         {
-            // retry allocation every ACCESSDENIED_RETRY_INTERVAL ms in case the 3D app closed or the user left the secure desktop
-            return GetTickCount() - m_accessDeniedLastCheck > ACCESSDENIED_RETRY_INTERVAL;
+            // retry allocation every ACCESSDENIED_DESKTOP_RETRY_INTERVAL ms in case the user left the secure desktop
+            return GetTickCount() - m_accessDeniedLastCheck > ACCESSDENIED_DESKTOP_RETRY_INTERVAL;
+        }
+        else if (m_state == AccessDeniedDuplication)
+        {
+            // retry allocation every ACCESSDENIED_DUPLICATION_RETRY_INTERVAL ms in case the 3D app closed
+            return GetTickCount() - m_accessDeniedLastCheck > ACCESSDENIED_DUPLICATION_RETRY_INTERVAL;
         }
         else if (m_state == Unavailable)
         {
@@ -306,6 +308,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
     }
 }
 
+// Must be called from DDuplGrabberThreadProc !
 bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
 {
     if (m_state == Uninitialized)
@@ -315,6 +318,29 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
     }
 
     freeScreens();
+
+
+    HDESK screensaverDesk = OpenInputDesktop(0, true, DESKTOP_SWITCHDESKTOP);
+    if (!screensaverDesk) {
+        DWORD err = GetLastError();
+
+        if (err == ERROR_ACCESS_DENIED) {
+            // fake success, see grabScreens
+            m_state = AccessDeniedDesktop;
+            m_accessDeniedLastCheck = GetTickCount();
+            qWarning(Q_FUNC_INFO " Access to input desktop denied, retry later");
+            return true;
+        } else {
+            qCritical(Q_FUNC_INFO " Failed to open input desktop: %x", GetLastError());
+            return true;
+        }
+    }
+
+    BOOL success = SetThreadDesktop(screensaverDesk);
+    if (!success) {
+        qCritical(Q_FUNC_INFO " Failed to set grab desktop: %x", GetLastError());
+        return false;
+    }
 
     for (IDXGIAdapter1Ptr adapter : m_adapters)
     {
@@ -350,9 +376,9 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
                     if (hr == E_ACCESSDENIED)
                     {
                         // fake success, see grabScreens
-                        m_state = AccessDenied;
+                        m_state = AccessDeniedDuplication;
                         m_accessDeniedLastCheck = GetTickCount();
-                        qWarning(Q_FUNC_INFO " Desktop Duplication not available, access denied");
+                        qWarning(Q_FUNC_INFO " Desktop Duplication not available, access denied, retry later");
                         return true;
                     }
                     else if (hr == E_NOTIMPL || hr == DXGI_ERROR_UNSUPPORTED)
@@ -428,11 +454,26 @@ GrabResult DDuplGrabber::grabScreens()
 {
     if (m_state != Allocated)
     {
-        if (m_state == AccessDenied)
+        if (m_state == AccessDeniedDuplication)
         {
-            // If Access is denied, we are on a secure desktop or a 3D application is running
+            // If access to Desktop Duplication is denied, as far as we know 3D application is running
             // Return black buffers and retry allocation in isReallocationNeeded
             return returnBlackBuffer();
+        }
+        else if (m_state == AccessDeniedDesktop)
+        {
+            // If access to the input desktop is denied, as far as we know a secure desktop is active
+            // Retry allocation in isReallocationNeeded
+            if (m_sessionIsLocked)
+            {
+                // In case of logon screen, keeping the last image will most closely resemble what we've last seen, so GrabResultFrameNotReady is better
+                return GrabResultFrameNotReady;
+            }
+            else
+            {
+                // In case of UAC prompt, that will at least be what we'll have before and after the prompt, reducing its visual impact
+                return returnBlackBuffer();
+            }
         }
         else
         {

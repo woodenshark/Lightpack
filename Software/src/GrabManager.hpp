@@ -46,6 +46,7 @@ signals:
     void updateLedsColors(const QList<QRgb> & colors);
     void ambilightTimeOfUpdatingColors(double ms);
     void changeScreen();
+    void onSessionChange(int change);
 
 public:
 

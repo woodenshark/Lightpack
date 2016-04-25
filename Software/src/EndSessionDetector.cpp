@@ -39,47 +39,28 @@ bool EndSessionDetector::nativeEventFilter(const QByteArray& eventType, void* me
 	Q_UNUSED(eventType);
 	Q_UNUSED(message);
 
-	bool isSessionEnding = false;
-	bool isSessionResuming = false;
-
 #ifdef Q_OS_WIN
 	MSG* msg = (MSG*)message;
 
 	if (msg->message == WM_QUERYENDSESSION)
 	{
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is ending";
-		if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
-		{
-			Destroy();
-			isSessionEnding = true;
-		}
+		emit sessionChangeDetected(Ending);
 	}
 	else if (msg->message == WM_WTSSESSION_CHANGE)
 	{
 		if (msg->wParam == WTS_SESSION_LOCK)
 		{
 			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is locking";
-			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
-			{
-				isSessionEnding = true;
-			}
+			emit sessionChangeDetected(Locking);
 		}
 		else if (msg->wParam == WTS_SESSION_UNLOCK)
 		{
 			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is resuming";
-			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
-			{
-				isSessionResuming = true;
-			}
+			emit sessionChangeDetected(Unlocking);
 		}
 	}
 #endif
-
-	if (isSessionEnding)
-		getLightpackApp()->settingsWnd()->switchOffLeds();
-	else if (isSessionResuming)
-		getLightpackApp()->settingsWnd()->switchOnLeds();
-
 	return false;
 }
 

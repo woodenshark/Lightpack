@@ -196,7 +196,7 @@ SOURCES += \
     Plugin.cpp \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
-    EndSessionDetector.cpp \
+    SessionChangeDetector.cpp \
     wizard/ZoneWidget.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
@@ -246,7 +246,7 @@ HEADERS += \
     PluginsManager.hpp \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
-    EndSessionDetector.hpp \
+    SessionChangeDetector.hpp \
     wizard/ZoneWidget.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \

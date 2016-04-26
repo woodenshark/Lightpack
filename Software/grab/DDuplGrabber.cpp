@@ -24,7 +24,8 @@
 */
 
 #include "DDuplGrabber.hpp"
-#include "EndSessionDetector.hpp"
+#include "SessionChangeDetector.hpp"
+#include "debug.h"
 
 #ifdef DDUPL_GRAB_SUPPORT
 #include <comdef.h>
@@ -86,7 +87,7 @@ DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
     m_threadReturnEvent(NULL),
     m_threadReallocateArg(),
     m_threadReallocateResult(false),
-    m_sessionIsLocked(false)
+    m_isSessionLocked(false)
 {
 }
 
@@ -242,7 +243,14 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
 
 void DDuplGrabber::onSessionChange(int change)
 {
-    m_sessionIsLocked = ((SessionChange)change == SessionChange::Locking);
+    if (change == SessionChange::Locking)
+    {
+        m_isSessionLocked = true;
+    }
+    else if (change == SessionChange::Unlocking)
+    {
+        m_isSessionLocked = false;
+    }
 }
 
 bool DDuplGrabber::isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const
@@ -318,7 +326,6 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
     }
 
     freeScreens();
-
 
     HDESK screensaverDesk = OpenInputDesktop(0, true, DESKTOP_SWITCHDESKTOP);
     if (!screensaverDesk) {
@@ -431,6 +438,7 @@ BufferFormat mapDXGIFormatToBufferFormat(DXGI_FORMAT format)
 
 GrabResult DDuplGrabber::returnBlackBuffer()
 {
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
     for (GrabbedScreen& screen : _screensWithWidgets)
     {
         size_t sizeNeeded = screen.screenInfo.rect.height() * screen.screenInfo.rect.width() * 4; // Assumes 4 bytes per pixel
@@ -464,7 +472,7 @@ GrabResult DDuplGrabber::grabScreens()
         {
             // If access to the input desktop is denied, as far as we know a secure desktop is active
             // Retry allocation in isReallocationNeeded
-            if (m_sessionIsLocked)
+            if (m_isSessionLocked)
             {
                 // In case of logon screen, keeping the last image will most closely resemble what we've last seen, so GrabResultFrameNotReady is better
                 return GrabResultFrameNotReady;
@@ -504,7 +512,7 @@ GrabResult DDuplGrabber::grabScreens()
                 // in theory, DXGI_ERROR_INVALID_CALL is returned if the frame was not released
                 // it also happens in conjunction with secure desktop (even though the frame was properly released)
                 m_state = LostAccess;
-                qWarning(Q_FUNC_INFO " Lost Access to desktop 0x%X: 0x%X, requesting realloc", screen.screenInfo.handle, hr);
+                DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Lost Access to desktop" << screen.screenInfo.handle << ":" << (void*)(0xffffffff & hr) << ", requesting realloc";
                 return GrabResultFrameNotReady;
             }
             else if (FAILED(hr))

@@ -34,7 +34,7 @@
 #include "PluginsManager.hpp"
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
-#include "EndSessionDetector.hpp"
+#include "SessionChangeDetector.hpp"
 
 #include <stdio.h>
 #include <iostream>
@@ -99,6 +99,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
     m_applicationDirPath = appDirPath;
     m_noGui = false;
+    m_isSessionLocked = false;
 
 
     processCommandLineArguments();
@@ -167,10 +168,10 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
     startPluginManager();
 
-    QSharedPointer<EndSessionDetector> endSessionDetector(new EndSessionDetector());
-    connect(endSessionDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
-    connect(endSessionDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
-    m_EventFilters.push_back(endSessionDetector);
+    QSharedPointer<SessionChangeDetector> sessionChangeDetector(new SessionChangeDetector());
+    connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
+    connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
+    m_EventFilters.push_back(sessionChangeDetector);
 
     for (EventFilters::const_iterator it = m_EventFilters.begin(); it != m_EventFilters.end(); ++it)
         this->installNativeEventFilter(it->data());
@@ -193,35 +194,6 @@ HWND LightpackApplication::getMainWindowHandle() {
     // to get HWND sometimes needed to activate window
 //    winFocus(m_settingsWindow, true);
     return reinterpret_cast<HWND>(m_settingsWindow->winId());
-}
-
-bool LightpackApplication::winEventFilter ( MSG * msg, long * result ) {
-    Q_UNUSED(result);
-
-    const unsigned char POWER_RESUME  = 0x01;
-    const unsigned char POWER_SUSPEND = 0x02;
-    static unsigned char processed = 0x00;
-    if ( WM_POWERBROADCAST == msg->message ) {
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "WM_POWERBROADCAST "  <<  msg->wParam << " " << processed;
-        switch(msg->wParam) {
-        case PBT_APMRESUMEAUTOMATIC :
-            if ( !(POWER_RESUME & processed) ) {
-                m_ledDeviceManager->switchOnLeds();
-                processed = POWER_RESUME;
-                return true;
-            }
-            break;
-        case PBT_APMSUSPEND :
-            if ( !(POWER_SUSPEND & processed) ) {
-                m_ledDeviceManager->switchOffLeds();
-                processed = POWER_SUSPEND;
-                return true;
-            }
-            break;
-        }
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "hwnd = " << msg->hwnd;
-    }
-    return false;
 }
 #endif
 
@@ -329,20 +301,25 @@ void LightpackApplication::onSessionChange(int change)
 {
     switch (change)
     {
-        case SessionChange::Ending:
-            if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
-            {
-                getLightpackApp()->settingsWnd()->switchOffLeds();
-            }
-            break;
         case SessionChange::Locking:
             if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
             {
                 getLightpackApp()->settingsWnd()->switchOffLeds();
             }
+            m_isSessionLocked = true;
             break;
         case SessionChange::Unlocking:
             if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+            {
+                getLightpackApp()->settingsWnd()->switchOnLeds();
+            }
+            m_isSessionLocked = false;
+            break;
+        case SessionChange::Sleeping:
+            getLightpackApp()->settingsWnd()->switchOffLeds();
+            break;
+        case SessionChange::Resuming:
+            if (!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock())
             {
                 getLightpackApp()->settingsWnd()->switchOnLeds();
             }

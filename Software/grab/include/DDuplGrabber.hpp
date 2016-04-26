@@ -102,7 +102,7 @@ private:
     DDuplGrabberThreadCommand m_threadCommand;
     QList<ScreenInfo> m_threadReallocateArg;
     bool m_threadReallocateResult;
-    bool m_sessionIsLocked;
+    bool m_isSessionLocked;
 };
 
 

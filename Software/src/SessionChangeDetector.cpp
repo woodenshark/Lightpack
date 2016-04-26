@@ -1,4 +1,4 @@
-#include "EndSessionDetector.hpp"
+#include "SessionChangeDetector.hpp"
 #include "debug.h"
 #include "LightpackApplication.hpp"
 
@@ -23,7 +23,7 @@ class register_exception : public std::exception {
   }
 };
 
-EndSessionDetector::EndSessionDetector()
+SessionChangeDetector::SessionChangeDetector()
 	: m_isDestroyed(false)
 {
 #ifdef Q_OS_WIN
@@ -33,7 +33,7 @@ EndSessionDetector::EndSessionDetector()
 #endif
 }
 
-bool EndSessionDetector::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
+bool SessionChangeDetector::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
 {
 	Q_UNUSED(result);
 	Q_UNUSED(eventType);
@@ -41,30 +41,37 @@ bool EndSessionDetector::nativeEventFilter(const QByteArray& eventType, void* me
 
 #ifdef Q_OS_WIN
 	MSG* msg = (MSG*)message;
-
-	if (msg->message == WM_QUERYENDSESSION)
-	{
-		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is ending";
-		emit sessionChangeDetected(Ending);
-	}
-	else if (msg->message == WM_WTSSESSION_CHANGE)
+	
+	if (msg->message == WM_WTSSESSION_CHANGE)
 	{
 		if (msg->wParam == WTS_SESSION_LOCK)
 		{
-			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is locking";
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Session is locking";
 			emit sessionChangeDetected(Locking);
 		}
 		else if (msg->wParam == WTS_SESSION_UNLOCK)
 		{
-			DEBUG_MID_LEVEL << Q_FUNC_INFO << "Session is resuming";
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Session is unlocking";
 			emit sessionChangeDetected(Unlocking);
+		}
+	}
+	else if (msg->message == WM_POWERBROADCAST)
+	{
+		if (msg->wParam == PBT_APMSUSPEND)
+		{
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "System is going to sleep";
+			emit sessionChangeDetected(Sleeping);
+		} else if (msg->wParam == PBT_APMRESUMESUSPEND)
+		{
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "System is resuming";
+			emit sessionChangeDetected(Resuming);
 		}
 	}
 #endif
 	return false;
 }
 
-void EndSessionDetector::Destroy()
+void SessionChangeDetector::Destroy()
 {
 	if (!m_isDestroyed)
 	{
@@ -75,7 +82,7 @@ void EndSessionDetector::Destroy()
 	}
 }
 
-EndSessionDetector::~EndSessionDetector()
+SessionChangeDetector::~SessionChangeDetector()
 {
 	Destroy();
 }

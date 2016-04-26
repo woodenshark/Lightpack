@@ -29,7 +29,7 @@
 #include "SettingsWindow.hpp"
 #include "LedDeviceManager.hpp"
 #include "qtsingleapplication.h"
-#include "EndSessionDetector.hpp"
+#include "SessionChangeDetector.hpp"
 
 #include <memory>
 
@@ -125,4 +125,6 @@ private:
 
     typedef std::vector<QSharedPointer<QAbstractNativeEventFilter> > EventFilters;
     EventFilters m_EventFilters;
+
+	bool m_isSessionLocked;
 };

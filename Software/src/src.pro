@@ -131,6 +131,8 @@ unix:!macx{
     SOURCES += hidapi/linux/hid-libusb.c
     # For X11 grabber
     LIBS +=-lXext -lX11
+	
+    QMAKE_CXXFLAGS += -std=c++11
 }
 
 macx{

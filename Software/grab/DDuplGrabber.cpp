@@ -243,11 +243,11 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
 
 void DDuplGrabber::onSessionChange(int change)
 {
-    if (change == SessionChange::Locking)
+    if (change == SessionChangeDetector::Locking)
     {
         m_isSessionLocked = true;
     }
-    else if (change == SessionChange::Unlocking)
+	else if (change == SessionChangeDetector::Unlocking)
     {
         m_isSessionLocked = false;
     }

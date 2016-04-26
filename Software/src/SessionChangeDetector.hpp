@@ -29,14 +29,6 @@
 #include "QObject"
 #include "QAbstractNativeEventFilter"
 
-enum SessionChange : int {
-    Ending,
-    Locking,
-    Unlocking,
-    Sleeping,
-    Resuming
-};
-
 class SessionChangeDetector :
     public QObject,
     public QAbstractNativeEventFilter
@@ -44,6 +36,15 @@ class SessionChangeDetector :
     Q_OBJECT
 
 public:
+
+	enum SessionChange : int {
+		Ending,
+		Locking,
+		Unlocking,
+		Sleeping,
+		Resuming
+	};
+
     SessionChangeDetector();
 
     bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) Q_DECL_OVERRIDE;

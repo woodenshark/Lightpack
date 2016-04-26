@@ -213,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -479,7 +479,7 @@
                   </sizepolicy>
                  </property>
                  <property name="whatsThis">
-                  <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can adjust &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in the dark scenes or you can adjust &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turning lights OFF in the dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
+                  <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can either use &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in dark scenes or you can use &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turns lights OFF in dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
                  </property>
                  <property name="maximum">
                   <number>100</number>
@@ -1679,8 +1679,7 @@
              </size>
             </property>
             <property name="whatsThis">
-             <string>
-&lt;h4&gt;Plugins&lt;/h4&gt; Here you can manage your plugins which stores in you profile folder. Plugins work in priority of order &amp;mdash; first plugin in the list has the highest priority. You can increase or decrease priority of any plugin in list.</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:medium; font-weight:600;&quot;&gt;Plugins&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Here you can manage your plugins which are stored in you profile folder. Check each plugin's documentation for requirements and settings. Plugins work in priority of order — first plugin in the list has the highest priority.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">margin-top:0px;</string>
@@ -1732,7 +1731,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,0">
+         <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
           <item>
            <widget class="QListWidget" name="list_Plugins">
             <property name="sizePolicy">
@@ -1816,34 +1815,6 @@
             <string>Info</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,0,0">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelPluginName">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="baseSize">
-               <size>
-                <width>100</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Name:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="0">
              <widget class="QLabel" name="labelPluginAuthor">
               <property name="sizePolicy">
@@ -1886,6 +1857,48 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="labelPluginName">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="baseSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Name:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_PluginName">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="QTextBrowser" name="tb_PluginDescription">
+              <property name="openExternalLinks">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="labePluginVersion">
               <property name="sizePolicy">
@@ -1924,20 +1937,6 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_PluginName">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="3">
-             <widget class="QTextBrowser" name="tb_PluginDescription">
-              <property name="openExternalLinks">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </widget>
@@ -1954,14 +1953,14 @@
        <attribute name="title">
         <string>Experimental</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
         <property name="spacing">
          <number>12</number>
         </property>
         <item>
          <widget class="QLabel" name="label_DevTabWarning">
           <property name="text">
-           <string>This tab is used for experimental and not stable features. Any tuning with all these controls provide inevetible plane crash, miscarrige or nuclear disaster. Use it on your own risk.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tab is used for experimental and unstable features. Any tuning with these controls may cause inevetible plane crash, miscarriage or nuclear disaster. Use it at your own risk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="scaledContents">
            <bool>false</bool>
@@ -2276,7 +2275,7 @@
         <item>
          <widget class="QCheckBox" name="checkBox_SendDataOnlyIfColorsChanges">
           <property name="text">
-           <string>Send data only if colors changes</string>
+           <string>Send data only if colors changed</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -2411,7 +2410,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Open-source software from team made &lt;b&gt;Lightpack&lt;/b&gt; &amp;mdash; content-appropriate ambient lighting system with USB interface&lt;br&gt;&lt;b&gt;This is an unofficial fork of the open source project not affiliated with Woodenshark or Lightpack&lt;/b&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:600;&quot;&gt;Woodenshark&lt;/span&gt; team created this software with &lt;span style=&quot; font-weight:600;&quot;&gt;Lightpack&lt;/span&gt; — content-appropriate ambient lighting system with USB interface&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This is an unofficial fork of the open source project that is not affiliated with Woodenshark or Lightpack&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -2516,7 +2515,7 @@
            </font>
           </property>
           <property name="text">
-           <string>This program is distributed &amp;laquo;as is&amp;raquo;. It source code is under &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;GPL license&lt;/a&gt;. No warranty of any kind is expressed or implied. The authors will not be liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software. All content, such as icons, plugins, bitmaps etc. is under &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;CC-BY-SA&lt;/a&gt; if otherwise is not noticed. &lt;br /&gt;&lt;br /&gt;This software build with &lt;a href=&quot;http://qt-project.org/&quot;&gt;Qt&lt;/a&gt; cross-platform framework and &lt;a href=&quot;http://somerandomdude.com/work/iconic/&quot;&gt;&amp;laquo;Iconic&amp;raquo;&lt;/a&gt; icon set by P.J. Onori as a third-party licensed products.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This program is distributed «as is». Its source code is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GPL license&lt;/span&gt;&lt;/a&gt;. No warranty of any kind is expressed or implied. The authors will not be liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software. All content, such as icons, plugins, bitmaps etc. is under &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;CC-BY-SA&lt;/span&gt;&lt;/a&gt; if otherwise is not noticed. &lt;br/&gt;&lt;br/&gt;This software build with the &lt;a href=&quot;http://qt-project.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Qt&lt;/span&gt;&lt;/a&gt; cross-platform framework and &lt;a href=&quot;http://somerandomdude.com/work/iconic/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;«Iconic»&lt;/span&gt;&lt;/a&gt; icon set by P.J. Onori as third-party licensed products.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>

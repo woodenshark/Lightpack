@@ -41,10 +41,11 @@ void PluginsManager::LoadPlugins(QString path)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << path;
 
-    //QStringList pluginPaths = QApplication::libraryPaths();
-   // path = QString(Settings::getApplicationDirPath() + "Plugins");
     QDir dir(path);
-    //QStringList files = dir.entryList(QStringList("*.py"), QDir::Files);
+
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
 
     QStringList lstDirs = dir.entryList(QDir::Dirs |
                                         QDir::AllDirs |

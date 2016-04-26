@@ -134,7 +134,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     m_deviceLockStatus = DeviceLocked::Unlocked;
 
-    adjustSizeAndMoveCenter();
+	adjustSize();
+	resize(minimumSize());
 
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
 }
@@ -267,7 +268,6 @@ void SettingsWindow::connectSignalsSlots()
     //Plugins
     //    connected during setupUi by name:
     //    connect(ui->list_Plugins,SIGNAL(currentRowChanged(int)),this,SLOT(on_list_Plugins_itemClicked(QListWidgetItem *)));
-    //connect(ui->pushButton_ConsolePlugin,SIGNAL(clicked()),this,SLOT(viewPluginConsole()));
     connect(ui->pushButton_UpPriority, SIGNAL(clicked()), this, SLOT(MoveUpPlugin()));
     connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
 
@@ -358,8 +358,6 @@ void SettingsWindow::updateExpertModeWidgetsVisibility()
     } else {
         ui->listWidget->setItemHidden(ui->listWidget->item(4),true);
     }
-
-    ui->pushButton_ConsolePlugin->setVisible(Settings::isExpertModeEnabled());
 
     updateDeviceTabWidgetsVisibility();
 }
@@ -1730,16 +1728,6 @@ void SettingsWindow::quit()
     QApplication::quit();
 }
 
-void SettingsWindow::adjustSizeAndMoveCenter()
-{
-    QRect screen = QApplication::desktop()->screenGeometry(this);
-
-    adjustSize();
-    move(screen.width()  / 2 - width()  / 2,
-         screen.height() / 2 - height() / 2);
-    resize(minimumSize());
-}
-
 void SettingsWindow::setFirmwareVersion(const QString &firmwareVersion)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
@@ -1770,9 +1758,8 @@ void SettingsWindow::versionsUpdate()
 
     ui->labelVersions->setText( versionsTemplate );
 
-    adjustSize();
-
-    setFixedSize( sizeHint() );
+	adjustSize();
+	resize(minimumSize());
 }
 
 void SettingsWindow::showHelpOf(QObject *object)

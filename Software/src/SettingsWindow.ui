@@ -243,7 +243,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -1441,6 +1441,13 @@
          <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
           <property name="text">
            <string>Keep lights ON after lock computer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
+          <property name="text">
+           <string>Keep lights ON after suspend</string>
           </property>
          </widget>
         </item>

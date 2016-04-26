@@ -223,6 +223,7 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
+    connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
 
     // Dev tab
 #ifdef QT_GRAB_SUPPORT
@@ -338,11 +339,6 @@ void SettingsWindow::onBlur()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     emit showLedWidgets(false);
-}
-
-void SettingsWindow::onKeepLightsAfterExit_Toggled(bool isEnabled)
-{
-    Settings::setKeepLightsOnAfterExit(isEnabled);
 }
 
 void SettingsWindow::onExpertModeEnabled_Toggled(bool isEnabled)
@@ -1582,6 +1578,7 @@ void SettingsWindow::updateUiFromSettings()
     ui->checkBox_SendDataOnlyIfColorsChanges->setChecked             (Settings::isSendDataOnlyIfColorsChanges());
     ui->checkBox_KeepLightsOnAfterExit->setChecked                   (Settings::isKeepLightsOnAfterExit());
     ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
+    ui->checkBox_KeepLightsOnAfterSuspend->setChecked                 (Settings::isKeepLightsOnAfterSuspend());
     ui->checkBox_PingDeviceEverySecond->setChecked                   (Settings::isPingDeviceEverySecond());
 
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
@@ -1948,7 +1945,17 @@ void SettingsWindow::on_pbRunConfigurationWizard_clicked()
     quit();
 }
 
+void SettingsWindow::onKeepLightsAfterExit_Toggled(bool isEnabled)
+{
+    Settings::setKeepLightsOnAfterExit(isEnabled);
+}
+
 void SettingsWindow::onKeepLightsAfterLock_Toggled(bool isEnabled)
 {
     Settings::setKeepLightsOnAfterLock(isEnabled);
+}
+
+void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
+{
+    Settings::setKeepLightsOnAfterSuspend(isEnabled);
 }

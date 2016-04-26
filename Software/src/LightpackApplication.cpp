@@ -301,6 +301,16 @@ void LightpackApplication::onSessionChange(int change)
 {
     switch (change)
     {
+        case SessionChange::Ending:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
+            {
+                // Process all currently pending signals (which may include updating the color signals)
+                QApplication::processEvents(QEventLoop::AllEvents, 500);
+
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+                QApplication::processEvents(QEventLoop::AllEvents, 500);
+            }
+            break;
         case SessionChange::Locking:
             if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
             {
@@ -316,12 +326,18 @@ void LightpackApplication::onSessionChange(int change)
             m_isSessionLocked = false;
             break;
         case SessionChange::Sleeping:
-            getLightpackApp()->settingsWnd()->switchOffLeds();
+            if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
+            {
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+            }
             break;
         case SessionChange::Resuming:
-            if (!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock())
+            if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
             {
-                getLightpackApp()->settingsWnd()->switchOnLeds();
+                if (!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock())
+                {
+                    getLightpackApp()->settingsWnd()->switchOnLeds();
+                }
             }
             break;
     }

@@ -41,8 +41,13 @@ bool SessionChangeDetector::nativeEventFilter(const QByteArray& eventType, void*
 
 #ifdef Q_OS_WIN
 	MSG* msg = (MSG*)message;
-	
-	if (msg->message == WM_WTSSESSION_CHANGE)
+
+	if (msg->message == WM_QUERYENDSESSION)
+	{
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Session is ending";
+		emit sessionChangeDetected(Ending);
+	}
+	else if (msg->message == WM_WTSSESSION_CHANGE)
 	{
 		if (msg->wParam == WTS_SESSION_LOCK)
 		{

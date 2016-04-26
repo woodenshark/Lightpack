@@ -30,6 +30,7 @@
 #include "QAbstractNativeEventFilter"
 
 enum SessionChange : int {
+    Ending,
     Locking,
     Unlocking,
     Sleeping,

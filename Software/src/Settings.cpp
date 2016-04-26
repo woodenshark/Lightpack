@@ -69,6 +69,7 @@ static const QString DebugLevel = "DebugLevel";
 static const QString IsExpertModeEnabled = "IsExpertModeEnabled";
 static const QString IsKeepLightsOnAfterExit = "IsKeepLightsOnAfterExit";
 static const QString IsKeepLightsOnAfterLock = "IsKeepLightsOnAfterLock";
+static const QString IsKeepLightsOnAfterSuspend = "IsKeepLightsOnAfterSuspend";
 static const QString IsPingDeviceEverySecond = "IsPingDeviceEverySecond";
 static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShown";
 static const QString ConnectedDevice = "ConnectedDevice";
@@ -251,8 +252,9 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::Language,               Main::LanguageDefault);
     setNewOptionMain(Main::Key::DebugLevel,             Main::DebugLevelDefault);
     setNewOptionMain(Main::Key::IsExpertModeEnabled,    Main::IsExpertModeEnabledDefault);
-    setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit,   Main::IsKeepLightsOnAfterExit);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit, Main::IsKeepLightsOnAfterExit);
     setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterSuspend, Main::IsKeepLightsOnAfterSuspend);
     setNewOptionMain(Main::Key::IsPingDeviceEverySecond,Main::IsPingDeviceEverySecond);
     setNewOptionMain(Main::Key::IsUpdateFirmwareMessageShown, Main::IsUpdateFirmwareMessageShown);
     setNewOptionMain(Main::Key::ConnectedDevice,        Main::ConnectedDeviceDefault);
@@ -631,6 +633,18 @@ void Settings::setKeepLightsOnAfterLock(bool isEnabled)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     setValueMain(Main::Key::IsKeepLightsOnAfterLock, isEnabled);
     m_this->keepLightsOnAfterLockChanged(isEnabled);
+}
+
+bool Settings::isKeepLightsOnAfterSuspend()
+{
+    return valueMain(Main::Key::IsKeepLightsOnAfterSuspend).toBool();
+}
+
+void Settings::setKeepLightsOnAfterSuspend(bool isEnabled)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    setValueMain(Main::Key::IsKeepLightsOnAfterSuspend, isEnabled);
+    m_this->keepLightsOnAfterSuspendChanged(isEnabled);
 }
 
 bool Settings::isPingDeviceEverySecond()

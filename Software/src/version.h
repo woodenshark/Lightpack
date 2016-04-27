@@ -44,5 +44,6 @@
 #define VER_ORIGINALFILENAME_STR    "Prismatik.exe"
 
 
-// Lightpack API version
-#define API_VERSION     "1.5"
+// Prismatik API version. When breaking compatibilty to Lightpack API v1.4,
+// change ApiServer::ApiVersion and the API help accordingly!
+#define API_VERSION     "2.0"

@@ -38,7 +38,7 @@
 using namespace SettingsScope;
 
 // Immediatly after successful connection server sends to client -- ApiVersion
-const char * ApiServer::ApiVersion = "Lightpack API v" API_VERSION " (type \"help\" for more info)\r\n";
+const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
 const char * ApiServer::CmdUnknown = "unknown command\r\n";
 const char * ApiServer::CmdExit = "exit";
 const char * ApiServer::CmdHelp = "help";
@@ -1209,7 +1209,9 @@ QString ApiServer::formatHelp(const QString & cmd, const QString & description, 
 void ApiServer::initHelpMessage()
 {
     m_helpMessage += "\r\n";
-    m_helpMessage += "Lightpack " VERSION_STR ". API Server " API_VERSION "\r\n";
+    m_helpMessage += "Prismatik " VERSION_STR ", API " API_VERSION "\r\n";
+    m_helpMessage += "Prismatik API is a fork of the original API\r\n";
+    m_helpMessage += "It is backwards compatible to Lightpack API 1.4\r\n";
     m_helpMessage += "\r\n";
 
     m_helpMessage += formatHelp(

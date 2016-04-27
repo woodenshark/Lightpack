@@ -183,9 +183,11 @@ private slots:
     void on_pushButton_LightpackColorDepthHelp_clicked();
     void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
-    void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_GammaCorrectionHelp_clicked();
 
-    void on_pushButton_lumosityThresholdHelp_clicked();
+	void on_pushButton_lumosityThresholdHelp_clicked();
+
+	void on_pushButton_AllPluginsHelp_clicked();
 
     void pluginSwitch(int index);
     void on_list_Plugins_itemClicked(QListWidgetItem*);

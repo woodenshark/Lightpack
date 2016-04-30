@@ -36,6 +36,10 @@
 #include "Plugin.hpp"
 #include "SessionChangeDetector.hpp"
 
+#ifdef Q_OS_WIN
+#include "WinUtils.hpp"
+#endif
+
 #include <stdio.h>
 #include <iostream>
 
@@ -505,6 +509,12 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
         case QSysInfo::WV_WINDOWS10: qDebug() << "Windows 10 (operating system version 10.0)"; break;
         default:                    qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
         }
+
+        if (WinUtils::IsUserAdmin()) {
+            qDebug() << "App is running as Admin";
+        } else {
+            qDebug() << "Not running as Admin";
+        }
 #       elif defined(Q_OS_LINUX)
         // TODO: print some details about OS (cat /proc/partitions? lsb_release -a?)
 #       elif defined(Q_OS_MAC)
@@ -695,7 +705,6 @@ void LightpackApplication::initGrabManager()
     connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
-    connect(m_grabManager,SIGNAL(changeScreen(QRect)),m_pluginInterface,SLOT(refreshScreenRect(QRect)));
 
 }
 

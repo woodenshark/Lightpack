@@ -47,36 +47,15 @@ win32 {
         GRABBERS_SOURCES += WinAPIGrabber.cpp
     }
 
-    contains(DEFINES, WINAPI_EACH_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/WinAPIGrabberEachWidget.hpp
-        GRABBERS_SOURCES += WinAPIGrabberEachWidget.cpp
-    }
-
     contains(DEFINES, DDUPL_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/DDuplGrabber.hpp
         GRABBERS_SOURCES += DDuplGrabber.cpp
-    }
-
-    contains(DEFINES, D3D9_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/D3D9Grabber.hpp
-        GRABBERS_SOURCES += D3D9Grabber.cpp
     }
 
     contains(DEFINES, D3D10_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/D3D10Grabber.hpp
         GRABBERS_SOURCES += D3D10Grabber.cpp
     }
-}
-
-# Common Qt grabbers
-contains(DEFINES, QT_GRAB_SUPPORT) {
-    GRABBERS_HEADERS += \
-        include/QtGrabberEachWidget.hpp \
-        include/QtGrabber.hpp
-
-    GRABBERS_SOURCES += \
-        QtGrabberEachWidget.cpp \
-        QtGrabber.cpp
 }
 
 HEADERS += \

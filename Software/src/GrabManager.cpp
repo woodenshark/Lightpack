@@ -35,13 +35,9 @@
 #include "GrabberContext.hpp"
 #include "TimeEvaluations.hpp"
 #include "WinAPIGrabber.hpp"
-#include "WinAPIGrabberEachWidget.hpp"
 #include "DDuplGrabber.hpp"
-#include "QtGrabber.hpp"
-#include "QtGrabberEachWidget.hpp"
 #include "X11Grabber.hpp"
 #include "MacOSGrabber.hpp"
-#include "D3D9Grabber.hpp"
 #include "D3D10Grabber.hpp"
 #include "GrabManager.hpp"
 
@@ -517,10 +513,6 @@ void GrabManager::initGrabbers()
     m_grabbers[Grab::GrabberTypeWinAPI] = initGrabber(new WinAPIGrabber(NULL, m_grabberContext));
 #endif
 
-#ifdef D3D9_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeD3D9] = initGrabber(new D3D9Grabber(NULL, m_grabberContext));
-#endif
-
 #ifdef DDUPL_GRAB_SUPPORT
     DDuplGrabber* dDuplGrabber = new DDuplGrabber(NULL, m_grabberContext);
     m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(dDuplGrabber);
@@ -533,14 +525,6 @@ void GrabManager::initGrabbers()
 
 #ifdef MAC_OS_CG_GRAB_SUPPORT
     m_grabbers[Grab::GrabberTypeMacCoreGraphics] = initGrabber(new MacOSGrabber(NULL, m_grabberContext));
-#endif
-#ifdef QT_GRAB_SUPPORT
-    //TODO: migrate Qt grabbers to the new hierarchy
-    m_grabbers[Grab::GrabberTypeQtEachWidget] = initGrabber(new QtGrabberEachWidget(NULL, m_grabberContext));
-    m_grabbers[Grab::GrabberTypeQt] = initGrabber(new QtGrabber(NULL, m_grabberContext));
-#endif
-#ifdef WINAPI_EACH_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeWinAPIEachWidget] = initGrabber(new WinAPIGrabberEachWidget(NULL, m_grabberContext));
 #endif
 #ifdef D3D10_GRAB_SUPPORT
     if (Settings::isDx1011GrabberEnabled()) {

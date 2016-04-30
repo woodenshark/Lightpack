@@ -227,21 +227,11 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
 
     // Dev tab
-#ifdef QT_GRAB_SUPPORT
-    connect(ui->radioButton_GrabQt, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-    connect(ui->radioButton_GrabQt_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#endif
 #ifdef WINAPI_GRAB_SUPPORT
     connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef DDUPL_GRAB_SUPPORT
     connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#endif
-#ifdef WINAPI_EACH_GRAB_SUPPORT
-    connect(ui->radioButton_GrabWinAPI_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#endif
-#ifdef D3D9_GRAB_SUPPORT
-    connect(ui->radioButton_GrabD3D9, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef X11_GRAB_SUPPORT
     connect(ui->radioButton_GrabX11, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -744,14 +734,8 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
 #else
     ui->radioButton_GrabWinAPI->setChecked(true);
 #endif
-#ifndef WINAPI_EACH_SUPPORT
-    ui->radioButton_GrabWinAPI_EachWidget->setVisible(false);
-#endif
 #ifndef DDUPL_GRAB_SUPPORT
     ui->radioButton_GrabDDupl->setVisible(false);
-#endif
-#ifndef D3D9_GRAB_SUPPORT
-    ui->radioButton_GrabD3D9->setVisible(false);
 #endif
 #ifndef D3D10_GRAB_SUPPORT
     ui->checkBox_EnableDx1011Capture->setVisible(false);
@@ -766,12 +750,6 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
     ui->radioButton_GrabMacCoreGraphics->setVisible(false);
 #else
     ui->radioButton_GrabMacCoreGraphics->setChecked(true);
-#endif
-#ifndef QT_GRAB_SUPPORT
-    ui->radioButton_GrabQt->setVisible(false);
-    ui->radioButton_GrabQt_EachWidget->setVisible(false);
-#else
-    ui->radioButton_GrabQt->setChecked(true);
 #endif
 }
 
@@ -1613,18 +1591,10 @@ void SettingsWindow::updateUiFromSettings()
     case Grab::GrabberTypeWinAPI:
         ui->radioButton_GrabWinAPI->setChecked(true);
         break;
-    case Grab::GrabberTypeWinAPIEachWidget:
-        ui->radioButton_GrabWinAPI_EachWidget->setChecked(true);
-        break;
 #endif
 #ifdef DDUPL_GRAB_SUPPORT
     case Grab::GrabberTypeDDupl:
         ui->radioButton_GrabDDupl->setChecked(true);
-        break;
-#endif
-#ifdef D3D9_GRAB_SUPPORT
-    case Grab::GrabberTypeD3D9:
-        ui->radioButton_GrabD3D9->setChecked(true);
         break;
 #endif
 #ifdef X11_GRAB_SUPPORT
@@ -1637,12 +1607,6 @@ void SettingsWindow::updateUiFromSettings()
         ui->radioButton_GrabMacCoreGraphics->setChecked(true);
         break;
 #endif
-    case Grab::GrabberTypeQtEachWidget:
-        ui->radioButton_GrabQt_EachWidget->setChecked(true);
-        break;
-
-    default:
-        ui->radioButton_GrabQt->setChecked(true);
     }
 
 #ifdef D3D10_GRAB_SUPPORT
@@ -1668,18 +1632,10 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
     if (ui->radioButton_GrabWinAPI->isChecked()) {
         return Grab::GrabberTypeWinAPI;
     }
-    if (ui->radioButton_GrabWinAPI_EachWidget->isChecked()) {
-        return Grab::GrabberTypeWinAPIEachWidget;
-    }
 #endif
 #ifdef DDUPL_GRAB_SUPPORT
     if (ui->radioButton_GrabDDupl->isChecked()) {
         return Grab::GrabberTypeDDupl;
-    }
-#endif
-#ifdef D3D9_GRAB_SUPPORT
-    if (ui->radioButton_GrabD3D9->isChecked()) {
-        return Grab::GrabberTypeD3D9;
     }
 #endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
@@ -1687,10 +1643,6 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
         return Grab::GrabberTypeMacCoreGraphics;
     }
 #endif
-
-    if (ui->radioButton_GrabQt_EachWidget->isChecked()) {
-        return Grab::GrabberTypeQtEachWidget;
-    }
 
     return Grab::GrabberTypeQt;
 }

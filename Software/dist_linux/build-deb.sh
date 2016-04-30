@@ -6,7 +6,7 @@
 #
 
 #TODO: get the version from a centralized point, eg. version.h
-VERSION=5.11.2.6
+VERSION=5.11.2.7
 
 if [ -z $1 ];
 then

@@ -13,6 +13,15 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.7
+---------------
+April 30, 2016
+
+* Fix API compatiblity, now on Prismatik API 2.0 (#34)
+* Improved layout for high dpi screens (#33)
+* Fix standby detection and add option to keep lights on after standby (#28)
+* DDupl: different behavior for logon screen and UAC prompts
+
 Version 5.11.2.6
 ---------------
 February 21, 2016

@@ -46,7 +46,7 @@ GrabResult QtGrabberEachWidget::_grab(QList<QRgb> &grabResult, const QList<GrabW
 
     grabResult.clear();
     foreach(GrabWidget * widget, grabWidgets)
-	{
+    {
         grabResult.append( widget->isAreaEnabled() ? getColor(widget) : qRgb(0,0,0) );
     }
     return GrabResultOk;

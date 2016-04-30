@@ -156,20 +156,20 @@ QRgb WinAPIGrabberEachWidget::getColor(int x, int y, int width, int height)
     }
 
 #if 0
-	int monitorWidth = screenWidth;
-	int monitorHeight = screenHeight;
-	const int BytesPerPixel = 4;
-	// Save image of screen:
-	QImage * im = new QImage( monitorWidth, monitorHeight, QImage::Format_RGB32 );
-	for(int i=0; i<monitorWidth; i++){
-		for(int j=0; j<monitorHeight; j++){
-			index = (BytesPerPixel * j * monitorWidth) + (BytesPerPixel * i);
-			QRgb rgb = pbPixelsBuff[index+2] << 16 | pbPixelsBuff[index+1] << 8 | pbPixelsBuff[index];
-			im->setPixel(i, j, rgb);
-		}
-	}
-	im->save(QString("screen%1x%2.jpg").arg(x).arg(y));
-	delete im;
+    int monitorWidth = screenWidth;
+    int monitorHeight = screenHeight;
+    const int BytesPerPixel = 4;
+    // Save image of screen:
+    QImage * im = new QImage( monitorWidth, monitorHeight, QImage::Format_RGB32 );
+    for(int i=0; i<monitorWidth; i++){
+        for(int j=0; j<monitorHeight; j++){
+            index = (BytesPerPixel * j * monitorWidth) + (BytesPerPixel * i);
+            QRgb rgb = pbPixelsBuff[index+2] << 16 | pbPixelsBuff[index+1] << 8 | pbPixelsBuff[index];
+            im->setPixel(i, j, rgb);
+        }
+    }
+    im->save(QString("screen%1x%2.jpg").arg(x).arg(y));
+    delete im;
 #endif
 
     QRgb result = qRgb(r, g, b);

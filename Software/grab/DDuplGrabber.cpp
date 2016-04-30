@@ -247,7 +247,7 @@ void DDuplGrabber::onSessionChange(int change)
     {
         m_isSessionLocked = true;
     }
-	else if (change == SessionChangeDetector::Unlocking)
+    else if (change == SessionChangeDetector::Unlocking)
     {
         m_isSessionLocked = false;
     }

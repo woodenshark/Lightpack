@@ -107,8 +107,10 @@ public:
     static void setExpertModeEnabled(bool isEnabled);
     static bool isKeepLightsOnAfterExit();
     static void setKeepLightsOnAfterExit(bool isEnabled);
-	static bool isKeepLightsOnAfterLock();
-	static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterLock();
+    static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterSuspend();
+    static void setKeepLightsOnAfterSuspend(bool isEnabled);
     static bool isPingDeviceEverySecond();
     static void setPingDeviceEverySecond(bool isEnabled);
     static bool isUpdateFirmwareMessageShown();
@@ -168,6 +170,8 @@ public:
 #ifdef D3D10_GRAB_SUPPORT
     static bool isDx1011GrabberEnabled();
     static void setDx1011GrabberEnabled(bool isEnabled);
+    static bool isDx9GrabbingEnabled();
+    static void setDx9GrabbingEnabled(bool isEnabled);
 #endif
 
     static Lightpack::Mode getLightpackMode();
@@ -238,7 +242,8 @@ signals:
     void apiKeyChanged(const QString &);
     void expertModeEnabledChanged(bool);
     void keepLightsOnAfterExitChanged(bool isEnabled);
-	void keepLightsOnAfterLockChanged(bool isEnabled);
+    void keepLightsOnAfterLockChanged(bool isEnabled);
+    void keepLightsOnAfterSuspendChanged(bool isEnabled);
     void pingDeviceEverySecondEnabledChanged(bool);
 
     void languageChanged(const QString &);
@@ -267,7 +272,10 @@ signals:
     void deviceGammaChanged(double gamma);
     void deviceColorSequenceChanged(QString value);
     void grabberTypeChanged(const Grab::GrabberType grabMode);
-    void dx1011GrabberEnabledChanged(const bool isEnabled);
+#ifdef D3D10_GRAB_SUPPORT
+    void dx1011GrabberEnabledChanged(bool isEnabled);
+    void dx9GrabberEnabledChanged(bool isEnabled);
+#endif
     void lightpackModeChanged(const Lightpack::Mode mode);
     void moodLampLiquidModeChanged(bool isLiquidMode);
     void moodLampColorChanged(const QColor color);

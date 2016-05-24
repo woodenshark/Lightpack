@@ -24,23 +24,39 @@
  *
  */
 
-#ifndef END_SESSION_DETECTOR
-#define END_SESSION_DETECTOR
+#ifndef SESSION_CHANGE_DETECTOR
+#define SESSION_CHANGE_DETECTOR
+#include "QObject"
 #include "QAbstractNativeEventFilter"
 
-class EndSessionDetector :
+class SessionChangeDetector :
+    public QObject,
     public QAbstractNativeEventFilter
 {
+    Q_OBJECT
+
 public:
-    EndSessionDetector();
+
+	enum SessionChange : int {
+		Ending,
+		Locking,
+		Unlocking,
+		Sleeping,
+		Resuming
+	};
+
+    SessionChangeDetector();
 
     bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) Q_DECL_OVERRIDE;
 
-    ~EndSessionDetector();
+    ~SessionChangeDetector();
+
+signals:
+    void sessionChangeDetected(int change);
 
 private:
-	void Destroy();
+    void Destroy();
 
-	bool m_isDestroyed;
+    bool m_isDestroyed;
 };
 #endif

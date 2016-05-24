@@ -1,7 +1,7 @@
 /*
- * QtGrabberEachWidget.hpp
+ * WinUtils.hpp
  *
- *  Created on: 22.11.11
+ *  Created on: 25.07.11
  *     Project: Lightpack
  *
  *  Copyright (c) 2011 Timur Sattarov, Mike Shatohin
@@ -23,29 +23,33 @@
  *
  */
 
+#ifndef WINDXUTILS_HPP
+#define WINDXUTILS_HPP
+
 #pragma once
 
-#include "GrabberBase.hpp"
-#ifdef QT_GRAB_SUPPORT
+#if !defined NOMINMAX
+#define NOMINMAX
+#endif
 
-#include "../src/enums.hpp"
+#if !defined WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
 
-
-using namespace Grab;
-
-class QtGrabberEachWidget : public GrabberBase
+namespace WinUtils
 {
-public:
-    QtGrabberEachWidget(QObject *parent, GrabberContext * context);
-    virtual ~QtGrabberEachWidget();
+/*!
+  We are not allowed to create DXGIFactory inside of Dll, so determine SwapChain->Present vtbl location here.
+  To determine location we need to create SwapChain instance and dereference pointer.
+ \param hWnd window handle to bind SwapChain to
+ \return UINT
+*/
+BOOL LoadD3DandDXGI();
+UINT GetDxgiPresentOffset(HWND hWnd);
+UINT GetD3D9PresentOffset(HWND hWnd);
+UINT GetD3D9SCPresentOffset(HWND hWnd);
+UINT GetD3D9ResetOffset(HWND hWnd);
+}
 
-    DECLARE_GRABBER_NAME("QtGrabberEachWidget")
-
-protected:
-    virtual GrabResult _grab(QList<QRgb> &grabResult, const QList<GrabWidget*> &grabWidgets);
-
-private:
-    QRgb getColor(const QWidget * w);
-};
-
-#endif // QT_GRAB_SUPPORT
+#endif // WINDXUTILS_HPP

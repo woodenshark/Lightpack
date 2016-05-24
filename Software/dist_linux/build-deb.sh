@@ -5,14 +5,16 @@
 # Created on: 25.12.11
 #
 
+#TODO: get the version from a centralized point, eg. version.h
+VERSION=5.11.2.7
 
-if [ -z $2 ];
+if [ -z $1 ];
 then
-    echo "usage: $0 <version> <arch>"
+    echo "usage: $0 <arch>"
     exit 1
 fi
 
-perl prepare_deb.pl $1 $2 || exit 1;
+perl prepare_deb.pl $VERSION $1 || exit 1;
 
 chmod a+x deb/DEBIAN/control || exit 1;
 

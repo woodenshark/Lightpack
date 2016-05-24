@@ -120,6 +120,7 @@ void GrabberBase::grab()
     screens2Grab.reserve(5);
     screensWithWidgets(&screens2Grab, *_context->grabWidgets);
     if (isReallocationNeeded(screens2Grab)) {
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "reallocating";
         if (!reallocate(screens2Grab)) {
             qCritical() << Q_FUNC_INFO << " couldn't reallocate grabbing buffer";
             emit frameGrabAttempted(GrabResultError);

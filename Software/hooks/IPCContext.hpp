@@ -25,7 +25,7 @@ public:
     HANDLE m_hMutex;
     HANDLE m_hFrameGrabbedEvent;
 
-    HOOKSGRABBER_SHARED_MEM_DESC m_memDesc;
+    HOOKSGRABBER_SHARED_MEM_DESC *m_pMemDesc;
 
     PVOID m_pMemMap;
 };

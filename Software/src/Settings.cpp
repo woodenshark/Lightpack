@@ -40,7 +40,7 @@
 
 namespace
 {
-inline const WBAdjustment getLedAdjustment(size_t ledIndex)
+inline const WBAdjustment getLedAdjustment(int ledIndex)
 {
     using namespace SettingsScope;
 
@@ -69,6 +69,7 @@ static const QString DebugLevel = "DebugLevel";
 static const QString IsExpertModeEnabled = "IsExpertModeEnabled";
 static const QString IsKeepLightsOnAfterExit = "IsKeepLightsOnAfterExit";
 static const QString IsKeepLightsOnAfterLock = "IsKeepLightsOnAfterLock";
+static const QString IsKeepLightsOnAfterSuspend = "IsKeepLightsOnAfterSuspend";
 static const QString IsPingDeviceEverySecond = "IsPingDeviceEverySecond";
 static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShown";
 static const QString ConnectedDevice = "ConnectedDevice";
@@ -150,6 +151,7 @@ static const QString Slowdown = "Grab/Slowdown";
 static const QString LuminosityThreshold = "Grab/LuminosityThreshold";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
+static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
 }
 // [MoodLamp]
 namespace MoodLamp
@@ -199,6 +201,7 @@ static const QString WinAPIEachWidget = "WinAPIEachWidget";
 static const QString X11 = "X11";
 static const QString D3D9 = "D3D9";
 static const QString MacCoreGraphics = "MacCoreGraphics";
+static const QString DDupl = "DDupl";
 }
 
 } /*Value*/
@@ -249,8 +252,9 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::Language,               Main::LanguageDefault);
     setNewOptionMain(Main::Key::DebugLevel,             Main::DebugLevelDefault);
     setNewOptionMain(Main::Key::IsExpertModeEnabled,    Main::IsExpertModeEnabledDefault);
-    setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit,   Main::IsKeepLightsOnAfterExit);
-	setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit, Main::IsKeepLightsOnAfterExit);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
+    setNewOptionMain(Main::Key::IsKeepLightsOnAfterSuspend, Main::IsKeepLightsOnAfterSuspend);
     setNewOptionMain(Main::Key::IsPingDeviceEverySecond,Main::IsPingDeviceEverySecond);
     setNewOptionMain(Main::Key::IsUpdateFirmwareMessageShown, Main::IsUpdateFirmwareMessageShown);
     setNewOptionMain(Main::Key::ConnectedDevice,        Main::ConnectedDeviceDefault);
@@ -621,14 +625,26 @@ void Settings::setKeepLightsOnAfterExit(bool isEnabled)
 
 bool Settings::isKeepLightsOnAfterLock()
 {
-	return valueMain(Main::Key::IsKeepLightsOnAfterLock).toBool();
+    return valueMain(Main::Key::IsKeepLightsOnAfterLock).toBool();
 }
 
 void Settings::setKeepLightsOnAfterLock(bool isEnabled)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     setValueMain(Main::Key::IsKeepLightsOnAfterLock, isEnabled);
     m_this->keepLightsOnAfterLockChanged(isEnabled);
+}
+
+bool Settings::isKeepLightsOnAfterSuspend()
+{
+    return valueMain(Main::Key::IsKeepLightsOnAfterSuspend).toBool();
+}
+
+void Settings::setKeepLightsOnAfterSuspend(bool isEnabled)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    setValueMain(Main::Key::IsKeepLightsOnAfterSuspend, isEnabled);
+    m_this->keepLightsOnAfterSuspendChanged(isEnabled);
 }
 
 bool Settings::isPingDeviceEverySecond()
@@ -1053,6 +1069,11 @@ Grab::GrabberType Settings::getGrabberType()
         return Grab::GrabberTypeWinAPIEachWidget;
 #endif
 
+#ifdef DDUPL_GRAB_SUPPORT
+    if (strGrabber == Profile::Value::GrabberType::DDupl)
+        return Grab::GrabberTypeDDupl;
+#endif
+
 #ifdef D3D9_GRAB_SUPPORT
     if (strGrabber == Profile::Value::GrabberType::D3D9)
         return Grab::GrabberTypeD3D9;
@@ -1098,6 +1119,13 @@ void Settings::setGrabberType(Grab::GrabberType grabberType)
         break;
 #endif
 
+#ifdef DDUPL_GRAB_SUPPORT
+    case Grab::GrabberTypeDDupl:
+        strGrabber = Profile::Value::GrabberType::DDupl;
+        break;
+
+#endif
+
 #ifdef D3D9_GRAB_SUPPORT
     case Grab::GrabberTypeD3D9:
         strGrabber = Profile::Value::GrabberType::D3D9;
@@ -1132,6 +1160,15 @@ bool Settings::isDx1011GrabberEnabled() {
 void Settings::setDx1011GrabberEnabled(bool isEnabled) {
     setValue(Profile::Key::Grab::IsDx1011GrabberEnabled, isEnabled);
     m_this->dx1011GrabberEnabledChanged(isEnabled);
+}
+
+bool Settings::isDx9GrabbingEnabled() {
+    return value(Profile::Key::Grab::IsDx9GrabbingEnabled).toBool();
+}
+
+void Settings::setDx9GrabbingEnabled(bool isEnabled) {
+    setValue(Profile::Key::Grab::IsDx9GrabbingEnabled, isEnabled);
+    m_this->dx9GrabberEnabledChanged(isEnabled);
 }
 #endif
 
@@ -1220,9 +1257,9 @@ void Settings::setMoodLampSpeed(int value)
 QList<WBAdjustment> Settings::getLedCoefs()
 {
     QList<WBAdjustment> result;
-    const size_t numOfLeds = getNumberOfLeds(getConnectedDevice());
+    const int numOfLeds = getNumberOfLeds(getConnectedDevice());
 
-    for(size_t led = 0; led < numOfLeds; ++led)
+    for (int led = 0; led < numOfLeds; ++led)
         result.append(getLedAdjustment(led));
 
     return result;
@@ -1447,6 +1484,8 @@ void Settings::initCurrentProfile(bool isResetDefault)
     setNewOption(Profile::Key::Grab::Slowdown,      Profile::Grab::SlowdownDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::LuminosityThreshold, Profile::Grab::MinimumLevelOfSensitivityDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled, Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled, Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled, Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
     // [MoodLamp]
     setNewOption(Profile::Key::MoodLamp::IsLiquidMode,  Profile::MoodLamp::IsLiquidMode, isResetDefault);
     setNewOption(Profile::Key::MoodLamp::Color,         Profile::MoodLamp::ColorDefault, isResetDefault);
@@ -1610,9 +1649,9 @@ void Settings::migrateSettings()
 
             int remap[] = {3, 4, 2, 1, 0, 5, 6, 7, 8, 9};
 
-            size_t ledCount = getNumberOfLeds(SupportedDevices::DeviceTypeLightpack);
+            int ledCount = getNumberOfLeds(SupportedDevices::DeviceTypeLightpack);
             QMap<int, LedInfo> ledInfoMap;
-            for(size_t i = 0; i < ledCount; i++){
+            for (int i = 0; i < ledCount; i++){
                 LedInfo ledInfo;
                 ledInfo.isEnabled = isLedEnabled(i);
                 ledInfo.position = getLedPosition(i);

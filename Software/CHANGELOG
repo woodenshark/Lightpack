@@ -6,11 +6,66 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
                    _/                      _/                                         
               _/_/                        _/                                          
 
-                        lightpack.googlecode.com
+                        github.com/psieg/Lightpack
+                               lightpack.tv
 
 ===================================================================================
 #    Software changelog
 ===================================================================================
+
+Version 5.11.2.7
+---------------
+April 30, 2016
+
+* Fix API compatiblity, now on Prismatik API 2.0 (#34)
+* Improved layout for high dpi screens (#33)
+* Fix standby detection and add option to keep lights on after standby (#28)
+* DDupl: different behavior for logon screen and UAC prompts
+
+Version 5.11.2.6
+---------------
+February 21, 2016
+
+* Move DirectX scanning to dedicated thread (#17)
+
+Version 5.11.2.5
+---------------
+February 14, 2016
+
+* Implement missing API get methods (#16)
+* Move DirectX Grabber to dedicated thread (#17)
+
+Version 5.11.2.4
+---------------
+February 7, 2016
+
+* Enable Desktop Duplication grabber to grab screensavers
+* Fix crash when launching configuration wizard
+
+Version 5.11.2.3
+---------------
+September 1, 2015
+
+* Fix constant color shutting off (regression from #10)
+* Fix DX admin message prematurely creating a message loop
+
+Version 5.11.2.2
+---------------
+August 1, 2015
+
+* Removed unnecessary dependencies from installer (#8)
+* Keep sending updates to the device even if no grabbing happened (#10)
+* Fixed crash when deleting profile (woodenshark#42)
+* Desktop Duplication is now the default grabber
+* Live DX enable/disable fix
+
+Version 5.11.2.1
+---------------
+July 23, 2015
+
+* Windows 8 Desktop Duplication API Grabber
+* x64 build with improved DirectX grabbing
+* Qt 5.5
 
 Version 5.11.2
 ---------------
@@ -24,7 +79,6 @@ September 30, 2014
 * Add missing dependency (linqt5serialport5) to deb-package information
 * New command line option: "--set-profile <profile_name>" for switching profile from external programs/scripts
 * New command line option "--debug <level>" changes verbosity level of debug output. Valid values are: high, mid, low, zero. --debug-high and similar command line options from now on are obsolete and will be removed in future versions.
-
 
 Version 5.11.1
 ---------------

@@ -34,6 +34,11 @@
 #include "PluginsManager.hpp"
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
+#include "SessionChangeDetector.hpp"
+
+#ifdef Q_OS_WIN
+#include "WinUtils.hpp"
+#endif
 
 #include <stdio.h>
 #include <iostream>
@@ -54,6 +59,41 @@ LightpackApplication::LightpackApplication(int &argc, char **argv)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 }
 
+LightpackApplication::~LightpackApplication()
+{
+
+    m_moodlampManager->start(false);
+    m_grabManager->start(false);
+    m_pluginManager->StopPlugins();
+
+    QApplication::processEvents(QEventLoop::AllEvents, 1000);
+
+    m_EventFilters.clear();
+
+    m_ledDeviceManagerThread->quit();
+    m_apiServerThread->quit();
+    m_ledDeviceManagerThread->wait();
+    m_apiServerThread->wait();
+
+    delete m_settingsWindow;
+    m_settingsWindow = NULL;
+    delete m_ledDeviceManager;
+    m_ledDeviceManager = NULL;
+    delete m_ledDeviceManagerThread;
+    m_ledDeviceManagerThread = NULL;
+    delete m_apiServerThread;
+    m_apiServerThread = NULL;
+    delete m_grabManager;
+    m_grabManager = NULL;
+    delete m_moodlampManager;
+    m_moodlampManager = NULL;
+
+    delete m_pluginManager;
+    m_pluginManager = NULL;
+    delete m_pluginInterface;
+    m_pluginInterface = NULL;
+}
+
 void LightpackApplication::initializeAll(const QString & appDirPath)
 {
     setApplicationName("Prismatik");
@@ -63,6 +103,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
     m_applicationDirPath = appDirPath;
     m_noGui = false;
+    m_isSessionLocked = false;
 
 
     processCommandLineArguments();
@@ -131,7 +172,10 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
     startPluginManager();
 
-    m_EventFilters.push_back(QSharedPointer<QAbstractNativeEventFilter>(new EndSessionDetector()));
+    QSharedPointer<SessionChangeDetector> sessionChangeDetector(new SessionChangeDetector());
+    connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
+    connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
+    m_EventFilters.push_back(sessionChangeDetector);
 
     for (EventFilters::const_iterator it = m_EventFilters.begin(); it != m_EventFilters.end(); ++it)
         this->installNativeEventFilter(it->data());
@@ -154,35 +198,6 @@ HWND LightpackApplication::getMainWindowHandle() {
     // to get HWND sometimes needed to activate window
 //    winFocus(m_settingsWindow, true);
     return reinterpret_cast<HWND>(m_settingsWindow->winId());
-}
-
-bool LightpackApplication::winEventFilter ( MSG * msg, long * result ) {
-    Q_UNUSED(result);
-
-    const unsigned char POWER_RESUME  = 0x01;
-    const unsigned char POWER_SUSPEND = 0x02;
-    static unsigned char processed = 0x00;
-    if ( WM_POWERBROADCAST == msg->message ) {
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "WM_POWERBROADCAST "  <<  msg->wParam << " " << processed;
-        switch(msg->wParam) {
-        case PBT_APMRESUMEAUTOMATIC :
-            if ( !(POWER_RESUME & processed) ) {
-                m_ledDeviceManager->switchOnLeds();
-                processed = POWER_RESUME;
-                return true;
-            }
-            break;
-        case PBT_APMSUSPEND :
-            if ( !(POWER_SUSPEND & processed) ) {
-                m_ledDeviceManager->switchOffLeds();
-                processed = POWER_SUSPEND;
-                return true;
-            }
-            break;
-        }
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "hwnd = " << msg->hwnd;
-    }
-    return false;
 }
 #endif
 
@@ -284,6 +299,52 @@ void LightpackApplication::quitFromWizard(int result)
 {
     Q_UNUSED(result);
     quit();
+}
+
+void LightpackApplication::onSessionChange(int change)
+{
+    switch (change)
+    {
+        case SessionChangeDetector::SessionChange::Ending:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
+            {
+                // Process all currently pending signals (which may include updating the color signals)
+                QApplication::processEvents(QEventLoop::AllEvents, 500);
+
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+                QApplication::processEvents(QEventLoop::AllEvents, 500);
+            }
+            break;
+        case SessionChangeDetector::SessionChange::Locking:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+            {
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+            }
+            m_isSessionLocked = true;
+            break;
+        case SessionChangeDetector::SessionChange::Unlocking:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+            {
+                getLightpackApp()->settingsWnd()->switchOnLeds();
+            }
+            m_isSessionLocked = false;
+            break;
+        case SessionChangeDetector::SessionChange::Sleeping:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
+            {
+                getLightpackApp()->settingsWnd()->switchOffLeds();
+            }
+            break;
+        case SessionChangeDetector::SessionChange::Resuming:
+            if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
+            {
+                if (!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock())
+                {
+                    getLightpackApp()->settingsWnd()->switchOnLeds();
+                }
+            }
+            break;
+    }
 }
 
 void LightpackApplication::processCommandLineArguments()
@@ -443,7 +504,16 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
         case QSysInfo::WV_2003:     qDebug() << "Windows Server 2003, Windows Server 2003 R2, Windows Home Server, Windows XP Professional x64 Edition (operating system version 5.2)"; break;
         case QSysInfo::WV_VISTA:    qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
         case QSysInfo::WV_WINDOWS7: qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
+        case QSysInfo::WV_WINDOWS8: qDebug() << "Windows 8 (operating system version 6.2)"; break;
+        case QSysInfo::WV_WINDOWS8_1: qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
+        case QSysInfo::WV_WINDOWS10: qDebug() << "Windows 10 (operating system version 10.0)"; break;
         default:                    qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
+        }
+
+        if (WinUtils::IsUserAdmin()) {
+            qDebug() << "App is running as Admin";
+        } else {
+            qDebug() << "Not running as Admin";
         }
 #       elif defined(Q_OS_LINUX)
         // TODO: print some details about OS (cat /proc/partitions? lsb_release -a?)
@@ -494,14 +564,17 @@ void LightpackApplication::startApiServer()
     connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),  m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
     connect(settings(), SIGNAL(ardulightNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)),   m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+    connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
 
     if (!m_noGui)
     {
         connect(m_apiServer, SIGNAL(errorOnStartListening(QString)), m_settingsWindow, SLOT(onApiServer_ErrorOnStartListening(QString)));
     }
 
-    connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_pluginInterface,    SLOT(updateColors(QList<QRgb>)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)), m_pluginInterface, SLOT(updateSmoothCache(int)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)), m_pluginInterface, SLOT(updateGammaCache(double)), Qt::QueuedConnection);
+    connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)), m_pluginInterface, SLOT(updateBrightnessCache(int)), Qt::QueuedConnection);
 
     m_apiServer->firstStart();
 
@@ -513,7 +586,7 @@ void LightpackApplication::startLedDeviceManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     m_ledDeviceManager = new LedDeviceManager();
-    m_LedDeviceManagerThread = new QThread();
+    m_ledDeviceManagerThread = new QThread();
 
 //    connect(settings(), SIGNAL(connectedDeviceChanged(const SupportedDevices::DeviceType)), this, SLOT(handleConnectedDeviceChange(const SupportedDevices::DeviceType)), Qt::DirectConnection);
 //    connect(settings(), SIGNAL(adalightSerialPortNameChanged(QString)),               m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
@@ -569,8 +642,8 @@ void LightpackApplication::startLedDeviceManager()
         connect(m_ledDeviceManager, SIGNAL(firmwareVersion(QString)),   m_settingsWindow, SLOT(ledDeviceFirmwareVersionResult(QString)), Qt::QueuedConnection);
         connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)), Qt::QueuedConnection);
     }
-    m_ledDeviceManager->moveToThread(m_LedDeviceManagerThread);
-    m_LedDeviceManagerThread->start();
+    m_ledDeviceManager->moveToThread(m_ledDeviceManagerThread);
+    m_ledDeviceManagerThread->start();
     QMetaObject::invokeMethod(m_ledDeviceManager, "init", Qt::QueuedConnection);
 
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "end";
@@ -595,10 +668,6 @@ void LightpackApplication::startPluginManager()
     m_pluginManager->LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
     m_pluginManager->StartPlugins();
 
-    //m_PluginThread = new QThread();
-    //m_pluginManager->moveToThread(m_PluginThread);
-    //m_PluginThread->start();
-
 }
 
 
@@ -613,6 +682,11 @@ void LightpackApplication::initGrabManager()
     connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)), m_grabManager, SLOT(onGrabberTypeChanged(const Grab::GrabberType &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabSlowdownChanged(int)), m_grabManager, SLOT(onGrabSlowdownChanged(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)), m_grabManager, SLOT(onGrabAvgColorsEnabledChanged(bool)), Qt::QueuedConnection);
+    connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)), m_grabManager, SLOT(onSendDataOnlyIfColorsEnabledChanged(bool)), Qt::QueuedConnection);
+#ifdef D3D10_GRAB_SUPPORT
+    connect(settings(), SIGNAL(dx1011GrabberEnabledChanged(bool)), m_grabManager, SLOT(onDx1011GrabberEnabledChanged(bool)), Qt::QueuedConnection);
+    connect(settings(), SIGNAL(dx9GrabberEnabledChanged(bool)), m_grabManager, SLOT(onDx9GrabberEnabledChanged(bool)), Qt::QueuedConnection);
+#endif
 
     connect(settings(), SIGNAL(profileLoaded(const QString &)),        m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
@@ -621,8 +695,6 @@ void LightpackApplication::initGrabManager()
     // Connections to signals which will be connected to ILedDevice
     if (!m_noGui)
     {
-//        connect(m_settingsWindow, SIGNAL(settingsChanged()), this, SLOT(settingsChanged()));
-
         connect(m_settingsWindow, SIGNAL(showLedWidgets(bool)), this, SLOT(showLedWidgets(bool)));
         connect(m_settingsWindow, SIGNAL(setColoredLedWidget(bool)), this, SLOT(setColoredLedWidget(bool)));
 
@@ -632,10 +704,7 @@ void LightpackApplication::initGrabManager()
 
     connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
-    connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_pluginInterface, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
     connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
-    connect(m_grabManager,SIGNAL(changeScreen(QRect)),m_pluginInterface,SLOT(refreshScreenRect(QRect)));
 
 }
 
@@ -721,27 +790,4 @@ void LightpackApplication::requestBacklightStatus()
 {
     //m_apiServer->resultBacklightStatus(m_backlightStatus);
     m_pluginInterface->resultBacklightStatus(m_backlightStatus);
-}
-
-void LightpackApplication::free()
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-
-    m_moodlampManager->start(false);
-    m_grabManager->start(false);
-    m_pluginManager->StopPlugins();
-
-    QApplication::processEvents(QEventLoop::AllEvents, 1000);
-
-    delete m_pluginManager;
-    delete m_moodlampManager;
-    delete m_grabManager;
-    delete m_ledDeviceManager;
-
-    m_pluginManager = NULL;
-    m_moodlampManager = NULL;
-    m_grabManager = NULL;
-    m_ledDeviceManager = NULL;
-
-    QApplication::processEvents(QEventLoop::AllEvents, 1000);
 }

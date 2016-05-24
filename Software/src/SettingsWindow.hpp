@@ -152,6 +152,7 @@ private slots:
     void onSliderDeviceGammaCorrection_valueChanged(int value);
     void onDeviceSendDataOnlyIfColorsChanged_toggled(bool state);
     void onDx1011CaptureEnabledChanged(bool isEnabled);
+    void onDx9CaptureEnabledChanged(bool isEnabled);
 
     void onDontShowLedWidgets_Toggled(bool checked);
     void onSetColoredLedWidgets(bool checked);
@@ -171,7 +172,6 @@ private slots:
     void startTestsClick();
 
     void onExpertModeEnabled_Toggled(bool isEnabled);
-    void onKeepLightsAfterExit_Toggled(bool isEnabled);
     void onEnableApi_Toggled(bool isEnabled);
     void onListenOnlyOnLoInterface_Toggled(bool localOnly);
     void onApiKey_EditingFinished();
@@ -183,9 +183,11 @@ private slots:
     void on_pushButton_LightpackColorDepthHelp_clicked();
     void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
-    void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_GammaCorrectionHelp_clicked();
 
-    void on_pushButton_lumosityThresholdHelp_clicked();
+	void on_pushButton_lumosityThresholdHelp_clicked();
+
+	void on_pushButton_AllPluginsHelp_clicked();
 
     void pluginSwitch(int index);
     void on_list_Plugins_itemClicked(QListWidgetItem*);
@@ -193,7 +195,9 @@ private slots:
     void MoveUpPlugin();
     void MoveDownPlugin();
 
-	void onKeepLightsAfterLock_Toggled(bool isEnabled);
+    void onKeepLightsAfterExit_Toggled(bool isEnabled);
+    void onKeepLightsAfterLock_Toggled(bool isEnabled);
+    void onKeepLightsAfterSuspend_Toggled(bool isEnabled);
 
     void on_pbRunConfigurationWizard_clicked();
 
@@ -269,5 +273,7 @@ private:
 
     QList<Plugin*> _plugins;
     static bool toPriority(Plugin* s1 , Plugin* s2 );
+
+    bool updatingFromSettings = false;
 };
 

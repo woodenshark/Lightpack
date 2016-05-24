@@ -134,7 +134,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     m_deviceLockStatus = DeviceLocked::Unlocked;
 
-    adjustSizeAndMoveCenter();
+    adjustSize();
+    resize(minimumSize());
 
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
 }
@@ -212,7 +213,7 @@ void SettingsWindow::connectSignalsSlots()
     connect(Settings::settingsSingleton(), SIGNAL(profileLoaded(const QString &)),        this, SLOT(handleProfileLoaded(QString)), Qt::QueuedConnection);
     connect(Settings::settingsSingleton(), SIGNAL(currentProfileInited(const QString &)), this, SLOT(handleProfileLoaded(QString)), Qt::QueuedConnection);
 
-    connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, SLOT(onHotkeyChanged(QString,QKeySequence,QKeySequence)));
+    // connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, SLOT(onHotkeyChanged(QString,QKeySequence,QKeySequence)));
     connect(Settings::settingsSingleton(), SIGNAL(lightpackModeChanged(Lightpack::Mode)), this, SLOT(onLightpackModeChanged(Lightpack::Mode)));
 
     connect(ui->pushButton_ProfileNew, SIGNAL(clicked()), this, SLOT(profileNew()));
@@ -222,22 +223,15 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->pushButton_SelectColor, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
+    connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
+    connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
 
     // Dev tab
-    connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#ifdef QT_GRAB_SUPPORT
-    connect(ui->radioButton_GrabQt, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-    connect(ui->radioButton_GrabQt_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#endif
 #ifdef WINAPI_GRAB_SUPPORT
     connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
-#ifdef WINAPI_EACH_GRAB_SUPPORT
-    connect(ui->radioButton_GrabWinAPI_EachWidget, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
-#endif
-#ifdef D3D9_GRAB_SUPPORT
-    connect(ui->radioButton_GrabD3D9, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+#ifdef DDUPL_GRAB_SUPPORT
+    connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
 #ifdef X11_GRAB_SUPPORT
     connect(ui->radioButton_GrabX11, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
@@ -247,6 +241,7 @@ void SettingsWindow::connectSignalsSlots()
 #endif
 #ifdef D3D10_GRAB_SUPPORT
     connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onDx1011CaptureEnabledChanged(bool)));
+    connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onDx9CaptureEnabledChanged(bool)));
 #endif
 
 
@@ -264,7 +259,6 @@ void SettingsWindow::connectSignalsSlots()
     //Plugins
     //    connected during setupUi by name:
     //    connect(ui->list_Plugins,SIGNAL(currentRowChanged(int)),this,SLOT(on_list_Plugins_itemClicked(QListWidgetItem *)));
-    //connect(ui->pushButton_ConsolePlugin,SIGNAL(clicked()),this,SLOT(viewPluginConsole()));
     connect(ui->pushButton_UpPriority, SIGNAL(clicked()), this, SLOT(MoveUpPlugin()));
     connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
 
@@ -337,11 +331,6 @@ void SettingsWindow::onBlur()
     emit showLedWidgets(false);
 }
 
-void SettingsWindow::onKeepLightsAfterExit_Toggled(bool isEnabled)
-{
-    Settings::setKeepLightsOnAfterExit(isEnabled);
-}
-
 void SettingsWindow::onExpertModeEnabled_Toggled(bool isEnabled)
 {
     Settings::setExpertModeEnabled(isEnabled);
@@ -355,8 +344,6 @@ void SettingsWindow::updateExpertModeWidgetsVisibility()
     } else {
         ui->listWidget->setItemHidden(ui->listWidget->item(4),true);
     }
-
-    ui->pushButton_ConsolePlugin->setVisible(Settings::isExpertModeEnabled());
 
     updateDeviceTabWidgetsVisibility();
 }
@@ -555,13 +542,6 @@ void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, 
     startBacklight();
 }
 
-void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-
-#ifdef D3D10_GRAB_SUPPORT
-    Settings::setDx1011GrabberEnabled(isEnabled);
-#endif
-}
 void SettingsWindow::setModeChanged(Lightpack::Mode mode)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << mode;
@@ -754,14 +734,12 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
 #else
     ui->radioButton_GrabWinAPI->setChecked(true);
 #endif
-#ifndef WINAPI_EACH_SUPPORT
-    ui->radioButton_GrabWinAPI_EachWidget->setVisible(false);
-#endif
-#ifndef D3D9_GRAB_SUPPORT
-    ui->radioButton_GrabD3D9->setVisible(false);
+#ifndef DDUPL_GRAB_SUPPORT
+    ui->radioButton_GrabDDupl->setVisible(false);
 #endif
 #ifndef D3D10_GRAB_SUPPORT
     ui->checkBox_EnableDx1011Capture->setVisible(false);
+    ui->checkBox_EnableDx9Capture->setVisible(false);
 #endif
 #ifndef X11_GRAB_SUPPORT
     ui->radioButton_GrabX11->setVisible(false);
@@ -772,12 +750,6 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
     ui->radioButton_GrabMacCoreGraphics->setVisible(false);
 #else
     ui->radioButton_GrabMacCoreGraphics->setChecked(true);
-#endif
-#ifndef QT_GRAB_SUPPORT
-    ui->radioButton_GrabQt->setVisible(false);
-    ui->radioButton_GrabQt_EachWidget->setVisible(false);
-#else
-    ui->radioButton_GrabQt->setChecked(true);
 #endif
 }
 
@@ -1037,11 +1009,33 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 
 void SettingsWindow::onGrabberChanged()
 {
-    Grab::GrabberType grabberType = getSelectedGrabberType();
+    if (!updatingFromSettings) {
+        Grab::GrabberType grabberType = getSelectedGrabberType();
 
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
+        if (grabberType != Settings::getGrabberType()) {
+            DEBUG_LOW_LEVEL << Q_FUNC_INFO << "GrabberType: " << grabberType << ", isDx1011CaptureEnabled: " << isDx1011CaptureEnabled();
+            Settings::setGrabberType(grabberType);
+        }
+    }
+}
 
-    Settings::setGrabberType(grabberType);
+void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+    if (!updatingFromSettings) {
+#ifdef D3D10_GRAB_SUPPORT
+        Settings::setDx1011GrabberEnabled(isEnabled);
+#endif
+    }
+    ui->checkBox_EnableDx9Capture->setEnabled(isEnabled);
+}
+
+void SettingsWindow::onDx9CaptureEnabledChanged(bool isEnabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+    if (!updatingFromSettings) {
+#ifdef D3D10_GRAB_SUPPORT
+        Settings::setDx9GrabbingEnabled(isEnabled);
+#endif
+    }
 }
 
 void SettingsWindow::onGrabSlowdown_valueChanged(int value)
@@ -1313,10 +1307,10 @@ void SettingsWindow::profileSwitch(const QString & configName)
 
     ui->comboBox_Profiles->setCurrentIndex(index);
 
+    Settings::loadOrCreateProfile(configName);
+
     if (m_trayIcon)
         m_trayIcon->updateProfiles();
-
-    Settings::loadOrCreateProfile(configName);
 
 }
 
@@ -1546,6 +1540,7 @@ void SettingsWindow::createTrayIcon()
 void SettingsWindow::updateUiFromSettings()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    updatingFromSettings = true;
 
     profilesLoadAll();
 
@@ -1558,7 +1553,8 @@ void SettingsWindow::updateUiFromSettings()
 
     ui->checkBox_SendDataOnlyIfColorsChanges->setChecked             (Settings::isSendDataOnlyIfColorsChanges());
     ui->checkBox_KeepLightsOnAfterExit->setChecked                   (Settings::isKeepLightsOnAfterExit());
-	ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
+    ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
+    ui->checkBox_KeepLightsOnAfterSuspend->setChecked                 (Settings::isKeepLightsOnAfterSuspend());
     ui->checkBox_PingDeviceEverySecond->setChecked                   (Settings::isPingDeviceEverySecond());
 
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
@@ -1595,13 +1591,10 @@ void SettingsWindow::updateUiFromSettings()
     case Grab::GrabberTypeWinAPI:
         ui->radioButton_GrabWinAPI->setChecked(true);
         break;
-    case Grab::GrabberTypeWinAPIEachWidget:
-        ui->radioButton_GrabWinAPI_EachWidget->setChecked(true);
-        break;
 #endif
-#ifdef D3D9_GRAB_SUPPORT
-    case Grab::GrabberTypeD3D9:
-        ui->radioButton_GrabD3D9->setChecked(true);
+#ifdef DDUPL_GRAB_SUPPORT
+    case Grab::GrabberTypeDDupl:
+        ui->radioButton_GrabDDupl->setChecked(true);
         break;
 #endif
 #ifdef X11_GRAB_SUPPORT
@@ -1614,22 +1607,18 @@ void SettingsWindow::updateUiFromSettings()
         ui->radioButton_GrabMacCoreGraphics->setChecked(true);
         break;
 #endif
-    case Grab::GrabberTypeQtEachWidget:
-        ui->radioButton_GrabQt_EachWidget->setChecked(true);
-        break;
-
-    default:
-        ui->radioButton_GrabQt->setChecked(true);
     }
 
 #ifdef D3D10_GRAB_SUPPORT
     ui->checkBox_EnableDx1011Capture->setChecked(Settings::isDx1011GrabberEnabled());
+    ui->checkBox_EnableDx9Capture->setChecked(Settings::isDx9GrabbingEnabled());
 #endif
 
     onMoodLampLiquidMode_Toggled(ui->radioButton_LiquidColorMoodLampMode->isChecked());
     updateExpertModeWidgetsVisibility();
     onGrabberChanged();
     settingsProfileChanged_UpdateUI(Settings::getCurrentProfileName());
+    updatingFromSettings = false;
 }
 
 Grab::GrabberType SettingsWindow::getSelectedGrabberType()
@@ -1643,13 +1632,10 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
     if (ui->radioButton_GrabWinAPI->isChecked()) {
         return Grab::GrabberTypeWinAPI;
     }
-    if (ui->radioButton_GrabWinAPI_EachWidget->isChecked()) {
-        return Grab::GrabberTypeWinAPIEachWidget;
-    }
 #endif
-#ifdef D3D9_GRAB_SUPPORT
-    if (ui->radioButton_GrabD3D9->isChecked()) {
-        return Grab::GrabberTypeD3D9;
+#ifdef DDUPL_GRAB_SUPPORT
+    if (ui->radioButton_GrabDDupl->isChecked()) {
+        return Grab::GrabberTypeDDupl;
     }
 #endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
@@ -1657,10 +1643,6 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
         return Grab::GrabberTypeMacCoreGraphics;
     }
 #endif
-
-    if (ui->radioButton_GrabQt_EachWidget->isChecked()) {
-        return Grab::GrabberTypeQtEachWidget;
-    }
 
     return Grab::GrabberTypeQt;
 }
@@ -1695,16 +1677,6 @@ void SettingsWindow::quit()
     QApplication::quit();
 }
 
-void SettingsWindow::adjustSizeAndMoveCenter()
-{
-    QRect screen = QApplication::desktop()->screenGeometry(this);
-
-    adjustSize();
-    move(screen.width()  / 2 - width()  / 2,
-         screen.height() / 2 - height() / 2);
-    resize(minimumSize());
-}
-
 void SettingsWindow::setFirmwareVersion(const QString &firmwareVersion)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
@@ -1718,7 +1690,7 @@ void SettingsWindow::versionsUpdate()
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
     // use template to construct version string
-    QString versionsTemplate = tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"> <html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\"> <p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">software <span style=\" font-size:8pt; font-weight:600;\">%1</span><span style=\" font-size:8pt;\"> (revision </span><a href=\"https://github.com/woodenshark/Lightpack/commit/%2\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">%2 </span></a><span style=\" font-size:8pt;\">), firmware <b>%3</b></span></p></body></html>");
+    QString versionsTemplate = tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"> <html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\"> <p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">software <span style=\" font-size:8pt; font-weight:600;\">%1</span><span style=\" font-size:8pt;\"> (revision </span><a href=\"https://github.com/psieg/Lightpack/commit/%2\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">%2</span></a><span style=\" font-size:8pt;\">), firmware <b>%3</b></span></p></body></html>");
 
 #ifdef GIT_REVISION
     versionsTemplate = versionsTemplate.arg(
@@ -1736,8 +1708,7 @@ void SettingsWindow::versionsUpdate()
     ui->labelVersions->setText( versionsTemplate );
 
     adjustSize();
-
-    setFixedSize( sizeHint() );
+    resize(minimumSize());
 }
 
 void SettingsWindow::showHelpOf(QObject *object)
@@ -1770,6 +1741,10 @@ void SettingsWindow::on_pushButton_lumosityThresholdHelp_clicked()
     showHelpOf(ui->horizontalSlider_LuminosityThreshold);
 }
 
+void SettingsWindow::on_pushButton_AllPluginsHelp_clicked()
+{
+    showHelpOf(ui->label_AllPlugins);
+}
 
 bool SettingsWindow::toPriority(Plugin* s1 ,Plugin* s2 )
 {
@@ -1899,8 +1874,6 @@ QString SettingsWindow::getPluginName(const Plugin *plugin) const
 
 void SettingsWindow::on_pbRunConfigurationWizard_clicked()
 {
-    getLightpackApp()->free();
-
 #ifdef Q_OS_WIN
     QString cmdLine;
     cmdLine.append("\"");
@@ -1915,7 +1888,17 @@ void SettingsWindow::on_pbRunConfigurationWizard_clicked()
     quit();
 }
 
+void SettingsWindow::onKeepLightsAfterExit_Toggled(bool isEnabled)
+{
+    Settings::setKeepLightsOnAfterExit(isEnabled);
+}
+
 void SettingsWindow::onKeepLightsAfterLock_Toggled(bool isEnabled)
 {
-	Settings::setKeepLightsOnAfterLock(isEnabled);
+    Settings::setKeepLightsOnAfterLock(isEnabled);
+}
+
+void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
+{
+    Settings::setKeepLightsOnAfterSuspend(isEnabled);
 }

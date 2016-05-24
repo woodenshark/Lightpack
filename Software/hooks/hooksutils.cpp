@@ -2,7 +2,7 @@
 #include "Logger.hpp"
 
 bool WriteToProtectedMem(void * mem, void * newVal, void * savedVal, size_t size) {
-    DWORD protection = PAGE_READWRITE;
+    DWORD protection = PAGE_EXECUTE_READWRITE;
     DWORD oldProtection;
     Logger *logger = Logger::getInstance();
 

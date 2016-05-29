@@ -26,11 +26,7 @@
 
 #include <QStringList>
 
-#ifdef UNITY_DESKTOP
-#include "SysTrayIcon_unity_p.hpp"
-#else
 #include "SysTrayIcon_qt_p.hpp"
-#endif
 
 const QString SysTrayIcon::LightpackDownloadsPageUrl = "http://code.google.com/p/lightpack/downloads/list";
 

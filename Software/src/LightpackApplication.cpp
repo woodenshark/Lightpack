@@ -529,11 +529,12 @@ bool LightpackApplication::checkSystemTrayAvailability() const
 {
 #ifdef Q_OS_LINUX
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-	if (qgetenv("QT_QPA_PLATFORMTHEME") != "appmenu-qt5")
 		// From: https://github.com/owncloud/client/pull/4747
 		// See: https://bugs.launchpad.net/ubuntu/+source/owncloud-client/+bug/1573639
 		// Qt issue: https://bugs.launchpad.net/appmenu-qt5/+bug/1574699
-#endif
+		qWarning() << Q_FUNC_INFO << "Skipping TrayIcon check due to https://bugs.launchpad.net/appmenu-qt5/+bug/1574699";
+		return true;
+#else
 	{
 		// When you add lightpack in the Startup in Ubuntu (10.04), tray starts later than the application runs.
 		// Check availability tray every second for 20 seconds.
@@ -545,6 +546,7 @@ bool LightpackApplication::checkSystemTrayAvailability() const
 			QThread::sleep(1);
 		}
 	}
+#endif
 #endif
 
     if (QSystemTrayIcon::isSystemTrayAvailable() == false)

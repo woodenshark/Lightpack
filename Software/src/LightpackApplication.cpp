@@ -527,17 +527,25 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
 
 bool LightpackApplication::checkSystemTrayAvailability() const
 {
-#   ifdef Q_OS_LINUX
-    // When you add lightpack in the Startup in Ubuntu (10.04), tray starts later than the application runs.
-    // Check availability tray every second for 20 seconds.
-    for (int i = 0; i < 20; i++)
-    {
-        if (QSystemTrayIcon::isSystemTrayAvailable())
-            break;
+#ifdef Q_OS_LINUX
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+	if (qgetenv("QT_QPA_PLATFORMTHEME") != "appmenu-qt5")
+		// From: https://github.com/owncloud/client/pull/4747
+		// See: https://bugs.launchpad.net/ubuntu/+source/owncloud-client/+bug/1573639
+		// Qt issue: https://bugs.launchpad.net/appmenu-qt5/+bug/1574699
+#endif
+	{
+		// When you add lightpack in the Startup in Ubuntu (10.04), tray starts later than the application runs.
+		// Check availability tray every second for 20 seconds.
+		for (int i = 0; i < 20; i++)
+		{
+			if (QSystemTrayIcon::isSystemTrayAvailable())
+				break;
 
-        QThread::sleep(1);
-    }
-#   endif
+			QThread::sleep(1);
+		}
+	}
+#endif
 
     if (QSystemTrayIcon::isSystemTrayAvailable() == false)
     {

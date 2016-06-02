@@ -201,6 +201,8 @@ private slots:
 
     void on_pbRunConfigurationWizard_clicked();
 
+	void on_checkBox_checkForUpdates_Toggled(bool isEnabled);
+
 private:
     void updateExpertModeWidgetsVisibility();
     void updateDeviceTabWidgetsVisibility();

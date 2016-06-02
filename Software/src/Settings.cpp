@@ -74,7 +74,7 @@ static const QString IsPingDeviceEverySecond = "IsPingDeviceEverySecond";
 static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShown";
 static const QString ConnectedDevice = "ConnectedDevice";
 static const QString SupportedDevices = "SupportedDevices";
-static const QString LastReadUpdateId = "LastReadUpdateId";
+static const QString CheckForUpdates = "CheckForUpdates";
 
 // [Hotkeys]
 namespace Hotkeys
@@ -279,7 +279,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,      Main::AlienFx::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,    Main::Lightpack::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Virtual::NumberOfLeds,      Main::Virtual::NumberOfLedsDefault);
-    setNewOptionMain(Main::Key::LastReadUpdateId,           Main::LastReadUpdateId);
+    setNewOptionMain(Main::Key::CheckForUpdates,            Main::CheckForUpdates);
 
     if (isDebugLevelObtainedFromCmdArgs == false)
     {
@@ -1458,13 +1458,13 @@ QString Settings::getProfilesPath() {
    return m_applicationDirPath + "Profiles/";
 }
 
-uint Settings::getLastReadUpdateId() {
-   return valueMain(Main::Key::LastReadUpdateId).toUInt();
+bool Settings::isCheckForUpdatesEnabled() {
+   return valueMain(Main::Key::CheckForUpdates).toBool();
 
 }
 
-void Settings::setLastReadUpdateId(const uint updateId) {
-    setValueMain(Main::Key::LastReadUpdateId, updateId);
+void Settings::setCheckForUpdatesEnabled(bool isEnabled) {
+	setValueMain(Main::Key::CheckForUpdates, isEnabled);
 }
 
 //

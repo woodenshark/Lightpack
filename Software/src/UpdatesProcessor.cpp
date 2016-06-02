@@ -27,8 +27,11 @@
 #include <QXmlStreamReader>
 #include <QNetworkReply>
 #include "version.h"
+#include "debug.h"
 #include "UpdatesProcessor.hpp"
 
+//#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
+#define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
 
 const AppVersion kCurVersion(VERSION_STR);
 
@@ -38,20 +41,27 @@ UpdatesProcessor::UpdatesProcessor(QObject * parent)
 {
 }
 
+void UpdatesProcessor::error(QNetworkReply::NetworkError code){
+	qWarning() << Q_FUNC_INFO << "Updatecheck failed: " << code << ": " << _reply->errorString();
+}
+
 void UpdatesProcessor::requestUpdates()
 {
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "checking" << UPDATE_CHECK_URL;
     if(_reply != NULL) {
         _reply->disconnect();
         delete _reply;
         _reply = NULL;
     }
 
-    QNetworkRequest request(QUrl("http://lightpack.tv/updates.xml"));
-    _reply = _networkMan.get(request);
-    connect(_reply, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
+	QNetworkRequest request(QUrl(UPDATE_CHECK_URL));
+	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+	_reply = _networkMan.get(request);
+	connect(_reply, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
+	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
 }
 
-QList<UpdateInfo> UpdatesProcessor::readUpdates(uint lastReadId)
+QList<UpdateInfo> UpdatesProcessor::readUpdates()
 {
     QList<UpdateInfo> updates;
 
@@ -65,15 +75,13 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates(uint lastReadId)
                 UpdateInfo updateInfo = *it;
                 if (!updateInfo.softwareVersion.isEmpty() && !isVersionMatches(updateInfo.softwareVersion, kCurVersion)) {
                     updates.removeAll(updateInfo);
-                } else if (updateInfo.id <= lastReadId) {
-                    updates.removeAll(updateInfo);
                 } else {
                     it++;
                 }
             }
         }
     }
-
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
     return updates;
 }
 
@@ -90,7 +98,7 @@ bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersi
     Condition cond;
     QStringRef predicateRef(&predicate);
 
-    QStringRef predicateVerStr = predicateRef.right(2).trimmed();
+    QStringRef predicateVerStr = predicateRef.mid(2).trimmed();
 
     QStringRef condStr = predicateRef.left(2);
 

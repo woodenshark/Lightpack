@@ -262,7 +262,9 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->pushButton_UpPriority, SIGNAL(clicked()), this, SLOT(MoveUpPlugin()));
     connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
 
+	// About page
     connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
+	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(on_checkBox_checkForUpdates_Toggled(bool)));
 }
 
 // ----------------------------------------------------------------------------
@@ -443,7 +445,7 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
     updateUiFromSettings();
     this->requestFirmwareVersion();
-    if (m_trayIcon)
+    if (m_trayIcon && Settings::isCheckForUpdatesEnabled())
         m_trayIcon->checkUpdate();
 }
 
@@ -1551,10 +1553,12 @@ void SettingsWindow::updateUiFromSettings()
 
     ui->checkBox_ExpertModeEnabled->setChecked                       (Settings::isExpertModeEnabled());
 
+	ui->checkBox_checkForUpdates->setChecked                         (Settings::isCheckForUpdatesEnabled());
+
     ui->checkBox_SendDataOnlyIfColorsChanges->setChecked             (Settings::isSendDataOnlyIfColorsChanges());
     ui->checkBox_KeepLightsOnAfterExit->setChecked                   (Settings::isKeepLightsOnAfterExit());
     ui->checkBox_KeepLightsOnAfterLockComputer->setChecked           (Settings::isKeepLightsOnAfterLock());
-    ui->checkBox_KeepLightsOnAfterSuspend->setChecked                 (Settings::isKeepLightsOnAfterSuspend());
+    ui->checkBox_KeepLightsOnAfterSuspend->setChecked                (Settings::isKeepLightsOnAfterSuspend());
     ui->checkBox_PingDeviceEverySecond->setChecked                   (Settings::isPingDeviceEverySecond());
 
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
@@ -1900,5 +1904,11 @@ void SettingsWindow::onKeepLightsAfterLock_Toggled(bool isEnabled)
 
 void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
 {
-    Settings::setKeepLightsOnAfterSuspend(isEnabled);
+	Settings::setKeepLightsOnAfterSuspend(isEnabled);
+}
+
+
+void SettingsWindow::on_checkBox_checkForUpdates_Toggled(bool isEnabled)
+{
+	Settings::setCheckForUpdatesEnabled(isEnabled);
 }

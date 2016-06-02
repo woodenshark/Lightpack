@@ -31,6 +31,7 @@
 #include <QString>
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 class QNetworkReply;
 class QXmlStreamReader;
@@ -144,10 +145,13 @@ class UpdatesProcessor: public QObject
 public:
     UpdatesProcessor(QObject * parent = NULL);
     void requestUpdates();
-    QList<UpdateInfo> readUpdates(uint lastReadId);
+    QList<UpdateInfo> readUpdates();
 
 signals:
-    void readyRead();
+	void readyRead();
+
+private slots:
+	void error(QNetworkReply::NetworkError code);
 
 private:
     QList<UpdateInfo> * readUpdates(QList<UpdateInfo> * readUpdates, QXmlStreamReader * xmlReader);

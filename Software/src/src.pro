@@ -181,7 +181,6 @@ SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \
     GrabWidget.cpp  GrabConfigWidget.cpp \
     LogWriter.cpp \
-    SpeedTest.cpp \
     LedDeviceLightpack.cpp \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
@@ -227,7 +226,6 @@ HEADERS += \
     GrabConfigWidget.hpp \
     debug.h \
     LogWriter.hpp \
-    SpeedTest.hpp \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
     LedDeviceLightpack.hpp \

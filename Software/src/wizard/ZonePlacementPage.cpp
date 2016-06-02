@@ -32,7 +32,7 @@
 #include "AndromedaDistributor.hpp"
 #include "CassiopeiaDistributor.hpp"
 #include "PegasusDistributor.hpp"
-#include "GrabAreaWidget.hpp"
+#include "GrabWidget.hpp"
 #include "LedDeviceLightpack.hpp"
 
 
@@ -191,7 +191,7 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
 
 void ZonePlacementPage::addGrabArea(int id, const QRect &r)
 {
-    GrabAreaWidget *zone = new GrabAreaWidget(id);
+    GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith);
 
     zone->move(r.topLeft());
     zone->resize(r.size());

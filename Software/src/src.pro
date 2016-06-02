@@ -205,7 +205,6 @@ SOURCES += \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
-    wizard/GrabAreaWidget.cpp \
     wizard/AndromedaDistributor.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
@@ -255,7 +254,6 @@ HEADERS += \
     wizard/MonitorIdForm.hpp \
     wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
-    wizard/GrabAreaWidget.hpp \
     wizard/AndromedaDistributor.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
@@ -290,7 +288,6 @@ FORMS += SettingsWindow.ui \
     wizard/MonitorIdForm.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
-    wizard/GrabAreaWidget.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/SelectDevicePage.ui
 

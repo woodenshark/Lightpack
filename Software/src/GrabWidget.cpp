@@ -51,7 +51,7 @@ const QColor GrabWidget::m_colors[GrabWidget::ColorsCount][2] = {
     { Qt::white,       Qt::black }, // ColorIndexWhite == 11
 };
 
-GrabWidget::GrabWidget(int id, QWidget *parent) :
+GrabWidget::GrabWidget(int id, int features, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GrabWidget)
 {
@@ -65,23 +65,37 @@ GrabWidget::GrabWidget(int id, QWidget *parent) :
     m_selfId = id;
     m_selfIdString = QString::number(m_selfId + 1);
 
-    m_configWidget = new GrabConfigWidget();
-
     setCursorOnAll(Qt::OpenHandCursor);
     setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip);
     setFocusPolicy(Qt::NoFocus);
 
-    setMouseTracking(true);
+	setMouseTracking(true);
 
-    settingsProfileChanged();
+	cmd = NOP;
+	m_features = features;
+	m_backgroundColor = Qt::white;
 
-    fillBackgroundColored();
+	//fillBackgroundColored(); ??
 
-    connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
-    connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)),   this, SLOT(onRedCoef_ValueChanged(double)));
-    connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
-    connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)),  this, SLOT(onBlueCoef_ValueChanged(double)));
-    connect(ui->button_OpenConfig, SIGNAL(clicked()), this, SLOT(onOpenConfigButton_Clicked()));
+	if (features & AllowCoefAndEnableConfig) {
+
+		m_configWidget = new GrabConfigWidget();
+		connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
+		connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
+		connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
+		connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
+
+	} else {
+		ui->button_OpenConfig->setVisible(false);
+	}
+
+	if (features & SyncSettings) {
+
+		settingsProfileChanged();
+
+		connect(ui->button_OpenConfig, SIGNAL(clicked()), this, SLOT(onOpenConfigButton_Clicked()));
+
+	}
 }
 
 GrabWidget::~GrabWidget()
@@ -100,27 +114,31 @@ void GrabWidget::closeEvent(QCloseEvent *event)
 
 void GrabWidget::saveSizeAndPosition()
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	if (m_features & SyncSettings) {
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    Settings::setLedPosition(m_selfId, pos());
-    Settings::setLedSize(m_selfId, size());
+		Settings::setLedPosition(m_selfId, pos());
+		Settings::setLedSize(m_selfId, size());
+	}
 }
 
 void GrabWidget::settingsProfileChanged()
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << m_selfId;
+	if (m_features & SyncSettings) {
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << m_selfId;
 
-    m_coefRed = Settings::getLedCoefRed(m_selfId);
-    m_coefGreen = Settings::getLedCoefGreen(m_selfId);
-    m_coefBlue = Settings::getLedCoefBlue(m_selfId);
+		m_coefRed = Settings::getLedCoefRed(m_selfId);
+		m_coefGreen = Settings::getLedCoefGreen(m_selfId);
+		m_coefBlue = Settings::getLedCoefBlue(m_selfId);
 
-    m_configWidget->setIsAreaEnabled(Settings::isLedEnabled(m_selfId));
-    m_configWidget->setCoefs(m_coefRed, m_coefGreen, m_coefBlue);
+		m_configWidget->setIsAreaEnabled(Settings::isLedEnabled(m_selfId));
+		m_configWidget->setCoefs(m_coefRed, m_coefGreen, m_coefBlue);
 
-    move(Settings::getLedPosition(m_selfId));
-    resize(Settings::getLedSize(m_selfId));
+		move(Settings::getLedPosition(m_selfId));
+		resize(Settings::getLedSize(m_selfId));
 
-    emit resizeOrMoveCompleted(m_selfId);
+		emit resizeOrMoveCompleted(m_selfId);
+	}
 }
 
 void GrabWidget::setCursorOnAll(Qt::CursorShape cursor)
@@ -196,12 +214,13 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
             cmd = MOVE;
             setCursorOnAll(Qt::ClosedHandCursor);
         }
-        emit resizeOrMoveStarted();
+        emit resizeOrMoveStarted(m_selfId);
     }
     else
     {
         cmd = NOP;
-    }
+	}
+	repaint();
 }
 
 void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
@@ -375,6 +394,7 @@ void GrabWidget::mouseReleaseEvent(QMouseEvent *pe)
     saveSizeAndPosition();
 
     emit resizeOrMoveCompleted(m_selfId);
+	repaint();
 }
 
 
@@ -382,7 +402,7 @@ void GrabWidget::wheelEvent(QWheelEvent *pe)
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
-    if (!isAreaEnabled())
+	if (!(m_features & AllowColorCycle) || !isAreaEnabled())
     {
         // Do nothing if area disabled
         return;
@@ -415,6 +435,9 @@ void GrabWidget::paintEvent(QPaintEvent *)
 
     QPainter painter(this);
     painter.setPen(QColor(0x77, 0x77, 0x77));
+	if ((m_features & DimUntilInteractedWith) && isAreaEnabled()) {
+		painter.setBrush(QBrush(cmd == NOP ? QColor(m_backgroundColor.dark(150)) : QColor(m_backgroundColor)));
+	}
     painter.drawRect(0, 0, width() - 1, height() - 1);
 
 //    // Icon 'resize' opacity
@@ -475,7 +498,11 @@ bool GrabWidget::isAreaEnabled()
 {
     DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-    return m_configWidget->isAreaEnabled();
+	if (m_features & AllowCoefAndEnableConfig) {
+		return m_configWidget->isAreaEnabled();
+	} else {
+		return true;
+	}
 }
 
 void GrabWidget::fillBackgroundWhite()
@@ -552,9 +579,10 @@ void GrabWidget::onIsAreaEnabled_Toggled(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 
-    Settings::setLedEnabled(m_selfId, state);
-
-    fillBackgroundColored();    
+	if (m_features & SyncSettings) {
+		Settings::setLedEnabled(m_selfId, state);
+	}
+	setBackgroundColor(m_backgroundColor);
 }
 
 void GrabWidget::onOpenConfigButton_Clicked()
@@ -592,14 +620,16 @@ void GrabWidget::setBackgroundColor(QColor color)
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
 
+	m_backgroundColor = color;
+
     QPalette pal = palette();
 
     if (isAreaEnabled())
     {
-        pal.setBrush(backgroundRole(), QBrush(color));
+		pal.setBrush(backgroundRole(), QBrush(m_backgroundColor));
     } else {
         // Disabled widget
-        pal.setBrush(backgroundRole(), QBrush(Qt::gray));
+		pal.setBrush(backgroundRole(), QBrush(Qt::darkGray));
     }
     setPalette(pal);
 }

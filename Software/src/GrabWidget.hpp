@@ -26,18 +26,24 @@
 
 #pragma once
 
-//#include <QtWidgets/QWidget>
 #include "GrabConfigWidget.hpp"
 
 namespace Ui {
     class GrabWidget;
 }
 
+enum GrabWidgetFeature : int {
+	SyncSettings = 0x1,
+	AllowCoefAndEnableConfig = 0x10,
+	AllowColorCycle = 0x100,
+	DimUntilInteractedWith = 0x1000
+};
+
 class GrabWidget : public QWidget
 {
     Q_OBJECT
 public:
-    GrabWidget(int id, QWidget *parent = 0);
+	GrabWidget(int id, int features = 0x11, QWidget *parent = 0);
     virtual ~GrabWidget();
 
     void saveSizeAndPosition();
@@ -53,7 +59,7 @@ private:
     void fillBackground(int index);
 
 signals:
-    void resizeOrMoveStarted();
+	void resizeOrMoveStarted(int id);
     void resizeOrMoveCompleted(int id);
     void mouseRightButtonClicked(int selfId);
     void sizeAndPositionChanged(int w, int h, int x, int y);
@@ -118,8 +124,11 @@ private:
     GrabConfigWidget *m_configWidget;
 
     QColor m_textColor;
+	QColor m_backgroundColor;
     QString m_selfIdString;
     QString m_widthHeight;
+
+	int m_features;
 
 protected:
     virtual void mousePressEvent(QMouseEvent *pe);

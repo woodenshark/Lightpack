@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>603</height>
+    <width>651</width>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -213,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -2446,6 +2446,13 @@
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_checkForUpdates">
+          <property name="text">
+           <string>Check for updates on startup</string>
           </property>
          </widget>
         </item>

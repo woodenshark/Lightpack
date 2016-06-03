@@ -200,8 +200,8 @@ public:
     static bool isLedEnabled(int ledIndex);
     static void setLedEnabled(int ledIndex, bool isEnabled);
 
-    static uint getLastReadUpdateId();
-    static void setLastReadUpdateId(const uint updateId);
+    static bool isCheckForUpdatesEnabled();
+	static void setCheckForUpdatesEnabled(bool isEnabled);
 
 private:        
     static int getValidDeviceRefreshDelay(int value);

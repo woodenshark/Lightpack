@@ -223,164 +223,199 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
 	repaint();
 }
 
+QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
+	int newWidth = width();
+	int newHeight = height();
+	int newX = x();
+	int newY = y();
+
+	switch (cmd)
+	{
+		case MOVE:
+			break;
+
+		case RESIZE_HOR_RIGHT:
+			newWidth = pe->x() + mousePressDiffFromBorder.width();
+			newWidth = (newWidth <= MinimumWidth) ? MinimumWidth : newWidth;
+			break;
+
+		case RESIZE_VER_DOWN:
+			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			newHeight = (newHeight <= MinimumHeight) ? MinimumHeight : newHeight;
+			break;
+
+		case RESIZE_HOR_LEFT:
+			newY = pos().y();
+			newHeight = height();
+
+			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+
+			if (newWidth < MinimumWidth)
+			{
+				newWidth = MinimumWidth;
+				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
+			} else {
+				newX = pe->globalPos().x() - mousePressPosition.x();
+			}
+			break;
+
+		case RESIZE_VER_UP:
+			newX = pos().x();
+			newWidth = width();
+
+			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+
+			if (newHeight < MinimumHeight)
+			{
+				newHeight = MinimumHeight;
+				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
+			} else {
+				newY = pe->globalPos().y() - mousePressPosition.y();
+			}
+			break;
+
+
+		case RESIZE_RIGHT_DOWN:
+			newWidth = pe->x() + mousePressDiffFromBorder.width();
+			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			newWidth = (newWidth <= MinimumWidth) ? MinimumWidth : newWidth;
+			newHeight = (newHeight <= MinimumHeight) ? MinimumHeight : newHeight;
+			break;
+
+		case RESIZE_RIGHT_UP:
+			newWidth = pe->x() + mousePressDiffFromBorder.width();
+			if (newWidth < MinimumWidth) newWidth = MinimumWidth;
+			newX = pos().x();
+
+			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+
+			if (newHeight < MinimumHeight)
+			{
+				newHeight = MinimumHeight;
+				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
+			} else {
+				newY = pe->globalPos().y() - mousePressPosition.y();
+			}
+			break;
+
+		case RESIZE_LEFT_DOWN:
+			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			if (newHeight < MinimumHeight) newHeight = MinimumHeight;
+			newY = pos().y();
+
+			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+
+			if (newWidth < MinimumWidth)
+			{
+				newWidth = MinimumWidth;
+				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
+			} else {
+				newX = pe->globalPos().x() - mousePressPosition.x();
+			}
+			break;
+
+		case RESIZE_LEFT_UP:
+			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+
+			if (newWidth < MinimumWidth)
+			{
+				newWidth = MinimumWidth;
+				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
+			} else {
+				newX = pe->globalPos().x() - mousePressPosition.x();
+			}
+
+			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+
+			if (newHeight < MinimumHeight)
+			{
+				newHeight = MinimumHeight;
+				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
+			} else {
+				newY = pe->globalPos().y() - mousePressPosition.y();
+			}
+			break;
+		default:
+			break;
+	}
+
+	return QRect(newX, newY, newWidth, newHeight);
+}
+
 void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 {
     DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "pe->pos() =" << pe->pos();
-
-    int newWidth, newHeight, newX, newY;
-    QPoint moveHere;
 
     QRect screen = QApplication::desktop()->screenGeometry(this);
 
     int left, top, right, bottom;
 
-    switch (cmd)
-    {
-    case MOVE:
-        moveHere = pe->globalPos() - mousePressPosition;
+	QPoint moveHere;
+	
+	if (cmd == NOP ){
+		checkAndSetCursors(pe);
+	} else if (cmd == MOVE) {
+		moveHere = pe->globalPos() - mousePressPosition;
 
-        left = moveHere.x();
-        top = moveHere.y();
+		left = moveHere.x();
+		top = moveHere.y();
 
-        right = moveHere.x() + width();
-        bottom = moveHere.y() + height();
+		right = moveHere.x() + width();
+		bottom = moveHere.y() + height();
 
-        if (left < screen.left() + StickyCloserPixels &&
-           left > screen.left() - StickyCloserPixels)
-            moveHere.setX(screen.left());
+		if (left < screen.left() + StickyCloserPixels &&
+			left > screen.left() - StickyCloserPixels)
+			moveHere.setX(screen.left());
 
-        if (top < screen.top() + StickyCloserPixels &&
-           top > screen.top() - StickyCloserPixels)
-            moveHere.setY(screen.top());
+		if (top < screen.top() + StickyCloserPixels &&
+			top > screen.top() - StickyCloserPixels)
+			moveHere.setY(screen.top());
 
-        if (right < screen.right() + StickyCloserPixels &&
-           right > screen.right() - StickyCloserPixels)
-            moveHere.setX(screen.right() - width() + 1);
+		if (right < screen.right() + StickyCloserPixels &&
+			right > screen.right() - StickyCloserPixels)
+			moveHere.setX(screen.right() - width() + 1);
 
-        if (bottom < screen.bottom() + StickyCloserPixels &&
-           bottom > screen.bottom() - StickyCloserPixels)
-            moveHere.setY(screen.bottom() - height() + 1);
+		if (bottom < screen.bottom() + StickyCloserPixels &&
+			bottom > screen.bottom() - StickyCloserPixels)
+			moveHere.setY(screen.bottom() - height() + 1);
 
-        move(moveHere);
-        break;
+		move(moveHere);
+	} else {
+		QRect newRect = resizeAccordingly(pe);
 
-    case RESIZE_HOR_RIGHT:
-        newWidth = pe->x() + mousePressDiffFromBorder.width();
-        resize((newWidth <= MinimumWidth) ? MinimumWidth : newWidth, height());
-        break;
+		if (cmd == RESIZE_HOR_RIGHT || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_RIGHT_DOWN) {
+			if (abs(newRect.right() - screen.right())  < StickyCloserPixels) {
+				newRect.setRight(screen.right());
+			}
+		}
 
-    case RESIZE_VER_DOWN:
-        newHeight = pe->y() + mousePressDiffFromBorder.height();
-        resize(width(), (newHeight <= MinimumHeight) ? MinimumHeight : newHeight);
-        break;
+		if (cmd == RESIZE_VER_DOWN || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_RIGHT_DOWN) {
+			if (abs(newRect.bottom() - screen.bottom()) < StickyCloserPixels) {
+				newRect.setBottom(screen.bottom());
+			}
+		}
 
-    case RESIZE_HOR_LEFT:
-        newY = pos().y();
-        newHeight = height();
+		if (cmd == RESIZE_HOR_LEFT || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_LEFT_UP) {
+			if (abs(newRect.left() - screen.left()) < StickyCloserPixels) {
+				newRect.setLeft(screen.left());
+			}
+		}
 
-        newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+		if (cmd == RESIZE_VER_UP || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_LEFT_UP) {
+			if (newRect.top() - screen.top() < StickyCloserPixels) {
+				newRect.setTop(screen.top());
+			}
+		}
+		
+		if (newRect.size() != geometry().size()) {
+			resize(newRect.size());
+		}
+		if (newRect.topLeft() != geometry().topLeft()) {
+			move(newRect.topLeft());
+		}
+	}
 
-        if (newWidth < MinimumWidth)
-        {
-            newWidth = MinimumWidth;
-            newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
-        } else {
-            newX = pe->globalPos().x() - mousePressPosition.x();
-        }
-        resize(newWidth, newHeight);
-        move(newX, newY);
-        break;
-
-    case RESIZE_VER_UP:
-        newX = pos().x();
-        newWidth = width();
-
-        newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
-
-        if (newHeight < MinimumHeight)
-        {
-            newHeight = MinimumHeight;
-            newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
-        } else {
-            newY = pe->globalPos().y() - mousePressPosition.y();
-        }
-        resize(newWidth, newHeight);
-        move(newX, newY);
-        break;
-
-
-    case RESIZE_RIGHT_DOWN:
-        newWidth = pe->x() + mousePressDiffFromBorder.width();
-        newHeight = pe->y() + mousePressDiffFromBorder.height();
-        resize((newWidth <= MinimumWidth) ? MinimumWidth : newWidth, (newHeight <= MinimumHeight) ? MinimumHeight : newHeight);
-        break;
-
-    case RESIZE_RIGHT_UP:
-        newWidth = pe->x() + mousePressDiffFromBorder.width();
-        if (newWidth < MinimumWidth) newWidth = MinimumWidth;
-        newX = pos().x();
-
-        newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
-
-        if (newHeight < MinimumHeight)
-        {
-            newHeight = MinimumHeight;
-            newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
-        } else {
-            newY = pe->globalPos().y() - mousePressPosition.y();
-        }
-        resize(newWidth, newHeight);
-        move(newX, newY);
-        break;
-
-    case RESIZE_LEFT_DOWN:
-        newHeight = pe->y() + mousePressDiffFromBorder.height();
-        if (newHeight < MinimumHeight) newHeight = MinimumHeight;
-        newY = pos().y();
-
-        newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
-
-        if (newWidth < MinimumWidth)
-        {
-            newWidth = MinimumWidth;
-            newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
-        } else {
-            newX = pe->globalPos().x() - mousePressPosition.x();
-        }
-        resize(newWidth, newHeight);
-        move(newX, newY);
-        break;
-
-    case RESIZE_LEFT_UP:
-        newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
-
-        if (newWidth < MinimumWidth)
-        {
-            newWidth = MinimumWidth;
-            newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
-        } else {
-            newX = pe->globalPos().x() - mousePressPosition.x();
-        }
-
-        newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
-
-        if (newHeight < MinimumHeight)
-        {
-            newHeight = MinimumHeight;
-            newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
-        } else {
-            newY = pe->globalPos().y() - mousePressPosition.y();
-        }
-        resize(newWidth, newHeight);
-        move(newX, newY);
-        break;
-
-    case NOP:
-    default:        
-        checkAndSetCursors(pe);
-        break;
-    }
-    resizeEvent(NULL);
+    //resizeEvent(NULL);
 }
 
 void GrabWidget::mouseReleaseEvent(QMouseEvent *pe)
@@ -426,7 +461,7 @@ void GrabWidget::resizeEvent(QResizeEvent *)
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
-    m_widthHeight = QString::number(width()) + "x" + QString::number(height());
+	m_widthHeight = QString::number(width()) + "x" + QString::number(height());
 }
 
 void GrabWidget::paintEvent(QPaintEvent *)

@@ -82,6 +82,8 @@ private:
     void setTextColor(QColor color);
     void setOpenConfigButtonBackground(const QColor &color);
 
+	QRect GrabWidget::resizeAccordingly(QMouseEvent *pe);
+
 public:
     static const int ColorIndexWhite = 11;
 

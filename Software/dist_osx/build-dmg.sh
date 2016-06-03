@@ -9,7 +9,7 @@ DMG_NAME="Prismatik.$1.dmg"
 SRC_FOLDER="contents"
 LAYOUT_FILE="dsstore"
 APP_PATH="$SRC_FOLDER/Prismatik.app/Contents/MacOS"
-QT_PATH=~/Qt/5.2.1/clang_64
+QT_PATH=$QTDIR
 
 if [ ! -L "$SRC_FOLDER/Applications" ]; then
 	echo "Creating link to /Applications folder"
@@ -60,8 +60,10 @@ done
 #    done 
 #done
 
-codesign -vvv --deep -s "$IDENTITY" $SRC_FOLDER/Prismatik.app || exit 1
-codesign -vvv --verify $SRC_FOLDER/Prismatik.app || exit 1
+if ["$IDENTITY" != "<none>"]; then
+	codesign -vvv --deep -s "$IDENTITY" $SRC_FOLDER/Prismatik.app || exit 1
+	codesign -vvv --verify $SRC_FOLDER/Prismatik.app || exit 1
+fi
 
 # Create the image
 echo "Creating disk image..."

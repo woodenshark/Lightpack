@@ -25,7 +25,5 @@ echo.
 
 echo.
 
-pause
-
 exit 0
 

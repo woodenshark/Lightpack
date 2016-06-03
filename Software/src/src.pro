@@ -50,9 +50,6 @@ TRANSLATIONS += ../res/translations/ru_RU.ts \
 RESOURCES    = ../res/LightpackResources.qrc
 RC_FILE      = ../res/Lightpack.rc
 
-# Generate .qm language files
-system($$[QT_INSTALL_BINS]/lrelease src.pro)
-
 include(../build-config.prf)
 
 # Grabber types configuration
@@ -152,6 +149,7 @@ macx{
     isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
         # Default value
         # For build universal binaries (native on Intel and PowerPC)
+        message( "Using default QMAKE_MAC_SDK" )
         QMAKE_MAC_SDK = macosx10.9
     } else {
         message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
@@ -159,9 +157,13 @@ macx{
     }
 
     CONFIG(clang) {
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -stdlib=libstdc++ -x objective-c++
+        QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -x objective-c++
     }
 }
+
+# Generate .qm language files
+QMAKE_MAC_SDK = macosx10.9
+system($$[QT_INSTALL_BINS]/lrelease src.pro)
 
 INCLUDEPATH += . \
                .. \

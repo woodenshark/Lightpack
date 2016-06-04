@@ -51,7 +51,7 @@ const QColor GrabWidget::m_colors[GrabWidget::ColorsCount][2] = {
     { Qt::white,       Qt::black }, // ColorIndexWhite == 11
 };
 
-GrabWidget::GrabWidget(int id, int features, QWidget *parent) :
+GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GrabWidget)
 {
@@ -73,6 +73,7 @@ GrabWidget::GrabWidget(int id, int features, QWidget *parent) :
 
 	cmd = NOP;
 	m_features = features;
+	m_fellows = fellows;
 	m_backgroundColor = Qt::white;
 
 	//fillBackgroundColored(); ??
@@ -342,69 +343,117 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 	return QRect(newX, newY, newWidth, newHeight);
 }
 
+bool GrabWidget::snapEdgeToScreenOrClosestFellow(
+	QRect& newRect, 
+	const QRect& screen,
+	std::function<void(QRect&,int)> setter,
+	std::function<int(const QRect&)> getter,
+	std::function<int(const QRect&)> oppositeGetter) {
+	if (abs(getter(newRect) - getter(screen))  < StickyCloserPixels) {
+		setter(newRect, getter(screen));
+		return true;
+	}
+
+	if (m_fellows) {
+		int candidate = INT_MIN;
+		for (auto fellow : *m_fellows) {
+			if (fellow != this) {
+				if (abs(getter(newRect) - getter(fellow->geometry())) < StickyCloserPixels &&
+					abs(getter(newRect) - getter(fellow->geometry())) < abs(candidate - getter(fellow->geometry()))) {
+					candidate = getter(fellow->geometry());
+					break;
+				}
+				if (abs(getter(newRect) - oppositeGetter(fellow->geometry())) < StickyCloserPixels &&
+					abs(getter(newRect) - oppositeGetter(fellow->geometry())) < abs(candidate - oppositeGetter(fellow->geometry()))) {
+					candidate = oppositeGetter(fellow->geometry());
+					break;
+				}
+			}
+		}
+		if (candidate != INT_MIN) {
+			setter(newRect, candidate);
+			return true;
+		}
+	}
+	return false;
+}
+
+
 void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 {
     DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "pe->pos() =" << pe->pos();
 
     QRect screen = QApplication::desktop()->screenGeometry(this);
-
-    int left, top, right, bottom;
-
-	QPoint moveHere;
+	
 	
 	if (cmd == NOP ){
 		checkAndSetCursors(pe);
 	} else if (cmd == MOVE) {
+		QPoint moveHere;
 		moveHere = pe->globalPos() - mousePressPosition;
+		QRect newRect = QRect(moveHere, geometry().size());
+		bool snapped;
 
-		left = moveHere.x();
-		top = moveHere.y();
+		snapped = snapEdgeToScreenOrClosestFellow(
+			newRect, screen,
+			[](QRect& r, int v) { r.moveLeft(v); },
+			[](const QRect& r) { return r.left(); },
+			[](const QRect& r) { return r.right() + 1; });
+		if (!snapped) {
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) { r.moveRight(v); },
+				[](const QRect& r) { return r.right(); },
+				[](const QRect& r) { return r.left() - 1; });
+		}
 
-		right = moveHere.x() + width();
-		bottom = moveHere.y() + height();
+		snapped = snapEdgeToScreenOrClosestFellow(
+			newRect, screen,
+			[](QRect& r, int v) { r.moveTop(v); },
+			[](const QRect& r) { return r.top(); },
+			[](const QRect& r) { return r.bottom() + 1; });
+		if (!snapped) {
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) { r.moveBottom(v); },
+				[](const QRect& r) { return r.bottom(); },
+				[](const QRect& r) { return r.top() - 1; });
+		}
 
-		if (left < screen.left() + StickyCloserPixels &&
-			left > screen.left() - StickyCloserPixels)
-			moveHere.setX(screen.left());
-
-		if (top < screen.top() + StickyCloserPixels &&
-			top > screen.top() - StickyCloserPixels)
-			moveHere.setY(screen.top());
-
-		if (right < screen.right() + StickyCloserPixels &&
-			right > screen.right() - StickyCloserPixels)
-			moveHere.setX(screen.right() - width() + 1);
-
-		if (bottom < screen.bottom() + StickyCloserPixels &&
-			bottom > screen.bottom() - StickyCloserPixels)
-			moveHere.setY(screen.bottom() - height() + 1);
-
-		move(moveHere);
+		move(newRect.topLeft());
 	} else {
 		QRect newRect = resizeAccordingly(pe);
 
-		if (cmd == RESIZE_HOR_RIGHT || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_RIGHT_DOWN) {
-			if (abs(newRect.right() - screen.right())  < StickyCloserPixels) {
-				newRect.setRight(screen.right());
-			}
-		}
-
-		if (cmd == RESIZE_VER_DOWN || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_RIGHT_DOWN) {
-			if (abs(newRect.bottom() - screen.bottom()) < StickyCloserPixels) {
-				newRect.setBottom(screen.bottom());
-			}
-		}
-
 		if (cmd == RESIZE_HOR_LEFT || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_LEFT_UP) {
-			if (abs(newRect.left() - screen.left()) < StickyCloserPixels) {
-				newRect.setLeft(screen.left());
-			}
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) {  r.setLeft(v); },
+				[](const QRect& r) { return r.left(); },
+				[](const QRect& r) { return r.right() + 1; });
 		}
 
 		if (cmd == RESIZE_VER_UP || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_LEFT_UP) {
-			if (newRect.top() - screen.top() < StickyCloserPixels) {
-				newRect.setTop(screen.top());
-			}
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) {  r.setTop(v); },
+				[](const QRect& r) { return r.top(); },
+				[](const QRect& r) { return r.bottom() + 1; });
+		}
+
+		if (cmd == RESIZE_HOR_RIGHT || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_RIGHT_DOWN) {
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) {  r.setRight(v); },
+				[](const QRect& r) { return r.right(); },
+				[](const QRect& r) { return r.left() - 1; });
+		}
+
+		if (cmd == RESIZE_VER_DOWN || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_RIGHT_DOWN) {
+			snapEdgeToScreenOrClosestFellow(
+				newRect, screen,
+				[](QRect& r, int v) {  r.setBottom(v); },
+				[](const QRect& r) { return r.bottom(); },
+				[](const QRect& r) { return r.top() - 1; });
 		}
 		
 		if (newRect.size() != geometry().size()) {
@@ -414,8 +463,6 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 			move(newRect.topLeft());
 		}
 	}
-
-    //resizeEvent(NULL);
 }
 
 void GrabWidget::mouseReleaseEvent(QMouseEvent *pe)

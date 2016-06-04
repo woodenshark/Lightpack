@@ -631,7 +631,7 @@ void GrabManager::initLedWidgets(int numberOfLeds)
     {
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "First widget initialization";
 
-		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, m_parentWidget);
+		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
         connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
         connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
@@ -653,7 +653,7 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 
         for (int i = 0; i < diff; i++)
         {
-			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, m_parentWidget);
+			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
             connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
             connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));

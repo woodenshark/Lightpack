@@ -191,7 +191,7 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
 
 void ZonePlacementPage::addGrabArea(int id, const QRect &r)
 {
-    GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith);
+    GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith, &_grabAreas);
 
     zone->move(r.topLeft());
     zone->resize(r.size());

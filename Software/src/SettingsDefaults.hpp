@@ -163,6 +163,8 @@ static const int RefreshDelayMin = 64;
 static const int RefreshDelayDefault = 100;
 static const int RefreshDelayMax = 1023;
 
+static const bool IsUsbPowerLedDisabled = false;
+
 static const int BrightnessMin = 0;
 static const int BrightnessDefault = 100;
 static const int BrightnessMax = 100;

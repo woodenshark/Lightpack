@@ -32,6 +32,9 @@
 #endif
 
 #define SOFTWARE_VERSION 0x06UL
+// This defines our custom firmware version
+// This helps us detect official and our unofficial firmwares separately (don't forget to increase this every time something has changed)
+#define SOFTWARE_VERSION_UNOFFICIAL 0x01UL
 
 #if(LIGHTPACK_HW == 7)
 #define VERSION_OF_FIRMWARE              (0x0700UL + SOFTWARE_VERSION)
@@ -45,8 +48,9 @@
 #error Unknown Lightpach HW version, check LIGHTPACK_HW value
 #endif
 
-#define VERSION_OF_FIRMWARE_MAJOR        ((VERSION_OF_FIRMWARE & 0xff00) >> 8)
-#define VERSION_OF_FIRMWARE_MINOR         (VERSION_OF_FIRMWARE & 0x00ff)
+#define VERSION_OF_FIRMWARE_MAJOR        ((VERSION_OF_FIRMWARE & 0xFF00) >> 8)
+#define VERSION_OF_FIRMWARE_MINOR        (VERSION_OF_FIRMWARE & 0x00FF)
+#define VERSION_OF_FIRMWARE_UNOFFICIAL   SOFTWARE_VERSION_UNOFFICIAL & 0xFF
 
 
 // Use Bit Angle Modulation (BAM) instead of Pulse Width Modulation (PWM)

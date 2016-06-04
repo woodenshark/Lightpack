@@ -164,6 +164,7 @@ static const QString Speed = "MoodLamp/Speed";
 namespace Device
 {
 static const QString RefreshDelay = "Device/RefreshDelay";
+static const QString IsUsbPowerLedDisabled = "Device/IsUsbPowerLedDisabled";
 static const QString Smooth = "Device/Smooth";
 static const QString Brightness = "Device/Brightness";
 static const QString ColorDepth = "Device/ColorDepth";
@@ -999,6 +1000,16 @@ void Settings::setDeviceRefreshDelay(int value)
     m_this->deviceRefreshDelayChanged(value);
 }
 
+bool Settings::isDeviceUsbPowerLedDisabled() {
+    return value(Profile::Key::Device::IsUsbPowerLedDisabled).toBool();
+}
+
+void Settings::setDeviceUsbPowerLedDisabled(bool isDisabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    setValue(Profile::Key::Device::IsUsbPowerLedDisabled, isDisabled);
+    m_this->deviceUsbPowerLedDisabledChanged(isDisabled);
+}
+
 int Settings::getDeviceBrightness()
 {
     return getValidDeviceBrightness(value(Profile::Key::Device::Brightness).toInt());
@@ -1492,7 +1503,8 @@ void Settings::initCurrentProfile(bool isResetDefault)
     setNewOption(Profile::Key::MoodLamp::Speed,         Profile::MoodLamp::SpeedDefault, isResetDefault);
     // [Device]
     setNewOption(Profile::Key::Device::RefreshDelay,Profile::Device::RefreshDelayDefault, isResetDefault);
-    setNewOption(Profile::Key::Device::Brightness,  Profile::Device::BrightnessDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled, Profile::Device::IsUsbPowerLedDisabled, isResetDefault);
+    setNewOption(Profile::Key::Device::Brightness, Profile::Device::BrightnessDefault, isResetDefault);
     setNewOption(Profile::Key::Device::Smooth,      Profile::Device::SmoothDefault, isResetDefault);
     setNewOption(Profile::Key::Device::Gamma,       Profile::Device::GammaDefault, isResetDefault);
     setNewOption(Profile::Key::Device::ColorDepth,  Profile::Device::ColorDepthDefault, isResetDefault);

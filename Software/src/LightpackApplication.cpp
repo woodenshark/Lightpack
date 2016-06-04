@@ -620,6 +620,7 @@ void LightpackApplication::startLedDeviceManager()
     connect(settings(), SIGNAL(deviceColorDepthChanged(int)),       m_ledDeviceManager, SLOT(setColorDepth(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(deviceSmoothChanged(int)),           m_ledDeviceManager, SLOT(setSmoothSlowdown(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(deviceRefreshDelayChanged(int)),     m_ledDeviceManager, SLOT(setRefreshDelay(int)), Qt::QueuedConnection);
+    connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(deviceGammaChanged(double)),         m_ledDeviceManager, SLOT(setGamma(double)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(deviceBrightnessChanged(int)),       m_ledDeviceManager, SLOT(setBrightness(int)), Qt::QueuedConnection);
 //    connect(settings(), SIGNAL(deviceColorSequenceChanged(QString)),m_ledDeviceManager, SLOT(setColorSequence(QString)), Qt::QueuedConnection);
@@ -640,6 +641,7 @@ void LightpackApplication::startLedDeviceManager()
         connect(m_ledDeviceManager, SIGNAL(openDeviceSuccess(bool)),    m_settingsWindow, SLOT(ledDeviceOpenSuccess(bool)), Qt::QueuedConnection);
         connect(m_ledDeviceManager, SIGNAL(ioDeviceSuccess(bool)),      m_settingsWindow, SLOT(ledDeviceCallSuccess(bool)), Qt::QueuedConnection);
         connect(m_ledDeviceManager, SIGNAL(firmwareVersion(QString)),   m_settingsWindow, SLOT(ledDeviceFirmwareVersionResult(QString)), Qt::QueuedConnection);
+        connect(m_ledDeviceManager, SIGNAL(firmwareVersionUnofficial(int)), m_settingsWindow, SLOT(ledDeviceFirmwareVersionUnofficialResult(int)), Qt::QueuedConnection);
         connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)), Qt::QueuedConnection);
     }
     m_ledDeviceManager->moveToThread(m_ledDeviceManagerThread);

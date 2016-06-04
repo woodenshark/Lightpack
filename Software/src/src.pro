@@ -181,7 +181,6 @@ SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \
     GrabWidget.cpp  GrabConfigWidget.cpp \
     LogWriter.cpp \
-    SpeedTest.cpp \
     LedDeviceLightpack.cpp \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
@@ -206,7 +205,6 @@ SOURCES += \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
-    wizard/GrabAreaWidget.cpp \
     wizard/AndromedaDistributor.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
@@ -227,7 +225,6 @@ HEADERS += \
     GrabConfigWidget.hpp \
     debug.h \
     LogWriter.hpp \
-    SpeedTest.hpp \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
     LedDeviceLightpack.hpp \
@@ -257,7 +254,6 @@ HEADERS += \
     wizard/MonitorIdForm.hpp \
     wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
-    wizard/GrabAreaWidget.hpp \
     wizard/AndromedaDistributor.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
@@ -292,7 +288,6 @@ FORMS += SettingsWindow.ui \
     wizard/MonitorIdForm.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
-    wizard/GrabAreaWidget.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/SelectDevicePage.ui
 

@@ -99,6 +99,10 @@ win32 {
             ../common/WinDXUtils.cpp
 }
 
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++11
+}
+
 macx {
     #QMAKE_LFLAGS += -F/System/Library/Frameworks
 

@@ -34,7 +34,6 @@
 #include "ui_SettingsWindow.h"
 
 #include "Settings.hpp"
-#include "SpeedTest.hpp"
 #include "ColorButton.hpp"
 #include "LedDeviceManager.hpp"
 #include "enums.hpp"
@@ -87,8 +86,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     QRegExpValidator *validatorApiKey = new QRegExpValidator(QRegExp("[a-zA-Z0-9{}_-]*"), this);
     ui->lineEdit_ApiKey->setValidator(validatorApiKey);
-
-    m_speedTest = new SpeedTest();
 
     // hide main tabbar
     QTabBar* tabBar=ui->tabWidget->findChild<QTabBar*>();
@@ -1508,16 +1505,6 @@ void SettingsWindow::loadTranslation(const QString & language)
     }else{
         qWarning() << "Fail load translation for locale" << locale << "pathToLocale" << pathToLocale;
     }
-}
-
-// ----------------------------------------------------------------------------
-// Start grab speed tests
-// ----------------------------------------------------------------------------
-
-void SettingsWindow::startTestsClick()
-{
-    // While testing this function freezes GUI
-    m_speedTest->start();
 }
 
 // ----------------------------------------------------------------------------

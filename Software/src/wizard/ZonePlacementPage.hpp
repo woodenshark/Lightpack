@@ -37,6 +37,7 @@ class ZonePlacementPage;
 class ZoneWidget;
 class AbstractLedDevice;
 class AreaDistributor;
+class GrabWidget;
 
 class ZonePlacementPage : public QWizardPage, SettingsAwareTrait
 {
@@ -75,7 +76,7 @@ private:
     Ui::ZonePlacementPage *_ui;
     QList<ZoneWidget*> _zoneWidgets;
     int _screenId;
-    QList<QWidget*> _grabAreas;
+    QList<GrabWidget*> _grabAreas;
     QRect _newAreaRect;
     int _x0;
     int _y0;

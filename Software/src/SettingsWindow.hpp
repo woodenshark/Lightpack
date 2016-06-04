@@ -34,7 +34,6 @@
 #include "Settings.hpp"
 #include "GrabManager.hpp"
 #include "MoodLampManager.hpp"
-#include "SpeedTest.hpp"
 #include "ColorButton.hpp"
 #include "enums.hpp"
 
@@ -169,8 +168,6 @@ private slots:
 
     void loadTranslation(const QString & language);
 
-    void startTestsClick();
-
     void onExpertModeEnabled_Toggled(bool isEnabled);
     void onEnableApi_Toggled(bool isEnabled);
     void onListenOnlyOnLoInterface_Toggled(bool localOnly);
@@ -243,8 +240,6 @@ private:
     QString m_deviceLockModule;
 
     QTimer m_smoothScrollTimer;
-
-    SpeedTest *m_speedTest;
 
     Grab::GrabberType getSelectedGrabberType();
 

@@ -5,8 +5,7 @@
 # Created on: 25.12.11
 #
 
-#TODO: get the version from a centralized point, eg. version.h
-VERSION=5.11.2.7
+VERSION=`cat ../VERSION`
 
 if [ -z $1 ];
 then

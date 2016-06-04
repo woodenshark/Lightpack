@@ -104,11 +104,14 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 
 ###Firmware build instructions
 
+**Updating firmware on Windows:**
+If you don't want to build the firmware yourself, you can follow the [documentation](https://github.com/Atarity/Lightpack-docs/blob/master/EN/Lightpack_firmware_update_with_FLIP_utility.md) for flashing the latest firmware on Windows.
+
 *Please note that these instructions are for Debian based systems.*
 
 **Compiling firmware only:**
 
-1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain): `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude`
+1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain): `sudo apt-get install gcc-avr binutils-avr avr-libc`
 2. Compile the firmware:
   * `cd Firmware`
   * `make LIGHTPACK_HW=7` (or any other hardware version 4-7)
@@ -117,7 +120,7 @@ to run Prismatik please make sure PythonQt libs are available for load at runtim
 
 **Compiling and uploading firmware to device:**
 
-1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain) and **dfu-programmer**: `sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude dfu-programmer`
+1. Install [AVR GCC Toolchain](http://avr-eclipse.sourceforge.net/wiki/index.php/The_AVR_GCC_Toolchain) and **dfu-programmer**: `sudo apt-get install gcc-avr binutils-avr avr-libc avrdude dfu-programmer`
 2. Reboot device to bootloader (via the secret button on the device)
 3. Compile and upload the firmware:
   * `cd Firmware`

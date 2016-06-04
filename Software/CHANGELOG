@@ -13,6 +13,14 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.8
+---------------
+June 5, 2016
+
+* Grab widgets snap to each other (#40)
+* Ability to toggle the power LED state (#27)
+* Include update check on startup
+
 Version 5.11.2.7
 ---------------
 April 30, 2016

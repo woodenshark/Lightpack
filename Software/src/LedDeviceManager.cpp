@@ -59,7 +59,9 @@ LedDeviceManager::LedDeviceManager(QObject *parent)
 
 LedDeviceManager::~LedDeviceManager()
 {
-    m_ledDeviceThread->deleteLater();
+    m_ledDeviceThread->quit();
+    m_ledDeviceThread->wait();
+
     for (int i = 0; i < m_ledDevices.size(); i++) {
         if(m_ledDevices[i])
             m_ledDevices[i]->close();
@@ -74,7 +76,7 @@ void LedDeviceManager::init()
     if (!m_cmdTimeoutTimer)
         m_cmdTimeoutTimer = new QTimer();
 
-    m_cmdTimeoutTimer->setInterval(100);
+    m_cmdTimeoutTimer->setInterval(1000);
     connect(m_cmdTimeoutTimer, SIGNAL(timeout()), this, SLOT(ledDeviceCommandTimedOut()));
 
     initLedDevice();
@@ -138,6 +140,20 @@ void LedDeviceManager::processOffLeds()
     m_backlightStatus = Backlight::StatusOff;
 
     emit ledDeviceOffLeds();
+}
+
+void LedDeviceManager::setUsbPowerLedDisabled(bool isDisabled) {
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << isDisabled
+        << "Is last command completed:" << m_isLastCommandCompleted;
+
+    if (m_isLastCommandCompleted) {
+        m_cmdTimeoutTimer->start();
+        m_isLastCommandCompleted = false;
+        emit ledDeviceSetUsbPowerLedDisabled(isDisabled);
+    } else {
+        m_savedUsbPowerLedDisabled = isDisabled;
+        cmdQueueAppend(LedDeviceCommands::SetUsbPowerLedDisabled);
+    }
 }
 
 void LedDeviceManager::setRefreshDelay(int value)
@@ -413,6 +429,7 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
     connect(m_ledDevice, SIGNAL(commandCompleted(bool)),        this, SLOT(ledDeviceCommandCompleted(bool)), Qt::QueuedConnection);
 
     connect(m_ledDevice, SIGNAL(firmwareVersion(QString)),      this, SIGNAL(firmwareVersion(QString)), Qt::QueuedConnection);
+    connect(m_ledDevice, SIGNAL(firmwareVersionUnofficial(int)), this, SIGNAL(firmwareVersionUnofficial(int)), Qt::QueuedConnection);
     connect(m_ledDevice, SIGNAL(ioDeviceSuccess(bool)),         this, SIGNAL(ioDeviceSuccess(bool)), Qt::QueuedConnection);
     connect(m_ledDevice, SIGNAL(openDeviceSuccess(bool)),       this, SIGNAL(openDeviceSuccess(bool)), Qt::QueuedConnection);    
     connect(m_ledDevice, SIGNAL(colorsUpdated(QList<QRgb>)),    this, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), Qt::QueuedConnection);
@@ -420,6 +437,7 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
     connect(this, SIGNAL(ledDeviceOpen()),                      m_ledDevice, SLOT(open()), Qt::QueuedConnection);
     connect(this, SIGNAL(ledDeviceSetColors(QList<QRgb>)),      m_ledDevice, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(this, SIGNAL(ledDeviceOffLeds()),                   m_ledDevice, SLOT(switchOffLeds()), Qt::QueuedConnection);
+    connect(this, SIGNAL(ledDeviceSetUsbPowerLedDisabled(bool)), m_ledDevice, SLOT(setUsbPowerLedDisabled(bool)), Qt::QueuedConnection);
     connect(this, SIGNAL(ledDeviceSetRefreshDelay(int)),        m_ledDevice, SLOT(setRefreshDelay(int)), Qt::QueuedConnection);
     connect(this, SIGNAL(ledDeviceSetColorDepth(int)),          m_ledDevice, SLOT(setColorDepth(int)), Qt::QueuedConnection);
     connect(this, SIGNAL(ledDeviceSetSmoothSlowdown(int)),      m_ledDevice, SLOT(setSmoothSlowdown(int)), Qt::QueuedConnection);
@@ -444,6 +462,7 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
     disconnect(m_ledDevice, SIGNAL(commandCompleted(bool)),     this, SLOT(ledDeviceCommandCompleted(bool)));
 
     disconnect(m_ledDevice, SIGNAL(firmwareVersion(QString)),   this, SIGNAL(firmwareVersion(QString)));
+    disconnect(m_ledDevice, SIGNAL(firmwareVersionUnofficial(int)), this, SIGNAL(firmwareVersionUnofficial(int)));
     disconnect(m_ledDevice, SIGNAL(ioDeviceSuccess(bool)),      this, SIGNAL(ioDeviceSuccess(bool)));
     disconnect(m_ledDevice, SIGNAL(openDeviceSuccess(bool)),    this, SIGNAL(openDeviceSuccess(bool)));
     disconnect(m_ledDevice, SIGNAL(colorsUpdated(QList<QRgb>)), this, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)));
@@ -451,6 +470,7 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
     disconnect(this, SIGNAL(ledDeviceOpen()),                   m_ledDevice, SLOT(open()));
     disconnect(this, SIGNAL(ledDeviceSetColors(QList<QRgb>)),   m_ledDevice, SLOT(setColors(QList<QRgb>)));
     disconnect(this, SIGNAL(ledDeviceOffLeds()),                m_ledDevice, SLOT(switchOffLeds()));
+    disconnect(this, SIGNAL(ledDeviceSetUsbPowerLedDisabled(int)), m_ledDevice, SLOT(setUsbPowerLedDisabled(bool)));
     disconnect(this, SIGNAL(ledDeviceSetRefreshDelay(int)),     m_ledDevice, SLOT(setRefreshDelay(int)));
     disconnect(this, SIGNAL(ledDeviceSetColorDepth(int)),       m_ledDevice, SLOT(setColorDepth(int)));
     disconnect(this, SIGNAL(ledDeviceSetSmoothSlowdown(int)),   m_ledDevice, SLOT(setSmoothSlowdown(int)));
@@ -496,6 +516,11 @@ void LedDeviceManager::cmdQueueProcessNext()
                 m_cmdTimeoutTimer->start();
                 emit ledDeviceSetColors(m_savedColors);
             }
+            break;
+
+        case LedDeviceCommands::SetUsbPowerLedDisabled:
+            m_cmdTimeoutTimer->start();
+            emit ledDeviceSetUsbPowerLedDisabled(m_savedUsbPowerLedDisabled);
             break;
 
         case LedDeviceCommands::SetRefreshDelay:

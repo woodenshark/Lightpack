@@ -153,6 +153,7 @@ static hid_device *new_hid_device()
 static void register_error(hid_device *device, const char *op)
 {
 	WCHAR *ptr, *msg;
+	UNREFERENCED_PARAMETER(op);
 
 	FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |

@@ -32,7 +32,7 @@
 #include "AndromedaDistributor.hpp"
 #include "CassiopeiaDistributor.hpp"
 #include "PegasusDistributor.hpp"
-#include "GrabAreaWidget.hpp"
+#include "GrabWidget.hpp"
 #include "LedDeviceLightpack.hpp"
 
 
@@ -73,10 +73,10 @@ void ZonePlacementPage::initializePage()
     _ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 
     if (_isInitFromSettings) {
-        size_t ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
+        int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
         _ui->sbNumberOfLeds->setValue(ledCount);
 
-        for(size_t i = 0; i < ledCount; i++) {
+        for (int i = 0; i < ledCount; i++) {
             QPoint topLeft = Settings::getLedPosition(i);
             QSize size = Settings::getLedSize(i);
             QRect r(topLeft, size);
@@ -191,7 +191,7 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
 
 void ZonePlacementPage::addGrabArea(int id, const QRect &r)
 {
-    GrabAreaWidget *zone = new GrabAreaWidget(id);
+    GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith, &_grabAreas);
 
     zone->move(r.topLeft());
     zone->resize(r.size());

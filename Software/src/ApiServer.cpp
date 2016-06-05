@@ -38,7 +38,7 @@
 using namespace SettingsScope;
 
 // Immediatly after successful connection server sends to client -- ApiVersion
-const char * ApiServer::ApiVersion = "Lightpack API v" API_VERSION " (type \"help\" for more info)\r\n";
+const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
 const char * ApiServer::CmdUnknown = "unknown command\r\n";
 const char * ApiServer::CmdExit = "exit";
 const char * ApiServer::CmdHelp = "help";
@@ -100,6 +100,15 @@ const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 const char * ApiServer::CmdGetBacklight = "getmode";
 const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
 const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
+
+const char * ApiServer::CmdGetGamma = "getgamma";
+const char * ApiServer::CmdResultGamma = "gamma:";
+
+const char * ApiServer::CmdGetBrightness = "getbrightness";
+const char * ApiServer::CmdResultBrightness = "brightness:";
+
+const char * ApiServer::CmdGetSmooth = "getsmooth";
+const char * ApiServer::CmdResultSmooth = "smooth:";
 
 const char * ApiServer::CmdGuid = "guid:";
 
@@ -173,13 +182,18 @@ ApiServer::ApiServer(quint16 port, QObject *parent)
     }
 }
 
+ApiServer::~ApiServer() {
+    m_apiSetColorTaskThread->quit();
+    m_apiSetColorTaskThread->wait();
+}
+
 void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
 {
     QString test = lightpack->Version();
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << test;
     lightpack = lightpackInterface;
     connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(QList<QRgb>)), lightpack, SIGNAL(updateLedsColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(const QList<QRgb> &)), lightpack, SLOT(updateColors(const QList<QRgb> &)), Qt::QueuedConnection);
+    connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(const QList<QRgb> &)), lightpack, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
 
 }
 
@@ -528,6 +542,24 @@ void ApiServer::clientProcessCommands()
                 result = CmdSetResult_Error;
                 break;
             }
+        }
+        else if (cmdBuffer == CmdGetGamma)
+        {
+            API_DEBUG_OUT << CmdGetGamma;
+
+            result = QString("%1%2\r\n").arg(CmdResultGamma).arg(lightpack->GetGamma());
+        }
+        else if (cmdBuffer == CmdGetBrightness)
+        {
+            API_DEBUG_OUT << CmdGetBrightness;
+
+            result = QString("%1%2\r\n").arg(CmdResultBrightness).arg(lightpack->GetBrightness());
+        }
+        else if (cmdBuffer == CmdGetSmooth)
+        {
+            API_DEBUG_OUT << CmdGetSmooth;
+
+            result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
         }
         else if (cmdBuffer.startsWith(CmdGuid))
         {
@@ -1177,7 +1209,9 @@ QString ApiServer::formatHelp(const QString & cmd, const QString & description, 
 void ApiServer::initHelpMessage()
 {
     m_helpMessage += "\r\n";
-    m_helpMessage += "Lightpack " VERSION_STR ". API Server " API_VERSION "\r\n";
+    m_helpMessage += "Prismatik " VERSION_STR ", API " API_VERSION "\r\n";
+    m_helpMessage += "Prismatik API is a fork of the original API\r\n";
+    m_helpMessage += "It is backwards compatible to Lightpack API 1.4\r\n";
     m_helpMessage += "\r\n";
 
     m_helpMessage += formatHelp(
@@ -1258,6 +1292,21 @@ void ApiServer::initHelpMessage()
                 "Get mode of the current profile",
                 formatHelp(CmdResultBacklight_Ambilight) +
                 formatHelp(CmdResultBacklight_Moodlamp)
+                );
+    m_helpMessage += formatHelp(
+                CmdGetGamma,
+                "Get the current gamma correction value",
+                formatHelp(CmdResultGamma + QString("2.004"))
+                );
+    m_helpMessage += formatHelp(
+                CmdGetBrightness,
+                "Get the current brightness value",
+                formatHelp(CmdResultBrightness + QString("100"))
+                );
+    m_helpMessage += formatHelp(
+                CmdGetSmooth,
+                "Get the current smooth value",
+                formatHelp(CmdResultSmooth + QString("1"))
                 );
 
     // Set-commands

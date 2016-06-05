@@ -52,6 +52,7 @@ namespace Lightpack
 enum Mode {
     AmbilightMode,
     MoodLampMode,
+	SoundVisualizeMode,
     UnknownMode,
     Default = AmbilightMode
 };
@@ -68,6 +69,7 @@ enum GrabberType {
     GrabberTypeWinAPIEachWidget,
     GrabberTypeD3D9,
     GrabberTypeMacCoreGraphics,
+    GrabberTypeDDupl,
 
     GrabbersCount,
 
@@ -144,6 +146,7 @@ namespace LedDeviceCommands
 enum Cmd {
     OffLeds,
     SetColors,
+    SetUsbPowerLedDisabled,
     SetRefreshDelay,
     SetColorDepth,
     SetSmoothSlowdown,

@@ -412,7 +412,6 @@ void SettingsWindow::setDeviceTabWidgetsVisibility(DeviceTab::Options options)
 void SettingsWindow::syncLedDeviceWithSettingsWindow()
 {
     emit updateBrightness(Settings::getDeviceBrightness());
-    emit updateSmoothSlowdown(Settings::getDeviceSmooth());
     emit updateGamma(Settings::getDeviceGamma());
 }
 
@@ -527,18 +526,6 @@ void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, 
     if (m_deviceLockStatus == DeviceLocked::Unlocked)
     {
         syncLedDeviceWithSettingsWindow();
-
-        if (Settings::getLightpackMode() == Lightpack::MoodLampMode && ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Switch off smooth if moodlamp liquid mode
-            emit updateSmoothSlowdown(0);
-        }
-    } else {
-        if (Settings::getLightpackMode() == Lightpack::MoodLampMode && ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Restore smooth slowdown value before change control to API
-            emit updateSmoothSlowdown(Settings::getDeviceSmooth());
-        }
     }
 
     startBacklight();
@@ -1160,22 +1147,12 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
         ui->comboBox_LightpackModes->setCurrentIndex(GrabModeIndex);
         ui->stackedWidget_LightpackModes->setCurrentIndex(GrabModeIndex);
         emit showLedWidgets(!ui->radioButton_GrabWidgetsDontShow->isChecked() && this->isVisible());
-        if (ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-//             Restore smooth slowdown value
-            emit updateSmoothSlowdown(Settings::getDeviceSmooth());
-        }
         break;
 
     case Lightpack::MoodLampMode:
         ui->comboBox_LightpackModes->setCurrentIndex(MoodLampModeIndex);
         ui->stackedWidget_LightpackModes->setCurrentIndex(MoodLampModeIndex);
         emit showLedWidgets(false);
-        if (ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Switch off smooth if moodlamp liquid mode
-            emit updateSmoothSlowdown(0);
-        }
         break;
 
     default:
@@ -1209,16 +1186,12 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
         ui->horizontalSlider_MoodLampSpeed->setEnabled(true);
         ui->label_slowMoodLampSpeed->setEnabled(true);
         ui->label_fastMoodLampSpeed->setEnabled(true);
-        // Switch off smooth if liquid mode enabled
-        // this helps normal work liquid mode on hw5 and hw4 lightpacks
-        emit updateSmoothSlowdown(0);
     } else {
         // Constant color mode
         ui->pushButton_SelectColor->setEnabled(true);
         ui->horizontalSlider_MoodLampSpeed->setEnabled(false);
         ui->label_slowMoodLampSpeed->setEnabled(false);
         ui->label_fastMoodLampSpeed->setEnabled(false);
-        emit updateSmoothSlowdown(Settings::getDeviceSmooth());
     }
 }
 

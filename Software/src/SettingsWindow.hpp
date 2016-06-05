@@ -67,7 +67,6 @@ signals:
     void updateLedsColors(const QList<QRgb> &);
     void updateRefreshDelay(int value);
     void updateColorDepth(int value);
-    void updateSmoothSlowdown(int value);
     void updateSlowdown(int value);
     void updateGamma(double value);
     void updateBrightness(int percent);

@@ -156,6 +156,12 @@ static const int SpeedMax = 100;
 static const QString ColorDefault = "#00FF00";
 static const bool IsLiquidMode = true;
 }
+// [SoundVisualizer]
+namespace SoundVisualizer
+{
+static const QString MinColorDefault = "#301000";
+static const QString MaxColorDefault = "#0000FF";
+}
 // [Device]
 namespace Device
 {

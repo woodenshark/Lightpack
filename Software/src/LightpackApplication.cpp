@@ -232,11 +232,6 @@ void LightpackApplication::startBacklight()
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "m_backlightStatus =" << m_backlightStatus
                     << "m_deviceLockStatus =" << m_deviceLockStatus;
 
-    connect(settings(), SIGNAL(moodLampColorChanged(QColor)), m_moodlampManager, SLOT(setCurrentColor(QColor)));
-    connect(settings(), SIGNAL(moodLampSpeedChanged(int)),    m_moodlampManager, SLOT(setLiquidModeSpeed(int)));
-    connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),    m_moodlampManager, SLOT(setLiquidMode(bool)));
-//    connect(settings(), SIGNAL(profileLoaded(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)));
-
     bool isBacklightEnabled = (m_backlightStatus == Backlight::StatusOn || m_backlightStatus == Backlight::StatusDeviceError);
     bool isCanStart = (isBacklightEnabled && m_deviceLockStatus == DeviceLocked::Unlocked);
 
@@ -249,13 +244,27 @@ void LightpackApplication::startBacklight()
     {
     case Lightpack::AmbilightMode:
         m_grabManager->start(isCanStart);
-        m_moodlampManager->start(false);
+		m_moodlampManager->start(false);
+#ifdef BASS_SOUND_SUPPORT
+		m_soundManager->start(false);
+#endif
         break;
 
     case Lightpack::MoodLampMode:
         m_grabManager->start(false);
-        m_moodlampManager->start(isCanStart);
+		m_moodlampManager->start(isCanStart);
+#ifdef BASS_SOUND_SUPPORT
+		m_soundManager->start(false);
+#endif
         break;
+
+#ifdef BASS_SOUND_SUPPORT
+	case Lightpack::SoundVisualizeMode:
+		m_grabManager->start(false);
+		m_moodlampManager->start(false);
+		m_soundManager->start(isCanStart);
+		break;
+#endif
 
     default:
         qWarning() << Q_FUNC_INFO << "lightpackMode unsupported value =" << lightpackMode;
@@ -272,7 +281,10 @@ void LightpackApplication::startBacklight()
     {
     case Backlight::StatusOff:
         emit clearColorBuffers();
-        break;
+		break;
+
+	case Backlight::StatusOn:
+		break;
 
     default:
         qWarning() << Q_FUNC_INFO << "status contains crap =" << m_backlightStatus;
@@ -676,11 +688,16 @@ void LightpackApplication::startPluginManager()
 void LightpackApplication::initGrabManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-    m_grabManager = new GrabManager(NULL);
-    m_moodlampManager = new MoodLampManager(NULL);
+	m_grabManager = new GrabManager(NULL);
 
-    m_moodlampManager->initFromSettings();
+	m_moodlampManager = new MoodLampManager(NULL);
+	m_moodlampManager->initFromSettings();
 
+#ifdef BASS_SOUND_SUPPORT
+	m_soundManager = new SoundManager(m_settingsWindow->winId(), NULL);
+	m_soundManager->initFromSettings();
+#endif
+	
     connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)), m_grabManager, SLOT(onGrabberTypeChanged(const Grab::GrabberType &)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabSlowdownChanged(int)), m_grabManager, SLOT(onGrabSlowdownChanged(int)), Qt::QueuedConnection);
     connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)), m_grabManager, SLOT(onGrabAvgColorsEnabledChanged(bool)), Qt::QueuedConnection);
@@ -690,10 +707,25 @@ void LightpackApplication::initGrabManager()
     connect(settings(), SIGNAL(dx9GrabberEnabledChanged(bool)), m_grabManager, SLOT(onDx9GrabberEnabledChanged(bool)), Qt::QueuedConnection);
 #endif
 
-    connect(settings(), SIGNAL(profileLoaded(const QString &)),        m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
-    connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
-//    connect(settings(), SIGNAL(profileLoaded(const QString &)),        m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
-//    connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(moodLampColorChanged(QColor)), m_moodlampManager, SLOT(setCurrentColor(QColor)));
+	connect(settings(), SIGNAL(moodLampSpeedChanged(int)), m_moodlampManager, SLOT(setLiquidModeSpeed(int)));
+	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)), m_moodlampManager, SLOT(setLiquidMode(bool)));
+
+#ifdef BASS_SOUND_SUPPORT
+	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)), m_soundManager, SLOT(setMinColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)), m_soundManager, SLOT(setMaxColor(QColor)));
+#endif
+
+	connect(settings(), SIGNAL(profileLoaded(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_grabManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+
+    connect(settings(), SIGNAL(profileLoaded(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+#ifdef BASS_SOUND_SUPPORT
+	connect(settings(), SIGNAL(profileLoaded(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)), m_moodlampManager, SLOT(settingsProfileChanged(const QString &)), Qt::QueuedConnection);
+#endif
+
     // Connections to signals which will be connected to ILedDevice
     if (!m_noGui)
     {
@@ -702,12 +734,15 @@ void LightpackApplication::initGrabManager()
 
         // GrabManager to this
         connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_settingsWindow, SLOT(refreshAmbilightEvaluated(double)));
-    }
+	}
+
+	connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
 
     connect(m_grabManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
     connect(m_moodlampManager, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
-
+#ifdef BASS_SOUND_SUPPORT
+	connect(m_soundManager, SIGNAL(updateLedsColors(const QList<QRgb> &)), m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+#endif
 }
 
 void LightpackApplication::commitData(QSessionManager &sessionManager)
@@ -745,33 +780,55 @@ void LightpackApplication::settingsChanged()
 
     m_grabManager->onSendDataOnlyIfColorsEnabledChanged(Settings::isSendDataOnlyIfColorsChanges());
 
-    m_moodlampManager->setSendDataOnlyIfColorsChanged(Settings::isSendDataOnlyIfColorsChanges());
+	m_moodlampManager->setSendDataOnlyIfColorsChanged(Settings::isSendDataOnlyIfColorsChanges());
+
 
     m_moodlampManager->setCurrentColor(Settings::getMoodLampColor());
     m_moodlampManager->setLiquidModeSpeed(Settings::getMoodLampSpeed());
     m_moodlampManager->setLiquidMode(Settings::isMoodLampLiquidMode());
 
     bool isBacklightEnabled = Settings::isBacklightEnabled();
-    bool isCanStart =(isBacklightEnabled && m_deviceLockStatus == DeviceLocked::Unlocked);
+    bool isCanStart = (isBacklightEnabled && m_deviceLockStatus == DeviceLocked::Unlocked);
 
 //    numberOfLedsChanged(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
+
+#ifdef BASS_SOUND_SUPPORT
+	m_soundManager->setSendDataOnlyIfColorsChanged(Settings::isSendDataOnlyIfColorsChanges());
+#endif
 
     switch (Settings::getLightpackMode())
     {
     case Lightpack::AmbilightMode:
         m_grabManager->start(isCanStart);
-        m_moodlampManager->start(false);
+		m_moodlampManager->start(false);
+#ifdef BASS_SOUND_SUPPORT
+		m_soundManager->start(false);
+#endif
         break;
+
+#ifdef BASS_SOUND_SUPPORT
+	case Lightpack::SoundVisualizeMode:
+		m_grabManager->start(false);
+		m_moodlampManager->start(false);
+		m_soundManager->start(isCanStart);
+		break;
+#endif
 
     default:
         m_grabManager->start(false);
-        m_moodlampManager->start(isCanStart);
+		m_moodlampManager->start(isCanStart);
+#ifdef BASS_SOUND_SUPPORT
+		m_soundManager->start(false);
+#endif
         break;
     }
 
     //Force update colors on device for start ping device
-    m_grabManager->reset();
-    m_moodlampManager->reset();
+	m_grabManager->reset();
+	m_moodlampManager->reset();
+#ifdef BASS_SOUND_SUPPORT
+	m_soundManager->reset();
+#endif
 
 }
 

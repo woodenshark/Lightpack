@@ -185,6 +185,13 @@ public:
     static int getMoodLampSpeed();
     static void setMoodLampSpeed(int value);
 
+#ifdef BASS_SOUND_SUPPORT
+	static QColor getSoundVisualizerMinColor();
+	static void setSoundVisualizerMinColor(QColor color);
+	static QColor getSoundVisualizerMaxColor();
+	static void setSoundVisualizerMaxColor(QColor color);
+#endif
+
     static QList<WBAdjustment> getLedCoefs();
 
     static double getLedCoefRed(int ledIndex);
@@ -283,6 +290,10 @@ signals:
     void moodLampLiquidModeChanged(bool isLiquidMode);
     void moodLampColorChanged(const QColor color);
     void moodLampSpeedChanged(int value);
+#ifdef BASS_SOUND_SUPPORT
+	void soundVisualizerMinColorChanged(const QColor color);
+	void soundVisualizerMaxColorChanged(const QColor color);
+#endif
     void ledCoefRedChanged(int ledIndex, double value);
     void ledCoefGreenChanged(int ledIndex, double value);
     void ledCoefBlueChanged(int ledIndex, double value);

@@ -213,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -235,6 +235,53 @@
         <property name="rightMargin">
          <number>20</number>
         </property>
+        <item row="5" column="0">
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>1</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="0">
+         <widget class="QComboBox" name="comboBox_LightpackModes">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>Screen grabbing</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mood lamp</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sound visualization</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QStackedWidget" name="stackedWidget_LightpackModes">
           <property name="sizePolicy">
@@ -244,10 +291,16 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page">
            <layout class="QVBoxLayout" name="verticalLayout_12">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0">
               <item row="0" column="1">
@@ -377,122 +430,6 @@
              </layout>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_3">
-              <property name="title">
-               <string>Eyes care settings</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="7" column="0">
-                <widget class="QRadioButton" name="radioButton_LuminosityDeadZone">
-                 <property name="text">
-                  <string>Dead-zone</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="styleSheet">
-                  <string notr="true">margin-top:0px;</string>
-                 </property>
-                 <property name="text">
-                  <string>Scene luminosity threshold:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0">
-                <widget class="QLabel" name="label_luminosityThresholdUsedFor">
-                 <property name="text">
-                  <string>Luminosity threshold is used for:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
-                <widget class="QRadioButton" name="radioButton_MinimumLuminosity">
-                 <property name="text">
-                  <string>Minimum luminosity level</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="3">
-                <widget class="QSpinBox" name="spinBox_LuminosityThreshold">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>50</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="minimum">
-                  <number>0</number>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="4">
-                <widget class="QPushButton" name="pushButton_lumosityThresholdHelp">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">margin: 0px;</string>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../res/LightpackResources.qrc">
-                   <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QSlider" name="horizontalSlider_LuminosityThreshold">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="whatsThis">
-                  <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can either use &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in dark scenes or you can use &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turns lights OFF in dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
                <string>Appearance of grab widgets</string>
@@ -532,6 +469,12 @@
           </widget>
           <widget class="QWidget" name="page_2">
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -548,7 +491,7 @@
                </widget>
               </item>
               <item>
-               <widget class="ColorButton" name="pushButton_SelectColor">
+               <widget class="ColorButton" name="pushButton_SelectColorMoodLamp">
                 <property name="text">
                  <string/>
                 </property>
@@ -653,9 +596,95 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="page_3">
+           <layout class="QVBoxLayout" name="verticalLayout_17">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Animate colors from</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="ColorButton" name="pushButton_SelectColorSoundVizMin">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>to</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="ColorButton" name="pushButton_SelectColorSoundVizMax">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>136</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <property name="topMargin">
            <number>5</number>
@@ -741,53 +770,127 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="0">
-         <spacer name="verticalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>1</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="0">
-         <widget class="QComboBox" name="comboBox_LightpackModes">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>Screen grabbing</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Mood lamp</string>
-           </property>
-          </item>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_14">
           <property name="text">
            <string>Mode:</string>
           </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Eye care settings</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="7" column="0">
+            <widget class="QRadioButton" name="radioButton_LuminosityDeadZone">
+             <property name="text">
+              <string>Dead-zone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="styleSheet">
+              <string notr="true">margin-top:0px;</string>
+             </property>
+             <property name="text">
+              <string>Scene luminosity threshold:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_luminosityThresholdUsedFor">
+             <property name="text">
+              <string>Luminosity threshold is used for:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QRadioButton" name="radioButton_MinimumLuminosity">
+             <property name="text">
+              <string>Minimum luminosity level</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QSpinBox" name="spinBox_LuminosityThreshold">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>50</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="4">
+            <widget class="QPushButton" name="pushButton_lumosityThresholdHelp">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">margin: 0px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../res/LightpackResources.qrc">
+               <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QSlider" name="horizontalSlider_LuminosityThreshold">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can either use &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in dark scenes or you can use &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turns lights OFF in dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>

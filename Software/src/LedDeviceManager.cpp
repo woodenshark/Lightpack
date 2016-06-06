@@ -76,7 +76,7 @@ void LedDeviceManager::init()
     if (!m_cmdTimeoutTimer)
         m_cmdTimeoutTimer = new QTimer();
 
-    m_cmdTimeoutTimer->setInterval(1000);
+    m_cmdTimeoutTimer->setInterval(100);
     connect(m_cmdTimeoutTimer, SIGNAL(timeout()), this, SLOT(ledDeviceCommandTimedOut()));
 
     initLedDevice();

@@ -146,15 +146,15 @@ macx{
 
     QMAKE_INFO_PLIST = ./Info.plist
 
-    isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
-        # Default value
-        # For build universal binaries (native on Intel and PowerPC)
-        message( "Using default QMAKE_MAC_SDK" )
-        QMAKE_MAC_SDK = macosx10.9
-    } else {
-        message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
-        QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
-    }
+	#see build-vars.prf
+    #isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
+    #    # Default value
+    #    # For build universal binaries (native on Intel and PowerPC)
+    #    QMAKE_MAC_SDK = macosx10.9
+    #} else {
+    #    message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
+    #    QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
+    #}
 
     CONFIG(clang) {
         QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -x objective-c++

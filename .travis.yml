@@ -1,0 +1,26 @@
+language: cpp
+#language: objective-c
+
+notifications:
+  email: false
+
+os:
+  - osx
+  
+before_install:
+  - brew update
+  - brew install qt5
+  - export QTDIR=/usr/local/opt/qt5/
+  - export PATH=$PATH:$QTDIR/bin
+  - export VERSION=`cat Software/VERSION`
+  - qmake -v
+
+script:
+  - export QMAKE_MAC_SDK=macosx10.8
+  - cd Software
+  - ./update_locales.sh
+  - qmake -r
+  - make
+  - macdeployqt bin/Prismatik.app -dmg
+  - ls bin
+  - curl -T bin/Prismatik.dmg "https://psieg.de/lightpack/osx_builds/Prismatik_${VERSION}_${TRAVIS_BUILD_NUMBER}.dmg" -u "${PSIEG_UPLOAD_USER}:${PSIEG_UPLOAD_PASSWORD}"

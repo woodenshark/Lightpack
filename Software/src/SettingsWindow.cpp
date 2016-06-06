@@ -55,7 +55,10 @@ const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.co
 
 // Indexes of supported modes listed in ui->comboBox_Modes and ui->stackedWidget_Modes
 const int SettingsWindow::GrabModeIndex = 0;
-const int SettingsWindow::MoodLampModeIndex  = 1;
+const int SettingsWindow::MoodLampModeIndex = 1;
+#ifdef BASS_SOUND_SUPPORT
+const int SettingsWindow::SoundVisualizeModeIndex = 2;
+#endif
 
 SettingsWindow::SettingsWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -115,6 +118,12 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui->checkBox_DisableUsbPowerLed->setVisible(false);
 
     updateStatusBar();
+
+#ifdef BASS_SOUND_SUPPORT
+	ui->label_licenseAndCredits->setText(ui->label_licenseAndCredits->text() + tr(" The sound visualizer uses the <a href=\"http://un4seen.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">BASS</span></a> library."));
+#else
+	ui->comboBox_LightpackModes->removeItem(2);
+#endif
 
     initGrabbersRadioButtonsVisibility();
     initLanguages();
@@ -220,7 +229,11 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->pushButton_ProfileResetToDefault, SIGNAL(clicked()), this, SLOT(profileResetToDefaultCurrent()));
     connect(ui->pushButton_DeleteProfile, SIGNAL(clicked()), this, SLOT(profileDeleteCurrent()));
 
-    connect(ui->pushButton_SelectColor, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
+    connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
+#ifdef BASS_SOUND_SUPPORT
+	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
+	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
+#endif
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
@@ -412,7 +425,6 @@ void SettingsWindow::setDeviceTabWidgetsVisibility(DeviceTab::Options options)
 void SettingsWindow::syncLedDeviceWithSettingsWindow()
 {
     emit updateBrightness(Settings::getDeviceBrightness());
-    emit updateSmoothSlowdown(Settings::getDeviceSmooth());
     emit updateGamma(Settings::getDeviceGamma());
 }
 
@@ -527,18 +539,6 @@ void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, 
     if (m_deviceLockStatus == DeviceLocked::Unlocked)
     {
         syncLedDeviceWithSettingsWindow();
-
-        if (Settings::getLightpackMode() == Lightpack::MoodLampMode && ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Switch off smooth if moodlamp liquid mode
-            emit updateSmoothSlowdown(0);
-        }
-    } else {
-        if (Settings::getLightpackMode() == Lightpack::MoodLampMode && ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Restore smooth slowdown value before change control to API
-            emit updateSmoothSlowdown(Settings::getDeviceSmooth());
-        }
     }
 
     startBacklight();
@@ -605,17 +605,6 @@ void SettingsWindow::toggleBacklight()
     emit backlightStatusChanged(m_backlightStatus);
 
     startBacklight();
-}
-
-void SettingsWindow::toggleBacklightMode()
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-
-    using namespace Lightpack;
-
-    Mode curMode = Settings::getLightpackMode();
-
-    Settings::setLightpackMode(curMode == AmbilightMode ? MoodLampMode : AmbilightMode );
 }
 
 void SettingsWindow::startBacklight()
@@ -936,10 +925,7 @@ void SettingsWindow::ledDeviceOpenSuccess(bool isSuccess)
 
 void SettingsWindow::ledDeviceCallSuccess(bool isSuccess)
 {    
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << isSuccess << m_backlightStatus;
-#if 0
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
-#endif
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << isSuccess << m_backlightStatus << sender();
 
     // If Backlight::StatusOff then nothings changed
 
@@ -1132,22 +1118,19 @@ void SettingsWindow::onLightpackModes_currentIndexChanged(int index)
 
     using namespace Lightpack;
 
+	switch (index) {
+		case MoodLampModeIndex:
+			Settings::setLightpackMode(MoodLampMode);
+			break;
+#ifdef BASS_SOUND_SUPPORT
+		case SoundVisualizeModeIndex:
+			Settings::setLightpackMode(SoundVisualizeMode);
+			break;
+#endif
+		default:
+			Settings::setLightpackMode(AmbilightMode);
 
-    // Dirty hack to ignore index change when combobox is re-populated by Qt framework
-    // TODO: get rid of combobox for Mode UI component
-    static int hack = -1;
-    if (index >= 0) {
-        if (-1 == hack)
-            Settings::setLightpackMode(index == GrabModeIndex ? AmbilightMode : MoodLampMode);
-        else {
-            ui->comboBox_LightpackModes->setCurrentIndex(hack);
-            hack = -1;
-        }
-    }
-    else {
-        hack = Settings::getLightpackMode() == MoodLampMode ? MoodLampModeIndex : GrabModeIndex;
-        DEBUG_MID_LEVEL << "Mode combo hack: " << hack;
-    }
+	}
 }
 
 void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
@@ -1160,23 +1143,21 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
         ui->comboBox_LightpackModes->setCurrentIndex(GrabModeIndex);
         ui->stackedWidget_LightpackModes->setCurrentIndex(GrabModeIndex);
         emit showLedWidgets(!ui->radioButton_GrabWidgetsDontShow->isChecked() && this->isVisible());
-        if (ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-//             Restore smooth slowdown value
-            emit updateSmoothSlowdown(Settings::getDeviceSmooth());
-        }
         break;
 
     case Lightpack::MoodLampMode:
         ui->comboBox_LightpackModes->setCurrentIndex(MoodLampModeIndex);
         ui->stackedWidget_LightpackModes->setCurrentIndex(MoodLampModeIndex);
         emit showLedWidgets(false);
-        if (ui->radioButton_LiquidColorMoodLampMode->isChecked())
-        {
-            // Switch off smooth if moodlamp liquid mode
-            emit updateSmoothSlowdown(0);
-        }
         break;
+
+#ifdef BASS_SOUND_SUPPORT
+	case SoundVisualizeModeIndex:
+		ui->comboBox_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
+		ui->stackedWidget_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
+		emit showLedWidgets(false);
+		break;
+#endif
 
     default:
         DEBUG_LOW_LEVEL << "LightpacckMode unsuppotred value =" << mode;
@@ -1187,8 +1168,8 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
 
 void SettingsWindow::onMoodLampColor_changed(QColor color)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
-    Settings::setMoodLampColor(color);
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
+	Settings::setMoodLampColor(color);
 }
 
 void SettingsWindow::onMoodLampSpeed_valueChanged(int value)
@@ -1205,22 +1186,32 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
     if (Settings::isMoodLampLiquidMode())
     {
         // Liquid color mode
-        ui->pushButton_SelectColor->setEnabled(false);
+        ui->pushButton_SelectColorMoodLamp->setEnabled(false);
         ui->horizontalSlider_MoodLampSpeed->setEnabled(true);
         ui->label_slowMoodLampSpeed->setEnabled(true);
         ui->label_fastMoodLampSpeed->setEnabled(true);
-        // Switch off smooth if liquid mode enabled
-        // this helps normal work liquid mode on hw5 and hw4 lightpacks
-        emit updateSmoothSlowdown(0);
     } else {
         // Constant color mode
-        ui->pushButton_SelectColor->setEnabled(true);
+		ui->pushButton_SelectColorMoodLamp->setEnabled(true);
         ui->horizontalSlider_MoodLampSpeed->setEnabled(false);
         ui->label_slowMoodLampSpeed->setEnabled(false);
         ui->label_fastMoodLampSpeed->setEnabled(false);
-        emit updateSmoothSlowdown(Settings::getDeviceSmooth());
     }
 }
+
+#ifdef BASS_SOUND_SUPPORT
+void SettingsWindow::onSoundVizMinColor_changed(QColor color)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
+	Settings::setSoundVisualizerMinColor(color);
+}
+
+void SettingsWindow::onSoundVizMaxColor_changed(QColor color)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
+	Settings::setSoundVisualizerMaxColor(color);
+}
+#endif
 
 void SettingsWindow::onDontShowLedWidgets_Toggled(bool checked)
 {
@@ -1575,8 +1566,13 @@ void SettingsWindow::updateUiFromSettings()
     // Check the selected moodlamp mode (setChecked(false) not working to select another)
     ui->radioButton_ConstantColorMoodLampMode->setChecked            (!Settings::isMoodLampLiquidMode());
     ui->radioButton_LiquidColorMoodLampMode->setChecked              (Settings::isMoodLampLiquidMode());
-    ui->pushButton_SelectColor->setColor                             (Settings::getMoodLampColor());
+    ui->pushButton_SelectColorMoodLamp->setColor                     (Settings::getMoodLampColor());
     ui->horizontalSlider_MoodLampSpeed->setValue                     (Settings::getMoodLampSpeed());
+
+#ifdef BASS_SOUND_SUPPORT
+	ui->pushButton_SelectColorSoundVizMin->setColor                  (Settings::getSoundVisualizerMinColor());
+	ui->pushButton_SelectColorSoundVizMax->setColor                  (Settings::getSoundVisualizerMaxColor());
+#endif
 
     ui->checkBox_DisableUsbPowerLed->setChecked                      (Settings::isDeviceUsbPowerLedDisabled());
     ui->horizontalSlider_DeviceRefreshDelay->setValue                (Settings::getDeviceRefreshDelay());

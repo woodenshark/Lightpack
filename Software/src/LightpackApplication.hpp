@@ -111,6 +111,9 @@ private:
     QThread *m_apiServerThread;
     GrabManager *m_grabManager;
     MoodLampManager *m_moodlampManager;
+#ifdef BASS_SOUND_SUPPORT
+	SoundManager *m_soundManager;
+#endif
 
     PluginsManager *m_pluginManager;
     LightpackPluginInterface *m_pluginInterface;

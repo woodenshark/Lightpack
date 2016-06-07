@@ -48,6 +48,9 @@ Settings_t g_Settings =
 
         // Timer OCR value
         .timerOutputCompareRegValue = 100,
+
+        // The enabled state of the blue USB LED on the back of the device
+        .isUsbLedEnabled = true,
 };
 
 /*

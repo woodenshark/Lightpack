@@ -12,9 +12,8 @@ GAPIProxyFrameGrabber::GAPIProxyFrameGrabber(HANDLE syncRunMutex) {
 }
 
 GAPIProxyFrameGrabber::~GAPIProxyFrameGrabber() {
-    if (this->isHooksInstalled())
-        this->removeHooks();
-    this->free();
+    // calling free here would not call the virtual overriden free of a derived class and therefore
+    // would not have the desired effect. All derived classes must call free themselves
 }
 
 bool GAPIProxyFrameGrabber::startOverallPerfCount() {

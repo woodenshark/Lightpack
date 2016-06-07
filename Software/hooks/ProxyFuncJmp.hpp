@@ -15,7 +15,7 @@ public:
     virtual bool removeHook();
 
 private:
-    static const int kJmpInstructionSize = 6;
+    static const int kJmpInstructionSize = 5;
     unsigned char m_pOriginalCode[kJmpInstructionSize];
     unsigned char m_pJmpCode[kJmpInstructionSize];
 };

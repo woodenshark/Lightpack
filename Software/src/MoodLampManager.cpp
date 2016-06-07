@@ -46,11 +46,7 @@ MoodLampManager::MoodLampManager(QObject *parent) : QObject(parent)
     m_isMoodLampEnabled = false;
     m_rgbSaved = 0;
 
-    m_isLiquidMode = Settings::isMoodLampLiquidMode();
-    m_liquidModeSpeed = Settings::getMoodLampSpeed();
-    m_currentColor = Settings::getMoodLampColor();
-
-    m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
+	initFromSettings();
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
 }

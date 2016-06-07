@@ -6,7 +6,7 @@
  */
 
 #ifndef HOOKSDLL_H
-#define	HOOKSDLL_H
+#define    HOOKSDLL_H
 
 #if !defined NOMINMAX
 #define NOMINMAX
@@ -23,5 +23,5 @@
 #define HOOKSDLL_API __declspec(dllimport)
 #endif
 
-#endif	/* HOOKSDLL_H */
+#endif    /* HOOKSDLL_H */
 

@@ -19,12 +19,10 @@ public:
     ~GAPIProxyFrameGrabber();
     virtual bool init() = 0;
     virtual bool isGAPILoaded() = 0;
-    //must be overidden in derived classes
-    virtual bool isHooksInstalled(){return false;}
+    virtual bool isHooksInstalled() = 0;
     virtual bool installHooks() = 0;
-    //must be overidden in derived classes
-    virtual bool removeHooks(){return false;}
-    virtual void free(){}
+    virtual bool removeHooks() = 0;
+    virtual void free() = 0;
 
     void setIPCContext(IPCContext *ipcContext) { m_ipcContext = ipcContext; }
 

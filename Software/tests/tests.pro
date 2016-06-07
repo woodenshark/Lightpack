@@ -12,6 +12,8 @@ DESTDIR     = bin
 CONFIG     += console
 CONFIG     -= app_bundle
 
+include(../build-config.prf)
+
 CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
 
 # QMake and GCC produce a lot of stuff

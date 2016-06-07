@@ -24,6 +24,9 @@
  */
 
 #include "LibraryInjector.h"
+#ifdef _WIN64
+#include "../common/D3D10GrabberDefs.hpp"
+#endif
 
 #include <stdarg.h>
 #include <olectl.h>
@@ -39,6 +42,12 @@ static volatile LONG locksCount = 0;
 
 #define REPORT_LOG_BUF_SIZE 2048
 static HANDLE hEventSrc = NULL;
+
+#ifdef _DEBUG
+#define INJECT_WAIT_DELAY INFINITE
+#else
+#define INJECT_WAIT_DELAY 2000
+#endif
 
 typedef struct {
     const ILibraryInjectorVtbl *lpVtbl;
@@ -128,96 +137,122 @@ static HRESULT STDMETHODCALLTYPE LibraryInjector_QueryInterface(ILibraryInjector
     return(NOERROR);
 }
 
-static ULONG STDMETHODCALLTYPE LibraryInjector_AddRef(LibraryInjector * this) {
-    return InterlockedIncrement(&(this->refCount));
+static ULONG STDMETHODCALLTYPE LibraryInjector_AddRef(ILibraryInjector * this) {
+    return InterlockedIncrement(&(((LibraryInjector*)this)->refCount));
 }
 
-static ULONG STDMETHODCALLTYPE LibraryInjector_Release(LibraryInjector * this) {
-    InterlockedDecrement(&(this->refCount));
-    if ((this->refCount) == 0) {
-        freeLibraryInjector(this);
+static ULONG STDMETHODCALLTYPE LibraryInjector_Release(ILibraryInjector * this) {
+    LibraryInjector * _this = (LibraryInjector*)this;
+    InterlockedDecrement(&(_this->refCount));
+    if ((_this->refCount) == 0) {
+        freeLibraryInjector(_this);
         return(0);
     }
-    return (this->refCount);
+    return (_this->refCount);
 }
 
 static HRESULT STDMETHODCALLTYPE LibraryInjector_Inject(ILibraryInjector * this, DWORD ProcessId, LPWSTR ModulePath) {
-    char CodePage[4096] ={
-        0x90,                                     // nop (to replace with int 3h - 0xCC)
-        0xC7, 0x04, 0xE4, 0x00, 0x00, 0x00, 0x00, // mov DWORD PTR [esp], 0h | DLLName to inject (DWORD)
-        0xB8, 0x00, 0x00, 0x00, 0x00,             // mov eax, LoadLibProc
-        0xFF, 0xD0,                               // call eax
-        0x83, 0xEC, 0x04,                         // sub esp,4
-        0xB8, 0x00, 0x00, 0x00, 0x00,             // mov eax, ExitTheadProc
-        0xFF, 0xD0                                // call eax
-    };
+    char CodePage[2048];
+    WCHAR modulePath[300];
 
+    wcscpy(modulePath, ModulePath);
     UNREFERENCED_PARAMETER(this);
-
-#define LIB_NAME_OFFSET 4
-#define LOAD_LIB_OFFSET 9
-#define EXIT_THREAD_OFFSET 19
-#define SIZE_OF_CODE 25
-    reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
+    //reportLog(EVENTLOG_INFORMATION_TYPE, L"injecting library...");
     if(AcquirePrivilege()) {
-        int sizeofCP;
-        LPVOID Memory;
-        LPWSTR DLLName;
-        DWORD *LoadLibProc, *LibNameArg, *ExitThreadProc;
-        HANDLE hThread;
+        size_t sizeofCP;
+        LPVOID Memory = NULL;
+        HANDLE hThread = NULL;
         HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
+        HRESULT result = E_FAIL;
 
-        HANDLE Process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+        DWORD_PTR LoadLibAddr = (DWORD_PTR)GetProcAddress(hKernel32, "LoadLibraryW");
 
-        if (Process == NULL) {
+        HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+
+        if (hProcess == NULL) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't open process");
-            return S_FALSE;
+            goto end;
         }
 
-        sizeofCP = wcslen(ModulePath)*2 + SIZE_OF_CODE + 1;
-        Memory = VirtualAllocEx(Process, 0, sizeofCP, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#ifdef _WIN64
+        BOOL isWow64Process = FALSE;
+        IsWow64Process(hProcess, &isWow64Process);
+        if (isWow64Process) {
+
+            HANDLE mapping = OpenFileMapping(FILE_MAP_READ, FALSE, HOOKSGRABBER_SHARED_MEM_NAME);
+            if (NULL == mapping) {
+                reportLog(EVENTLOG_ERROR_TYPE, L"couldn't open shared memory");
+                goto end;
+            }
+
+            char *memory = (char *)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, HOOKSGRABBER_SHARED_MEM_SIZE);
+            if (memory == NULL) {
+                reportLog(EVENTLOG_ERROR_TYPE, L"couldn't map shared memory");
+                CloseHandle(mapping);
+                goto end;
+            }
+
+            size_t len = wcslen(modulePath);
+            wcscpy(modulePath + len - 4, L"32.dll");
+
+            struct HOOKSGRABBER_SHARED_MEM_DESC *desc = (struct HOOKSGRABBER_SHARED_MEM_DESC*)memory;
+
+            LoadLibAddr = desc->loadLibraryWAddress32;
+
+            UnmapViewOfFile(memory);
+            CloseHandle(mapping);
+        }
+#endif
+
+        sizeofCP = wcslen(modulePath)*2 + 1;
+        Memory = VirtualAllocEx(hProcess, 0, sizeofCP, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
         if (!Memory) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't allocate memory");
-            return S_FALSE;
+            goto end;
         }
 
-        DLLName = (LPWSTR) ((DWORD) CodePage + SIZE_OF_CODE);
-        LoadLibProc = (DWORD*) (CodePage + LOAD_LIB_OFFSET);
-        LibNameArg = (DWORD*) (CodePage + LIB_NAME_OFFSET);
-        ExitThreadProc = (DWORD*) (CodePage + EXIT_THREAD_OFFSET);
+        wcscpy((wchar_t*)CodePage, modulePath);
 
-        wcscpy(DLLName, ModulePath);
-        *LoadLibProc = (DWORD) GetProcAddress(hKernel32, "LoadLibraryW");
-        *ExitThreadProc = (DWORD) GetProcAddress(hKernel32, "ExitThread");
-        *LibNameArg = (DWORD)Memory + SIZE_OF_CODE; // need to do this: *EBX = *EBX + (Section)
-        ////////////////////////////
-
-        if(!WriteProcessMemory(Process, Memory, CodePage, sizeofCP, 0)) {
+        if (!WriteProcessMemory(hProcess, Memory, CodePage, sizeofCP, 0)) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't write loading library code");
-            return S_FALSE;
+            goto end;
         }
 
-        hThread = CreateRemoteThread(Process, 0, 0, (LPTHREAD_START_ROUTINE) Memory, 0, 0, 0);
-        //    hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CodePage, 0, 0, 0);
+        hThread = CreateRemoteThread(hProcess, 0, 0, (LPTHREAD_START_ROUTINE)LoadLibAddr, Memory, 0, 0);
         if (!hThread) {
             reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
-            return S_FALSE;
-        } else {
-            reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
+            goto end;
         }
-        WaitForSingleObject(hThread, INFINITE);
-        CloseHandle(hThread);
+        
 
-        return S_OK;
+        HRESULT hr = (WaitForSingleObject(hThread, INJECT_WAIT_DELAY));
+        if (hr != WAIT_OBJECT_0) {
+            TerminateThread(hThread, E_FAIL);
+            reportLog(EVENTLOG_ERROR_TYPE, L"couldn't create remote thread");
+            goto end;
+        }
+
+        //reportLog(EVENTLOG_INFORMATION_TYPE, L"library injected successfully");
+        result = S_OK;
+
+    end:
+        if (Memory)
+            VirtualFreeEx(hProcess, Memory, 0, MEM_RELEASE);
+        if (hThread)
+            CloseHandle(hThread);
+        if (hProcess)
+            CloseHandle(hProcess);
+
+        return result;
     } else {
         reportLog(EVENTLOG_ERROR_TYPE, L"couldn't acquire privileges to inject");
         return S_FALSE;
     }
 }
 
-static ULONG STDMETHODCALLTYPE ClassFactory_AddRef(ClassFactory * this) {
-    return InterlockedIncrement(&(this->refCount));
+static ULONG STDMETHODCALLTYPE ClassFactory_AddRef(IClassFactory * this) {
+    return InterlockedIncrement(&(((ClassFactory*)this)->refCount));
 }
 
 // IClassFactory's QueryInterface()
@@ -233,13 +268,14 @@ static HRESULT STDMETHODCALLTYPE ClassFactory_QueryInterface(IClassFactory * thi
     return(E_NOINTERFACE);
 }
 
-static ULONG STDMETHODCALLTYPE ClassFactory_Release(ClassFactory * this) {
-    InterlockedDecrement(&(this->refCount));
-    if ((this->refCount) == 0) {
-        freeClassFactory(this);
+static ULONG STDMETHODCALLTYPE ClassFactory_Release(IClassFactory * this) {
+    ClassFactory * _this = (ClassFactory*)this;
+    InterlockedDecrement(&(_this->refCount));
+    if ((_this->refCount) == 0) {
+        freeClassFactory(_this);
         return (0);
     }
-    return (this->refCount);
+    return (_this->refCount);
 }
 
 static HRESULT STDMETHODCALLTYPE ClassFactory_CreateInstance(IClassFactory * this, IUnknown *punkOuter, REFIID vTableGuid, void **objHandle) {
@@ -281,7 +317,7 @@ static HRESULT STDMETHODCALLTYPE ClassFactory_CreateInstance(IClassFactory * thi
 
 // IClassFactory's LockServer(). It is called by someone
 // who wants to lock this DLL in memory
-static HRESULT STDMETHODCALLTYPE ClassFactory_LockServer(ClassFactory * this, BOOL flock) {
+static HRESULT STDMETHODCALLTYPE ClassFactory_LockServer(IClassFactory * this, BOOL flock) {
     UNREFERENCED_PARAMETER(this);
 
     if (flock) InterlockedIncrement(&locksCount);

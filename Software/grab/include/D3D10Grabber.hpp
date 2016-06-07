@@ -40,7 +40,7 @@ class D3D10Grabber : public GrabberBase
     Q_OBJECT
 
 public:
-    D3D10Grabber(QObject * parent, GrabberContext *context, GetHwndCallback_t getHwndCb);
+    D3D10Grabber(QObject * parent, GrabberContext *context, GetHwndCallback_t getHwndCb, bool injectD3D9);
     virtual ~D3D10Grabber();
 
     DECLARE_GRABBER_NAME("D3D10Grabber")
@@ -55,6 +55,7 @@ public slots:
 protected slots:
     virtual GrabResult grabScreens();
     virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
+    virtual void showAdminMessage();
 
     virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 

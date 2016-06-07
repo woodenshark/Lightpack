@@ -29,14 +29,26 @@
 #include <QColor>
 #include <QTimer>
 
+
+struct SoundManagerDeviceInfo {
+	SoundManagerDeviceInfo(){ this->name = ""; this->id = -1; }
+	SoundManagerDeviceInfo(QString name, int id){ this->name = name; this->id = id; }
+	QString name;
+	int id;
+};
+Q_DECLARE_METATYPE(SoundManagerDeviceInfo);
+
 class SoundManager : public QObject
 {
     Q_OBJECT
+
 public:
 	explicit SoundManager(int hWnd, QObject *parent = 0);
+	~SoundManager();
 
 signals:
     void updateLedsColors(const QList<QRgb> & colors);
+	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 
 public:
     void start(bool isMoodLampEnabled);
@@ -51,13 +63,15 @@ public slots:
 	void setNumberOfLeds(int value);
 	void setMinColor(QColor color);
 	void setMaxColor(QColor color);
+	void setDevice(int value);
+	void requestDeviceList();
 
 private slots:
     void updateColors();
 
 private:
+	bool init();
 	void initColors(int numberOfLeds);
-	void update();
 
 private:
 	QList<QRgb> m_colors;
@@ -67,8 +81,10 @@ private:
 	QTimer m_timer;
 	int m_hWnd;
 
-	bool   m_isMoodLampEnabled;
+	bool   m_isEnabled;
+	bool   m_isInited;
 	QColor m_minColor;
 	QColor m_maxColor;
+	int    m_device;
     bool   m_isSendDataOnlyIfColorsChanged;
 };

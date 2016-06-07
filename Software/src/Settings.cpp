@@ -165,6 +165,7 @@ namespace SoundVisualizer
 {
 static const QString MinColor = "SoundVisualizer/MinColor";
 static const QString MaxColor = "SoundVisualizer/MaxColor";
+static const QString Device = "SoundVisualizer/Device";
 }
 // [Device]
 namespace Device
@@ -1311,6 +1312,18 @@ void Settings::setSoundVisualizerMaxColor(QColor value)
 	setValue(Profile::Key::SoundVisualizer::MaxColor, value.name());
 	m_this->soundVisualizerMaxColorChanged(value);
 }
+
+int Settings::getSoundVisualizerDevice()
+{
+	return value(Profile::Key::SoundVisualizer::Device).toInt();
+}
+
+void Settings::setSoundVisualizerDevice(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	setValue(Profile::Key::SoundVisualizer::Device, value);
+	m_this->soundVisualizerDeviceChanged(value);
+}
 #endif
 
 QList<WBAdjustment> Settings::getLedCoefs()
@@ -1551,8 +1564,9 @@ void Settings::initCurrentProfile(bool isResetDefault)
     setNewOption(Profile::Key::MoodLamp::Speed,                     Profile::MoodLamp::SpeedDefault, isResetDefault);
 #ifdef BASS_SOUND_SUPPORT
 	// [SoundVisualizer]
-	setNewOption(Profile::Key::SoundVisualizer::MinColor,           Profile::SoundVisualizer::MinColorDefault, isResetDefault);
-	setNewOption(Profile::Key::SoundVisualizer::MaxColor,           Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MinColor, Profile::SoundVisualizer::MinColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MaxColor, Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::Device, Profile::SoundVisualizer::DeviceDefault, isResetDefault);
 #endif
     // [Device]
     setNewOption(Profile::Key::Device::RefreshDelay,                Profile::Device::RefreshDelayDefault, isResetDefault);

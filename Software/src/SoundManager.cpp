@@ -31,17 +31,39 @@
 #include "bass.h"
 #include "basswasapi.h"
 
+#define MAX_DEVICE_ID 100
+
 using namespace SettingsScope;
 
 SoundManager::SoundManager(int hWnd, QObject *parent) : QObject(parent)
 {
 	m_hWnd = hWnd;
 
-    m_isMoodLampEnabled = false;
+	m_isEnabled = false;
+	m_isInited = false;
 
 	initFromSettings();
 
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+}
+
+SoundManager::~SoundManager()
+{
+	if (m_isEnabled) start(false);
+	if (m_isInited) BASS_Free();
+}
+
+bool SoundManager::init() {
+	BASS_SetConfig(BASS_CONFIG_UNICODE, true);
+	// initialize "no sound" BASS device
+	if (!BASS_Init(0, 44100, 0, (HWND)m_hWnd, NULL)) {
+		qCritical() << Q_FUNC_INFO << "Can't initialize BASS" << BASS_ErrorGetCode();
+		m_isInited = false;
+		return false;
+	}
+
+	m_isInited = true;
+	return true;
 }
 
 // WASAPI callback - not doing anything with the data
@@ -53,41 +75,91 @@ DWORD CALLBACK DuffRecording(void *buffer, DWORD length, void *user)
 	return TRUE; // continue recording
 }
 
+void SoundManager::requestDeviceList()
+{
+	if (!m_isInited)
+	{
+		if (!init()) {
+			m_isEnabled = false;
+			return;
+		}
+	}
+
+	QList<SoundManagerDeviceInfo> devices;
+	int recommended = -1;
+
+	for (int i = 0; i < MAX_DEVICE_ID; i++) {
+		BASS_WASAPI_DEVICEINFO inf;
+		if (BASS_WASAPI_GetDeviceInfo(i, &inf)) {
+			if (inf.flags & BASS_DEVICE_ENABLED) {
+				devices.append(SoundManagerDeviceInfo(inf.name, i));
+
+				if (inf.flags & BASS_DEVICE_LOOPBACK) {
+					devices.last().name.append(tr(" (loopback)"));
+					if (!recommended) recommended = i;
+				}
+			}
+		}
+	}
+
+	emit deviceList(devices, recommended);
+}
+
 void SoundManager::start(bool isEnabled)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 
-	if (m_isMoodLampEnabled == isEnabled)
+	if (m_isEnabled == isEnabled)
 		return;
 
-    m_isMoodLampEnabled = isEnabled;
+	m_isEnabled = isEnabled;
 
-    if (m_isMoodLampEnabled)
+	if (m_isEnabled)
 	{
-		// initialize "no sound" BASS device
-		if (!BASS_Init(0, 44100, 0, (HWND)m_hWnd, NULL)) {
-			qCritical() << Q_FUNC_INFO << "Can't initialize BASS" << BASS_ErrorGetCode();
-			return;
-		}
-
-		int device = -2;
-		for (int i = -5; i < 20; i++) {
-			BASS_WASAPI_DEVICEINFO inf;
-			if (BASS_WASAPI_GetDeviceInfo(i, &inf)) {
-				if ((inf.flags & BASS_DEVICE_ENABLED) &&
-					(inf.flags & BASS_DEVICE_LOOPBACK)) {
-					device = i;
-					break;
-				}
+		if (!m_isInited)
+		{
+			if (!init()) {
+				m_isEnabled = false;
+				return;
 			}
 		}
 
-		// initialize default input WASAPI device
-		if (!BASS_WASAPI_Init(device, 0, 0, BASS_WASAPI_BUFFER, 1, 0.1, &DuffRecording, NULL)) {
+		int device = -2;
+		if (m_device == -1) {
+			// Fallback: first enabled loopback device (recommended)
+			for (int i = 0; i < MAX_DEVICE_ID; i++) {
+				BASS_WASAPI_DEVICEINFO inf;
+				if (BASS_WASAPI_GetDeviceInfo(i, &inf)) {
+					if ((inf.flags & BASS_DEVICE_ENABLED) &&
+						(inf.flags & BASS_DEVICE_LOOPBACK)) {
+						device = i;
+						break;
+					}
+				}
+			}
+		} else {
+			BASS_WASAPI_DEVICEINFO inf;
+			if (BASS_WASAPI_GetDeviceInfo(m_device, &inf)) {
+				if (!(inf.flags & BASS_DEVICE_ENABLED)) {
+					qCritical() << Q_FUNC_INFO << "Selected device is not enabled!";
+					return;
+				}
+				if (!(inf.flags & BASS_DEVICE_LOOPBACK)) {
+					qWarning() << Q_FUNC_INFO << "Selected device is not a loopback device";
+				}
+			} else {
+				qCritical() << Q_FUNC_INFO << "Unable to get device info for" << m_device;
+				return;
+			}
+			device = m_device;
+		}
+
+		// initialize input WASAPI device
+		if (!BASS_WASAPI_Init(device, 0, 0, BASS_WASAPI_BUFFER, 1, 0.1f, &DuffRecording, NULL)) {
 			qCritical() << Q_FUNC_INFO << "Can't initialize WASAPI device" << BASS_ErrorGetCode();
 			return;
 		}
-		//BASS_WASAPI_GetInfo(&info);
+
 		BASS_WASAPI_Start();
 		// setup update timer (40hz)
 		//m_timer = timeSetEvent(25, 25, (LPTIMECALLBACK)&UpdateSpectrum, 0, TIME_PERIODIC);
@@ -98,7 +170,6 @@ void SoundManager::start(bool isEnabled)
 	{
 		m_timer.stop();
 		BASS_WASAPI_Free();
-		BASS_Free();
 	}
 }
 
@@ -116,6 +187,16 @@ void SoundManager::setMaxColor(QColor color)
 	m_maxColor = color;
 }
 
+void SoundManager::setDevice(int value)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
+
+	bool enabled = m_isEnabled;
+	if (enabled) start(false);
+	m_device = value;
+	if (enabled) start(true);
+}
+
 void SoundManager::setSendDataOnlyIfColorsChanged(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
@@ -129,10 +210,6 @@ void SoundManager::setNumberOfLeds(int numberOfLeds)
     initColors(numberOfLeds);
 }
 
-void SoundManager::reset()
-{
-}
-
 void SoundManager::settingsProfileChanged(const QString &profileName)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
@@ -144,9 +221,15 @@ void SoundManager::initFromSettings()
 {
 	m_minColor = Settings::getSoundVisualizerMinColor();
 	m_maxColor = Settings::getSoundVisualizerMaxColor();
+	m_device = Settings::getSoundVisualizerDevice();
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
     initColors(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
+}
+
+void SoundManager::reset()
+{
+	initColors(m_colors.size());
 }
 
 void SoundManager::updateColors()

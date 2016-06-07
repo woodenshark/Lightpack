@@ -74,6 +74,9 @@ signals:
     void updateGamma(double value);
     void updateBrightness(int percent);
     void requestFirmwareVersion();
+#ifdef BASS_SOUND_SUPPORT
+	void requestSoundVizDevices();
+#endif
     void recreateLedDevice();
     void resultBacklightStatus(Backlight::Status);
     void backlightStatusChanged(Backlight::Status);
@@ -107,6 +110,10 @@ public slots:
     void onPingDeviceEverySecond_Toggled(bool state);
     void processMessage(const QString &message);
 
+#ifdef BASS_SOUND_SUPPORT
+	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
+#endif
+
     void updatePlugin(QList<Plugin*> plugins);
 
     void onFocus();
@@ -129,6 +136,7 @@ private slots:
 #ifdef BASS_SOUND_SUPPORT
 	void onSoundVizMinColor_changed(QColor color);
 	void onSoundVizMaxColor_changed(QColor color);
+	void onSoundVizDevice_currentIndexChanged(int index);
 #endif
     void showAbout(); /* using in actions */
     void onPostInit();

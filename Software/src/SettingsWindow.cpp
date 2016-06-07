@@ -278,7 +278,7 @@ void SettingsWindow::connectSignalsSlots()
 
 	// About page
     connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
-	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(on_checkBox_checkForUpdates_Toggled(bool)));
+	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
 }
 
 // ----------------------------------------------------------------------------
@@ -1938,7 +1938,7 @@ void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
 }
 
 
-void SettingsWindow::on_checkBox_checkForUpdates_Toggled(bool isEnabled)
+void SettingsWindow::onCheckBox_checkForUpdates_Toggled(bool isEnabled)
 {
 	Settings::setCheckForUpdatesEnabled(isEnabled);
 }

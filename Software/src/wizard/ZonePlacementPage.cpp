@@ -32,6 +32,7 @@
 #include "AndromedaDistributor.hpp"
 #include "CassiopeiaDistributor.hpp"
 #include "PegasusDistributor.hpp"
+#include "CustomDistributor.hpp"
 #include "GrabWidget.hpp"
 #include "LedDeviceLightpack.hpp"
 
@@ -233,7 +234,16 @@ void ZonePlacementPage::on_pbPegasus_clicked()
     distributeAreas(pegasus);
 
     delete pegasus;
+}
 
+
+void ZonePlacementPage::on_pbCustom_clicked()
+{
+	CustomDistributor *custom = new CustomDistributor(_screenId, _ui->sbTopLeds->value(), _ui->sbSideLeds->value(), _ui->sbBottomLeds->value());
+
+	distributeAreas(custom);
+
+	delete custom;
 }
 
 

@@ -233,6 +233,7 @@ void SettingsWindow::connectSignalsSlots()
 #ifdef BASS_SOUND_SUPPORT
 	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
+	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
 #endif
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
@@ -277,7 +278,7 @@ void SettingsWindow::connectSignalsSlots()
 
 	// About page
     connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
-	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(on_checkBox_checkForUpdates_Toggled(bool)));
+	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
 }
 
 // ----------------------------------------------------------------------------
@@ -457,6 +458,9 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
     updateUiFromSettings();
     this->requestFirmwareVersion();
+#ifdef BASS_SOUND_SUPPORT
+	this->requestSoundVizDevices();
+#endif
     if (m_trayIcon && Settings::isCheckForUpdatesEnabled())
         m_trayIcon->checkUpdate();
 }
@@ -851,6 +855,25 @@ void SettingsWindow::processMessage(const QString &message)
     }
 }
 
+#ifdef BASS_SOUND_SUPPORT
+void SettingsWindow::updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended)
+{
+	ui->comboBox_SoundVizDevice->blockSignals(true);
+	ui->comboBox_SoundVizDevice->clear();
+	int selectedDevice = Settings::getSoundVisualizerDevice();
+	if (selectedDevice == -1) selectedDevice = recommended;
+	int selectIndex = -1;
+	for (int i = 0; i < devices.size(); i++) {
+		ui->comboBox_SoundVizDevice->addItem(devices[i].name, devices[i].id);
+		if (devices[i].id == selectedDevice) {
+			selectIndex = i;
+		}
+	}
+	ui->comboBox_SoundVizDevice->setCurrentIndex(selectIndex);
+	ui->comboBox_SoundVizDevice->blockSignals(false);
+}
+#endif
+
 // ----------------------------------------------------------------------------
 // Show / Hide settings and about windows
 // ----------------------------------------------------------------------------
@@ -1210,6 +1233,12 @@ void SettingsWindow::onSoundVizMaxColor_changed(QColor color)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
 	Settings::setSoundVisualizerMaxColor(color);
+}
+
+void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
+	Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
 }
 #endif
 
@@ -1572,6 +1601,7 @@ void SettingsWindow::updateUiFromSettings()
 #ifdef BASS_SOUND_SUPPORT
 	ui->pushButton_SelectColorSoundVizMin->setColor                  (Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor                  (Settings::getSoundVisualizerMaxColor());
+	ui->comboBox_SoundVizDevice->setCurrentIndex                     (Settings::getSoundVisualizerDevice());
 #endif
 
     ui->checkBox_DisableUsbPowerLed->setChecked                      (Settings::isDeviceUsbPowerLedDisabled());
@@ -1908,7 +1938,7 @@ void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
 }
 
 
-void SettingsWindow::on_checkBox_checkForUpdates_Toggled(bool isEnabled)
+void SettingsWindow::onCheckBox_checkForUpdates_Toggled(bool isEnabled)
 {
 	Settings::setCheckForUpdatesEnabled(isEnabled);
 }

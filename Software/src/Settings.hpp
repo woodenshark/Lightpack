@@ -190,6 +190,8 @@ public:
 	static void setSoundVisualizerMinColor(QColor color);
 	static QColor getSoundVisualizerMaxColor();
 	static void setSoundVisualizerMaxColor(QColor color);
+	static int getSoundVisualizerDevice();
+	static void setSoundVisualizerDevice(int value);
 #endif
 
     static QList<WBAdjustment> getLedCoefs();
@@ -293,6 +295,7 @@ signals:
 #ifdef BASS_SOUND_SUPPORT
 	void soundVisualizerMinColorChanged(const QColor color);
 	void soundVisualizerMaxColorChanged(const QColor color);
+	void soundVisualizerDeviceChanged(int value);
 #endif
     void ledCoefRedChanged(int ledIndex, double value);
     void ledCoefGreenChanged(int ledIndex, double value);

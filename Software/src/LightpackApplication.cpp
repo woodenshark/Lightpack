@@ -712,8 +712,9 @@ void LightpackApplication::initGrabManager()
 	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),                m_moodlampManager,  SLOT(setLiquidMode(bool)));
 
 #ifdef BASS_SOUND_SUPPORT
-	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)),         m_soundManager,     SLOT(setMaxColor(QColor)));
-	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),         m_soundManager,     SLOT(setMinColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)),         m_soundManager, SLOT(setMaxColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),         m_soundManager, SLOT(setMinColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerDeviceChanged(int)),              m_soundManager, SLOT(setDevice(int)));
 #endif
 
 	connect(settings(), SIGNAL(profileLoaded(const QString &)),                 m_grabManager,      SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
@@ -734,6 +735,11 @@ void LightpackApplication::initGrabManager()
 
 		// GrabManager to this
 		connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_settingsWindow, SLOT(refreshAmbilightEvaluated(double)));
+
+#ifdef BASS_SOUND_SUPPORT
+		connect(m_settingsWindow, SIGNAL(requestSoundVizDevices()),                   m_soundManager,   SLOT(requestDeviceList()));
+		connect(m_soundManager, SIGNAL(deviceList(const QList<SoundManagerDeviceInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> &, int)));
+#endif
 	}
 
 	connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));

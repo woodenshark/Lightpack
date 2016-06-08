@@ -161,6 +161,7 @@ namespace SoundVisualizer
 {
 static const QString MinColorDefault = "#301000";
 static const QString MaxColorDefault = "#0000FF";
+static const int DeviceDefault = -1;
 }
 // [Device]
 namespace Device

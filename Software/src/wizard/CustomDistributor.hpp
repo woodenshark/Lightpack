@@ -31,9 +31,9 @@
 class CustomDistributor : public AreaDistributor
 {
 public:
-    CustomDistributor(int screenId, size_t top, size_t side, size_t bottom):
-		AreaDistributor(screenId, top + 2*side + bottom),
-		_top(top), _side(side), _bottom(bottom),
+	CustomDistributor(QRect screen, int top, int side, int bottom, double thickness = 0.15, double standWidth = 0.0) :
+		AreaDistributor(screen, top + 2 * side + bottom),
+		_topLeds(top), _sideLeds(side), _bottomLeds(bottom), _thickness(thickness), _standWidth(bottom % 2 == 0 ? standWidth : 0.0),
         _dx(0), _dy(0)
     {}
     virtual ~CustomDistributor();
@@ -41,17 +41,27 @@ public:
     virtual ScreenArea * next();
 
 protected:
-    char _dx, _dy;
-    double _width, _height;
-	size_t _top, _side, _bottom;
+	char _dx, _dy;
+	int _width, _height;
+	int _x, _y;
+	int _topLeds, _sideLeds, _bottomLeds;
+	double _thickness;
+	double _standWidth;
 
-    virtual size_t areaCountOnSideEdge() const;
-    virtual size_t areaCountOnTopEdge() const;
-    virtual size_t areaCountOnBottomEdge() const;
+	void startBottomRight();
+	void startRightUp();
+	void startTopLeft();
+	void startLeftDown();
+	void startBottomRight2();
+
+    virtual int areaCountOnSideEdge() const;
+    virtual int areaCountOnTopEdge() const;
+    virtual int areaCountOnBottomEdge() const;
 
 private:
     void cleanCurrentArea() {
-        delete _currentArea;
+		if (_currentArea)
+			delete _currentArea;
         _currentArea = NULL;
     }
 };

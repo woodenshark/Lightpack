@@ -227,9 +227,6 @@ SOURCES += \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
-    wizard/AndromedaDistributor.cpp \
-    wizard/CassiopeiaDistributor.cpp \
-    wizard/PegasusDistributor.cpp \
     wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
     UpdatesProcessor.cpp
@@ -279,9 +276,6 @@ HEADERS += \
     wizard/SelectDevicePage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
-    wizard/AndromedaDistributor.hpp \
-    wizard/CassiopeiaDistributor.hpp \
-    wizard/PegasusDistributor.hpp \
     wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp \

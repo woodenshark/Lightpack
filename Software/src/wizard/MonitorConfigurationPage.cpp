@@ -48,6 +48,7 @@ MonitorConfigurationPage::~MonitorConfigurationPage()
 void MonitorConfigurationPage::initializePage()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	_ui->cbMonitor->clear();
     int screenCount = QApplication::desktop()->screenCount();
     for (int i = 0; i < screenCount; i++) {
         QRect geom = QApplication::desktop()->screenGeometry(i);

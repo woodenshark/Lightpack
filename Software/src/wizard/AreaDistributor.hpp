@@ -40,58 +40,51 @@ public:
         _vScanStart(vScanStart),
         _vScanEnd(vScanEnd){}
 
-    double hScanStart() { return _hScanStart; }
-    double hScanEnd() { return _hScanEnd; }
-    double vScanStart() { return _vScanStart; }
-    double vScanEnd() { return _vScanEnd; }
+    int hScanStart() { return _hScanStart; }
+	int hScanEnd() { return _hScanEnd; }
+	int vScanStart() { return _vScanStart; }
+	int vScanEnd() { return _vScanEnd; }
 protected:
-    double _hScanStart;
-    double _hScanEnd;
-    double _vScanStart;
-    double _vScanEnd;
+	int _hScanStart;
+	int _hScanEnd;
+	int _vScanStart;
+	int _vScanEnd;
 };
 
-template <class T>
-inline T within1(T x) {
-    if (x < 0.0) return 0.0;
-    if (x > 1.0) return 1.0;
-    return x;
-}
 
 template <class T>
-inline int cmp(T x, T y, T e) {
+inline int cmp(T x, T y, double e) {
     T d = x - y;
-    if (fabs(d) < e) return 0;
+    if (fabs((double)d) < e) return 0;
     if (d < 0) return -1;
     return 1;
 }
 
 class AreaDistributor {
 public:
-    AreaDistributor(int screenId, size_t areaCount):
-        _screenId(screenId),
+	AreaDistributor(QRect screen, int areaCount) :
         _areaCount(areaCount),
+		_screen(screen),
         _currentArea(NULL)
     {}
     virtual ~AreaDistributor(){}
 
     virtual ScreenArea * next() = 0;
 
-    size_t areaCount() const { return _areaCount; }
+    int areaCount() const { return _areaCount; }
 
 protected:
-    int _screenId;
-    size_t _areaCount;
+    int _areaCount;
+	QRect _screen;
     ScreenArea * _currentArea;
 
     double aspect() const {
-       QRect screenRect = QApplication::desktop()->screenGeometry(_screenId);
-       return (double)screenRect.width() / screenRect.height();
+       return (double)_screen.width() / _screen.height();
     }
 
-    virtual size_t areaCountOnSideEdge() const = 0;
-    virtual size_t areaCountOnTopEdge() const = 0;
-    virtual size_t areaCountOnBottomEdge() const = 0;
+    virtual int areaCountOnSideEdge() const = 0;
+    virtual int areaCountOnTopEdge() const = 0;
+    virtual int areaCountOnBottomEdge() const = 0;
 };
 
 #endif // AREADISTRIBUTOR_HPP

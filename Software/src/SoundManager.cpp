@@ -171,6 +171,21 @@ void SoundManager::start(bool isEnabled)
 		m_timer.stop();
 		BASS_WASAPI_Free();
 	}
+
+	if (m_isEnabled && m_isLiquidMode)
+		m_generator.start();
+	else
+		m_generator.stop();
+}
+
+void SoundManager::setDevice(int value)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
+
+	bool enabled = m_isEnabled;
+	if (enabled) start(false);
+	m_device = value;
+	if (enabled) start(true);
 }
 
 void SoundManager::setMinColor(QColor color)
@@ -187,14 +202,23 @@ void SoundManager::setMaxColor(QColor color)
 	m_maxColor = color;
 }
 
-void SoundManager::setDevice(int value)
+void SoundManager::setLiquidMode(bool state)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+	m_isLiquidMode = state;
+	if (m_isLiquidMode && m_isEnabled)
+		m_generator.start();
+	else {
+		m_generator.stop();
+		if (m_isEnabled)
+			updateColors();
+	}
+}
 
-	bool enabled = m_isEnabled;
-	if (enabled) start(false);
-	m_device = value;
-	if (enabled) start(true);
+void SoundManager::setLiquidModeSpeed(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	m_generator.setSpeed(value);
 }
 
 void SoundManager::setSendDataOnlyIfColorsChanged(bool state)
@@ -219,9 +243,11 @@ void SoundManager::settingsProfileChanged(const QString &profileName)
 
 void SoundManager::initFromSettings()
 {
+	m_device = Settings::getSoundVisualizerDevice();
 	m_minColor = Settings::getSoundVisualizerMinColor();
 	m_maxColor = Settings::getSoundVisualizerMaxColor();
-	m_device = Settings::getSoundVisualizerDevice();
+	m_isLiquidMode = Settings::isSoundVisualizerLiquidMode();
+	m_generator.setSpeed(Settings::getSoundVisualizerLiquidSpeed());
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
     initColors(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
@@ -230,6 +256,7 @@ void SoundManager::initFromSettings()
 void SoundManager::reset()
 {
 	initColors(m_colors.size());
+	m_generator.reset();
 }
 
 void SoundManager::updateColors()
@@ -240,7 +267,7 @@ void SoundManager::updateColors()
 	BASS_WASAPI_GetData(fft, BASS_DATA_FFT2048); // get the FFT data
 
 	m_frames++;
-#define SPECHEIGHT 255
+#define SPECHEIGHT 1000
 	int b0 = 0;
 	bool changed = false;
 	for (int i = 0; i < m_colors.size(); i++)
@@ -251,7 +278,7 @@ void SoundManager::updateColors()
 		if (b1 <= b0) b1 = b0 + 1; // make sure it uses at least 1 FFT bin
 		for (; b0<b1; b0++)
 			if (peak<fft[1 + b0]) peak = fft[1 + b0];
-		int val = sqrt(peak) * 3 * SPECHEIGHT - 4; // scale it (sqrt to make low values more visible)
+		int val = sqrt(peak) * /* 3 * */ SPECHEIGHT - 4; // scale it (sqrt to make low values more visible)
 		if (val>SPECHEIGHT) val = SPECHEIGHT; // cap it
 		if (val<0) val = 0; // cap it
 
@@ -262,10 +289,12 @@ void SoundManager::updateColors()
 			val = (val * SPECHEIGHT) / m_peaks[i]; // scale val according to peak
 
 		if (Settings::isLedEnabled(i)) {
+			QColor from = m_isLiquidMode ? QColor(0, 0, 0) : m_minColor;
+			QColor to = m_isLiquidMode ? m_generator.current() : m_maxColor;
 			QColor rgb;
-			rgb.setRed(m_minColor.red() + (m_maxColor.red() - m_minColor.red()) * (val / 255.f));
-			rgb.setGreen(m_minColor.green() + (m_maxColor.green() - m_minColor.green()) * (val / 255.f));
-			rgb.setBlue(m_minColor.blue() + (m_maxColor.blue() - m_minColor.blue()) * (val / 255.f));
+			rgb.setRed(from.red() + (to.red() - from.red()) * (val / (double)SPECHEIGHT));
+			rgb.setGreen(from.green() + (to.green() - from.green()) * (val / (double)SPECHEIGHT));
+			rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (val / (double)SPECHEIGHT));
 			if (m_colors[i] != rgb.rgb()) changed = true;
 
 			m_colors[i] = rgb.rgb();

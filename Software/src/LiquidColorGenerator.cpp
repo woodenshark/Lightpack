@@ -83,6 +83,7 @@ void LiquidColorGenerator::reset()
 	m_red = 0;
 	m_green = 0;
 	m_blue = 0;
+	m_unselectedColors.clear();
 }
 
 void LiquidColorGenerator::updateColor()
@@ -120,15 +121,13 @@ int LiquidColorGenerator::generateDelay()
 
 QColor LiquidColorGenerator::generateColor()
 {
-    static QList<QColor> unselectedColors;
-
-    if (unselectedColors.empty())
+    if (m_unselectedColors.empty())
     {
         for (int i = 0; i < ColorsMoodLampCount; i++)
-            unselectedColors << AvailableColors[i];
+			m_unselectedColors << AvailableColors[i];
     }
 
-    int randIndex = PrismatikMath::rand(unselectedColors.size());
+	int randIndex = PrismatikMath::rand(m_unselectedColors.size());
 
-    return unselectedColors.takeAt(randIndex);
+	return m_unselectedColors.takeAt(randIndex);
 }

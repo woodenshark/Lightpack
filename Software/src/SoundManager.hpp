@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include "LiquidColorGenerator.hpp"
 
 
 struct SoundManagerDeviceInfo {
@@ -61,9 +62,11 @@ public slots:
     void initFromSettings();
     void settingsProfileChanged(const QString &profileName);
 	void setNumberOfLeds(int value);
+	void setDevice(int value);
 	void setMinColor(QColor color);
 	void setMaxColor(QColor color);
-	void setDevice(int value);
+	void setLiquidMode(bool isEnabled);
+	void setLiquidModeSpeed(int value);
 	void requestDeviceList();
 
 private slots:
@@ -74,6 +77,8 @@ private:
 	void initColors(int numberOfLeds);
 
 private:
+	LiquidColorGenerator m_generator;
+
 	QList<QRgb> m_colors;
 	QList<int> m_peaks;
 	int m_frames;
@@ -81,8 +86,10 @@ private:
 	QTimer m_timer;
 	int m_hWnd;
 
+
 	bool   m_isEnabled;
 	bool   m_isInited;
+	bool   m_isLiquidMode;
 	QColor m_minColor;
 	QColor m_maxColor;
 	int    m_device;

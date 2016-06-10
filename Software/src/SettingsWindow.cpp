@@ -231,9 +231,11 @@ void SettingsWindow::connectSignalsSlots()
 
     connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
 #ifdef BASS_SOUND_SUPPORT
+	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
 	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
-	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
+	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
+	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
 #endif
     connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
     connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
@@ -1208,21 +1210,21 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
     Settings::setMoodLampLiquidMode(checked);
     if (Settings::isMoodLampLiquidMode())
     {
-        // Liquid color mode
         ui->pushButton_SelectColorMoodLamp->setEnabled(false);
         ui->horizontalSlider_MoodLampSpeed->setEnabled(true);
-        ui->label_slowMoodLampSpeed->setEnabled(true);
-        ui->label_fastMoodLampSpeed->setEnabled(true);
     } else {
-        // Constant color mode
 		ui->pushButton_SelectColorMoodLamp->setEnabled(true);
         ui->horizontalSlider_MoodLampSpeed->setEnabled(false);
-        ui->label_slowMoodLampSpeed->setEnabled(false);
-        ui->label_fastMoodLampSpeed->setEnabled(false);
     }
 }
 
 #ifdef BASS_SOUND_SUPPORT
+void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
+	Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
+}
+
 void SettingsWindow::onSoundVizMinColor_changed(QColor color)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << color;
@@ -1235,10 +1237,27 @@ void SettingsWindow::onSoundVizMaxColor_changed(QColor color)
 	Settings::setSoundVisualizerMaxColor(color);
 }
 
-void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
+void SettingsWindow::onSoundVizLiquidMode_Toggled(bool isLiquidMode)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
-	Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << isLiquidMode;
+
+	Settings::setSoundVisualizerLiquidMode(isLiquidMode);
+	if (Settings::isSoundVisualizerLiquidMode())
+	{
+		ui->pushButton_SelectColorSoundVizMin->setEnabled(false);
+		ui->pushButton_SelectColorSoundVizMax->setEnabled(false);
+		ui->horizontalSlider_SoundVizLiquidSpeed->setEnabled(true);
+	} else {
+		ui->pushButton_SelectColorSoundVizMin->setEnabled(true);
+		ui->pushButton_SelectColorSoundVizMax->setEnabled(true);
+		ui->horizontalSlider_SoundVizLiquidSpeed->setEnabled(false);
+	}
+}
+
+void SettingsWindow::onSoundVizLiquidSpeed_valueChanged(int value)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
+	Settings::setSoundVisualizerLiquidSpeed(value);
 }
 #endif
 
@@ -1599,9 +1618,12 @@ void SettingsWindow::updateUiFromSettings()
     ui->horizontalSlider_MoodLampSpeed->setValue                     (Settings::getMoodLampSpeed());
 
 #ifdef BASS_SOUND_SUPPORT
+	ui->comboBox_SoundVizDevice->setCurrentIndex                     (Settings::getSoundVisualizerDevice());
 	ui->pushButton_SelectColorSoundVizMin->setColor                  (Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor                  (Settings::getSoundVisualizerMaxColor());
-	ui->comboBox_SoundVizDevice->setCurrentIndex                     (Settings::getSoundVisualizerDevice());
+    ui->radioButton_SoundVizConstantMode->setChecked                 (!Settings::isSoundVisualizerLiquidMode());
+    ui->radioButton_SoundVizLiquidMode->setChecked                   (Settings::isSoundVisualizerLiquidMode());
+    ui->horizontalSlider_SoundVizLiquidSpeed->setValue               (Settings::getMoodLampSpeed());
 #endif
 
     ui->checkBox_DisableUsbPowerLed->setChecked                      (Settings::isDeviceUsbPowerLedDisabled());

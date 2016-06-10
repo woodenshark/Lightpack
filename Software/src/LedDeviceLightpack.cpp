@@ -127,7 +127,7 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
     emit commandCompleted(ok);
 }
 
-size_t LedDeviceLightpack::maxLedsCount()
+int LedDeviceLightpack::maxLedsCount()
 {
     if (m_devices.size() == 0)
         tryToReopenDevice();

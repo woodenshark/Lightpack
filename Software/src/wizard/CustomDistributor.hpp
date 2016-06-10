@@ -1,10 +1,10 @@
 /*
- * AndromedaZoneDistributor.hpp
+ * CustomDistributor.hpp
  *
- *  Created on: 10/28/2013
+ *  Created on: 08.06.2016
  *     Project: Prismatik
  *
- *  Copyright (c) 2013 Tim
+ *  Copyright (c) 2015 Patrick Siegler
  *
  *  Lightpack is an open-source, USB content-driving ambient lighting
  *  hardware.
@@ -24,36 +24,46 @@
  *
  */
 
-#ifndef ANDROMEDAZONEDISTRIBUTOR_HPP
-#define ANDROMEDAZONEDISTRIBUTOR_HPP
+#ifndef CUSTOMDISTRIBUTOR_HPP
+#define CUSTOMDISTRIBUTOR_HPP
 #include "AreaDistributor.hpp"
 
-class AndromedaDistributor : public AreaDistributor
+class CustomDistributor : public AreaDistributor
 {
 public:
-    AndromedaDistributor(int screenId, bool isStandPresent, size_t fragmentCount):
-        AreaDistributor(screenId, fragmentCount),
-        _isStandPresent(isStandPresent),
+	CustomDistributor(QRect screen, int top, int side, int bottom, double thickness = 0.15, double standWidth = 0.0) :
+		AreaDistributor(screen, top + 2 * side + bottom),
+		_topLeds(top), _sideLeds(side), _bottomLeds(bottom), _thickness(thickness), _standWidth(bottom % 2 == 0 ? standWidth : 0.0),
         _dx(0), _dy(0)
     {}
-    virtual ~AndromedaDistributor();
+    virtual ~CustomDistributor();
 
     virtual ScreenArea * next();
 
 protected:
-    bool _isStandPresent;
-    char _dx, _dy;
-    double _width, _height;
+	char _dx, _dy;
+	int _width, _height;
+	int _x, _y;
+	int _topLeds, _sideLeds, _bottomLeds;
+	double _thickness;
+	double _standWidth;
 
-    virtual size_t areaCountOnSideEdge() const;
-    virtual size_t areaCountOnTopEdge() const;
-    virtual size_t areaCountOnBottomEdge() const;
+	void startBottomRight();
+	void startRightUp();
+	void startTopLeft();
+	void startLeftDown();
+	void startBottomRight2();
+
+    virtual int areaCountOnSideEdge() const;
+    virtual int areaCountOnTopEdge() const;
+    virtual int areaCountOnBottomEdge() const;
 
 private:
     void cleanCurrentArea() {
-        delete _currentArea;
+		if (_currentArea)
+			delete _currentArea;
         _currentArea = NULL;
     }
 };
 
-#endif // ANDROMEDAZONEDISTRIBUTOR_HPP
+#endif // CUSTOMDISTRIBUTOR_HPP

@@ -49,8 +49,8 @@ public slots:
     void setGamma(double value);
     void setBrightness(int value);
     void requestFirmwareVersion();
-    size_t maxLedsCount() { return 255;}
-    size_t defaultLedsCount() { return 10;}
+	int maxLedsCount() { return 255; }
+	int defaultLedsCount() { return 10; }
 
 
 private:

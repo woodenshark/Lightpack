@@ -225,11 +225,9 @@ SOURCES += \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
-    wizard/AndromedaDistributor.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
-    wizard/CassiopeiaDistributor.cpp \
-    wizard/PegasusDistributor.cpp \
+    wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
     UpdatesProcessor.cpp
 
@@ -274,13 +272,11 @@ HEADERS += \
     wizard/MonitorIdForm.hpp \
     wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
-    wizard/AndromedaDistributor.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
-    wizard/CassiopeiaDistributor.hpp \
-    wizard/PegasusDistributor.hpp \
+    wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp \
     UpdatesProcessor.hpp

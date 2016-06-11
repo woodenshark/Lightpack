@@ -149,6 +149,7 @@ static const QString IsAvgColorsEnabled = "Grab/IsAvgColorsEnabled";
 static const QString IsSendDataOnlyIfColorsChanges = "Grab/IsSendDataOnlyIfColorsChanges";
 static const QString Slowdown = "Grab/Slowdown";
 static const QString LuminosityThreshold = "Grab/LuminosityThreshold";
+static const QString OverBrighten = "Grab/OverBrighten";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
 static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
@@ -962,6 +963,18 @@ void Settings::setGrabAvgColorsEnabled(bool isEnabled)
     m_this->grabAvgColorsEnabledChanged(isEnabled);
 }
 
+int Settings::getGrabOverBrighten()
+{
+	return getValidGrabOverBrighten(value(Profile::Key::Grab::OverBrighten).toInt());
+}
+
+void Settings::setGrabOverBrighten(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Grab::OverBrighten, getValidGrabOverBrighten(value));
+	m_this->grabOverBrightenChanged(value);
+}
+
 bool Settings::isSendDataOnlyIfColorsChanges()
 {
     return value(Profile::Key::Grab::IsSendDataOnlyIfColorsChanges).toBool();
@@ -976,7 +989,7 @@ void Settings::setSendDataOnlyIfColorsChanges(bool isEnabled)
 
 int Settings::getLuminosityThreshold()
 {
-    return value(Profile::Key::Grab::LuminosityThreshold).toInt();
+	return getValidLuminosityThreshold(value(Profile::Key::Grab::LuminosityThreshold).toInt());
 }
 
 void Settings::setLuminosityThreshold(int value)
@@ -1515,11 +1528,20 @@ int Settings::getValidSoundVisualizerLiquidSpeed(int value)
 
 int Settings::getValidLuminosityThreshold(int value)
 {
-    if (value < Profile::Grab::MinimumLevelOfSensitivityMin)
-        value = Profile::Grab::MinimumLevelOfSensitivityMin;
-    else if (value > Profile::Grab::MinimumLevelOfSensitivityMax)
-        value = Profile::Grab::MinimumLevelOfSensitivityMax;
-    return value;
+	if (value < Profile::Grab::LuminosityThresholdMin)
+		value = Profile::Grab::LuminosityThresholdMin;
+	else if (value > Profile::Grab::LuminosityThresholdMax)
+		value = Profile::Grab::LuminosityThresholdMax;
+	return value;
+}
+
+int Settings::getValidGrabOverBrighten(int value)
+{
+	if (value < Profile::Grab::OverBrightenMin)
+		value = Profile::Grab::OverBrightenMin;
+	else if (value > Profile::Grab::OverBrightenMax)
+		value = Profile::Grab::OverBrightenMax;
+	return value;
 }
 
 void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coef)
@@ -1589,9 +1611,10 @@ void Settings::initCurrentProfile(bool isResetDefault)
     // [Grab]
     setNewOption(Profile::Key::Grab::Grabber,                       Profile::Grab::GrabberDefaultString, isResetDefault);
     setNewOption(Profile::Key::Grab::IsAvgColorsEnabled,            Profile::Grab::IsAvgColorsEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::OverBrighten,                  Profile::Grab::OverBrightenDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsSendDataOnlyIfColorsChanges, Profile::Grab::IsSendDataOnlyIfColorsChangesDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::Slowdown,                      Profile::Grab::SlowdownDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::LuminosityThreshold,           Profile::Grab::MinimumLevelOfSensitivityDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::LuminosityThreshold,           Profile::Grab::LuminosityThresholdDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled,    Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled,        Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled,          Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);

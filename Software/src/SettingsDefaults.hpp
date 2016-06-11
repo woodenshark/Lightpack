@@ -143,9 +143,12 @@ static const bool IsDx9GrabbingEnabledDefault = false;
 static const int SlowdownMin = 1;
 static const int SlowdownDefault = 50;
 static const int SlowdownMax = 1000;
-static const int MinimumLevelOfSensitivityMin = 0;
-static const int MinimumLevelOfSensitivityDefault = 3;
-static const int MinimumLevelOfSensitivityMax = 100;
+static const int LuminosityThresholdMin = 0;
+static const int LuminosityThresholdDefault = 3;
+static const int LuminosityThresholdMax = 100;
+static const int OverBrightenMin = 0;
+static const int OverBrightenDefault = 0;
+static const int OverBrightenMax = 100;
 }
 // [MoodLamp]
 namespace MoodLamp

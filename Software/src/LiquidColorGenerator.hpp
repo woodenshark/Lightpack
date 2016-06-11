@@ -28,47 +28,48 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
-#include "LiquidColorGenerator.hpp"
 
-class MoodLampManager : public QObject
+class LiquidColorGenerator : public QObject
 {
     Q_OBJECT
 public:
-    explicit MoodLampManager(QObject *parent = 0);
+	explicit LiquidColorGenerator(QObject *parent = 0);
 
 signals:
-    void updateLedsColors(const QList<QRgb> & colors);
+	void updateColor(QColor color);
 
 public:
-    void start(bool isMoodLampEnabled);
-
-    // Common options
-    void setSendDataOnlyIfColorsChanged(bool state);
+	void start();
+	void stop();
+	QColor current();
     void reset();
 
 public slots:
-    void initFromSettings();
-    void setLiquidMode(bool isEnabled);
-    void setLiquidModeSpeed(int value);
-    void settingsProfileChanged(const QString &profileName);
-    void setNumberOfLeds(int value);
-    void setCurrentColor(QColor color);
+    void setSpeed(int value);
+	
+private:
+    int generateDelay();
+    QColor generateColor();
 
 private slots:
-    void updateColors();
+	void updateColor();
 
 private:
-    void initColors(int numberOfLeds);
-    void fillColors(QRgb rgb);
+	bool m_isEnabled;
 
-private:
-	LiquidColorGenerator m_generator;
-    QList<QRgb> m_colors;
+    QTimer m_timer;
+    int m_delay;
+    int m_speed;
 
-    bool   m_isMoodLampEnabled;
-    QColor m_currentColor;
-    bool   m_isLiquidMode;
-    bool   m_isSendDataOnlyIfColorsChanged;
+	int m_red = 0;
+	int m_green = 0;
+	int m_blue = 0;
 
-    QRgb m_rgbSaved;
+	int m_redNew = 0;
+	int m_greenNew = 0;
+	int m_blueNew = 0;
+
+    static const int ColorsMoodLampCount = 14;
+    static const QColor AvailableColors[ColorsMoodLampCount];
+	QList<QColor> m_unselectedColors;
 };

@@ -132,11 +132,13 @@ private slots:
     void onLightpackModeChanged(Lightpack::Mode);
     void onMoodLampColor_changed(QColor color);
     void onMoodLampSpeed_valueChanged(int value);
-    void onMoodLampLiquidMode_Toggled(bool isConstantColor);
+    void onMoodLampLiquidMode_Toggled(bool isLiquidMode);
 #ifdef BASS_SOUND_SUPPORT
+	void onSoundVizDevice_currentIndexChanged(int index);
 	void onSoundVizMinColor_changed(QColor color);
 	void onSoundVizMaxColor_changed(QColor color);
-	void onSoundVizDevice_currentIndexChanged(int index);
+	void onSoundVizLiquidMode_Toggled(bool isLiquidMode);
+	void onSoundVizLiquidSpeed_valueChanged(int value);
 #endif
     void showAbout(); /* using in actions */
     void onPostInit();

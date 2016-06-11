@@ -209,6 +209,7 @@ SOURCES += \
     ApiServer.cpp \
     ApiServerSetColorTask.cpp \
     MoodLampManager.cpp \
+	LiquidColorGenerator.cpp \
     LedDeviceManager.cpp \
     SelectWidget.cpp \
     GrabManager.cpp \
@@ -256,6 +257,7 @@ HEADERS += \
     ../../CommonHeaders/COMMANDS.h \
     ../../CommonHeaders/USB_ID.h \
     MoodLampManager.hpp \
+	LiquidColorGenerator.hpp \
     LedDeviceManager.hpp \
     SelectWidget.hpp \
     ../common/D3D10GrabberDefs.hpp \

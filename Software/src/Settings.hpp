@@ -186,12 +186,16 @@ public:
     static void setMoodLampSpeed(int value);
 
 #ifdef BASS_SOUND_SUPPORT
+	static int getSoundVisualizerDevice();
+	static void setSoundVisualizerDevice(int value);
 	static QColor getSoundVisualizerMinColor();
 	static void setSoundVisualizerMinColor(QColor color);
 	static QColor getSoundVisualizerMaxColor();
 	static void setSoundVisualizerMaxColor(QColor color);
-	static int getSoundVisualizerDevice();
-	static void setSoundVisualizerDevice(int value);
+	static bool isSoundVisualizerLiquidMode();
+	static void setSoundVisualizerLiquidMode(bool isLiquidMode);
+	static int getSoundVisualizerLiquidSpeed();
+	static void setSoundVisualizerLiquidSpeed(int value);
 #endif
 
     static QList<WBAdjustment> getLedCoefs();
@@ -222,6 +226,7 @@ private:
     static double getValidDeviceGamma(double value);
     static int getValidGrabSlowdown(int value);
     static int getValidMoodLampSpeed(int value);
+	static int getValidSoundVisualizerLiquidSpeed(int value);
     static int getValidLuminosityThreshold(int value);
     static void setValidLedCoef(int ledIndex, const QString & keyCoef, double coef);
     static double getValidLedCoef(int ledIndex, const QString & keyCoef);
@@ -293,9 +298,11 @@ signals:
     void moodLampColorChanged(const QColor color);
     void moodLampSpeedChanged(int value);
 #ifdef BASS_SOUND_SUPPORT
+	void soundVisualizerDeviceChanged(int value);
 	void soundVisualizerMinColorChanged(const QColor color);
 	void soundVisualizerMaxColorChanged(const QColor color);
-	void soundVisualizerDeviceChanged(int value);
+	void soundVisualizerLiquidModeChanged(bool isLiquidMode);
+	void soundVisualizerLiquidSpeedChanged(int value);
 #endif
     void ledCoefRedChanged(int ledIndex, double value);
     void ledCoefGreenChanged(int ledIndex, double value);

@@ -163,9 +163,11 @@ static const QString Speed = "MoodLamp/Speed";
 // [SoundVisualizer]
 namespace SoundVisualizer
 {
+static const QString Device = "SoundVisualizer/Device";
 static const QString MinColor = "SoundVisualizer/MinColor";
 static const QString MaxColor = "SoundVisualizer/MaxColor";
-static const QString Device = "SoundVisualizer/Device";
+static const QString IsLiquidMode = "SoundVisualizer/LiquidMode";
+static const QString LiquidSpeed = "SoundVisualizer/LiquidSpeed";
 }
 // [Device]
 namespace Device
@@ -1287,6 +1289,18 @@ void Settings::setMoodLampSpeed(int value)
 }
 
 #ifdef BASS_SOUND_SUPPORT
+int Settings::getSoundVisualizerDevice()
+{
+	return value(Profile::Key::SoundVisualizer::Device).toInt();
+}
+
+void Settings::setSoundVisualizerDevice(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	setValue(Profile::Key::SoundVisualizer::Device, value);
+	m_this->soundVisualizerDeviceChanged(value);
+}
+
 QColor Settings::getSoundVisualizerMinColor()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
@@ -1313,16 +1327,30 @@ void Settings::setSoundVisualizerMaxColor(QColor value)
 	m_this->soundVisualizerMaxColorChanged(value);
 }
 
-int Settings::getSoundVisualizerDevice()
+bool Settings::isSoundVisualizerLiquidMode()
 {
-	return value(Profile::Key::SoundVisualizer::Device).toInt();
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return value(Profile::Key::SoundVisualizer::IsLiquidMode).toBool();
 }
 
-void Settings::setSoundVisualizerDevice(int value)
+void Settings::setSoundVisualizerLiquidMode(bool value)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-	setValue(Profile::Key::SoundVisualizer::Device, value);
-	m_this->soundVisualizerDeviceChanged(value);
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::SoundVisualizer::IsLiquidMode, value);
+	m_this->soundVisualizerLiquidModeChanged(value);
+}
+
+int Settings::getSoundVisualizerLiquidSpeed()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return getValidSoundVisualizerLiquidSpeed(value(Profile::Key::SoundVisualizer::LiquidSpeed).toInt());
+}
+
+void Settings::setSoundVisualizerLiquidSpeed(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::SoundVisualizer::LiquidSpeed, getValidSoundVisualizerLiquidSpeed(value));
+	m_this->soundVisualizerLiquidSpeedChanged(value);
 }
 #endif
 
@@ -1469,11 +1497,20 @@ int Settings::getValidGrabSlowdown(int value)
 
 int Settings::getValidMoodLampSpeed(int value)
 {
-    if (value < Profile::MoodLamp::SpeedMin)
-        value = Profile::MoodLamp::SpeedMin;
-    else if (value > Profile::MoodLamp::SpeedMax)
-        value = Profile::MoodLamp::SpeedMax;
-    return value;
+	if (value < Profile::MoodLamp::SpeedMin)
+		value = Profile::MoodLamp::SpeedMin;
+	else if (value > Profile::MoodLamp::SpeedMax)
+		value = Profile::MoodLamp::SpeedMax;
+	return value;
+}
+
+int Settings::getValidSoundVisualizerLiquidSpeed(int value)
+{
+	if (value < Profile::SoundVisualizer::LiquidSpeedMin)
+		value = Profile::SoundVisualizer::LiquidSpeedMin;
+	else if (value > Profile::SoundVisualizer::LiquidSpeedMax)
+		value = Profile::SoundVisualizer::LiquidSpeedMax;
+	return value;
 }
 
 int Settings::getValidLuminosityThreshold(int value)
@@ -1559,14 +1596,16 @@ void Settings::initCurrentProfile(bool isResetDefault)
     setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled,        Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled,          Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
     // [MoodLamp]
-    setNewOption(Profile::Key::MoodLamp::IsLiquidMode,              Profile::MoodLamp::IsLiquidMode, isResetDefault);
+    setNewOption(Profile::Key::MoodLamp::IsLiquidMode,              Profile::MoodLamp::IsLiquidModeDefault, isResetDefault);
     setNewOption(Profile::Key::MoodLamp::Color,                     Profile::MoodLamp::ColorDefault, isResetDefault);
     setNewOption(Profile::Key::MoodLamp::Speed,                     Profile::MoodLamp::SpeedDefault, isResetDefault);
 #ifdef BASS_SOUND_SUPPORT
 	// [SoundVisualizer]
-	setNewOption(Profile::Key::SoundVisualizer::MinColor, Profile::SoundVisualizer::MinColorDefault, isResetDefault);
-	setNewOption(Profile::Key::SoundVisualizer::MaxColor, Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
-	setNewOption(Profile::Key::SoundVisualizer::Device, Profile::SoundVisualizer::DeviceDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::Device,             Profile::SoundVisualizer::DeviceDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MinColor,           Profile::SoundVisualizer::MinColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MaxColor,           Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::IsLiquidMode,       Profile::SoundVisualizer::IsLiquidModeDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::LiquidSpeed,        Profile::SoundVisualizer::LiquidSpeedDefault, isResetDefault);
 #endif
     // [Device]
     setNewOption(Profile::Key::Device::RefreshDelay,                Profile::Device::RefreshDelayDefault, isResetDefault);

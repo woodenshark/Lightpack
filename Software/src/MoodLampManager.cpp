@@ -31,14 +31,6 @@
 
 using namespace SettingsScope;
 
-int MoodLampManager::m_checkColors[MoodLampManager::ColorsMoodLampCount];
-const QColor MoodLampManager::m_colorsMoodLamp[MoodLampManager::ColorsMoodLampCount] =
-{
-    Qt::white, Qt::black, Qt::red, Qt::yellow, Qt::green, Qt::blue, Qt::magenta, Qt::cyan,
-    Qt::darkRed, Qt::darkGreen, Qt::darkBlue, Qt::darkYellow,
-    qRgb(255,128,0), qRgb(128,255,255), qRgb(128,0,255)
-};
-
 MoodLampManager::MoodLampManager(QObject *parent) : QObject(parent)
 {
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
@@ -48,7 +40,7 @@ MoodLampManager::MoodLampManager(QObject *parent) : QObject(parent)
 
 	initFromSettings();
 
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	connect(&m_generator, SIGNAL(updateColor(QColor)), this, SLOT(updateColors()));
 }
 
 void MoodLampManager::start(bool isEnabled)
@@ -62,10 +54,15 @@ void MoodLampManager::start(bool isEnabled)
         // Clear saved color for force emit signal after check m_rgbSaved != rgb in updateColors()
         // This is usable if start is called after API unlock, and we should force set current color
         m_rgbSaved = 0;
-        updateColors();
-    }
-    else
-        m_timer.stop();
+		updateColors();
+
+	}
+	
+	if (m_isMoodLampEnabled && m_isLiquidMode)
+		m_generator.start();
+	else
+		m_generator.stop();
+
 }
 
 void MoodLampManager::setCurrentColor(QColor color)
@@ -74,7 +71,7 @@ void MoodLampManager::setCurrentColor(QColor color)
 
     m_currentColor = color;
 
-    if (m_isMoodLampEnabled && (m_isLiquidMode == false))
+    if (m_isMoodLampEnabled && !m_isLiquidMode)
     {
         fillColors(color.rgb());
         emit updateLedsColors(m_colors);
@@ -85,10 +82,10 @@ void MoodLampManager::setLiquidMode(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
     m_isLiquidMode = state;
-    if (m_isLiquidMode && m_isMoodLampEnabled)
-        m_timer.start();
-    else {
-        m_timer.stop();
+	if (m_isLiquidMode && m_isMoodLampEnabled)
+		m_generator.start();
+	else {
+		m_generator.stop();
         if (m_isMoodLampEnabled)
             updateColors();
     }
@@ -97,8 +94,7 @@ void MoodLampManager::setLiquidMode(bool state)
 void MoodLampManager::setLiquidModeSpeed(int value)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-    m_liquidModeSpeed = value;
-    m_delay = generateDelay(m_liquidModeSpeed);
+	m_generator.setSpeed(value);
 }
 
 void MoodLampManager::setSendDataOnlyIfColorsChanged(bool state)
@@ -118,6 +114,7 @@ void MoodLampManager::setNumberOfLeds(int numberOfLeds)
 void MoodLampManager::reset()
 {
     m_rgbSaved = 0;
+	m_generator.reset();
 }
 
 void MoodLampManager::settingsProfileChanged(const QString &profileName)
@@ -129,7 +126,7 @@ void MoodLampManager::settingsProfileChanged(const QString &profileName)
 
 void MoodLampManager::initFromSettings()
 {
-    m_liquidModeSpeed = Settings::getMoodLampSpeed();
+    m_generator.setSpeed(Settings::getMoodLampSpeed());
     m_currentColor = Settings::getMoodLampColor();
     setLiquidMode(Settings::isMoodLampLiquidMode());
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
@@ -139,37 +136,13 @@ void MoodLampManager::initFromSettings()
 
 void MoodLampManager::updateColors()
 {
-    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << m_isLiquidMode << m_liquidModeSpeed;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << m_isLiquidMode;
 
     QRgb rgb;
 
     if (m_isLiquidMode)
     {
-        static int red   = 0;
-        static int green = 0;
-        static int blue  = 0;
-
-        static int redNew   = 0;
-        static int greenNew = 0;
-        static int blueNew  = 0;
-
-        if (red == redNew && green == greenNew && blue == blueNew)
-        {
-            m_delay = generateDelay(m_liquidModeSpeed);
-            QColor colorNew = generateColor();
-
-            redNew = colorNew.red();
-            greenNew = colorNew.green();
-            blueNew = colorNew.blue();
-
-            DEBUG_HIGH_LEVEL << Q_FUNC_INFO << colorNew;
-        }
-
-        if (redNew   != red)  { if (red   > redNew)   --red;   else ++red;   }
-        if (greenNew != green){ if (green > greenNew) --green; else ++green; }
-        if (blueNew  != blue) { if (blue  > blueNew)  --blue;  else ++blue;  }
-
-        rgb = qRgb(red, green, blue);
+		rgb = m_generator.current().rgb();
     }
     else
     {
@@ -182,32 +155,7 @@ void MoodLampManager::updateColors()
         emit updateLedsColors(m_colors);
     }
 
-    if (m_isMoodLampEnabled && m_isLiquidMode)
-    {
-        m_timer.start(m_delay);
-    }
-
     m_rgbSaved = rgb;
-}
-
-int MoodLampManager::generateDelay(int speed)
-{
-    return 1000 / (speed + PrismatikMath::rand(25) + 1);
-}
-
-QColor MoodLampManager::generateColor()
-{
-    static QList<QColor> unselectedColors;
-
-    if (unselectedColors.empty())
-    {
-        for (int i = 0; i < ColorsMoodLampCount; i++)
-            unselectedColors << m_colorsMoodLamp[i];
-    }
-
-    int randIndex = PrismatikMath::rand(unselectedColors.size());
-
-    return unselectedColors.takeAt(randIndex);
 }
 
 void MoodLampManager::initColors(int numberOfLeds)

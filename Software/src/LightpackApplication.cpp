@@ -413,6 +413,7 @@ void LightpackApplication::processCommandLineArguments()
 			DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
 	}
 	else if (parser.isSet(optionWizard)) {
+		Sleep(500); // Give calling instance a chance to release device
 		bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
 		runWizardLoop(isInitFromSettings);
 	}

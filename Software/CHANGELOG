@@ -13,6 +13,16 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.9
+---------------
+June 12, 2016
+
+* Windows: Add sound visualizer
+* Add custom distribution to wizard (#31)
+* Add overbrighten feature: Increase overall grab brightness
+* Fix a crash when using DDupl and gaming on one of multiple screens
+* Fix timing issue: Wizard finds no devices when launched from Prismatik
+
 Version 5.11.2.8
 ---------------
 June 5, 2016

@@ -417,7 +417,7 @@ void LightpackApplication::processCommandLineArguments()
 			DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
 			sendMessage("quitForWizard");
 			while (isRunning()) {
-				Sleep(200);
+				QThread::sleep(200);
 			}
 		}
 		bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);

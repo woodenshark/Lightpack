@@ -845,15 +845,18 @@ void SettingsWindow::processMessage(const QString &message)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << message;
 
-    if ("on" == message)
+	if (message == "on")
         setBacklightStatus(Backlight::StatusOn);
-    else if ("off" == message)
+	else if (message == "off")
         setBacklightStatus(Backlight::StatusOff);
     else if (message.startsWith("set-profile ")) {
         QString profile = message.mid(12);
         profileSwitch(profile);
-    }
-    else if (m_trayIcon != NULL) {
+	} else if (message == "quitForWizard") {
+		qWarning() << "Wizard was started, quitting!";
+		LightpackApplication::quit();
+	} else if (m_trayIcon != NULL) {
+		qWarning(qPrintable(message));
         m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
     }
 }

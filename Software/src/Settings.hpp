@@ -145,7 +145,9 @@ public:
     static bool isBacklightEnabled();
     static void setIsBacklightEnabled(bool isEnabled);
     static bool isGrabAvgColorsEnabled();
-    static void setGrabAvgColorsEnabled(bool isEnabled);
+	static void setGrabAvgColorsEnabled(bool isEnabled);
+	static int getGrabOverBrighten();
+	static void setGrabOverBrighten(int value);
     static bool isSendDataOnlyIfColorsChanges();
     static void setSendDataOnlyIfColorsChanges(bool isEnabled);
     static int getLuminosityThreshold();
@@ -227,7 +229,8 @@ private:
     static int getValidGrabSlowdown(int value);
     static int getValidMoodLampSpeed(int value);
 	static int getValidSoundVisualizerLiquidSpeed(int value);
-    static int getValidLuminosityThreshold(int value);
+	static int getValidLuminosityThreshold(int value);
+	static int getValidGrabOverBrighten(int value);
     static void setValidLedCoef(int ledIndex, const QString & keyCoef, double coef);
     static double getValidLedCoef(int ledIndex, const QString & keyCoef);
 
@@ -277,10 +280,11 @@ signals:
     void virtualNumberOfLedsChanged(int numberOfLeds);
     void grabSlowdownChanged(int value);
     void backlightEnabledChanged(bool isEnabled);
-    void grabAvgColorsEnabledChanged(bool isEnabled);
+	void grabAvgColorsEnabledChanged(bool isEnabled);
+	void grabOverBrightenChanged(int value);
     void sendDataOnlyIfColorsChangesChanged(bool isEnabled);
     void luminosityThresholdChanged(int value);
-    void minimumLuminosityEnabledChanged(bool value);
+	void minimumLuminosityEnabledChanged(bool value);
     void deviceRefreshDelayChanged(int value);
     void deviceUsbPowerLedDisabledChanged(bool isDisabled);
     void deviceBrightnessChanged(int value);

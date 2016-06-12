@@ -155,9 +155,10 @@ private slots:
 
     void onGrabberChanged();
     void onGrabSlowdown_valueChanged(int value);
-    void onLuminosityThreshold_valueChanged(int value);
-    void onMinimumLumosity_toggled(bool value);
-    void onGrabIsAvgColors_toggled(bool state);
+	void onGrabIsAvgColors_toggled(bool state);
+	void onGrabOverBrighten_valueChanged(int value);
+	void onLuminosityThreshold_valueChanged(int value);
+	void onMinimumLumosity_toggled(bool value);
 
     void onDeviceRefreshDelay_valueChanged(int value);
     void onDisableUsbPowerLed_toggled(bool state);
@@ -200,6 +201,8 @@ private slots:
 	void on_pushButton_GammaCorrectionHelp_clicked();
 
 	void on_pushButton_lumosityThresholdHelp_clicked();
+
+	void on_pushButton_grabOverBrightenHelp_clicked();
 
 	void on_pushButton_AllPluginsHelp_clicked();
 

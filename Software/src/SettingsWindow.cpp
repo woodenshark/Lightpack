@@ -188,7 +188,8 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->spinBox_LuminosityThreshold, SIGNAL(valueChanged(int)), this, SLOT(onLuminosityThreshold_valueChanged(int)));
     connect(ui->radioButton_MinimumLuminosity, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
     connect(ui->radioButton_LuminosityDeadZone, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
-    connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
+	connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
+	connect(ui->spinBox_GrabOverBrighten, SIGNAL(valueChanged(int)), this, SLOT(onGrabOverBrighten_valueChanged(int)));
 
     connect(ui->radioButton_GrabWidgetsDontShow, SIGNAL(toggled(bool)), this, SLOT( onDontShowLedWidgets_Toggled(bool)));
     connect(ui->radioButton_Colored, SIGNAL(toggled(bool)), this, SLOT(onSetColoredLedWidgets(bool)));
@@ -1065,25 +1066,33 @@ void SettingsWindow::onGrabSlowdown_valueChanged(int value)
     Settings::setGrabSlowdown(value);
 }
 
-void SettingsWindow::onLuminosityThreshold_valueChanged(int value)
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-    Settings::setLuminosityThreshold(value);
-}
-
-void SettingsWindow::onMinimumLumosity_toggled(bool value)
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-    Settings::setMinimumLuminosityEnabled(ui->radioButton_MinimumLuminosity->isChecked());
-}
-
 void SettingsWindow::onGrabIsAvgColors_toggled(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 
     Settings::setGrabAvgColorsEnabled(state);
+}
+
+void SettingsWindow::onGrabOverBrighten_valueChanged(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+
+	Settings::setGrabOverBrighten(value);
+}
+
+
+void SettingsWindow::onLuminosityThreshold_valueChanged(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+
+	Settings::setLuminosityThreshold(value);
+}
+
+void SettingsWindow::onMinimumLumosity_toggled(bool value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+
+	Settings::setMinimumLuminosityEnabled(ui->radioButton_MinimumLuminosity->isChecked());
 }
 
 void SettingsWindow::onDeviceRefreshDelay_valueChanged(int value)
@@ -1605,6 +1614,7 @@ void SettingsWindow::updateUiFromSettings()
 
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
     ui->spinBox_GrabSlowdown->setValue                               (Settings::getGrabSlowdown());
+    ui->spinBox_GrabOverBrighten->setValue                           (Settings::getGrabOverBrighten());
     ui->spinBox_LuminosityThreshold->setValue                        (Settings::getLuminosityThreshold());
 
     // Check the selected moodlamp mode (setChecked(false) not working to select another)
@@ -1794,7 +1804,12 @@ void SettingsWindow::on_pushButton_GammaCorrectionHelp_clicked()
 
 void SettingsWindow::on_pushButton_lumosityThresholdHelp_clicked()
 {
-    showHelpOf(ui->horizontalSlider_LuminosityThreshold);
+	showHelpOf(ui->horizontalSlider_LuminosityThreshold);
+}
+
+void SettingsWindow::on_pushButton_grabOverBrightenHelp_clicked()
+{
+	showHelpOf(ui->horizontalSlider_GrabOverBrighten);
 }
 
 void SettingsWindow::on_pushButton_AllPluginsHelp_clicked()

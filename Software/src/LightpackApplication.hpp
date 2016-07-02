@@ -130,4 +130,5 @@ private:
     EventFilters m_EventFilters;
 
 	bool m_isSessionLocked;
+	bool m_isLightsWereOn;
 };

@@ -330,12 +330,14 @@ void LightpackApplication::onSessionChange(int change)
 		case SessionChangeDetector::SessionChange::Locking:
 			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
 			{
+				if (!m_isSessionLocked)
+					m_isLightsWereOn = m_backlightStatus;
 				getLightpackApp()->settingsWnd()->switchOffLeds();
 			}
 			m_isSessionLocked = true;
 			break;
 		case SessionChangeDetector::SessionChange::Unlocking:
-			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
+			if (!SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOn)
 			{
 				getLightpackApp()->settingsWnd()->switchOnLeds();
 			}
@@ -344,13 +346,15 @@ void LightpackApplication::onSessionChange(int change)
 		case SessionChangeDetector::SessionChange::Sleeping:
 			if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
 			{
+				if (!m_isSessionLocked)
+					m_isLightsWereOn = m_backlightStatus;
 				getLightpackApp()->settingsWnd()->switchOffLeds();
 			}
 			break;
 		case SessionChangeDetector::SessionChange::Resuming:
 			if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
 			{
-				if (!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock())
+				if ((!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock()) && m_isLightsWereOn)
 				{
 					getLightpackApp()->settingsWnd()->switchOnLeds();
 				}

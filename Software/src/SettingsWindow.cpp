@@ -1044,8 +1044,8 @@ void SettingsWindow::onGrabberChanged()
 }
 
 void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-    if (!updatingFromSettings) {
+	if (!updatingFromSettings) {
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 #ifdef D3D10_GRAB_SUPPORT
         Settings::setDx1011GrabberEnabled(isEnabled);
 #endif
@@ -1054,8 +1054,8 @@ void SettingsWindow::onDx1011CaptureEnabledChanged(bool isEnabled) {
 }
 
 void SettingsWindow::onDx9CaptureEnabledChanged(bool isEnabled) {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-    if (!updatingFromSettings) {
+	if (!updatingFromSettings) {
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 #ifdef D3D10_GRAB_SUPPORT
         Settings::setDx9GrabbingEnabled(isEnabled);
 #endif
@@ -1233,8 +1233,10 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
 #ifdef BASS_SOUND_SUPPORT
 void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
-	Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
+	if (!updatingFromSettings) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
+		Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
+	}
 }
 
 void SettingsWindow::onSoundVizMinColor_changed(QColor color)
@@ -1631,7 +1633,12 @@ void SettingsWindow::updateUiFromSettings()
     ui->horizontalSlider_MoodLampSpeed->setValue                     (Settings::getMoodLampSpeed());
 
 #ifdef BASS_SOUND_SUPPORT
-	ui->comboBox_SoundVizDevice->setCurrentIndex                     (Settings::getSoundVisualizerDevice());
+	for (int i = 0; i < ui->comboBox_SoundVizDevice->count(); i++) {
+		if (ui->comboBox_SoundVizDevice->itemData(i).toInt() == Settings::getSoundVisualizerDevice()) {
+			ui->comboBox_SoundVizDevice->setCurrentIndex(i);
+			break;
+		}
+	}
 	ui->pushButton_SelectColorSoundVizMin->setColor                  (Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor                  (Settings::getSoundVisualizerMaxColor());
     ui->radioButton_SoundVizConstantMode->setChecked                 (!Settings::isSoundVisualizerLiquidMode());

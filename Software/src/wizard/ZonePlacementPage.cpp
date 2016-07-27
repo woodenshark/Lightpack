@@ -171,7 +171,7 @@ void ZonePlacementPage::turnLightsOff()
     device()->setColors(lights);
 }
 
-void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
+void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool invertIds, int idOffset) {
 
     cleanupGrabAreas();
     for(int i = 0; i < distributor->areaCount(); i++) {
@@ -183,7 +183,9 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
                 sf->vScanStart(),
                 (sf->hScanEnd() - sf->hScanStart()),
                 (sf->vScanEnd() - sf->vScanStart()));
-        addGrabArea(i, r);
+		int id = ((invertIds ? distributor->areaCount() - (i + 1) : i) + idOffset) % distributor->areaCount();
+		id = (id + distributor->areaCount()) % distributor->areaCount();
+		addGrabArea(id, r);
 
         delete sf;
     }
@@ -279,7 +281,7 @@ void ZonePlacementPage::on_pbCustom_clicked()
 		_ui->sbThickness->value() / 100.0, 
 		_ui->sbStandWidth->value() / 100.0);
 
-	distributeAreas(custom);
+	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 
 	delete custom;
 }

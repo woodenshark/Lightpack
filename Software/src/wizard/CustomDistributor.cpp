@@ -181,7 +181,7 @@ ScreenArea * CustomDistributor::next() {
 
 	}
 
-	return new ScreenArea(*_currentArea);;
+	return new ScreenArea(*_currentArea);
 
 }
 

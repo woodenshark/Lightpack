@@ -69,7 +69,7 @@ private:
     void addGrabArea(int id, const QRect &rect);
     void removeLastGrabArea();
     void cleanupGrabAreas();
-    void distributeAreas(AreaDistributor *);
+	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);
     void resetNewAreaRect();
     AbstractLedDevice * device();
 

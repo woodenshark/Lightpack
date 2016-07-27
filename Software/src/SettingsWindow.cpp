@@ -299,7 +299,9 @@ void SettingsWindow::changeEvent(QEvent *e)
     case QEvent::LanguageChange:
 
         currentPage = ui->listWidget->currentRow();
-        ui->retranslateUi(this);
+		updatingFromSettings = true;
+		ui->retranslateUi(this);
+		updatingFromSettings = false;
         if (m_trayIcon)
             m_trayIcon->retranslateUi();
 
@@ -1151,6 +1153,8 @@ void SettingsWindow::onSliderDeviceGammaCorrection_valueChanged(int value)
 
 void SettingsWindow::onLightpackModes_currentIndexChanged(int index)
 {
+	if (updatingFromSettings) return;
+
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << index << sender();
 
     using namespace Lightpack;
@@ -1567,13 +1571,15 @@ void SettingsWindow::loadTranslation(const QString & language)
         return;
     }
 
+	updatingFromSettings = true;
     m_translator = new QTranslator();
     if(m_translator->load(pathToLocale)){
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Load translation for locale" << locale;
         qApp->installTranslator(m_translator);
     }else{
         qWarning() << "Fail load translation for locale" << locale << "pathToLocale" << pathToLocale;
-    }
+	}
+	updatingFromSettings = false;
 }
 
 // ----------------------------------------------------------------------------

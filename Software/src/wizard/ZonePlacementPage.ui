@@ -208,6 +208,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pbAndromeda</tabstop>
+  <tabstop>pbCassiopeia</tabstop>
+  <tabstop>pbPegasus</tabstop>
+  <tabstop>sbNumberOfLeds</tabstop>
+  <tabstop>sbTopLeds</tabstop>
+  <tabstop>sbSideLeds</tabstop>
+  <tabstop>sbBottomLeds</tabstop>
+  <tabstop>sbThickness</tabstop>
+  <tabstop>sbStandWidth</tabstop>
+  <tabstop>pbCustom</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

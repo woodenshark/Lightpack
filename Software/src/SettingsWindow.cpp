@@ -1649,7 +1649,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->pushButton_SelectColorSoundVizMax->setColor                  (Settings::getSoundVisualizerMaxColor());
     ui->radioButton_SoundVizConstantMode->setChecked                 (!Settings::isSoundVisualizerLiquidMode());
     ui->radioButton_SoundVizLiquidMode->setChecked                   (Settings::isSoundVisualizerLiquidMode());
-    ui->horizontalSlider_SoundVizLiquidSpeed->setValue               (Settings::getMoodLampSpeed());
+    ui->horizontalSlider_SoundVizLiquidSpeed->setValue               (Settings::getSoundVisualizerLiquidSpeed());
 #endif
 
     ui->checkBox_DisableUsbPowerLed->setChecked                      (Settings::isDeviceUsbPowerLedDisabled());

@@ -142,6 +142,7 @@ private slots:
 #endif
     void showAbout(); /* using in actions */
     void onPostInit();
+	void checkOutdatedGrabber();
 
     void scrollThanks();
 

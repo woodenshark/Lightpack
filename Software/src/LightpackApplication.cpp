@@ -731,13 +731,10 @@ void LightpackApplication::initGrabManager()
 	connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)),         m_soundManager,     SLOT(setLiquidMode(bool)));
 #endif
 
-	connect(settings(), SIGNAL(profileLoaded(const QString &)),                 m_grabManager,      SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_grabManager,      SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 
-	connect(settings(), SIGNAL(profileLoaded(const QString &)),                 m_moodlampManager,  SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_moodlampManager,  SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 #ifdef BASS_SOUND_SUPPORT
-	connect(settings(), SIGNAL(profileLoaded(const QString &)),                 m_soundManager,     SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_soundManager,     SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
 #endif
 

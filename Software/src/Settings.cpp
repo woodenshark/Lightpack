@@ -390,7 +390,6 @@ void Settings::loadOrCreateProfile(const QString & profileName)
 
     m_mainConfig->setValue(Main::Key::ProfileLast, profileName);
     locker.unlock();
-    m_this->profileLoaded(profileName);
 }
 
 void Settings::renameCurrentProfile(const QString & profileName)

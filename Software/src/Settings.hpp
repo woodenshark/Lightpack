@@ -253,7 +253,6 @@ public:
     static QVariant value(const QString & key);
 
 signals:
-    void profileLoaded(const QString &);
     void currentProfileNameChanged(const QString &);
     void currentProfileRemoved();
     void currentProfileInited(const QString &);

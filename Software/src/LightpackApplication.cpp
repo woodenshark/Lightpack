@@ -530,6 +530,7 @@ void LightpackApplication::startLedDeviceManager()
 //    connect(m_pluginInterface, SIGNAL(changeDevice(QString)),        m_settingsWindow , SLOT(setDevice(QString)));
 //    connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),        m_settingsWindow , SLOT(updateUiFromSettings()));
 //    connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),        this , SLOT(numberOfLedsChanged(int)));
+    connect(m_pluginInterface, SIGNAL(updateBacklight(Lightpack::Mode)) , this, SLOT(setBacklightChanged(Lightpack::Mode)));
 
     if (!m_noGui)
     {

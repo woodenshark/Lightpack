@@ -351,22 +351,6 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="checkBox_GrabIsAvgColors">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Average color on all LEDs</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="2">
                <widget class="QLabel" name="label_GrabFrequency_txt_fps">
                 <property name="text">
@@ -479,6 +463,22 @@
                 </property>
                 <property name="flat">
                  <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="3">
+               <widget class="QCheckBox" name="checkBox_GrabIsAvgColors">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Average color on all LEDs</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1263,25 +1263,6 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Keep lights ON after exit</string>
-          </property>
-         </widget>
-        </item>
         <item row="14" column="0">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
@@ -1680,17 +1661,30 @@
           </widget>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="5" column="0" colspan="3">
          <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
           <property name="text">
            <string>Keep lights ON after lock computer</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="6" column="0" colspan="3">
          <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
           <property name="text">
            <string>Keep lights ON after suspend</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0" colspan="3">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Keep lights ON after exit</string>
           </property>
          </widget>
         </item>
@@ -2240,7 +2234,7 @@
         <item>
          <widget class="QLabel" name="label_DevTabWarning">
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tab is used for experimental and unstable features. Any tuning with these controls may cause inevetible plane crash, miscarriage or nuclear disaster. Use it at your own risk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tab is used for experimental and unstable features. Any tuning with these controls may cause inevitable plane crash, miscarriage or nuclear disaster. Use it at your own risk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="scaledContents">
            <bool>false</bool>

@@ -10,6 +10,7 @@ DESTDIR  = ../bin
 TARGET   = libraryinjector
 TEMPLATE = lib
 LIBS += -luuid -lole32 -ladvapi32 -luser32
+RC_FILE  = ../res/Libs.rc
 
 include(../build-config.prf)
 

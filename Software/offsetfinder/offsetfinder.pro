@@ -9,6 +9,7 @@ QT -= core gui
 DESTDIR  = ../bin
 TARGET   = offsetfinder
 LIBS += -ldxguid
+RC_FILE  = ../res/Libs.rc
 
 QMAKE_LIBS_QT_ENTRY =
 DEFINES += NO_QT

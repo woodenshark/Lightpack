@@ -58,6 +58,12 @@ DEFINES += $${SUPPORTED_GRABBERS}
 
 LIBS    += -L../lib -lgrab -lprismatik-math
 
+CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 unix:!macx{
     CONFIG    += link_pkgconfig debug
     PKGCONFIG += libusb-1.0

@@ -33,7 +33,55 @@
 #include "calculations.hpp"
 #include "debug.h"
 
-const uint32_t kMaxDisplaysCount = 10;
+namespace {
+
+static const size_t kBytesPerPixel = 4;
+static const uint32_t kMaxDisplaysCount = 10;
+
+bool allocateScreenBuffer(const ScreenInfo& screen,
+                          const qreal pixelRatio,
+                          GrabbedScreen& grabScreen)
+{
+    CGDirectDisplayID screenId = reinterpret_cast<intptr_t>(screen.handle);
+    const size_t width = CGDisplayPixelsWide(screenId) * pixelRatio;
+    const size_t height = CGDisplayPixelsHigh(screenId) * pixelRatio;
+    const size_t imgSize = height * width * kBytesPerPixel;
+
+    DEBUG_HIGH_LEVEL << "dimensions " << width << "x" << height << pixelRatio << screen.handle;
+    unsigned char *buffer = reinterpret_cast<unsigned char*>(calloc(imgSize, sizeof(unsigned char)));
+    if (!buffer)
+        return false;
+    grabScreen.imgData = buffer;
+    grabScreen.imgFormat = BufferFormatArgb;
+    grabScreen.screenInfo = screen;
+    grabScreen.imgDataSize = imgSize;
+    return true;
+}
+
+bool getScreenInfoFromRect(const CGDirectDisplayID display,
+                           const QList<GrabWidget *>& grabWidgets,
+                           ScreenInfo& screenInfo)
+{
+    const CGRect displayRect = CGDisplayBounds(display);
+    for (int k = 0; k < grabWidgets.size(); ++k) {
+        const QRect& rect = grabWidgets[k]->geometry();
+        const CGPoint widgetCenter = CGPointMake(rect.x() + rect.width() / 2,
+                                                 rect.y() + rect.height() / 2);
+        if (CGRectContainsPoint(displayRect, widgetCenter)) {
+            const int x1 = displayRect.origin.x;
+            const int y1 = displayRect.origin.y;
+            const int x2 = displayRect.size.width  + x1 - 1;
+            const int y2 = displayRect.size.height + y1 - 1;
+            screenInfo.rect.setCoords( x1, y1, x2, y2);
+            screenInfo.handle = reinterpret_cast<void *>(display);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+}
 
 MacOSGrabber::MacOSGrabber(QObject *parent, GrabberContext *context):
     GrabberBase(parent, context)
@@ -58,7 +106,9 @@ void MacOSGrabber::freeScreens()
     _screensWithWidgets.clear();
 }
 
-QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
+QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(
+    QList< ScreenInfo > * result,
+    const QList<GrabWidget *> &grabWidgets)
 {
     CGDirectDisplayID displays[kMaxDisplaysCount];
     uint32_t displayCount;
@@ -66,27 +116,11 @@ QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(QList< ScreenInfo > * res
     CGError err = CGGetActiveDisplayList(kMaxDisplaysCount, displays, &displayCount);
 
     result->clear();
-
     if (err == kCGErrorSuccess) {
         for (unsigned int i = 0; i < displayCount; ++i) {
-            CGRect cgScreenRect = CGDisplayBounds(displays[i]);
-            for (int k = 0; k < grabWidgets.size(); ++k) {
-                QRect rect = grabWidgets[k]->frameGeometry();
-                CGPoint widgetCenter = CGPointMake(rect.x() + rect.width() / 2, rect.y() + rect.height() / 2);
-                if (CGRectContainsPoint(cgScreenRect, widgetCenter)) {
-                    ScreenInfo screenInfo;
-                    int x1 = cgScreenRect.origin.x;
-                    int y1 = cgScreenRect.origin.y;
-                    int x2 = cgScreenRect.size.width  + x1 - 1;
-                    int y2 = cgScreenRect.size.height + y1 - 1;
-                    screenInfo.rect.setCoords( x1, y1, x2, y2);
-                    screenInfo.handle = reinterpret_cast<void *>(displays[i]);
-
-                    result->append(screenInfo);
-
-                    break;
-                }
-            }
+            ScreenInfo screenInfo;
+            if (getScreenInfoFromRect(displays[i], grabWidgets, screenInfo))
+                result->append(screenInfo);
         }
 
     } else {
@@ -98,54 +132,28 @@ QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(QList< ScreenInfo > * res
 
 void MacOSGrabber::toGrabbedScreen(CGImageRef imageRef, GrabbedScreen *screen)
 {
-    size_t width = CGImageGetWidth(imageRef);
-    size_t height = CGImageGetHeight(imageRef);
-    /*
-    size_t new_buf_size = height * width * bytesPerPixel;
-    if (new_buf_size > _imageBufSize) {
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "new width = " << width << " new height = " << height;
-        if (_imageBuf)
-            free(_imageBuf);
-        _imageBuf = (unsigned char*) calloc(height * width * bytesPerPixel, sizeof(unsigned char));
-        _imageBufSize = new_buf_size;
-    }
-*/
+    const size_t width = CGImageGetWidth(imageRef);
+    const size_t height = CGImageGetHeight(imageRef);
+    const size_t screenBufferSize = width * height * kBytesPerPixel;
+    Q_ASSERT(screen->imgDataSize == screenBufferSize);
 
     CGDataProviderRef provider = CGImageGetDataProvider(imageRef);
     CFDataRef dataref = CGDataProviderCopyData(provider);
-    memcpy(screen->imgData, CFDataGetBytePtr(dataref), width * height * 4);
+    memcpy(screen->imgData, CFDataGetBytePtr(dataref), screenBufferSize);
     CFRelease(dataref);
 }
 
 bool MacOSGrabber::reallocate(const QList<ScreenInfo> &screens)
 {
-    const size_t kBytesPerPixel = 4;
+    const qreal pixelRatio = ((QGuiApplication*)QCoreApplication::instance())->devicePixelRatio();
     freeScreens();
     for (int i = 0; i < screens.size(); ++i) {
-
-
-        //MacOSScreenData *d = new MacOSScreenData();
-
-        int screenid = reinterpret_cast<intptr_t>(screens[i].handle);
-
-        qreal pixelRatio = ((QGuiApplication*)QCoreApplication::instance())->devicePixelRatio();
-        long width = CGDisplayPixelsWide(screenid) * pixelRatio;
-        long height = CGDisplayPixelsHigh(screenid) * pixelRatio;
-
-        DEBUG_HIGH_LEVEL << "dimensions " << width << "x" << height << pixelRatio << screens[i].handle;
-
-        size_t imgSize = height * width * kBytesPerPixel;
-        unsigned char *buf = reinterpret_cast<unsigned char*>(calloc(imgSize, sizeof(unsigned char)));
-        if (buf == NULL) {
+        GrabbedScreen grabScreen;
+        if (!allocateScreenBuffer(screens[i], pixelRatio, grabScreen)) {
             qCritical() << "couldn't allocate image buffer";
             freeScreens();
             return false;
         }
-        GrabbedScreen grabScreen;
-        grabScreen.imgData = buf;
-        grabScreen.imgFormat = BufferFormatArgb;
-        grabScreen.screenInfo = screens[i];
-        //grabScreen.associatedData = d;
         _screensWithWidgets.append(grabScreen);
 
     }
@@ -155,20 +163,14 @@ bool MacOSGrabber::reallocate(const QList<ScreenInfo> &screens)
 GrabResult MacOSGrabber::grabScreens()
 {
     for (int i = 0; i < _screensWithWidgets.size(); ++i) {
-
         CGDirectDisplayID display = reinterpret_cast<intptr_t>(_screensWithWidgets[i].screenInfo.handle);
-
         CGImageRef imageRef = CGDisplayCreateImage(display);
 
         if (imageRef != NULL)
         {
-
             toGrabbedScreen(imageRef, &_screensWithWidgets[i] );
-
             CGImageRelease(imageRef);
-
         } else {
-
             qCritical() << Q_FUNC_INFO << "CGDisplayCreateImage(..) returned NULL";
             return GrabResultError;
         }

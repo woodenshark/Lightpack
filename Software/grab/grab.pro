@@ -23,6 +23,12 @@ INCLUDEPATH += ./include \
                ../math/include \
                ..
 
+CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 DEFINES += $${SUPPORTED_GRABBERS}
 # Linux/UNIX platform
 unix:!macx {
@@ -97,10 +103,6 @@ win32 {
     SOURCES += \
             WinUtils.cpp \
             ../common/WinDXUtils.cpp
-}
-
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++11
 }
 
 macx {

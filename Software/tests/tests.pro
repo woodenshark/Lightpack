@@ -15,6 +15,10 @@ CONFIG     -= app_bundle
 include(../build-config.prf)
 
 CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
 
 # QMake and GCC produce a lot of stuff
 OBJECTS_DIR = stuff

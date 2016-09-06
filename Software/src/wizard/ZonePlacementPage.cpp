@@ -129,11 +129,11 @@ bool ZonePlacementPage::validatePage()
         devType = SupportedDevices::DeviceTypeVirtual;
     }
     Settings::setConnectedDevice(devType);
-    Settings::setNumberOfLeds(devType, field("numberOfLeds").toInt());
+	Settings::setNumberOfLeds(devType, _grabAreas.size()); //field("numberOfLeds").toInt()
 
     for(int i = 0; i < _grabAreas.size(); i++) {
-        Settings::setLedPosition(i, _grabAreas[i]->geometry().topLeft());
-        Settings::setLedSize(i, _grabAreas[i]->geometry().size());
+		Settings::setLedPosition(_grabAreas[i]->getId(), _grabAreas[i]->geometry().topLeft());
+		Settings::setLedSize(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
     }
 
     cleanupGrabAreas();
@@ -282,6 +282,8 @@ void ZonePlacementPage::on_pbCustom_clicked()
 		_ui->sbStandWidth->value() / 100.0);
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+
+	_ui->sbNumberOfLeds->setValue(_grabAreas.size());
 
 	delete custom;
 }

@@ -49,6 +49,7 @@ public:
 
     void saveSizeAndPosition();
 
+	int getId();
     double getCoefRed();
     double getCoefGreen();
     double getCoefBlue();

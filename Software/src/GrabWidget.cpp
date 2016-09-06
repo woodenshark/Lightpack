@@ -554,6 +554,11 @@ void GrabWidget::paintEvent(QPaintEvent *)
     painter.drawText(rectWidthHeight, m_widthHeight, QTextOption(Qt::AlignHCenter | Qt::AlignBottom));
 }
 
+int GrabWidget::getId() {
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	return m_selfId;
+}
 
 double GrabWidget::getCoefRed()
 {

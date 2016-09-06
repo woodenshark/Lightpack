@@ -35,6 +35,7 @@
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
 #include "SessionChangeDetector.hpp"
+#include "LightpackCommandLineParser.hpp"
 
 #ifdef Q_OS_WIN
 #include "WinUtils.hpp"
@@ -365,136 +366,79 @@ void LightpackApplication::onSessionChange(int change)
 
 void LightpackApplication::processCommandLineArguments()
 {
-	g_debugLevel = SettingsScope::Main::DebugLevelDefault;
+    g_debugLevel = SettingsScope::Main::DebugLevelDefault;
 
-	m_isDebugLevelObtainedFromCmdArgs = false;
+    m_isDebugLevelObtainedFromCmdArgs = false;
 
-	QCommandLineParser parser;
-	parser.setApplicationDescription("Prismatik of Lightpack");
-	const QCommandLineOption optionHelp = parser.addHelpOption();
-	const QCommandLineOption optionVersion = parser.addVersionOption();
-	const QCommandLineOption optionNogui("nogui", "no GUI (console mode)");
-	parser.addOption(optionNogui);
+    LightpackCommandLineParser parser;
+    if (!parser.parse(arguments())) {
+        outputMessage(parser.errorText());
+        ::exit(WrongCommandLineArgument_ErrorCode);
+    }
 
-	const QCommandLineOption optionWizard("wizard", "run settings wizard first");
-	parser.addOption(optionWizard);
-
-	const QCommandLineOption optionOn("on", "send 'on leds' cmd to running instance, if any");
-	parser.addOption(optionOn);
-
-	const QCommandLineOption optionOff("off", "send 'off leds' cmd to the device or running instance");
-	parser.addOption(optionOff);
-
-	const QCommandLineOption optionSetProfile("set-profile", "switch to another profile in already running instance", "profile");
-	parser.addOption(optionSetProfile);
-
-	const QCommandLineOption optionDebug("debug", "verbosity level of debug output (high, mid, low, zero)", "debug");
-	parser.addOption(optionDebug);
-
-	if ( !parser.parse(arguments()) ) {
-		outputMessage(parser.errorText());
-		::exit(WrongCommandLineArgument_ErrorCode);
-	}
-
-	if (parser.isSet(optionHelp)) {
-		outputMessage(parser.helpText());
-		::exit(0);
-	}
-
-	if (parser.isSet(optionVersion)) {
-		QString m = "Version: " + QString(VERSION_STR) + "\n"
+    if (parser.isSetHelp()) {
+        outputMessage(parser.helpText());
+        ::exit(0);
+    }
+    if (parser.isSetVersion())
+    {
+        const QString versionString =
+            "Version: " VERSION_STR "\n"
 #ifdef GIT_REVISION
-			"Revision: " + QString(GIT_REVISION) + "\n"
+            "Revision: " GIT_REVISION "\n"
 #endif
-			"Build with Qt version " + QString(QT_VERSION_STR) + "\n";
-		outputMessage(m);
-		::exit(0);
-	}
+            "Build with Qt version " QT_VERSION_STR "\n";
+        outputMessage(versionString);
+        ::exit(0);
+    }
 
-	// these two options are mutually exclusive
-	if (parser.isSet(optionNogui)) {
-			m_noGui = true;
-			DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
-	}
-	else if (parser.isSet(optionWizard)) {
-		if (isRunning()) {
-			DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
-			sendMessage("quitForWizard");
-			while (isRunning()) {
-				QThread::sleep(200);
-			}
-		}
-		bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
-		runWizardLoop(isInitFromSettings);
-	}
+    // these two options are mutually exclusive
+    if (parser.isSetNoGUI()) {
+        m_noGui = true;
+        DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
+    } else if (parser.isSetWizard()) {
+        if (isRunning()) {
+            DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
+            sendMessage("quitForWizard");
+            while (isRunning()) {
+                QThread::sleep(200);
+            }
+        }
+        bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+        runWizardLoop(isInitFromSettings);
+    }
 
-	// 'on' and 'off' are mutually exclusive also
-	if (parser.isSet(optionOff)) {
-		if (!isRunning()) {
-			LedDeviceLightpack lightpackDevice;
-			lightpackDevice.switchOffLeds();
-		}
-		else
-			sendMessage("off");
-		::exit(0);
-	}
-	else if (parser.isSet(optionOn)) {
-		if (isRunning())
-			sendMessage("on");
-		::exit(0);
-	}
+    // 'on' and 'off' are mutually exclusive also
+    if (parser.isSetBacklightOff()) {
+        if (!isRunning()) {
+            LedDeviceLightpack lightpackDevice;
+            lightpackDevice.switchOffLeds();
+        } else {
+            sendMessage("off");
+        }
+        ::exit(0);
+    }
+    else if (parser.isSetBacklightOn())
+    {
+        if (isRunning())
+            sendMessage("on");
+        ::exit(0);
+    }
 
-	if (parser.isSet(optionSetProfile)) {
-		if (isRunning())
-			sendMessage("set-profile " + parser.value(optionSetProfile));
-		::exit(0);
-	}
+    if (parser.isSetProfile()) {
+        if (isRunning())
+            sendMessage("set-profile " + parser.profileName());
+        ::exit(0);
+    }
 
-	if (parser.isSet(optionDebug)) {
-		QString debugLevel = parser.value(optionDebug);
-		m_isDebugLevelObtainedFromCmdArgs = true;
-		if (debugLevel == "high")
-			g_debugLevel = Debug::HighLevel;
-		else if (debugLevel == "mid")
-			g_debugLevel = Debug::MidLevel;
-		else if (debugLevel == "low")
-			g_debugLevel = Debug::LowLevel;
-		else if (debugLevel == "zero")
-			g_debugLevel = Debug::ZeroLevel;
-		else {
-			qDebug() << "Wrong debug level specified " << debugLevel;
-			m_isDebugLevelObtainedFromCmdArgs = false;
-		}
-	}
+    if (parser.isSetDebuglevel())
+    {
+        g_debugLevel = parser.debugLevel();
+        m_isDebugLevelObtainedFromCmdArgs = true;
+    }
 
-	// Keep this for a while for backward compatibility
-	// TODO: remove this block.
-	for (int i = 1; i < arguments().count(); i++)
-	{
-		if (arguments().at(i) =="--debug-high") {
-			g_debugLevel = Debug::HighLevel;
-			m_isDebugLevelObtainedFromCmdArgs = true;
-			break;
-		}
-		else if (arguments().at(i) =="--debug-mid") {
-			g_debugLevel = Debug::MidLevel;
-			m_isDebugLevelObtainedFromCmdArgs = true;
-			break;
-		}
-		else if (arguments().at(i) =="--debug-low") {
-			g_debugLevel = Debug::LowLevel;
-			m_isDebugLevelObtainedFromCmdArgs = true;
-			break;
-		}
-		else if (arguments().at(i) =="--debug-zero") {
-			g_debugLevel = Debug::ZeroLevel;
-			m_isDebugLevelObtainedFromCmdArgs = true;
-			break;
-		}
-	}
-
-	if (m_isDebugLevelObtainedFromCmdArgs)
-		qDebug() << "Debug level" << g_debugLevel;
+    if (m_isDebugLevelObtainedFromCmdArgs)
+        qDebug() << "Debug level" << g_debugLevel;
 }
 
 void LightpackApplication::outputMessage(QString message) const

@@ -91,21 +91,21 @@ Name: (app); Type: dirifempty
 
 [CustomMessages]
 ; Startup group name
-russian.StartupGroup =─БРНЛЮРХВЕЯЙХИ ГЮОСЯЙ:
+russian.StartupGroup =автоматический запуск:
 english.StartupGroup =Automatic Startup:
 
 ; Startup icon name
-russian.CreateStartupIcon=дНАЮБХРЭ Б ЮБРНГЮЦПСГЙС
+russian.CreateStartupIcon=Добавить в папку запуска
 english.CreateStartupIcon=Add to startup folder
 
 ; Admin task name
-russian.CreateAdminStartupTask =─БРНЛЮРХВЕЯЙХИ ГЮОСЯЙ Я ОПЮБЮЛХ ЮДЛХМХЯРПЮРНПЮ
+russian.CreateAdminStartupTask =Автоматический запуск с правами администратора
 english.CreateAdminStartupTask =Automatically launch with admin rights
 
 ; Uninstall name
-russian.RemoveOnly =(РНКЭЙН СДЮКЕМХЕ)
+russian.RemoveOnly =(удалить только)
 english.RemoveOnly =(remove only)
 
 ; Docs link name
-russian.OpenWiki =нРЙПШРЭ ЯРПЮМХЖС Я ДНЙСЛЕМРЮЖХЕИ
+russian.OpenWiki =Открытая документация
 english.OpenWiki =Open documentation

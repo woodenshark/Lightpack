@@ -505,7 +505,11 @@ GrabResult DDuplGrabber::grabScreens()
             HRESULT hr = screenData->duplication->AcquireNextFrame(ACQUIRE_TIMEOUT_INTERVAL, &frameInfo, &resource);
             if (hr == DXGI_ERROR_WAIT_TIMEOUT)
             {
-                continue;
+				// If we have an old image for this screen, we can stick to that, otherwise we have to wait
+				if (screen.imgData == NULL)
+					return GrabResultFrameNotReady;
+				else
+					continue;
             }
             else if (hr == DXGI_ERROR_ACCESS_LOST || hr == DXGI_ERROR_INVALID_CALL)
             {

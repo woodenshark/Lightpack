@@ -52,6 +52,7 @@ namespace Lightpack
 enum Mode {
     AmbilightMode,
     MoodLampMode,
+	SoundVisualizeMode,
     UnknownMode,
     Default = AmbilightMode
 };
@@ -145,6 +146,7 @@ namespace LedDeviceCommands
 enum Cmd {
     OffLeds,
     SetColors,
+    SetUsbPowerLedDisabled,
     SetRefreshDelay,
     SetColorDepth,
     SetSmoothSlowdown,

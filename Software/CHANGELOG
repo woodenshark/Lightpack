@@ -13,6 +13,33 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.10
+---------------
+July 27, 2016
+
+* Extend custom distribution (#59)
+* Fix UI/settings bugs (#65)
+* Fix white balance ignored by luminosity threshold (#63)
+* Fix lights turning on themselves (#58)
+
+Version 5.11.2.9
+---------------
+June 12, 2016
+
+* Windows: Add sound visualizer
+* Add custom distribution to wizard (#31)
+* Add overbrighten feature: Increase overall grab brightness
+* Fix a crash when using DDupl and gaming on one of multiple screens
+* Fix timing issue: Wizard finds no devices when launched from Prismatik
+
+Version 5.11.2.8
+---------------
+June 5, 2016
+
+* Grab widgets snap to each other (#40)
+* Ability to toggle the power LED state (#27)
+* Include update check on startup
+
 Version 5.11.2.7
 ---------------
 April 30, 2016

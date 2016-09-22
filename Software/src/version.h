@@ -27,10 +27,10 @@
 #pragma once
 
 // Current version of Lightpack software
-#define VERSION_STR     "5.11.2.7"
+#define VERSION_STR     "5.11.2.10"
 
 // Resource defines using in Lightpack.rc
-#define VER_FILEVERSION             5,11,2,7
+#define VER_FILEVERSION             5,11,2,10
 #define VER_PRODUCTVERSION          VER_FILEVERSION
 
 #define VER_FILEVERSION_STR         VERSION_STR "\0"
@@ -40,7 +40,7 @@
 #define VER_COMPANYNAME_STR         "Patrick Siegler"
 #define VER_FILEDESCRIPTION_STR     "Lightpack Software"
 #define VER_INTERNALNAME_STR        "Prismatik"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright (c) 2014 Woodenshark LLC"
+#define VER_LEGALCOPYRIGHT_STR      ""
 #define VER_ORIGINALFILENAME_STR    "Prismatik.exe"
 
 

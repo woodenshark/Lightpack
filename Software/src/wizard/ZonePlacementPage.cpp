@@ -29,11 +29,12 @@
 #include "QDesktopWidget"
 #include "AbstractLedDevice.hpp"
 #include "Settings.hpp"
-#include "AndromedaDistributor.hpp"
-#include "CassiopeiaDistributor.hpp"
-#include "PegasusDistributor.hpp"
-#include "GrabAreaWidget.hpp"
+#include "CustomDistributor.hpp"
+#include "GrabWidget.hpp"
 #include "LedDeviceLightpack.hpp"
+
+#define STAND_WIDTH 0.3333
+#define THICKNESS 0.15
 
 
 ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
@@ -128,11 +129,11 @@ bool ZonePlacementPage::validatePage()
         devType = SupportedDevices::DeviceTypeVirtual;
     }
     Settings::setConnectedDevice(devType);
-    Settings::setNumberOfLeds(devType, field("numberOfLeds").toInt());
+	Settings::setNumberOfLeds(devType, _grabAreas.size()); //field("numberOfLeds").toInt()
 
     for(int i = 0; i < _grabAreas.size(); i++) {
-        Settings::setLedPosition(i, _grabAreas[i]->geometry().topLeft());
-        Settings::setLedSize(i, _grabAreas[i]->geometry().size());
+		Settings::setLedPosition(_grabAreas[i]->getId(), _grabAreas[i]->geometry().topLeft());
+		Settings::setLedSize(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
     }
 
     cleanupGrabAreas();
@@ -150,9 +151,9 @@ void ZonePlacementPage::resetNewAreaRect()
 void ZonePlacementPage::turnLightOn(int id)
 {
     QList<QRgb> lights;
-    for(size_t i=0; i < device()->maxLedsCount(); i++)
+    for(int i=0; i < device()->maxLedsCount(); i++)
     {
-        if (i == static_cast<size_t>(id))
+        if (i == id)
             lights.append(qRgb(255,255,255));
         else
             lights.append(0);
@@ -163,26 +164,28 @@ void ZonePlacementPage::turnLightOn(int id)
 void ZonePlacementPage::turnLightsOff()
 {
     QList<QRgb> lights;
-    for(size_t i=0; i < device()->maxLedsCount(); i++)
+    for(int i = 0; i < device()->maxLedsCount(); i++)
     {
         lights.append(0);
     }
     device()->setColors(lights);
 }
 
-void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
+void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool invertIds, int idOffset) {
 
     cleanupGrabAreas();
-    for(size_t i = 0; i < distributor->areaCount(); i++) {
+    for(int i = 0; i < distributor->areaCount(); i++) {
         ScreenArea *sf = distributor->next();
         qDebug() << sf->hScanStart() << sf->vScanStart();
 
         QRect s = QApplication::desktop()->screenGeometry(_screenId);
-        QRect r(s.left() + sf->hScanStart() * (float)s.width(),
-                s.top()  + sf->vScanStart() * (float)s.height(),
-                (sf->hScanEnd() - sf->hScanStart()) * (float)s.width(),
-                (sf->vScanEnd() - sf->vScanStart()) * (float)s.height());
-        addGrabArea(i, r);
+        QRect r(sf->hScanStart(),
+                sf->vScanStart(),
+                (sf->hScanEnd() - sf->hScanStart()),
+                (sf->vScanEnd() - sf->vScanStart()));
+		int id = ((invertIds ? distributor->areaCount() - (i + 1) : i) + idOffset) % distributor->areaCount();
+		id = (id + distributor->areaCount()) % distributor->areaCount();
+		addGrabArea(id, r);
 
         delete sf;
     }
@@ -191,7 +194,7 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor) {
 
 void ZonePlacementPage::addGrabArea(int id, const QRect &r)
 {
-    GrabAreaWidget *zone = new GrabAreaWidget(id);
+	GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith, &_grabAreas);
 
     zone->move(r.topLeft());
     zone->resize(r.size());
@@ -209,31 +212,80 @@ void ZonePlacementPage::removeLastGrabArea()
 
 void ZonePlacementPage::on_pbAndromeda_clicked()
 {
-    AndromedaDistributor *andromeda = new AndromedaDistributor(_screenId, true, _ui->sbNumberOfLeds->value());
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	double a = (double)screen.width() / screen.height();
+	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + 2 * a));
 
-    distributeAreas(andromeda);
+	int baseCount = (PrismatikMath::round(_ui->sbNumberOfLeds->value() - 2 * sideLeds)) / 2;
+	int rawCount = PrismatikMath::round(baseCount * (1 - STAND_WIDTH));
+	// we need symmetric bottom
+	int bottomLeds = rawCount + rawCount % 2;
 
-    delete andromeda;
+	CustomDistributor *custom = new CustomDistributor(
+		screen,
+		_ui->sbNumberOfLeds->value() - 2 * sideLeds - bottomLeds,
+		sideLeds,
+		bottomLeds,
+		THICKNESS,
+		0.5);
 
+	distributeAreas(custom);
+
+	delete custom;
 }
 
 void ZonePlacementPage::on_pbCassiopeia_clicked()
 {
-    CassiopeiaDistributor *cassiopeia = new CassiopeiaDistributor(_screenId, _ui->sbNumberOfLeds->value());
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	double a = (double)screen.width() / screen.height();
+	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + a));
 
-    distributeAreas(cassiopeia);
+	CustomDistributor *custom = new CustomDistributor(
+		screen,
+		_ui->sbNumberOfLeds->value() - 2 * sideLeds,
+		sideLeds,
+		0,
+		THICKNESS,
+		STAND_WIDTH);
 
-    delete cassiopeia;
+	distributeAreas(custom);
+
+	delete custom;
 }
 
 void ZonePlacementPage::on_pbPegasus_clicked()
 {
-    PegasusDistributor *pegasus = new PegasusDistributor(_screenId, _ui->sbNumberOfLeds->value());
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	CustomDistributor *custom = new CustomDistributor(
+		screen,
+		0,
+		_ui->sbNumberOfLeds->value() / 2,
+		0,
+		THICKNESS,
+		STAND_WIDTH);
 
-    distributeAreas(pegasus);
+	distributeAreas(custom);
 
-    delete pegasus;
+	delete custom;
+}
 
+
+void ZonePlacementPage::on_pbCustom_clicked()
+{
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	CustomDistributor *custom = new CustomDistributor(
+		screen,
+		_ui->sbTopLeds->value(), 
+		_ui->sbSideLeds->value(),
+		_ui->sbBottomLeds->value(),
+		_ui->sbThickness->value() / 100.0, 
+		_ui->sbStandWidth->value() / 100.0);
+
+	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+
+	_ui->sbNumberOfLeds->setValue(_grabAreas.size());
+
+	delete custom;
 }
 
 

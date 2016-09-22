@@ -74,7 +74,7 @@ static const QString IsPingDeviceEverySecond = "IsPingDeviceEverySecond";
 static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShown";
 static const QString ConnectedDevice = "ConnectedDevice";
 static const QString SupportedDevices = "SupportedDevices";
-static const QString LastReadUpdateId = "LastReadUpdateId";
+static const QString CheckForUpdates = "CheckForUpdates";
 
 // [Hotkeys]
 namespace Hotkeys
@@ -149,6 +149,7 @@ static const QString IsAvgColorsEnabled = "Grab/IsAvgColorsEnabled";
 static const QString IsSendDataOnlyIfColorsChanges = "Grab/IsSendDataOnlyIfColorsChanges";
 static const QString Slowdown = "Grab/Slowdown";
 static const QString LuminosityThreshold = "Grab/LuminosityThreshold";
+static const QString OverBrighten = "Grab/OverBrighten";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
 static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
@@ -160,10 +161,20 @@ static const QString IsLiquidMode = "MoodLamp/LiquidMode";
 static const QString Color = "MoodLamp/Color";
 static const QString Speed = "MoodLamp/Speed";
 }
+// [SoundVisualizer]
+namespace SoundVisualizer
+{
+static const QString Device = "SoundVisualizer/Device";
+static const QString MinColor = "SoundVisualizer/MinColor";
+static const QString MaxColor = "SoundVisualizer/MaxColor";
+static const QString IsLiquidMode = "SoundVisualizer/LiquidMode";
+static const QString LiquidSpeed = "SoundVisualizer/LiquidSpeed";
+}
 // [Device]
 namespace Device
 {
 static const QString RefreshDelay = "Device/RefreshDelay";
+static const QString IsUsbPowerLedDisabled = "Device/IsUsbPowerLedDisabled";
 static const QString Smooth = "Device/Smooth";
 static const QString Brightness = "Device/Brightness";
 static const QString ColorDepth = "Device/ColorDepth";
@@ -190,6 +201,7 @@ namespace LightpackMode
 {
 static const QString Ambilight = "Ambilight";
 static const QString MoodLamp = "MoodLamp";
+static const QString SoundVisualizer = "SoundVisualizer";
 }
 
 namespace GrabberType
@@ -279,7 +291,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,      Main::AlienFx::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,    Main::Lightpack::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Virtual::NumberOfLeds,      Main::Virtual::NumberOfLedsDefault);
-    setNewOptionMain(Main::Key::LastReadUpdateId,           Main::LastReadUpdateId);
+    setNewOptionMain(Main::Key::CheckForUpdates,            Main::CheckForUpdates);
 
     if (isDebugLevelObtainedFromCmdArgs == false)
     {
@@ -378,7 +390,6 @@ void Settings::loadOrCreateProfile(const QString & profileName)
 
     m_mainConfig->setValue(Main::Key::ProfileLast, profileName);
     locker.unlock();
-    m_this->profileLoaded(profileName);
 }
 
 void Settings::renameCurrentProfile(const QString & profileName)
@@ -951,6 +962,18 @@ void Settings::setGrabAvgColorsEnabled(bool isEnabled)
     m_this->grabAvgColorsEnabledChanged(isEnabled);
 }
 
+int Settings::getGrabOverBrighten()
+{
+	return getValidGrabOverBrighten(value(Profile::Key::Grab::OverBrighten).toInt());
+}
+
+void Settings::setGrabOverBrighten(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Grab::OverBrighten, getValidGrabOverBrighten(value));
+	m_this->grabOverBrightenChanged(value);
+}
+
 bool Settings::isSendDataOnlyIfColorsChanges()
 {
     return value(Profile::Key::Grab::IsSendDataOnlyIfColorsChanges).toBool();
@@ -965,7 +988,7 @@ void Settings::setSendDataOnlyIfColorsChanges(bool isEnabled)
 
 int Settings::getLuminosityThreshold()
 {
-    return value(Profile::Key::Grab::LuminosityThreshold).toInt();
+	return getValidLuminosityThreshold(value(Profile::Key::Grab::LuminosityThreshold).toInt());
 }
 
 void Settings::setLuminosityThreshold(int value)
@@ -997,6 +1020,16 @@ void Settings::setDeviceRefreshDelay(int value)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     setValue(Profile::Key::Device::RefreshDelay, getValidDeviceRefreshDelay(value));
     m_this->deviceRefreshDelayChanged(value);
+}
+
+bool Settings::isDeviceUsbPowerLedDisabled() {
+    return value(Profile::Key::Device::IsUsbPowerLedDisabled).toBool();
+}
+
+void Settings::setDeviceUsbPowerLedDisabled(bool isDisabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+    setValue(Profile::Key::Device::IsUsbPowerLedDisabled, isDisabled);
+    m_this->deviceUsbPowerLedDisabledChanged(isDisabled);
 }
 
 int Settings::getDeviceBrightness()
@@ -1186,6 +1219,12 @@ Lightpack::Mode Settings::getLightpackMode()
     {
         return Lightpack::MoodLampMode;
     }
+#ifdef BASS_SOUND_SUPPORT
+	else if (strMode == Profile::Value::LightpackMode::SoundVisualizer)
+	{
+		return Lightpack::SoundVisualizeMode;
+	}
+#endif
     else
     {
         qWarning() << Q_FUNC_INFO << "Read fail. Reset to default value = " << Lightpack::Default;
@@ -1209,6 +1248,13 @@ void Settings::setLightpackMode(Lightpack::Mode mode)
         setValue(Profile::Key::LightpackMode, Profile::Value::LightpackMode::MoodLamp);
         m_this->lightpackModeChanged(mode);
     }
+#ifdef BASS_SOUND_SUPPORT
+	else if (mode == Lightpack::SoundVisualizeMode)
+	{
+		setValue(Profile::Key::LightpackMode, Profile::Value::LightpackMode::SoundVisualizer);
+		m_this->lightpackModeChanged(mode);
+	}
+#endif
     else
     {
         qCritical() << Q_FUNC_INFO << "Invalid value =" << mode;
@@ -1253,6 +1299,72 @@ void Settings::setMoodLampSpeed(int value)
     setValue(Profile::Key::MoodLamp::Speed, getValidMoodLampSpeed(value));
     m_this->moodLampSpeedChanged(value);
 }
+
+#ifdef BASS_SOUND_SUPPORT
+int Settings::getSoundVisualizerDevice()
+{
+	return value(Profile::Key::SoundVisualizer::Device).toInt();
+}
+
+void Settings::setSoundVisualizerDevice(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	setValue(Profile::Key::SoundVisualizer::Device, value);
+	m_this->soundVisualizerDeviceChanged(value);
+}
+
+QColor Settings::getSoundVisualizerMinColor()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return QColor(value(Profile::Key::SoundVisualizer::MinColor).toString());
+}
+
+void Settings::setSoundVisualizerMinColor(QColor value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value.name();
+	setValue(Profile::Key::SoundVisualizer::MinColor, value.name());
+	m_this->soundVisualizerMinColorChanged(value);
+}
+
+QColor Settings::getSoundVisualizerMaxColor()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return QColor(value(Profile::Key::SoundVisualizer::MaxColor).toString());
+}
+
+void Settings::setSoundVisualizerMaxColor(QColor value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value.name();
+	setValue(Profile::Key::SoundVisualizer::MaxColor, value.name());
+	m_this->soundVisualizerMaxColorChanged(value);
+}
+
+bool Settings::isSoundVisualizerLiquidMode()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return value(Profile::Key::SoundVisualizer::IsLiquidMode).toBool();
+}
+
+void Settings::setSoundVisualizerLiquidMode(bool value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::SoundVisualizer::IsLiquidMode, value);
+	m_this->soundVisualizerLiquidModeChanged(value);
+}
+
+int Settings::getSoundVisualizerLiquidSpeed()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return getValidSoundVisualizerLiquidSpeed(value(Profile::Key::SoundVisualizer::LiquidSpeed).toInt());
+}
+
+void Settings::setSoundVisualizerLiquidSpeed(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::SoundVisualizer::LiquidSpeed, getValidSoundVisualizerLiquidSpeed(value));
+	m_this->soundVisualizerLiquidSpeedChanged(value);
+}
+#endif
 
 QList<WBAdjustment> Settings::getLedCoefs()
 {
@@ -1397,20 +1509,38 @@ int Settings::getValidGrabSlowdown(int value)
 
 int Settings::getValidMoodLampSpeed(int value)
 {
-    if (value < Profile::MoodLamp::SpeedMin)
-        value = Profile::MoodLamp::SpeedMin;
-    else if (value > Profile::MoodLamp::SpeedMax)
-        value = Profile::MoodLamp::SpeedMax;
-    return value;
+	if (value < Profile::MoodLamp::SpeedMin)
+		value = Profile::MoodLamp::SpeedMin;
+	else if (value > Profile::MoodLamp::SpeedMax)
+		value = Profile::MoodLamp::SpeedMax;
+	return value;
+}
+
+int Settings::getValidSoundVisualizerLiquidSpeed(int value)
+{
+	if (value < Profile::SoundVisualizer::LiquidSpeedMin)
+		value = Profile::SoundVisualizer::LiquidSpeedMin;
+	else if (value > Profile::SoundVisualizer::LiquidSpeedMax)
+		value = Profile::SoundVisualizer::LiquidSpeedMax;
+	return value;
 }
 
 int Settings::getValidLuminosityThreshold(int value)
 {
-    if (value < Profile::Grab::MinimumLevelOfSensitivityMin)
-        value = Profile::Grab::MinimumLevelOfSensitivityMin;
-    else if (value > Profile::Grab::MinimumLevelOfSensitivityMax)
-        value = Profile::Grab::MinimumLevelOfSensitivityMax;
-    return value;
+	if (value < Profile::Grab::LuminosityThresholdMin)
+		value = Profile::Grab::LuminosityThresholdMin;
+	else if (value > Profile::Grab::LuminosityThresholdMax)
+		value = Profile::Grab::LuminosityThresholdMax;
+	return value;
+}
+
+int Settings::getValidGrabOverBrighten(int value)
+{
+	if (value < Profile::Grab::OverBrightenMin)
+		value = Profile::Grab::OverBrightenMin;
+	else if (value > Profile::Grab::OverBrightenMax)
+		value = Profile::Grab::OverBrightenMax;
+	return value;
 }
 
 void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coef)
@@ -1458,13 +1588,13 @@ QString Settings::getProfilesPath() {
    return m_applicationDirPath + "Profiles/";
 }
 
-uint Settings::getLastReadUpdateId() {
-   return valueMain(Main::Key::LastReadUpdateId).toUInt();
+bool Settings::isCheckForUpdatesEnabled() {
+   return valueMain(Main::Key::CheckForUpdates).toBool();
 
 }
 
-void Settings::setLastReadUpdateId(const uint updateId) {
-    setValueMain(Main::Key::LastReadUpdateId, updateId);
+void Settings::setCheckForUpdatesEnabled(bool isEnabled) {
+	setValueMain(Main::Key::CheckForUpdates, isEnabled);
 }
 
 //
@@ -1475,27 +1605,37 @@ void Settings::initCurrentProfile(bool isResetDefault)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << isResetDefault;
 
     // [General]
-    setNewOption(Profile::Key::LightpackMode, Profile::LightpackModeDefault, isResetDefault);
-    setNewOption(Profile::Key::IsBacklightEnabled, Profile::IsBacklightEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::LightpackMode,					    Profile::LightpackModeDefault, isResetDefault);
+    setNewOption(Profile::Key::IsBacklightEnabled,                  Profile::IsBacklightEnabledDefault, isResetDefault);
     // [Grab]
-    setNewOption(Profile::Key::Grab::Grabber,       Profile::Grab::GrabberDefaultString, isResetDefault);
-    setNewOption(Profile::Key::Grab::IsAvgColorsEnabled, Profile::Grab::IsAvgColorsEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::Grabber,                       Profile::Grab::GrabberDefaultString, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsAvgColorsEnabled,            Profile::Grab::IsAvgColorsEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::OverBrighten,                  Profile::Grab::OverBrightenDefault, isResetDefault);
     setNewOption(Profile::Key::Grab::IsSendDataOnlyIfColorsChanges, Profile::Grab::IsSendDataOnlyIfColorsChangesDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::Slowdown,      Profile::Grab::SlowdownDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::LuminosityThreshold, Profile::Grab::MinimumLevelOfSensitivityDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled, Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled, Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
-    setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled, Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::Slowdown,                      Profile::Grab::SlowdownDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::LuminosityThreshold,           Profile::Grab::LuminosityThresholdDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled,    Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled,        Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
+    setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled,          Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
     // [MoodLamp]
-    setNewOption(Profile::Key::MoodLamp::IsLiquidMode,  Profile::MoodLamp::IsLiquidMode, isResetDefault);
-    setNewOption(Profile::Key::MoodLamp::Color,         Profile::MoodLamp::ColorDefault, isResetDefault);
-    setNewOption(Profile::Key::MoodLamp::Speed,         Profile::MoodLamp::SpeedDefault, isResetDefault);
+    setNewOption(Profile::Key::MoodLamp::IsLiquidMode,              Profile::MoodLamp::IsLiquidModeDefault, isResetDefault);
+    setNewOption(Profile::Key::MoodLamp::Color,                     Profile::MoodLamp::ColorDefault, isResetDefault);
+    setNewOption(Profile::Key::MoodLamp::Speed,                     Profile::MoodLamp::SpeedDefault, isResetDefault);
+#ifdef BASS_SOUND_SUPPORT
+	// [SoundVisualizer]
+	setNewOption(Profile::Key::SoundVisualizer::Device,             Profile::SoundVisualizer::DeviceDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MinColor,           Profile::SoundVisualizer::MinColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::MaxColor,           Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::IsLiquidMode,       Profile::SoundVisualizer::IsLiquidModeDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::LiquidSpeed,        Profile::SoundVisualizer::LiquidSpeedDefault, isResetDefault);
+#endif
     // [Device]
-    setNewOption(Profile::Key::Device::RefreshDelay,Profile::Device::RefreshDelayDefault, isResetDefault);
-    setNewOption(Profile::Key::Device::Brightness,  Profile::Device::BrightnessDefault, isResetDefault);
-    setNewOption(Profile::Key::Device::Smooth,      Profile::Device::SmoothDefault, isResetDefault);
-    setNewOption(Profile::Key::Device::Gamma,       Profile::Device::GammaDefault, isResetDefault);
-    setNewOption(Profile::Key::Device::ColorDepth,  Profile::Device::ColorDepthDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::RefreshDelay,                Profile::Device::RefreshDelayDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,       Profile::Device::IsUsbPowerLedDisabled, isResetDefault);
+    setNewOption(Profile::Key::Device::Brightness,			        Profile::Device::BrightnessDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::Smooth,				        Profile::Device::SmoothDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::Gamma,				        Profile::Device::GammaDefault, isResetDefault);
+    setNewOption(Profile::Key::Device::ColorDepth,			        Profile::Device::ColorDepthDefault, isResetDefault);
 
 
     QPoint ledPosition;

@@ -1,13 +1,12 @@
 /*
- * SpeedTest.hpp
+ * LightpackCommandLineParserTest.hpp
  *
- *  Created on: 4.04.2011
- *      Author: Mike Shatohin (brunql)
+ *  Created on: 08.08.2014
  *     Project: Lightpack
  *
  *  Lightpack is very simple implementation of the backlight for a laptop
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *  Copyright (c) 2014 Woodenshark LLC
  *
  *  Lightpack is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,37 +23,30 @@
  *
  */
 
-#pragma once
+#ifndef LIGHTPACKCOMMANDLINEPARSERTEST_H
+#define LIGHTPACKCOMMANDLINEPARSERTEST_H
 
-#include <QObject>
-#include <QFile>
-#include <QTextStream>
-#include <QTime>
+#include <QtTest/QtTest>
 
-class SpeedTest : public QObject
+class LightpackCommandLineParserTest : public QObject
 {
     Q_OBJECT
-
 public:
-    SpeedTest();
+    explicit LightpackCommandLineParserTest(QObject *parent = 0);
 
-    void start();
+private slots:
+    void initTestCase();
 
-private:
-    void printHeader();
-    void startTests();
-    void testFullScreenGrabSpeed();
-    void testDefaultLedWidgetsGrabSpeed();
+    void init();
+    void cleanup();
 
-private:
-    QFile resultFile;
-    QTextStream resultStream;
-
-    QTime time;
-
-    static const int TestTimes;
-    static const int LedsCount;
-    static const int LedWidth;
-    static const int LedHeight;
+    void testCase_parseVersion();
+    void testCase_parseHelp();
+    void testCase_parseWizard();
+    void testCase_parseBacklightOff();
+    void testCase_parseBacklightOn();
+    void testCase_parseBacklightOnAndOff();
+    void testCase_parseDebuglevel();
 };
 
+#endif // LIGHTPACKCOMMANDLINEPARSERTEST_H

@@ -55,15 +55,16 @@ public slots:
     virtual void close();
     virtual void setColors(const QList<QRgb> & colors);
     virtual void switchOffLeds();
+    virtual void setUsbPowerLedDisabled(bool isDisabled);
     virtual void setRefreshDelay(int value);
     virtual void setColorDepth(int value);
     virtual void setSmoothSlowdown(int value);
     virtual void setColorSequence(QString /*value*/);
     virtual void requestFirmwareVersion();
     virtual void updateDeviceSettings();
-    virtual size_t maxLedsCount();
-    virtual size_t defaultLedsCount() { return maxLedsCount(); }
-    size_t lightpacksFound() { return m_devices.size(); }
+	virtual int maxLedsCount();
+	virtual int defaultLedsCount() { return maxLedsCount(); }
+	int lightpacksFound() { return m_devices.size(); }
 
 private: 
     bool readDataFromDevice();

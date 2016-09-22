@@ -229,19 +229,18 @@ private slots:
     void onCheckUpdate_Finished()
     {
         using namespace SettingsScope;
-        QList<UpdateInfo> updates = _updatesProcessor.readUpdates(Settings::getLastReadUpdateId());
+        QList<UpdateInfo> updates = _updatesProcessor.readUpdates();
         if (updates.size() > 0) {
             if(updates.size() > 1) {
                 _trayMessage = SysTrayIcon::MessageGeneric;
-                _trayMsgUrl = QUrl("http://lightpack.tv");
-                _qsystray->showMessage("Updates are available", "click here to visit http://lightpack.tv");
+                _trayMsgUrl = QUrl("https://github.com/psieg/Lightpack/releases");
+                _qsystray->showMessage("Multiple updates are available", "Click to open the downloads page");
             } else {
                 _trayMessage = SysTrayIcon::MessageGeneric;
                 UpdateInfo update = updates.last();
                 _trayMsgUrl = QUrl(update.url);
                 _qsystray->showMessage(update.title, update.text);
             }
-            Settings::setLastReadUpdateId(updates.last().id);
         }
     }
 

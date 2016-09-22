@@ -60,11 +60,6 @@
 #   define SERIAL_PORT_DEFAULT    "COM1"
 #endif
 
-//it is supposed to define LASTREAD_UPDATE_ID_DEFAULT outside of this file
-#ifndef LASTREAD_UPDATE_ID_DEFAULT
-#   define LASTREAD_UPDATE_ID_DEFAULT 0
-#endif
-
 namespace SettingsScope
 {
 
@@ -83,7 +78,7 @@ static const bool IsPingDeviceEverySecond = true;
 static const bool IsUpdateFirmwareMessageShown = false;
 static const QString ConnectedDeviceDefault = "Lightpack";
 static const QString SupportedDevices = SUPPORTED_DEVICES; /* comma separated values! */
-static const uint LastReadUpdateId = LASTREAD_UPDATE_ID_DEFAULT;
+static const bool CheckForUpdates = true;
 
 // [HotKeys]
 namespace HotKeys
@@ -148,9 +143,12 @@ static const bool IsDx9GrabbingEnabledDefault = false;
 static const int SlowdownMin = 1;
 static const int SlowdownDefault = 50;
 static const int SlowdownMax = 1000;
-static const int MinimumLevelOfSensitivityMin = 0;
-static const int MinimumLevelOfSensitivityDefault = 3;
-static const int MinimumLevelOfSensitivityMax = 100;
+static const int LuminosityThresholdMin = 0;
+static const int LuminosityThresholdDefault = 3;
+static const int LuminosityThresholdMax = 100;
+static const int OverBrightenMin = 0;
+static const int OverBrightenDefault = 0;
+static const int OverBrightenMax = 100;
 }
 // [MoodLamp]
 namespace MoodLamp
@@ -159,7 +157,18 @@ static const int SpeedMin = 1;
 static const int SpeedDefault = 50;
 static const int SpeedMax = 100;
 static const QString ColorDefault = "#00FF00";
-static const bool IsLiquidMode = true;
+static const bool IsLiquidModeDefault = true;
+}
+// [SoundVisualizer]
+namespace SoundVisualizer
+{
+static const int DeviceDefault = -1;
+static const QString MinColorDefault = "#301000";
+static const QString MaxColorDefault = "#0000FF";
+static const bool IsLiquidModeDefault = true;
+static const int LiquidSpeedMin = 1;
+static const int LiquidSpeedDefault = 10;
+static const int LiquidSpeedMax = 100;
 }
 // [Device]
 namespace Device
@@ -167,6 +176,8 @@ namespace Device
 static const int RefreshDelayMin = 64;
 static const int RefreshDelayDefault = 100;
 static const int RefreshDelayMax = 1023;
+
+static const bool IsUsbPowerLedDisabled = false;
 
 static const int BrightnessMin = 0;
 static const int BrightnessDefault = 100;

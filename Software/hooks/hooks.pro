@@ -9,6 +9,7 @@ QT       -= core gui
 DESTDIR  = ../bin
 TARGET   = prismatik-hooks
 TEMPLATE = lib
+RC_FILE  = ../res/Libs.rc
 
 include(../build-config.prf)
 

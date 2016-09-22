@@ -30,14 +30,26 @@
 #include <QTimer>
 #include "LiquidColorGenerator.hpp"
 
-class MoodLampManager : public QObject
+
+struct SoundManagerDeviceInfo {
+	SoundManagerDeviceInfo(){ this->name = ""; this->id = -1; }
+	SoundManagerDeviceInfo(QString name, int id){ this->name = name; this->id = id; }
+	QString name;
+	int id;
+};
+Q_DECLARE_METATYPE(SoundManagerDeviceInfo);
+
+class SoundManager : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit MoodLampManager(QObject *parent = 0);
+	explicit SoundManager(int hWnd, QObject *parent = 0);
+	~SoundManager();
 
 signals:
     void updateLedsColors(const QList<QRgb> & colors);
+	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 
 public:
     void start(bool isMoodLampEnabled);
@@ -48,27 +60,38 @@ public:
 
 public slots:
     void initFromSettings();
-    void setLiquidMode(bool isEnabled);
-    void setLiquidModeSpeed(int value);
     void settingsProfileChanged(const QString &profileName);
-    void setNumberOfLeds(int value);
-    void setCurrentColor(QColor color);
+	void setNumberOfLeds(int value);
+	void setDevice(int value);
+	void setMinColor(QColor color);
+	void setMaxColor(QColor color);
+	void setLiquidMode(bool isEnabled);
+	void setLiquidModeSpeed(int value);
+	void requestDeviceList();
 
 private slots:
     void updateColors();
 
 private:
-    void initColors(int numberOfLeds);
-    void fillColors(QRgb rgb);
+	bool init();
+	void initColors(int numberOfLeds);
 
 private:
 	LiquidColorGenerator m_generator;
-    QList<QRgb> m_colors;
 
-    bool   m_isMoodLampEnabled;
-    QColor m_currentColor;
-    bool   m_isLiquidMode;
+	QList<QRgb> m_colors;
+	QList<int> m_peaks;
+	int m_frames;
+
+	QTimer m_timer;
+	int m_hWnd;
+
+
+	bool   m_isEnabled;
+	bool   m_isInited;
+	bool   m_isLiquidMode;
+	QColor m_minColor;
+	QColor m_maxColor;
+	int    m_device;
     bool   m_isSendDataOnlyIfColorsChanged;
-
-    QRgb m_rgbSaved;
 };

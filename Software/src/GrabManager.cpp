@@ -226,6 +226,11 @@ void GrabManager::onGrabAvgColorsEnabledChanged(bool state)
     m_avgColorsOnAllLeds = state;
 }
 
+void GrabManager::onGrabOverBrightenChanged(int value) {
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	m_overBrighten = value;
+}
+
 void GrabManager::onSendDataOnlyIfColorsEnabledChanged(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
@@ -272,6 +277,7 @@ void GrabManager::settingsProfileChanged(const QString &profileName)
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
     m_avgColorsOnAllLeds = Settings::isGrabAvgColorsEnabled();
+	m_overBrighten = Settings::getGrabOverBrighten();
 
     setNumberOfLeds(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 }
@@ -369,9 +375,19 @@ void GrabManager::handleGrabbedColors()
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
-        if (m_colorsCurrent[i] != m_colorsNew[i])
+		QRgb newColor = m_colorsNew[i];
+		if (m_overBrighten) {
+			int dRed = qRed(newColor);
+			int dGreen = qGreen(newColor);
+			int dBlue = qBlue(newColor);
+			int highest = qMax(dRed, qMax(dGreen, dBlue));
+			double scaleFactor = qMin((100 + 5 * m_overBrighten) / 100.0, 255.0 / highest);
+			newColor = qRgb(dRed * scaleFactor, dGreen * scaleFactor, dBlue * scaleFactor);
+		}
+
+		if (m_colorsCurrent[i] != newColor)
         {
-            m_colorsCurrent[i] = m_colorsNew[i];
+			m_colorsCurrent[i] = newColor;
             isColorsChanged = true;
         }
     }
@@ -625,14 +641,15 @@ void GrabManager::clearColorsCurrent()
 void GrabManager::initLedWidgets(int numberOfLeds)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
+	int widgetFlags = SyncSettings | AllowCoefAndEnableConfig | AllowColorCycle;
 
     if (m_ledWidgets.size() == 0)
     {
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "First widget initialization";
 
-        GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), m_parentWidget);
+		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-        connect(ledWidget, SIGNAL(resizeOrMoveStarted()), this, SLOT(pauseWhileResizeOrMoving()));
+        connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
         connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
 
 // TODO: Check out this line!
@@ -652,9 +669,9 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 
         for (int i = 0; i < diff; i++)
         {
-            GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), m_parentWidget);
+			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-            connect(ledWidget, SIGNAL(resizeOrMoveStarted()), this, SLOT(pauseWhileResizeOrMoving()));
+            connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
             connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
 
             m_ledWidgets << ledWidget;

@@ -5,8 +5,7 @@
 # Created on: 25.12.11
 #
 
-#TODO: get the version from a centralized point, eg. version.h
-VERSION=5.11.2.7
+VERSION=`cat ../VERSION`
 
 if [ -z $1 ];
 then
@@ -31,12 +30,12 @@ then
 fi
 
 
-if [ -x "`which md5deep 2>/dev/null`" ]; 
+if [ -x "`which hashdeep 2>/dev/null`" ]; 
 then
 	# Update MD5 sums
-	md5deep -r deb/usr > deb/DEBIAN/md5sums
+	hashdeep -r deb/usr > deb/DEBIAN/md5sums
 else
-	echo "Please install 'md5deep' package first."
+	echo "Please install 'hashdeep' package first."
 	exit 5
 fi
 

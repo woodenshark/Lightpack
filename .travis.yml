@@ -17,7 +17,6 @@ before_install:
   - qmake -v
 
 script:
-  - export QMAKE_MAC_SDK=macosx10.8
   - cd Software
   - ./update_locales.sh
   - qmake -r

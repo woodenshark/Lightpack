@@ -360,6 +360,7 @@ void LightpackApplication::onSessionChange(int change)
 					getLightpackApp()->settingsWnd()->switchOnLeds();
 				}
 			}
+			m_ledDeviceManager->updateDeviceSettings();
 			break;
 	}
 }

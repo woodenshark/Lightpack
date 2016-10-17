@@ -67,7 +67,7 @@ Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 Source: "content/ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion
-; These are needed only when including the base library for sound visualization
+; These are needed only when including the bass library for sound visualization
 Source: "content/bass.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/basswasapi.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; These files are needed only when building with MSVC - otherwise just comment them

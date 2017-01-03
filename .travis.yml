@@ -10,8 +10,8 @@ os:
 before_install:
   - brew update
   - brew tap homebrew/versions
-  - brew install homebrew/versions/qt55
-  - export QTDIR=/usr/local/opt/qt55/
+  - brew install qt@5.5
+  - export QTDIR=/usr/local/opt/qt@5.5/
   - export PATH=$PATH:$QTDIR/bin
   - export VERSION=`cat Software/VERSION`
   - qmake -v

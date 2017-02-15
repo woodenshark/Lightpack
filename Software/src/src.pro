@@ -228,12 +228,14 @@ SOURCES += \
     SessionChangeDetector.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
+    wizard/WizardPageUsingDevice.cpp \
     wizard/SelectProfilePage.cpp \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
+    wizard/GlobalColorCoefPage.cpp \
     wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
     UpdatesProcessor.cpp \
@@ -275,6 +277,7 @@ HEADERS += \
     SessionChangeDetector.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
+    wizard/WizardPageUsingDevice.hpp \
     wizard/SettingsAwareTrait.hpp \
     wizard/SelectProfilePage.hpp \
     wizard/MonitorIdForm.hpp \
@@ -282,6 +285,7 @@ HEADERS += \
     wizard/LightpackDiscoveryPage.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
+    wizard/GlobalColorCoefPage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
     wizard/CustomDistributor.hpp \
@@ -319,8 +323,7 @@ FORMS += SettingsWindow.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/SelectDevicePage.ui \
-    wizard/GlobalColorCoefPage.ui \
-    wizard/ColorCoefPage.ui
+    wizard/GlobalColorCoefPage.ui
 
 #
 # QtSingleApplication

@@ -38,9 +38,8 @@
 
 
 ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
-    QWizardPage(parent),
-    SettingsAwareTrait(isInitFromSettings, ts),
-    _ui(new Ui::ZonePlacementPage)
+	WizardPageUsingDevice(isInitFromSettings, ts, parent),
+	_ui(new Ui::ZonePlacementPage)
 {
     _ui->setupUi(this);
 
@@ -57,11 +56,6 @@ ZonePlacementPage::~ZonePlacementPage()
     delete _ui;
 }
 
-AbstractLedDevice * ZonePlacementPage::device()
-{
-    return _transSettings->ledDevice.data();
-}
-
 void ZonePlacementPage::initializePage()
 {
     using namespace SettingsScope;
@@ -71,7 +65,7 @@ void ZonePlacementPage::initializePage()
 
     device()->setSmoothSlowdown(70);
 
-    _ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
+    _ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount()); 
 
     if (_isInitFromSettings) {
         int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
@@ -107,34 +101,12 @@ void ZonePlacementPage::cleanupGrabAreas()
 
 bool ZonePlacementPage::validatePage()
 {
-    using namespace SettingsScope;
-    QString deviceName = device()->name();
-    SupportedDevices::DeviceType devType;
-    if (deviceName.compare("lightpack", Qt::CaseInsensitive) == 0) {
-        devType = SupportedDevices::DeviceTypeLightpack;
-
-    } else if (deviceName.compare("adalight", Qt::CaseInsensitive) == 0) {
-        devType = SupportedDevices::DeviceTypeAdalight;
-        Settings::setAdalightSerialPortName(field("serialPort").toString());
-        Settings::setAdalightSerialPortBaudRate(field("baudRate").toString());
-        Settings::setColorSequence(devType, field("colorFormat").toString());
-
-    } else if (deviceName.compare("ardulight", Qt::CaseInsensitive) == 0) {
-        devType = SupportedDevices::DeviceTypeArdulight;
-        Settings::setArdulightSerialPortName(field("serialPort").toString());
-        Settings::setArdulightSerialPortBaudRate(field("baudRate").toString());
-        Settings::setColorSequence(devType, field("colorFormat").toString());
-
-    } else {
-        devType = SupportedDevices::DeviceTypeVirtual;
-    }
-    Settings::setConnectedDevice(devType);
-	Settings::setNumberOfLeds(devType, _grabAreas.size()); //field("numberOfLeds").toInt()
-
-    for(int i = 0; i < _grabAreas.size(); i++) {
-		Settings::setLedPosition(_grabAreas[i]->getId(), _grabAreas[i]->geometry().topLeft());
-		Settings::setLedSize(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
-    }
+	_transSettings->zonePositions.clear();
+	_transSettings->zoneSizes.clear();
+	for (int i = 0; i < _grabAreas.size(); i++) {
+		_transSettings->zonePositions.insert(_grabAreas[i]->getId(), _grabAreas[i]->geometry().topLeft());
+		_transSettings->zoneSizes.insert(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
+	}
 
     cleanupGrabAreas();
     return true;
@@ -146,29 +118,6 @@ void ZonePlacementPage::resetNewAreaRect()
     _newAreaRect.setY(_y0);
     _newAreaRect.setWidth(100);
     _newAreaRect.setHeight(100);
-}
-
-void ZonePlacementPage::turnLightOn(int id)
-{
-    QList<QRgb> lights;
-    for(int i=0; i < device()->maxLedsCount(); i++)
-    {
-        if (i == id)
-            lights.append(qRgb(255,255,255));
-        else
-            lights.append(0);
-    }
-    device()->setColors(lights);
-}
-
-void ZonePlacementPage::turnLightsOff()
-{
-    QList<QRgb> lights;
-    for(int i = 0; i < device()->maxLedsCount(); i++)
-    {
-        lights.append(0);
-    }
-    device()->setColors(lights);
 }
 
 void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool invertIds, int idOffset) {

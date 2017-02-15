@@ -27,7 +27,7 @@
 #ifndef ZONECONFIGURATION_HPP
 #define ZONECONFIGURATION_HPP
 
-#include <QWizardPage>
+#include "WizardPageUsingDevice.hpp"
 #include "SettingsAwareTrait.hpp"
 
 namespace Ui {
@@ -39,7 +39,7 @@ class AbstractLedDevice;
 class AreaDistributor;
 class GrabWidget;
 
-class ZonePlacementPage : public QWizardPage, SettingsAwareTrait
+class ZonePlacementPage : public WizardPageUsingDevice
 {
     Q_OBJECT
 
@@ -51,11 +51,6 @@ protected:
     void initializePage();
     void cleanupPage();
     bool validatePage();
-    size_t getLedCountOnTopEdge(size_t ledCount);
-
-public slots:
-    void turnLightOn(int id);
-    void turnLightsOff();
 
 private slots:
     void on_pbAndromeda_clicked();
@@ -71,7 +66,6 @@ private:
     void cleanupGrabAreas();
 	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);
     void resetNewAreaRect();
-    AbstractLedDevice * device();
 
     Ui::ZonePlacementPage *_ui;
     int _screenId;

@@ -1,0 +1,77 @@
+/*
+* ZoneConfiguration.cpp
+*
+*  Created on: 16.2.2017
+*     Project: Prismatik
+*
+*  Copyright (c) 2017 Patrick Siegler
+*
+*  Lightpack is an open-source, USB content-driving ambient lighting
+*  hardware.
+*
+*  Prismatik is a free, open-source software: you can redistribute it and/or
+*  modify it under the terms of the GNU General Public License as published
+*  by the Free Software Foundation, either version 2 of the License, or
+*  (at your option) any later version.
+*
+*  Prismatik and Lightpack files is distributed in the hope that it will be
+*  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*  General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+#include "WizardPageUsingDevice.hpp"
+#include "AbstractLedDevice.hpp"
+
+
+WizardPageUsingDevice::WizardPageUsingDevice(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
+QWizardPage(parent),
+SettingsAwareTrait(isInitFromSettings, ts)
+{
+}
+
+WizardPageUsingDevice::~WizardPageUsingDevice()
+{
+}
+
+AbstractLedDevice * WizardPageUsingDevice::device()
+{
+	return _transSettings->ledDevice.data();
+}
+
+void WizardPageUsingDevice::turnLightOn(int id)
+{
+	QList<QRgb> lights;
+	for (int i = 0; i < device()->maxLedsCount(); i++)
+	{
+		if (i == id)
+			lights.append(qRgb(255, 255, 255));
+		else
+			lights.append(0);
+	}
+	device()->setColors(lights);
+}
+
+void WizardPageUsingDevice::turnLightsOn(QRgb color)
+{
+	QList<QRgb> lights;
+	for (int i = 0; i < device()->maxLedsCount(); i++)
+	{
+		lights.append(color);
+	}
+	device()->setColors(lights);
+}
+
+void WizardPageUsingDevice::turnLightsOff()
+{
+	QList<QRgb> lights;
+	for (int i = 0; i < device()->maxLedsCount(); i++)
+	{
+		lights.append(0);
+	}
+	device()->setColors(lights);
+}

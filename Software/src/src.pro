@@ -226,7 +226,6 @@ SOURCES += \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
     SessionChangeDetector.cpp \
-    wizard/ZoneWidget.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
     wizard/SelectProfilePage.cpp \
@@ -274,7 +273,6 @@ HEADERS += \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
     SessionChangeDetector.hpp \
-    wizard/ZoneWidget.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
     wizard/SettingsAwareTrait.hpp \
@@ -313,7 +311,6 @@ win32 {
 FORMS += SettingsWindow.ui \
     GrabWidget.ui \
     GrabConfigWidget.ui \
-    wizard/ZoneWidget.ui \
     wizard/ZonePlacementPage.ui \
     wizard/Wizard.ui \
     wizard/SelectProfilePage.ui \
@@ -321,7 +318,9 @@ FORMS += SettingsWindow.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
-    wizard/SelectDevicePage.ui
+    wizard/SelectDevicePage.ui \
+    wizard/GlobalColorCoefPage.ui \
+    wizard/ColorCoefPage.ui
 
 #
 # QtSingleApplication

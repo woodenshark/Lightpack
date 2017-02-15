@@ -74,7 +74,6 @@ private:
     AbstractLedDevice * device();
 
     Ui::ZonePlacementPage *_ui;
-    QList<ZoneWidget*> _zoneWidgets;
     int _screenId;
     QList<GrabWidget*> _grabAreas;
     QRect _newAreaRect;

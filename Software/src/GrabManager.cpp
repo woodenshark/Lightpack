@@ -642,7 +642,7 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
 	if (numberOfLeds) {
-		qWarning(Q_FUNC_INFO " Grabbing 0 LEDs!");
+		qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
 	}
 
 	int widgetFlags = SyncSettings | AllowCoefAndEnableConfig | AllowColorCycle;

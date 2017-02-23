@@ -258,8 +258,6 @@ void LedDeviceLightpack::updateDeviceSettings()
     setRefreshDelay(Settings::getDeviceRefreshDelay());
     setColorDepth(Settings::getDeviceColorDepth());
     setSmoothSlowdown(Settings::getDeviceSmooth());
-
-    requestFirmwareVersion();
 }
 
 

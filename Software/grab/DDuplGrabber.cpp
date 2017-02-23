@@ -139,6 +139,9 @@ bool DDuplGrabber::init()
     IDXGIAdapter1Ptr adapter;
     for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
     {
+		DXGI_ADAPTER_DESC1 desc;
+		adapter->GetDesc1(&desc);
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Found Adapter: " << QString::fromWCharArray(desc.Description);
         m_adapters.push_back(adapter);
     }
 

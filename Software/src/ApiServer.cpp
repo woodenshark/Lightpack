@@ -838,63 +838,17 @@ void ApiServer::clientProcessCommands()
         {
             API_DEBUG_OUT << CmdSetDevice;
 
-            if (m_lockedClient == 1)
-            {
-                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
-                API_DEBUG_OUT << QString(cmdBuffer);
-                QString setDeviceName = QString(cmdBuffer);
-                if (lightpack->SetDevice(sessionKey, setDeviceName))
-                {
-                    API_DEBUG_OUT << CmdSetDevice << "OK:" << setDeviceName;
-                    result = CmdSetResult_Ok;
-                } else {
-                    API_DEBUG_OUT << CmdSetDevice << "Error (device not found):" << setDeviceName;
-                    result = CmdSetResult_Error;
-                }
-            }
-            else if (m_lockedClient == 0)
-            {
-                result = CmdSetResult_NotLocked;
-            }
-            else // m_lockedClient != client
-            {
-                result = CmdSetResult_Busy;
-            }
+			//TODO
+			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+			result = CmdSetResult_Error;
         }
         else if (cmdBuffer.startsWith(CmdSetCountLeds))
         {
-            API_DEBUG_OUT << CmdSetCountLeds;
+			API_DEBUG_OUT << CmdSetCountLeds;
 
-            if (m_lockedClient == 1)
-            {
-                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
-                API_DEBUG_OUT << QString(cmdBuffer);
-                bool ok = false;
-                int countleds = QString(cmdBuffer).toInt(&ok);
-
-                if (ok)
-                {
-                    if (lightpack->SetCountLeds(sessionKey,countleds))
-                    {
-                        API_DEBUG_OUT << CmdSetCountLeds << "OK:" << countleds;
-                        result = CmdSetResult_Ok;
-                    } else {
-                        API_DEBUG_OUT << CmdSetCountLeds << "Error (max min test fail):" << countleds;
-                        result = CmdSetResult_Error;
-                    }
-                } else {
-                    API_DEBUG_OUT << CmdSetCountLeds << "Error (convert fail):" << countleds;
-                    result = CmdSetResult_Error;
-                }
-            }
-            else if (m_lockedClient == 0)
-            {
-                result = CmdSetResult_NotLocked;
-            }
-            else // m_lockedClient != client
-            {
-                result = CmdSetResult_Busy;
-            }
+			//TODO
+			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+			result = CmdSetResult_Error;
         }
         else if (cmdBuffer.startsWith(CmdSetLeds))
         {

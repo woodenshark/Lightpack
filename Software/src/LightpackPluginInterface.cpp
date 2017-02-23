@@ -388,6 +388,9 @@ bool LightpackPluginInterface::SetProfile(QString sessionKey,QString profile)
 
 bool LightpackPluginInterface::SetDevice(QString sessionKey,QString device)
 {
+	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetDevice";
+	return false;
+
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
      QStringList devices = Settings::getSupportedDevices();
@@ -488,6 +491,9 @@ bool LightpackPluginInterface::SetBacklight(QString sessionKey, int backlight)
 
 bool LightpackPluginInterface::SetCountLeds(QString sessionKey, int countLeds)
 {
+	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetCountLeds";
+	return false;
+
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
 

@@ -140,7 +140,7 @@ void SoundManager::start(bool isEnabled)
 			if (device == -2) {
 				qWarning() << Q_FUNC_INFO << "No saved device. No auto fallback device found.";
 			} else {
-				DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "No saved device. Falling back to first enabled loopback: " << device;
+				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "No saved device. Falling back to first enabled loopback: " << device;
 			}
 		} else {
 			BASS_WASAPI_DEVICEINFO inf;

@@ -64,11 +64,6 @@ protected slots:
 
 protected:
     void freeScreens();
-    void captureScreen();
-    QRgb getColor(const QWidget * grabme);
-    QRgb getColor(const QRect &widgetRect);
-    void updateMonitorInfo();
-    void resizePixelsBuffer();
 
 protected:
 

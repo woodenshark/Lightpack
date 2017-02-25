@@ -103,7 +103,7 @@ void LedDeviceManager::switchOnLeds()
 
 void LedDeviceManager::setColors(const QList<QRgb> & colors)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << "Is last command completed:" << m_isLastCommandCompleted
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "Is last command completed:" << m_isLastCommandCompleted
                     << " m_backlightStatus = " << m_backlightStatus;
 
     if (m_backlightStatus == Backlight::StatusOn)
@@ -321,7 +321,7 @@ void LedDeviceManager::updateWBAdjustments()
 
 void LedDeviceManager::ledDeviceCommandCompleted(bool ok)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << ok;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << ok;
 
     m_cmdTimeoutTimer->stop();
 

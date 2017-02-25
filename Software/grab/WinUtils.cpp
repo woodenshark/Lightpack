@@ -143,7 +143,7 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
     DWORD cbNeeded;
     DWORD cProcesses;
     char debug_buf_process[255];
-    char debug_buf_module[255];
+    //char debug_buf_module[255];
     WCHAR executableName[MAX_PATH];
     unsigned int i;
 
@@ -206,7 +206,7 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
                     {
 
                         PathStripPathW(szModName);
-                        ::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf_module, 255, NULL, NULL);
+                        //::WideCharToMultiByte(CP_ACP, 0, szModName, -1, debug_buf_module, 255, NULL, NULL);
                         //DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf_process << "has module" << debug_buf_module;
 
                         for (unsigned k = 0; k < withoutModuleCount; k++) {

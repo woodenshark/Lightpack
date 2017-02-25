@@ -77,7 +77,7 @@ void GrabberBase::startGrabbing()
 void GrabberBase::stopGrabbing()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
-    qWarning() << "grabScreensCount: " << grabScreensCount;
+	DEBUG_MID_LEVEL << "grabbed" << grabScreensCount << "frames";
     m_timer->stop();
 }
 
@@ -115,7 +115,7 @@ bool GrabberBase::isReallocationNeeded(const QList< ScreenInfo > &screensWithWid
 
 void GrabberBase::grab()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
     QList< ScreenInfo > screens2Grab;
     screens2Grab.reserve(5);
     screensWithWidgets(&screens2Grab, *_context->grabWidgets);
@@ -150,7 +150,7 @@ void GrabberBase::grab()
             // Checking for the 'grabme' widget position inside the monitor that is used to capture color
             if( !clippedRect.isValid() ){
 
-                DEBUG_MID_LEVEL << "Widget 'grabme' is out of screen:" << Debug::toString(clippedRect);
+                DEBUG_HIGH_LEVEL << "Widget 'grabme' is out of screen:" << Debug::toString(clippedRect);
 
                 _context->grabResult->append(qRgb(0,0,0));
                 continue;

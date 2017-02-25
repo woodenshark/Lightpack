@@ -122,7 +122,7 @@ GrabManager::~GrabManager()
 
     for (int i = 0; i < m_grabbers.size(); i++)
         if (m_grabbers[i]){
-            DEBUG_OUT << "deleting " << m_grabbers[i]->name();
+            DEBUG_LOW_LEVEL << "deleting " << m_grabbers[i]->name();
             delete m_grabbers[i];
             m_grabbers[i] = NULL;
         }
@@ -325,7 +325,7 @@ void GrabManager::setWhiteLedWidgets(bool state)
 
 void GrabManager::handleGrabbedColors()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
     if (m_grabber == NULL)
     {
@@ -421,7 +421,7 @@ void GrabManager::timeoutFakeGrab()
 
 void GrabManager::timeoutUpdateFPS()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
     m_noGrabCount++;
     if (m_noGrabCount > 2) m_fpsMs = 0;
     emit ambilightTimeOfUpdatingColors(m_fpsMs);

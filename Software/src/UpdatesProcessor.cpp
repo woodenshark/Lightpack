@@ -81,7 +81,7 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
             }
         }
     }
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
     return updates;
 }
 

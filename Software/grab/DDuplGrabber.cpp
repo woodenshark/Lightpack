@@ -415,6 +415,20 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
         }
     }
 
+
+	for (const ScreenInfo& screenInfo : grabScreens) {
+		bool found = false;
+		for (const GrabbedScreen& foundScreen : _screensWithWidgets) {
+			if (foundScreen.screenInfo == screenInfo) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			qWarning() << Q_FUNC_INFO << "No matching output was found for screenInfo at" << screenInfo.rect;
+		}
+	}
+
     m_state = Allocated;
 
     return true;

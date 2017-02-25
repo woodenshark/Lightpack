@@ -386,6 +386,10 @@ public:
 
     void start()
     {
+		if (!m_isInited) {
+			emit m_owner.grabberStateChangeRequested(false);
+			return;
+		}
         m_isStarted = true;
         if (m_memMap) {
             DWORD errorcode;
@@ -498,73 +502,6 @@ private slots:
     }
 
 private:
-
-    QRgb getColor(const QRect &widgetRect)
-    {
-        static const QRgb kBlackColor = qRgb(0,0,0);
-        DEBUG_HIGH_LEVEL << Q_FUNC_INFO << Debug::toString(widgetRect);
-
-        if (m_memMap == NULL)
-        {
-            qCritical() << Q_FUNC_INFO << "m_memMap == NULL";
-            return 0;
-        }
-
-        unsigned char * pbPixelsBuff = reinterpret_cast<unsigned char *>(m_memMap) + sizeof(HOOKSGRABBER_SHARED_MEM_DESC);
-        RECT rcMonitor = m_monitorInfo.rcMonitor;
-        QRect monitorRect = QRect( QPoint(rcMonitor.left, rcMonitor.top), QSize(m_memDesc.width, m_memDesc.height));
-
-        QRect clippedRect = monitorRect.intersected(widgetRect);
-
-        // Checking for the 'grabme' widget position inside the monitor that is used to capture color
-        if( !clippedRect.isValid() ){
-
-            DEBUG_MID_LEVEL << "Widget 'grabme' is out of screen:" << Debug::toString(clippedRect);
-
-            // Widget 'grabme' is out of screen
-            return kBlackColor;
-        }
-
-        // Convert coordinates from "Main" desktop coord-system to capture-monitor coord-system
-        QRect preparedRect = clippedRect.translated(-monitorRect.x(), -monitorRect.y());
-
-        // Align width by 4 for accelerated calculations
-        preparedRect.setWidth(preparedRect.width() - (preparedRect.width() % 4));
-
-        if( !preparedRect.isValid() ){
-            qWarning() << Q_FUNC_INFO << " preparedRect is not valid:" << Debug::toString(preparedRect);
-
-            // width and height can't be negative
-            return kBlackColor;
-        }
-
-        QRgb result;
-
-        if (Grab::Calculations::calculateAvgColor(&result, pbPixelsBuff, m_memDesc.format, m_memDesc.rowPitch, preparedRect) == 0) {
-            return result;
-        } else {
-            return kBlackColor;
-        }
-
-    #if 0
-        if (screenWidth < 1920 && (r > 120 || g > 120 || b > 120)) {
-            int monitorWidth = screenWidth;
-            int monitorHeight = screenHeight;
-            const int BytesPerPixel = 4;
-            // Save image of screen:
-            QImage * im = new QImage( monitorWidth, monitorHeight, QImage::Format_RGB32 );
-            for(int i=0; i<monitorWidth; i++){
-                for(int j=0; j<monitorHeight; j++){
-                    index = (BytesPerPixel * j * monitorWidth) + (BytesPerPixel * i);
-                    QRgb rgb = pbPixelsBuff[index+2] << 16 | pbPixelsBuff[index+1] << 8 | pbPixelsBuff[index];
-                    im->setPixel(i, j, rgb);
-                }
-            }
-            im->save("screen.jpg");
-            delete im;
-        }
-    #endif
-    }
 
     void freeIPC()
     {

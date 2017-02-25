@@ -60,7 +60,7 @@ public slots:
     virtual void open() = 0;
     virtual void close() = 0;
     virtual void setColors(const QList<QRgb> & colors) = 0;
-    virtual void switchOffLeds() = 0;
+	virtual void switchOffLeds() = 0;
 
     /*!
       \obsolete only form compatibility with Lightpack ver.<=5.5 hardware
@@ -86,6 +86,9 @@ public slots:
      \param value bits per channel
     */
     virtual void setColorDepth(int value) = 0;
+
+
+	virtual void setUsbPowerLedDisabled(bool isDisabled) { Q_UNUSED(isDisabled) emit commandCompleted(true); };
 
 protected:
     virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors);

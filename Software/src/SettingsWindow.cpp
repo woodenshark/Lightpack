@@ -818,10 +818,7 @@ void SettingsWindow::initVirtualLeds(int virtualLedsCount)
 
 void SettingsWindow::updateVirtualLedsColors(const QList<QRgb> & colors)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
-
-    if (Settings::getConnectedDevice() != SupportedDevices::DeviceTypeVirtual)
-        return;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
     if (colors.count() != m_labelsGrabbedColors.count())
     {
@@ -976,7 +973,7 @@ void SettingsWindow::ledDeviceOpenSuccess(bool isSuccess)
 
 void SettingsWindow::ledDeviceCallSuccess(bool isSuccess)
 {    
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << isSuccess << m_backlightStatus << sender();
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << isSuccess << m_backlightStatus << sender();
 
     // If Backlight::StatusOff then nothings changed
 
@@ -1035,7 +1032,7 @@ void SettingsWindow::ledDeviceFirmwareVersionUnofficialResult(const int version)
 
 void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 {    
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << updateResultMs;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << updateResultMs;
 
     double secs = updateResultMs / 1000;
     double hz = 0;

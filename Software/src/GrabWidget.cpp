@@ -116,7 +116,7 @@ void GrabWidget::closeEvent(QCloseEvent *event)
 void GrabWidget::saveSizeAndPosition()
 {
 	if (m_features & SyncSettings) {
-		DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+		DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
 		Settings::setLedPosition(m_selfId, pos());
 		Settings::setLedSize(m_selfId, size());
@@ -513,7 +513,7 @@ void GrabWidget::resizeEvent(QResizeEvent *)
 
 void GrabWidget::paintEvent(QPaintEvent *)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
     QPainter painter(this);
     painter.setPen(QColor(0x77, 0x77, 0x77));
@@ -684,21 +684,21 @@ void GrabWidget::onOpenConfigButton_Clicked()
 
 void GrabWidget::onRedCoef_ValueChanged(double value)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
     Settings::setLedCoefRed(m_selfId, value);
     m_coefRed = Settings::getLedCoefRed(m_selfId);
 }
 
 void GrabWidget::onGreenCoef_ValueChanged(double value)
 {
-    DEBUG_LOW_LEVEL << value;
+    DEBUG_MID_LEVEL << value;
     Settings::setLedCoefGreen(m_selfId, value);
     m_coefGreen = Settings::getLedCoefGreen(m_selfId);
 }
 
 void GrabWidget::onBlueCoef_ValueChanged(double value)
 {
-    DEBUG_LOW_LEVEL << value;
+    DEBUG_MID_LEVEL << value;
     Settings::setLedCoefBlue(m_selfId, value);
     m_coefBlue = Settings::getLedCoefBlue(m_selfId);
 }

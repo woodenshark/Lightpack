@@ -147,7 +147,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 #ifndef NO_QT
     char buf[100];
     sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
     intptr_t hDxgi = reinterpret_cast<intptr_t>(GetModuleHandle(L"dxgi.dll"));
@@ -155,7 +155,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 
 #ifndef NO_QT
     sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
     pSc->Release();
@@ -228,14 +228,14 @@ UINT GetD3D9PresentOffset(HWND hWnd){
 #ifndef NO_QT
         char buf[100];
         sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         UINT presentFuncOffset = (presentFuncPtr - reinterpret_cast<UINT>(hD3d9));
 
 #ifndef NO_QT
         sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         pD3DSwapChain->Release();
@@ -307,7 +307,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
 #ifndef NO_QT
         char buf[100];
         sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         void *pD3d9 = reinterpret_cast<void *>(hD3d9);
@@ -315,7 +315,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
 
 #ifndef NO_QT
         sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         pD3DSwapChain->Release();
@@ -388,14 +388,14 @@ UINT GetD3D9ResetOffset(HWND hWnd){
 #ifndef NO_QT
         char buf[100];
         sprintf(buf, "resetFuncPtr=%x", resetFuncPtr);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         UINT resetFuncOffset = (resetFuncPtr - reinterpret_cast<UINT>(hD3d9));
 
 #ifndef NO_QT
         sprintf(buf, "resetFuncOffset=%x", resetFuncOffset);
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << buf;
+        DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
         pD3DSwapChain->Release();

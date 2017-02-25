@@ -36,7 +36,7 @@ LightpackPluginInterface::~LightpackPluginInterface()
 //TODO timeout lock
 void LightpackPluginInterface::timeoutLock()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
     if (lockAlive)
     {
         lockAlive = false;
@@ -141,7 +141,7 @@ void LightpackPluginInterface::changeProfile(QString profile)
 
 void LightpackPluginInterface::refreshAmbilightEvaluated(double updateResultMs)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << updateResultMs;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << updateResultMs;
 
     double secs = updateResultMs / 1000;
     hz = 0;
@@ -158,7 +158,7 @@ void LightpackPluginInterface::refreshScreenRect(QRect rect)
 
 void LightpackPluginInterface::updateColorsCache(const QList<QRgb> & colors)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
     m_curColors = colors;
 }
 

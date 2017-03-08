@@ -81,6 +81,7 @@ void GlobalColorCoefPage::initializePage()
 		_ui->sbBlue->setValue(SettingsScope::Settings::getLedCoefBlue(1) * 100);
 	}
 
+	resetDeviceSettings();
 	onCoefValueChanged();
 }
 

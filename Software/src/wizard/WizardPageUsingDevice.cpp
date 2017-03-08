@@ -26,6 +26,8 @@
 
 #include "WizardPageUsingDevice.hpp"
 #include "AbstractLedDevice.hpp"
+#include "SettingsDefaults.hpp"
+#include "types.h"
 
 
 WizardPageUsingDevice::WizardPageUsingDevice(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
@@ -36,6 +38,29 @@ SettingsAwareTrait(isInitFromSettings, ts)
 
 WizardPageUsingDevice::~WizardPageUsingDevice()
 {
+}
+
+void WizardPageUsingDevice::resetDeviceSettings()
+{
+
+	QList<WBAdjustment> adjustments;
+	const int numOfLeds = device()->maxLedsCount();
+
+	for (int led = 0; led < numOfLeds; ++led) {
+		WBAdjustment wba;
+		wba.red = 1.0;
+		wba.green = 1.0;
+		wba.blue = 1.0;
+		adjustments.append(wba);
+	}
+
+	device()->updateWBAdjustments(adjustments);
+	device()->setBrightness(SettingsScope::Profile::Device::BrightnessDefault);
+	device()->setSmoothSlowdown(SettingsScope::Profile::Device::SmoothDefault);
+	device()->setGamma(SettingsScope::Profile::Device::GammaDefault);
+	device()->setMinimumLuminosityThresholdEnabled(false);
+
+
 }
 
 AbstractLedDevice * WizardPageUsingDevice::device()

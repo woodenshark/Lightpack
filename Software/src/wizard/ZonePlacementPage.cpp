@@ -82,6 +82,8 @@ void ZonePlacementPage::initializePage()
         on_pbAndromeda_clicked();
     }
     connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(on_numberOfLeds_valueChanged(int)));
+
+	resetDeviceSettings();
     turnLightsOff();
 }
 

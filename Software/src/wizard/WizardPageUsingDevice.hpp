@@ -48,6 +48,7 @@ protected slots:
 
 
 protected:
+	void resetDeviceSettings();
 	AbstractLedDevice * device();
 };
 

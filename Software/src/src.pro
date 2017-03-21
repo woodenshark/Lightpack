@@ -186,7 +186,7 @@ macx{
     #}
 
     CONFIG(clang) {
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -x objective-c++
+        QMAKE_CXXFLAGS += -x objective-c++
     }
 }
 

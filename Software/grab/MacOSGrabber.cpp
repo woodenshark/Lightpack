@@ -39,6 +39,17 @@ namespace {
 static const size_t kBytesPerPixel = 4;
 static const uint32_t kMaxDisplaysCount = 10;
 
+
+struct MacOSScreenData
+{
+	MacOSScreenData(CGImageRef _displayImageRef, CFDataRef _imageDataRef)
+		: displayImageRef(_displayImageRef), imageDataRef(_imageDataRef)
+	{}
+
+	CGImageRef displayImageRef = nullptr;
+	CFDataRef imageDataRef = nullptr;
+};
+
 bool allocateScreenBuffer(const ScreenInfo& screen,
                           const qreal pixelRatio,
                           GrabbedScreen& grabScreen)
@@ -83,14 +94,15 @@ bool getScreenInfoFromRect(const CGDirectDisplayID display,
 void freeScreenImageData(GrabbedScreen& screen)
 {
     screen.imgData = nullptr;
-    if (screen.imageDataRef) {
-        CFRelease(screen.imageDataRef);
-        screen.imageDataRef = nullptr;
-    }
-
-    if (screen.displayImageRef) {
-        CGImageRelease(screen.displayImageRef);
-        screen.displayImageRef = nullptr;
+	if (screen.associatedData) {
+		if (((MacOSScreenData*)screen.associatedData)->imageDataRef) {
+			CFRelease(((MacOSScreenData*)screen.associatedData)->imageDataRef);
+			((MacOSScreenData*)screen.associatedData)->imageDataRef = nullptr;
+		}
+		if (((MacOSScreenData*)screen.associatedData)->displayImageRef) {
+			CGImageRelease(((MacOSScreenData*)screen.associatedData)->displayImageRef);
+			((MacOSScreenData*)screen.associatedData)->displayImageRef = nullptr;
+		}
     }
 }
 
@@ -101,10 +113,16 @@ void toGrabbedScreen(CGImageRef imageRef, GrabbedScreen *screen)
     const size_t screenBufferSize = width * height * kBytesPerPixel;
     Q_ASSERT(screen->imgDataSize == screenBufferSize);
 
-    screen->displayImageRef = imageRef;
-    CGDataProviderRef provider = CGImageGetDataProvider(imageRef);
-    screen->imageDataRef = CGDataProviderCopyData(provider);
-    screen->imgData = CFDataGetBytePtr(screen->imageDataRef);
+	CGDataProviderRef provider = CGImageGetDataProvider(imageRef);
+
+	if (!screen->associatedData) {
+		screen->associatedData = new MacOSScreenData(imageRef, CGDataProviderCopyData(provider));
+	} else {
+		((MacOSScreenData*)screen->associatedData)->displayImageRef = imageRef;
+		((MacOSScreenData*)screen->associatedData)->imageDataRef = CGDataProviderCopyData(provider);
+	}
+
+	screen->imgData = CFDataGetBytePtr(((MacOSScreenData*)screen->associatedData)->imageDataRef);
 }
 
 }

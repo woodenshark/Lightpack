@@ -178,7 +178,7 @@ void GrabberBase::grab()
                 Calculations::calculateAvgColor(
                     &avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat,
                     grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
-                    preparedRect );
+                    preparedRect);
                 _context->grabResult->append(avgColor);
             } else {
                 _context->grabResult->append(qRgb(0,0,0));

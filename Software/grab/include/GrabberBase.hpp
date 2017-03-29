@@ -31,9 +31,6 @@
 #include "src/GrabWidget.hpp"
 #include "calculations.hpp"
 
-#ifdef MAC_OS_CG_GRAB_SUPPORT
-#include <CoreGraphics/CoreGraphics.h>
-#endif
 
 class GrabberContext;
 
@@ -57,15 +54,7 @@ struct ScreenInfo {
 struct GrabbedScreen {
     GrabbedScreen() = default;
 
-#ifdef MAC_OS_CG_GRAB_SUPPORT
-    CGImageRef displayImageRef = nullptr;
-    CFDataRef imageDataRef = nullptr;
-
-    // This is only a view to the |imageDataRef| pixels raw data.
-    const unsigned char * imgData = nullptr;
-#else
     unsigned char * imgData = nullptr;
-#endif
 
     size_t imgDataSize = 0;
     BufferFormat imgFormat = BufferFormatUnknown;

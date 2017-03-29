@@ -31,6 +31,10 @@
 #include "src/GrabWidget.hpp"
 #include "calculations.hpp"
 
+#ifdef MAC_OS_CG_GRAB_SUPPORT
+#include <CoreGraphics/CoreGraphics.h>
+#endif
+
 class GrabberContext;
 
 enum GrabResult {
@@ -40,26 +44,33 @@ enum GrabResult {
 };
 
 struct ScreenInfo {
-    ScreenInfo()
-        : handle(NULL)
-    {}
-    QRect rect;
-    void * handle;
-    bool operator== (const ScreenInfo &other) const {
+    ScreenInfo() = default;
+
+    bool operator==(const ScreenInfo &other) const {
         return other.rect == this->rect;
     }
+
+    QRect rect;
+    void * handle = nullptr;
 };
 
 struct GrabbedScreen {
-    GrabbedScreen()
-        : imgFormat(BufferFormatUnknown)
-        , associatedData(NULL)
-    {}
-    unsigned char * imgData;
-    size_t imgDataSize;
-    BufferFormat imgFormat;
+    GrabbedScreen() = default;
+
+#ifdef MAC_OS_CG_GRAB_SUPPORT
+    CGImageRef displayImageRef = nullptr;
+    CFDataRef imageDataRef = nullptr;
+
+    // This is only a view to the |imageDataRef| pixels raw data.
+    const unsigned char * imgData = nullptr;
+#else
+    unsigned char * imgData = nullptr;
+#endif
+
+    size_t imgDataSize = 0;
+    BufferFormat imgFormat = BufferFormatUnknown;
     ScreenInfo screenInfo;
-    void * associatedData;
+    void * associatedData = nullptr;
 };
 
 #define DECLARE_GRABBER_NAME(grabber_name) \

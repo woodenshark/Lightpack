@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>WizardPage</string>
   </property>
+  <property name="title">
+   <string>Zone placement</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="2">
     <spacer name="verticalSpacer_2">

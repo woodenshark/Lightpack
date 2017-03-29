@@ -226,15 +226,16 @@ SOURCES += \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
     SessionChangeDetector.cpp \
-    wizard/ZoneWidget.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
+    wizard/WizardPageUsingDevice.cpp \
     wizard/SelectProfilePage.cpp \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
+    wizard/GlobalColorCoefPage.cpp \
     wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
     UpdatesProcessor.cpp \
@@ -274,9 +275,9 @@ HEADERS += \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
     SessionChangeDetector.hpp \
-    wizard/ZoneWidget.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
+    wizard/WizardPageUsingDevice.hpp \
     wizard/SettingsAwareTrait.hpp \
     wizard/SelectProfilePage.hpp \
     wizard/MonitorIdForm.hpp \
@@ -284,6 +285,7 @@ HEADERS += \
     wizard/LightpackDiscoveryPage.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
+    wizard/GlobalColorCoefPage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
     wizard/CustomDistributor.hpp \
@@ -313,7 +315,6 @@ win32 {
 FORMS += SettingsWindow.ui \
     GrabWidget.ui \
     GrabConfigWidget.ui \
-    wizard/ZoneWidget.ui \
     wizard/ZonePlacementPage.ui \
     wizard/Wizard.ui \
     wizard/SelectProfilePage.ui \
@@ -321,7 +322,8 @@ FORMS += SettingsWindow.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
-    wizard/SelectDevicePage.ui
+    wizard/SelectDevicePage.ui \
+    wizard/GlobalColorCoefPage.ui
 
 #
 # QtSingleApplication

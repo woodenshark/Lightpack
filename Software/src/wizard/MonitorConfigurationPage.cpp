@@ -69,7 +69,8 @@ void MonitorConfigurationPage::initializePage()
         monitorIdForm->show();
 
         _monitorForms.append(monitorIdForm);
-    }
+	}
+	this->activateWindow();
 }
 
 bool MonitorConfigurationPage::validatePage()
@@ -91,19 +92,4 @@ void MonitorConfigurationPage::cleanupMonitors()
         delete monitorIdForm;
     }
     _monitorForms.clear();
-}
-
-void MonitorConfigurationPage::addMonitor(int id)\
-{
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-    QRadioButton *rbMon = new QRadioButton(this);
-
-    char buf[10];
-    QString name = QString("rb%0").arg(QString::number(id));
-
-    rbMon->setObjectName(name);
-    rbMon->setText(buf);
-
-    _ui->gridLayout->addWidget(rbMon, id + 1, 1, 1, 1);
-
 }

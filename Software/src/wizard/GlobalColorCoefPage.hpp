@@ -1,10 +1,10 @@
 /*
- * Wizard.hpp
+ * GlobalColorCoefPage.hpp
  *
- *  Created on: 10/22/2013
- *     Project: %PROJECT% (Use "Lightpack" for hardware/firmware, or "Prismatik" for software)
+ *  Created on: 15.2.2017
+ *     Project: Prismatik
  *
- *  Copyright (c) 2013 %NICKNAME%
+ *  Copyright (c) 2017 Patrick Siegler
  *
  *  Lightpack is an open-source, USB content-driving ambient lighting
  *  hardware.
@@ -24,44 +24,41 @@
  *
  */
 
-#ifndef WIZARD_HPP
-#define WIZARD_HPP
+#ifndef GLOBALCOLORCOEFPAGE_HPP
+#define GLOBALCOLORCOEFPAGE_HPP
 
-#include <QApplication>
-#include <QWizard>
+#include <QList>
+#include "WizardPageUsingDevice.hpp"
 #include "SettingsAwareTrait.hpp"
 
 namespace Ui {
-class Wizard;
+class GlobalColorCoefPage;
 }
+class MonitorIdForm;
 
-enum {
-    Page_LightpackDiscovery,
-    Page_ChooseDevice,
-    Page_ConfigureDevice,
-    Page_MonitorConfiguration,
-	Page_ChooseProfile,
-	Page_ZonePlacement,
-	Page_GlobalColorCoef
-};
-
-class Wizard : public QWizard, SettingsAwareTrait
+class GlobalColorCoefPage : public WizardPageUsingDevice
 {
     Q_OBJECT
 
 public:
-    explicit Wizard(bool isInitFromSettings, QWidget *parent = 0);
-    ~Wizard();
+    explicit GlobalColorCoefPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent = 0);
+    ~GlobalColorCoefPage();
 
-    int skipMonitorConfigurationPage() {
-        this->setField("screenId", -1);
-        return Page_ChooseProfile;
-    }
+protected:
+    virtual void initializePage();
+    virtual void cleanupPage();
+    virtual bool validatePage();
 
-public slots:
+private slots:
+	void onCoefValueChanged();
 
 private:
-    Ui::Wizard *_ui;
+    void addMonitor(int id);
+    void cleanupMonitors();
+
+	Ui::GlobalColorCoefPage *_ui;
+	int _screenId;
+    QList<MonitorIdForm*> _monitorForms;
 };
 
-#endif // WIZARD_HPP
+#endif // GLOBALCOLORCOEFPAGE_HPP

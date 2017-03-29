@@ -27,7 +27,8 @@
 #ifndef SETTINGSAWARETRAIT_HPP
 #define SETTINGSAWARETRAIT_HPP
 
-#include<QSharedPointer>
+#include <QSharedPointer>
+#include <QMap>
 
 namespace SettingsScope {
 class Settings;
@@ -37,6 +38,8 @@ class AbstractLedDevice;
 
 struct TransientSettings {
     QSharedPointer<AbstractLedDevice>ledDevice;
+	QMap<int, QPoint> zonePositions;
+	QMap<int, QSize> zoneSizes;
 };
 
 class SettingsAwareTrait {

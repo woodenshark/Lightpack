@@ -691,14 +691,14 @@ void GrabWidget::onRedCoef_ValueChanged(double value)
 
 void GrabWidget::onGreenCoef_ValueChanged(double value)
 {
-    DEBUG_MID_LEVEL << value;
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
     Settings::setLedCoefGreen(m_selfId, value);
     m_coefGreen = Settings::getLedCoefGreen(m_selfId);
 }
 
 void GrabWidget::onBlueCoef_ValueChanged(double value)
 {
-    DEBUG_MID_LEVEL << value;
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
     Settings::setLedCoefBlue(m_selfId, value);
     m_coefBlue = Settings::getLedCoefBlue(m_selfId);
 }

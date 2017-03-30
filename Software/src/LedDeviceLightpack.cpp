@@ -127,7 +127,7 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
     emit commandCompleted(ok);
 }
 
-size_t LedDeviceLightpack::maxLedsCount()
+int LedDeviceLightpack::maxLedsCount()
 {
     if (m_devices.size() == 0)
         tryToReopenDevice();
@@ -176,6 +176,19 @@ void LedDeviceLightpack::setRefreshDelay(int value)
     emit commandCompleted(ok);
 }
 
+void LedDeviceLightpack::setUsbPowerLedDisabled(bool isDisabled) {
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isDisabled;
+
+    m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START] = (unsigned char)!isDisabled;
+
+    bool ok = true;
+    for (int i = 0; i < m_devices.size(); ++i) {
+        if (!writeBufferToDeviceWithCheck(CMD_UNOFFICIAL_SET_USBLED, m_devices[i]))
+            ok = false;
+    }
+    emit commandCompleted(ok);
+}
+
 void LedDeviceLightpack::setColorDepth(int value)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
@@ -218,11 +231,13 @@ void LedDeviceLightpack::requestFirmwareVersion()
     bool ok = readDataFromDeviceWithCheck();
 
     // TODO: write command CMD_GET_VERSION to device
+    int fw_unofficial = 0;
     if (ok)
     {
         int fw_major = m_readBuffer[INDEX_FW_VER_MAJOR];
         int fw_minor = m_readBuffer[INDEX_FW_VER_MINOR];
-        fwVersion = QString::number(fw_major) + "." + QString::number(fw_minor);
+        fw_unofficial = m_readBuffer[INDEX_FW_VER_UNOFFICIAL];
+        fwVersion = QString::number(fw_major) + "." + QString::number(fw_minor) + (fw_unofficial > 0 ? "+" + QString::number(fw_unofficial) : "");
     } else {
         fwVersion = tr("read device fail");
     }
@@ -230,6 +245,7 @@ void LedDeviceLightpack::requestFirmwareVersion()
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Version:" << fwVersion;
 
     emit firmwareVersion(fwVersion);
+    emit firmwareVersionUnofficial(fw_unofficial);
     emit commandCompleted(ok);
 }
 
@@ -238,11 +254,10 @@ void LedDeviceLightpack::updateDeviceSettings()
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << sender();
 
     AbstractLedDevice::updateDeviceSettings();
+    setUsbPowerLedDisabled(Settings::isDeviceUsbPowerLedDisabled());
     setRefreshDelay(Settings::getDeviceRefreshDelay());
     setColorDepth(Settings::getDeviceColorDepth());
     setSmoothSlowdown(Settings::getDeviceSmooth());
-
-    requestFirmwareVersion();
 }
 
 

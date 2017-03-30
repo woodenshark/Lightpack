@@ -77,7 +77,7 @@ void GrabberBase::startGrabbing()
 void GrabberBase::stopGrabbing()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
-    qWarning() << "grabScreensCount: " << grabScreensCount;
+	DEBUG_MID_LEVEL << "grabbed" << grabScreensCount << "frames";
     m_timer->stop();
 }
 
@@ -115,11 +115,12 @@ bool GrabberBase::isReallocationNeeded(const QList< ScreenInfo > &screensWithWid
 
 void GrabberBase::grab()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
     QList< ScreenInfo > screens2Grab;
     screens2Grab.reserve(5);
     screensWithWidgets(&screens2Grab, *_context->grabWidgets);
     if (isReallocationNeeded(screens2Grab)) {
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "reallocating";
         if (!reallocate(screens2Grab)) {
             qCritical() << Q_FUNC_INFO << " couldn't reallocate grabbing buffer";
             emit frameGrabAttempted(GrabResultError);
@@ -149,7 +150,7 @@ void GrabberBase::grab()
             // Checking for the 'grabme' widget position inside the monitor that is used to capture color
             if( !clippedRect.isValid() ){
 
-                DEBUG_MID_LEVEL << "Widget 'grabme' is out of screen:" << Debug::toString(clippedRect);
+                DEBUG_HIGH_LEVEL << "Widget 'grabme' is out of screen:" << Debug::toString(clippedRect);
 
                 _context->grabResult->append(qRgb(0,0,0));
                 continue;
@@ -173,7 +174,11 @@ void GrabberBase::grab()
             const int bytesPerPixel = 4;
             QRgb avgColor;
             if (_context->grabWidgets->at(i)->isAreaEnabled()) {
-                Calculations::calculateAvgColor(&avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat, grabbedScreen->screenInfo.rect.width() * bytesPerPixel, preparedRect );
+                Q_ASSERT(grabbedScreen->imgData);
+                Calculations::calculateAvgColor(
+                    &avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat,
+                    grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
+                    preparedRect);
                 _context->grabResult->append(avgColor);
             } else {
                 _context->grabResult->append(qRgb(0,0,0));

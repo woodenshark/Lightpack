@@ -27,22 +27,23 @@
 #pragma once
 
 // Current version of Lightpack software
-#define VERSION_STR     "5.11.2"
+#define VERSION_STR     "5.11.2.11"
 
 // Resource defines using in Lightpack.rc
-#define VER_FILEVERSION             5,11,2,0
+#define VER_FILEVERSION             5,11,2,11
 #define VER_PRODUCTVERSION          VER_FILEVERSION
 
 #define VER_FILEVERSION_STR         VERSION_STR "\0"
 #define VER_PRODUCTVERSION_STR      VER_FILEVERSION_STR
 
-#define VER_PRODUCTNAME_STR         "Prismatik"
-#define VER_COMPANYNAME_STR         "Woodenshark LLC"
-#define VER_FILEDESCRIPTION_STR     "http://lightpack.tv"
+#define VER_PRODUCTNAME_STR         "Prismatik (unofficial)"
+#define VER_COMPANYNAME_STR         "Patrick Siegler"
+#define VER_FILEDESCRIPTION_STR     "Lightpack Software"
 #define VER_INTERNALNAME_STR        "Prismatik"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright (c) 2014 Woodenshark LLC"
-#define VER_ORIGINALFILENAME_STR    "Prismatik_sw" VERSION_STR ".exe"
+#define VER_LEGALCOPYRIGHT_STR      ""
+#define VER_ORIGINALFILENAME_STR    "Prismatik.exe"
 
 
-// Lightpack API version
-#define API_VERSION     "1.4"
+// Prismatik API version. When breaking compatibilty to Lightpack API v1.4,
+// change ApiServer::ApiVersion and the API help accordingly!
+#define API_VERSION     "2.0"

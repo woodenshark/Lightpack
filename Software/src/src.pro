@@ -12,7 +12,7 @@ CONFIG(msvc) {
 } else {
     PRE_TARGETDEPS += ../lib/libgrab.a
 }
-DESTDIR     = bin
+DESTDIR     = ../bin
 TEMPLATE    = app
 QT         += network widgets
 win32 {
@@ -58,6 +58,12 @@ DEFINES += $${SUPPORTED_GRABBERS}
 
 LIBS    += -L../lib -lgrab -lprismatik-math
 
+CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 unix:!macx{
     CONFIG    += link_pkgconfig debug
     PKGCONFIG += libusb-1.0
@@ -74,7 +80,15 @@ unix:!macx{
 }
 
 win32 {
-    CONFIG(msvc):DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
+        DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+        # Place *.lib and *.exp files in ../lib
+        QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
+    }
+
     # Windows version using WinAPI for HID
     LIBS    += -lsetupapi
     # For QSerialDevice
@@ -99,33 +113,38 @@ win32 {
     LIBS    += -lwtsapi32
 
     CONFIG(msvc) {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./
+        QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
+            $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations --no-compiler-runtime \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)\
+            copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcr$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+            copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+			copy /y \"$${OPENSSL_DIR}\\ssleay32.dll\" .\ $$escape_expand(\r\n)\
+			copy /y \"$${OPENSSL_DIR}\\libeay32.dll\" .\ $$escape_expand(\r\n)
     } else {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./
+		warning("unsupported setup - update src.pro to copy dependencies")
     }
+	
+	contains(DEFINES,BASS_SOUND_SUPPORT) {
+		INCLUDEPATH += $${BASS_DIR}/c/ \
+			$${BASSWASAPI_DIR}/c/
+		
+		contains(QMAKE_TARGET.arch, x86_64) {
+			LIBS += -L$${BASS_DIR}/c/x64/ -L$${BASSWASAPI_DIR}/c/x64/
+		} else {
+			LIBS += -L$${BASS_DIR}/c/ -L$${BASSWASAPI_DIR}/c/		
+		}
+		
+		LIBS	+= -lbass -lbasswasapi
+		
+		contains(QMAKE_TARGET.arch, x86_64) {
+			QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+				copy /y \"$${BASS_DIR}\\x64\\bass.dll\" .\ $$escape_expand(\r\n)\
+				copy /y \"$${BASSWASAPI_DIR}\\x64\\basswasapi.dll\" .\
+		} else {
+			QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+				copy /y \"$${BASS_DIR}\\bass.dll\" .\ $$escape_expand(\r\n)\
+				copy /y \"$${BASSWASAPI_DIR}\\basswasapi.dll\" .\	
+		}
+	}
 }
 
 unix:!macx{
@@ -133,6 +152,8 @@ unix:!macx{
     SOURCES += hidapi/linux/hid-libusb.c
     # For X11 grabber
     LIBS +=-lXext -lX11
+
+    QMAKE_CXXFLAGS += -std=c++11
 }
 
 macx{
@@ -154,19 +175,25 @@ macx{
 
     QMAKE_INFO_PLIST = ./Info.plist
 
-    isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
-        # Default value
-        # For build universal binaries (native on Intel and PowerPC)
-        QMAKE_MAC_SDK = macosx10.9
-    } else {
-        message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
-        QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
-    }
+	#see build-vars.prf
+    #isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
+    #    # Default value
+    #    # For build universal binaries (native on Intel and PowerPC)
+    #    QMAKE_MAC_SDK = macosx10.9
+    #} else {
+    #    message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
+    #    QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
+    #}
 
     CONFIG(clang) {
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -stdlib=libstdc++ -x objective-c++
+        QMAKE_CXXFLAGS += -x objective-c++
     }
 }
+
+# Generate .qm language files
+QMAKE_MAC_SDK = macosx
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+system($$[QT_INSTALL_BINS]/lrelease src.pro)
 
 INCLUDEPATH += . \
                .. \
@@ -181,7 +208,6 @@ SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \
     GrabWidget.cpp  GrabConfigWidget.cpp \
     LogWriter.cpp \
-    SpeedTest.cpp \
     LedDeviceLightpack.cpp \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
@@ -190,6 +216,7 @@ SOURCES += \
     ApiServer.cpp \
     ApiServerSetColorTask.cpp \
     MoodLampManager.cpp \
+	LiquidColorGenerator.cpp \
     LedDeviceManager.cpp \
     SelectWidget.cpp \
     GrabManager.cpp \
@@ -198,22 +225,21 @@ SOURCES += \
     Plugin.cpp \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
-    EndSessionDetector.cpp \
-    wizard/ZoneWidget.cpp \
+    SessionChangeDetector.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
+    wizard/WizardPageUsingDevice.cpp \
     wizard/SelectProfilePage.cpp \
     wizard/MonitorIdForm.cpp \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
-    wizard/GrabAreaWidget.cpp \
-    wizard/AndromedaDistributor.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
-    wizard/CassiopeiaDistributor.cpp \
-    wizard/PegasusDistributor.cpp \
+    wizard/GlobalColorCoefPage.cpp \
+    wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
-    UpdatesProcessor.cpp
+    UpdatesProcessor.cpp \
+    LightpackCommandLineParser.cpp
 
 HEADERS += \
     LightpackApplication.hpp \
@@ -227,7 +253,6 @@ HEADERS += \
     GrabConfigWidget.hpp \
     debug.h \
     LogWriter.hpp \
-    SpeedTest.hpp \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
     LedDeviceLightpack.hpp \
@@ -241,6 +266,7 @@ HEADERS += \
     ../../CommonHeaders/COMMANDS.h \
     ../../CommonHeaders/USB_ID.h \
     MoodLampManager.hpp \
+	LiquidColorGenerator.hpp \
     LedDeviceManager.hpp \
     SelectWidget.hpp \
     ../common/D3D10GrabberDefs.hpp \
@@ -248,26 +274,25 @@ HEADERS += \
     PluginsManager.hpp \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
-    EndSessionDetector.hpp \
-    wizard/ZoneWidget.hpp \
+    SessionChangeDetector.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
+    wizard/WizardPageUsingDevice.hpp \
     wizard/SettingsAwareTrait.hpp \
     wizard/SelectProfilePage.hpp \
     wizard/MonitorIdForm.hpp \
     wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
-    wizard/GrabAreaWidget.hpp \
-    wizard/AndromedaDistributor.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
+    wizard/GlobalColorCoefPage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
-    wizard/CassiopeiaDistributor.hpp \
-    wizard/PegasusDistributor.hpp \
+    wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp \
-    UpdatesProcessor.hpp
+    UpdatesProcessor.hpp \
+    LightpackCommandLineParser.hpp
 
 !contains(DEFINES,UNITY_DESKTOP) {
     HEADERS += systrayicon/SysTrayIcon_qt_p.hpp
@@ -275,6 +300,11 @@ HEADERS += \
 
 contains(DEFINES,UNITY_DESKTOP) {
     HEADERS += systrayicon/SysTrayIcon_unity_p.hpp
+}
+
+contains(DEFINES,BASS_SOUND_SUPPORT) {
+    SOURCES += SoundManager.cpp
+    HEADERS += SoundManager.hpp
 }
 
 win32 {
@@ -285,16 +315,15 @@ win32 {
 FORMS += SettingsWindow.ui \
     GrabWidget.ui \
     GrabConfigWidget.ui \
-    wizard/ZoneWidget.ui \
     wizard/ZonePlacementPage.ui \
     wizard/Wizard.ui \
     wizard/SelectProfilePage.ui \
     wizard/MonitorIdForm.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
-    wizard/GrabAreaWidget.ui \
     wizard/ConfigureDevicePage.ui \
-    wizard/SelectDevicePage.ui
+    wizard/SelectDevicePage.ui \
+    wizard/GlobalColorCoefPage.ui
 
 #
 # QtSingleApplication

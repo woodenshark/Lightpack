@@ -31,11 +31,6 @@
 
 #include "GrabberBase.hpp"
 
-#include <CoreGraphics/CGColorSpace.h>
-#include <CoreGraphics/CGContext.h>
-#include <CoreGraphics/CGImage.h>
-
-
 class MacOSGrabber : public GrabberBase
 {
 public:
@@ -51,7 +46,6 @@ protected slots:
     virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 private:
     void freeScreens();
-    void toGrabbedScreen(CGImageRef, GrabbedScreen *);
 };
 
 #endif // MAC_OS_CG_GRAB_SUPPORT

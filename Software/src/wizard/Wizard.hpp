@@ -40,8 +40,9 @@ enum {
     Page_ChooseDevice,
     Page_ConfigureDevice,
     Page_MonitorConfiguration,
-    Page_ChooseProfile,
-    Page_ZonePlacement
+	Page_ChooseProfile,
+	Page_ZonePlacement,
+	Page_GlobalColorCoef
 };
 
 class Wizard : public QWizard, SettingsAwareTrait

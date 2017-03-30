@@ -5,16 +5,18 @@
 # Created on: 25.12.11
 #
 
+VERSION=`cat ../VERSION`
 
-if [ -z $2 ];
+if [ -z $1 ];
 then
-    echo "usage: $0 <version> <arch>"
+    echo "usage: $0 <arch>"
     exit 1
 fi
 
-perl prepare_deb.pl $1 $2 || exit 1;
+perl prepare_deb.pl $VERSION $1 || exit 1;
 
-chmod a+x deb/DEBIAN/control || exit 1;
+chmod 0644 deb/DEBIAN/control || exit 1;
+chmod 0755 deb/DEBIAN/postinst || exit 1;
 
 if [ -e "deb/usr/bin/Prismatik" ];
 then
@@ -29,12 +31,13 @@ then
 fi
 
 
-if [ -x "`which md5deep 2>/dev/null`" ]; 
+if [ -x "`which hashdeep 2>/dev/null`" ]; 
 then
 	# Update MD5 sums
-	md5deep -r deb/usr > deb/DEBIAN/md5sums
+	hashdeep -r deb/usr > deb/DEBIAN/md5sums
+	chmod 0644 deb/DEBIAN/md5sums
 else
-	echo "Please install 'md5deep' package first."
+	echo "Please install 'hashdeep' package first."
 	exit 5
 fi
 

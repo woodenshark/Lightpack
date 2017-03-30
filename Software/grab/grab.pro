@@ -23,6 +23,12 @@ INCLUDEPATH += ./include \
                ../math/include \
                ..
 
+CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 DEFINES += $${SUPPORTED_GRABBERS}
 # Linux/UNIX platform
 unix:!macx {
@@ -47,31 +53,15 @@ win32 {
         GRABBERS_SOURCES += WinAPIGrabber.cpp
     }
 
-    contains(DEFINES, WINAPI_EACH_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/WinAPIGrabberEachWidget.hpp
-        GRABBERS_SOURCES += WinAPIGrabberEachWidget.cpp
-    }
-
-    contains(DEFINES, D3D9_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/D3D9Grabber.hpp
-        GRABBERS_SOURCES += D3D9Grabber.cpp
+    contains(DEFINES, DDUPL_GRAB_SUPPORT) {
+        GRABBERS_HEADERS += include/DDuplGrabber.hpp
+        GRABBERS_SOURCES += DDuplGrabber.cpp
     }
 
     contains(DEFINES, D3D10_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/D3D10Grabber.hpp
         GRABBERS_SOURCES += D3D10Grabber.cpp
     }
-}
-
-# Common Qt grabbers
-contains(DEFINES, QT_GRAB_SUPPORT) {
-    GRABBERS_HEADERS += \
-        include/QtGrabberEachWidget.hpp \
-        include/QtGrabber.hpp
-
-    GRABBERS_SOURCES += \
-        QtGrabberEachWidget.cpp \
-        QtGrabber.cpp
 }
 
 HEADERS += \
@@ -97,18 +87,22 @@ win32 {
         }
     }
 
-    # This will suppress many MSVC warnings about 'unsecure' CRT functions.
     CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
         DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+        # Create "fake" project dependencies of the libraries used dynamically
+        LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
     }
 
     HEADERS += \
             ../common/msvcstub.h \
             include/WinUtils.hpp \
-            include/WinDXUtils.hpp
+            ../common/WinDXUtils.hpp
     SOURCES += \
             WinUtils.cpp \
-            WinDXUtils.cpp
+            ../common/WinDXUtils.cpp
 }
 
 macx {

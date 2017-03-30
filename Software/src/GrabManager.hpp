@@ -46,6 +46,7 @@ signals:
     void updateLedsColors(const QList<QRgb> & colors);
     void ambilightTimeOfUpdatingColors(double ms);
     void changeScreen();
+    void onSessionChange(int change);
 
 public:
 
@@ -59,7 +60,12 @@ public slots:
     void onGrabberTypeChanged(const Grab::GrabberType grabberType);
     void onGrabSlowdownChanged(int ms);
     void onGrabAvgColorsEnabledChanged(bool state);
+	void onGrabOverBrightenChanged(int value);
     void onSendDataOnlyIfColorsEnabledChanged(bool state);
+#ifdef D3D10_GRAB_SUPPORT
+    void onDx1011GrabberEnabledChanged(bool state);
+    void onDx9GrabberEnabledChanged(bool state);
+#endif
     void start(bool isGrabEnabled);
     void settingsProfileChanged(const QString &profileName);
     void setVisibleLedWidgets(bool state);
@@ -69,6 +75,7 @@ public slots:
 
 private slots:
     void handleGrabbedColors();
+    void timeoutFakeGrab();
     void timeoutUpdateFPS();
     void pauseWhileResizeOrMoving();
     void resumeAfterResizeOrMoving();
@@ -81,6 +88,9 @@ private:
     GrabberBase *queryGrabber(Grab::GrabberType grabber);
     void initGrabbers();
     GrabberBase *initGrabber(GrabberBase *grabber);
+#ifdef D3D10_GRAB_SUPPORT
+    void reinitDx1011Grabber();
+#endif
     void initColorLists(int numberOfLeds);
     void clearColorsNew();
     void clearColorsCurrent();
@@ -95,9 +105,8 @@ private:
     D3D10Grabber *m_d3d10Grabber;
 #endif
 
-    QTimer *m_timerGrab;
     QTimer *m_timerUpdateFPS;
-    QThread *m_grabbersThread;
+    QTimer *m_timerFakeGrab;
     QWidget *m_parentWidget;
     QList<GrabWidget *> m_ledWidgets;
     QList<QRgb> m_grabResult;
@@ -113,9 +122,12 @@ private:
     bool m_isPauseGrabWhileResizeOrMoving;
     bool m_isSendDataOnlyIfColorsChanged;
     bool m_avgColorsOnAllLeds;
+    bool m_isGrabbingStarted;
+	int m_overBrighten;
 
     // Store last grabbing time in milliseconds
     double m_fpsMs;
+    int m_noGrabCount;
 
     bool m_isGrabWidgetsVisible;
     GrabberContext * m_grabberContext;

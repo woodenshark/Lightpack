@@ -66,6 +66,9 @@ typedef struct
     uint8_t maxPwmValue;
     uint16_t timerOutputCompareRegValue;
 
+    // Unofficial settings
+    uint8_t isUsbLedEnabled;
+
 } Settings_t;
 
 #endif /* DATATYPES_H_INCLUDED */

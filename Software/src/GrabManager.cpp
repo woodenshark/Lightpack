@@ -35,16 +35,16 @@
 #include "GrabberContext.hpp"
 #include "TimeEvaluations.hpp"
 #include "WinAPIGrabber.hpp"
-#include "WinAPIGrabberEachWidget.hpp"
-#include "QtGrabber.hpp"
-#include "QtGrabberEachWidget.hpp"
+#include "DDuplGrabber.hpp"
 #include "X11Grabber.hpp"
 #include "MacOSGrabber.hpp"
-#include "D3D9Grabber.hpp"
 #include "D3D10Grabber.hpp"
 #include "GrabManager.hpp"
 
 using namespace SettingsScope;
+
+#define FPS_UPDATE_INTERVAL 500
+#define FAKE_GRAB_INTERVAL 900
 
 #ifdef D3D10_GRAB_SUPPORT
 
@@ -64,31 +64,35 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
     m_parentWidget = parent;
 
-    m_timerGrab = new QTimer(this);
     m_timeEval = new TimeEvaluations();
 
     m_fpsMs = 0;
+    m_noGrabCount = 0;
 
     m_grabberContext = new GrabberContext();
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
-//    m_grabbersThread = new QThread();
     initGrabbers();
     m_grabber = queryGrabber(Settings::getGrabberType());
 
     m_timerUpdateFPS = new QTimer(this);
     connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
     m_timerUpdateFPS->setSingleShot(false);
-    m_timerUpdateFPS->start(500);
+    m_timerUpdateFPS->setInterval(FPS_UPDATE_INTERVAL);
+
+    m_timerFakeGrab = new QTimer(this);
+    connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
+    m_timerFakeGrab->setSingleShot(false);
+    m_timerFakeGrab->setInterval(FAKE_GRAB_INTERVAL);
 
     m_isPauseGrabWhileResizeOrMoving = false;
     m_isGrabWidgetsVisible = false;
+    m_isGrabbingStarted = false;
 
     initColorLists(MaximumNumberOfLeds::Default);
     initLedWidgets(MaximumNumberOfLeds::Default);
 
-//    connect(m_timerGrab, SIGNAL(timeout()), this, SLOT(handleGrabbedColors()));
     connect(QApplication::desktop(), SIGNAL(resized(int)), this, SLOT(scaleLedWidgets(int)));
     connect(QApplication::desktop(), SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
 
@@ -104,9 +108,10 @@ GrabManager::~GrabManager()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    delete m_timerGrab;
     delete m_timeEval;
     m_grabber = NULL;
+    delete m_timerFakeGrab;
+    delete m_timerUpdateFPS;
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
@@ -117,7 +122,7 @@ GrabManager::~GrabManager()
 
     for (int i = 0; i < m_grabbers.size(); i++)
         if (m_grabbers[i]){
-            DEBUG_OUT << "deleting " << m_grabbers[i]->name();
+            DEBUG_LOW_LEVEL << "deleting " << m_grabbers[i]->name();
             delete m_grabbers[i];
             m_grabbers[i] = NULL;
         }
@@ -138,6 +143,8 @@ void GrabManager::start(bool isGrabEnabled)
 
     clearColorsNew();
 
+    m_isGrabbingStarted = isGrabEnabled;
+
     if (m_grabber != NULL) {
         if (isGrabEnabled) {
             m_timerUpdateFPS->start();
@@ -145,6 +152,7 @@ void GrabManager::start(bool isGrabEnabled)
         } else {
             clearColorsCurrent();
             m_timerUpdateFPS->stop();
+            m_timerFakeGrab->stop();
             m_grabber->stopGrabbing();
             emit ambilightTimeOfUpdatingColors(0);
         }
@@ -154,6 +162,7 @@ void GrabManager::start(bool isGrabEnabled)
 void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << grabberType;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
 
     bool isStartNeeded = false;
     if (m_grabber != NULL) {
@@ -176,6 +185,8 @@ void GrabManager::onGrabberTypeChanged(const Grab::GrabberType grabberType)
         m_grabber->startGrabbing();
 #endif
     }
+
+    QApplication::restoreOverrideCursor();
 }
 
 void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
@@ -183,9 +194,10 @@ void GrabManager::onGrabberStateChangeRequested(bool isStartRequested) {
     D3D10Grabber *grabber = static_cast<D3D10Grabber *>(sender());
     if (grabber != m_grabber) {
         if (isStartRequested) {
-            if (Settings::isDx1011GrabberEnabled()) {
+            if (m_isGrabbingStarted && Settings::isDx1011GrabberEnabled()) {
                 m_grabber->stopGrabbing();
                 grabber->startGrabbing();
+                grabber->setGrabInterval(Settings::getGrabSlowdown());
             }
         } else {
             m_grabber->startGrabbing();
@@ -214,11 +226,30 @@ void GrabManager::onGrabAvgColorsEnabledChanged(bool state)
     m_avgColorsOnAllLeds = state;
 }
 
+void GrabManager::onGrabOverBrightenChanged(int value) {
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	m_overBrighten = value;
+}
+
 void GrabManager::onSendDataOnlyIfColorsEnabledChanged(bool state)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
     m_isSendDataOnlyIfColorsChanged = state;
 }
+
+#ifdef D3D10_GRAB_SUPPORT
+void GrabManager::onDx1011GrabberEnabledChanged(bool state)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    reinitDx1011Grabber();
+}
+
+void GrabManager::onDx9GrabberEnabledChanged(bool state)
+{
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    reinitDx1011Grabber();
+}
+#endif
 
 void GrabManager::setNumberOfLeds(int numberOfLeds)
 {
@@ -246,6 +277,7 @@ void GrabManager::settingsProfileChanged(const QString &profileName)
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
     m_avgColorsOnAllLeds = Settings::isGrabAvgColorsEnabled();
+	m_overBrighten = Settings::getGrabOverBrighten();
 
     setNumberOfLeds(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 }
@@ -293,7 +325,7 @@ void GrabManager::setWhiteLedWidgets(bool state)
 
 void GrabManager::handleGrabbedColors()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
     if (m_grabber == NULL)
     {
@@ -305,7 +337,6 @@ void GrabManager::handleGrabbedColors()
     // if one of LED widgets resizing or moving
     if (m_isPauseGrabWhileResizeOrMoving)
     {
-        m_timerGrab->start(50); // check in 50 ms
         return;
     }    
 
@@ -342,27 +373,21 @@ void GrabManager::handleGrabbedColors()
         }
     }
 
-//    // White balance
-//    for (int i = 0; i < m_ledWidgets.size(); i++)
-//    {
-//        QRgb rgb = m_colorsNew[i];
-
-//        unsigned r = qRed(rgb)   * m_ledWidgets[i]->getCoefRed();
-//        unsigned g = qGreen(rgb) * m_ledWidgets[i]->getCoefGreen();
-//        unsigned b = qBlue(rgb)  * m_ledWidgets[i]->getCoefBlue();
-
-//        if (r > 0xff) r = 0xff;
-//        if (g > 0xff) g = 0xff;
-//        if (b > 0xff) b = 0xff;
-
-//        m_colorsNew[i] = qRgb(r, g, b);
-//    }
-
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
-        if (m_colorsCurrent[i] != m_colorsNew[i])
+		QRgb newColor = m_colorsNew[i];
+		if (m_overBrighten) {
+			int dRed = qRed(newColor);
+			int dGreen = qGreen(newColor);
+			int dBlue = qBlue(newColor);
+			int highest = qMax(dRed, qMax(dGreen, dBlue));
+			double scaleFactor = qMin((100 + 5 * m_overBrighten) / 100.0, 255.0 / highest);
+			newColor = qRgb(dRed * scaleFactor, dGreen * scaleFactor, dBlue * scaleFactor);
+		}
+
+		if (m_colorsCurrent[i] != newColor)
         {
-            m_colorsCurrent[i] = m_colorsNew[i];
+			m_colorsCurrent[i] = newColor;
             isColorsChanged = true;
         }
     }
@@ -373,13 +398,32 @@ void GrabManager::handleGrabbedColors()
     }
 
     m_fpsMs = m_timeEval->howLongItEnd();
+    m_noGrabCount = 0;
     m_timeEval->howLongItStart();
 
+    if (m_isSendDataOnlyIfColorsChanged == false)
+    {
+        m_timerFakeGrab->start();
+    }
+}
+
+void GrabManager::timeoutFakeGrab()
+{
+    if (m_isSendDataOnlyIfColorsChanged == false && m_isGrabbingStarted)
+    {
+        emit updateLedsColors(m_colorsCurrent);
+    }
+    else
+    {
+        m_timerFakeGrab->stop();
+    }
 }
 
 void GrabManager::timeoutUpdateFPS()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+    m_noGrabCount++;
+    if (m_noGrabCount > 2) m_fpsMs = 0;
     emit ambilightTimeOfUpdatingColors(m_fpsMs);
 }
 
@@ -485,8 +529,10 @@ void GrabManager::initGrabbers()
     m_grabbers[Grab::GrabberTypeWinAPI] = initGrabber(new WinAPIGrabber(NULL, m_grabberContext));
 #endif
 
-#ifdef D3D9_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeD3D9] = initGrabber(new D3D9Grabber(NULL, m_grabberContext));
+#ifdef DDUPL_GRAB_SUPPORT
+    DDuplGrabber* dDuplGrabber = new DDuplGrabber(NULL, m_grabberContext);
+    m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(dDuplGrabber);
+    connect(this, SIGNAL(onSessionChange(int)), dDuplGrabber, SLOT(onSessionChange(int)));
 #endif
 
 #ifdef X11_GRAB_SUPPORT
@@ -496,18 +542,14 @@ void GrabManager::initGrabbers()
 #ifdef MAC_OS_CG_GRAB_SUPPORT
     m_grabbers[Grab::GrabberTypeMacCoreGraphics] = initGrabber(new MacOSGrabber(NULL, m_grabberContext));
 #endif
-#ifdef QT_GRAB_SUPPORT
-    //TODO: migrate Qt grabbers to the new hierarchy
-    m_grabbers[Grab::GrabberTypeQtEachWidget] = initGrabber(new QtGrabberEachWidget(NULL, m_grabberContext));
-    m_grabbers[Grab::GrabberTypeQt] = initGrabber(new QtGrabber(NULL, m_grabberContext));
-#endif
-#ifdef WINAPI_EACH_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeWinAPIEachWidget] = initGrabber(new WinAPIGrabberEachWidget(NULL, m_grabberContext));
-#endif
 #ifdef D3D10_GRAB_SUPPORT
-    m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle)));
-    connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
-    connect(getLightpackApp(), SIGNAL(postInitialization()), m_d3d10Grabber,  SLOT(init()));
+    if (Settings::isDx1011GrabberEnabled()) {
+        m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
+        connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
+        connect(getLightpackApp(), SIGNAL(postInitialization()), m_d3d10Grabber, SLOT(init()));
+    } else {
+        m_d3d10Grabber = NULL;
+    }
 #endif
 }
 
@@ -519,6 +561,25 @@ GrabberBase *GrabManager::initGrabber(GrabberBase * grabber) {
 
     return grabber;
 }
+
+#ifdef D3D10_GRAB_SUPPORT
+void GrabManager::reinitDx1011Grabber() {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    if (m_d3d10Grabber) {
+        delete m_d3d10Grabber;
+        m_d3d10Grabber = NULL;
+    }
+
+    if (Settings::isDx1011GrabberEnabled()) {
+        m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
+        connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
+        m_d3d10Grabber->init();
+    }
+
+    QApplication::restoreOverrideCursor();
+}
+#endif
 
 GrabberBase *GrabManager::queryGrabber(Grab::GrabberType grabberType)
 {
@@ -580,14 +641,19 @@ void GrabManager::clearColorsCurrent()
 void GrabManager::initLedWidgets(int numberOfLeds)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
+	if (numberOfLeds) {
+		qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
+	}
+
+	int widgetFlags = SyncSettings | AllowCoefAndEnableConfig | AllowColorCycle;
 
     if (m_ledWidgets.size() == 0)
     {
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "First widget initialization";
 
-        GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), m_parentWidget);
+		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-        connect(ledWidget, SIGNAL(resizeOrMoveStarted()), this, SLOT(pauseWhileResizeOrMoving()));
+        connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
         connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
 
 // TODO: Check out this line!
@@ -607,9 +673,9 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 
         for (int i = 0; i < diff; i++)
         {
-            GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), m_parentWidget);
+			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-            connect(ledWidget, SIGNAL(resizeOrMoveStarted()), this, SLOT(pauseWhileResizeOrMoving()));
+            connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
             connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
 
             m_ledWidgets << ledWidget;

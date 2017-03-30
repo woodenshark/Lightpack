@@ -83,10 +83,10 @@ public:
 
         connect(&_updatesProcessor, SIGNAL(readyRead()), this, SLOT(onCheckUpdate_Finished()));
 
-        _pixmapCache.insert("lock16", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-        _pixmapCache.insert("on16", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-        _pixmapCache.insert("off16", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-        _pixmapCache.insert("error16", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(16, Qt::SmoothTransformation)) );
+        _pixmapCache.insert("lock32", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(32, Qt::SmoothTransformation)) );
+        _pixmapCache.insert("on32", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(32, Qt::SmoothTransformation)) );
+        _pixmapCache.insert("off32", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(32, Qt::SmoothTransformation)) );
+        _pixmapCache.insert("error32", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(32, Qt::SmoothTransformation)) );
 
         setStatus(SysTrayIcon::StatusOn);
         _qsystray->show();
@@ -175,7 +175,7 @@ public:
         case SysTrayIcon::StatusOn:
             _switchOnBacklightAction->setEnabled(false);
             _switchOffBacklightAction->setEnabled(true);
-            _qsystray->setIcon(QIcon(*_pixmapCache["on16"]));
+            _qsystray->setIcon(QIcon(*_pixmapCache["on32"]));
 
             if(SettingsScope::Settings::isProfileLoaded())
                 _qsystray->setToolTip(tr("Enabled profile: %1").arg(SettingsScope::Settings::getCurrentProfileName()));
@@ -184,25 +184,25 @@ public:
         case SysTrayIcon::StatusLockedByApi:
             _switchOnBacklightAction->setEnabled(false);
             _switchOffBacklightAction->setEnabled(true);
-            _qsystray->setIcon(QIcon(*_pixmapCache["lock16"]));
+            _qsystray->setIcon(QIcon(*_pixmapCache["lock32"]));
             _qsystray->setToolTip(tr("Device locked via API"));
             break;
         case SysTrayIcon::StatusLockedByPlugin:
-            _qsystray->setIcon(QIcon(*_pixmapCache["lock16"]));
+            _qsystray->setIcon(QIcon(*_pixmapCache["lock32"]));
             _qsystray->setToolTip(tr("Device locked via Plugin")+" ("+(*arg)+")");
             break;
 
         case SysTrayIcon::StatusOff:
             _switchOnBacklightAction->setEnabled(true);
             _switchOffBacklightAction->setEnabled(false);
-            _qsystray->setIcon(QIcon(*_pixmapCache["off16"]));
+            _qsystray->setIcon(QIcon(*_pixmapCache["off32"]));
             _qsystray->setToolTip(tr("Disabled"));
             break;
 
         case SysTrayIcon::StatusError:
             _switchOnBacklightAction->setEnabled(false);
             _switchOffBacklightAction->setEnabled(true);
-            _qsystray->setIcon(QIcon(*_pixmapCache["error16"]));
+            _qsystray->setIcon(QIcon(*_pixmapCache["error32"]));
             _qsystray->setToolTip(tr("Error with connection device, verbose in logs"));
             break;
         default:
@@ -229,19 +229,18 @@ private slots:
     void onCheckUpdate_Finished()
     {
         using namespace SettingsScope;
-        QList<UpdateInfo> updates = _updatesProcessor.readUpdates(Settings::getLastReadUpdateId());
+        QList<UpdateInfo> updates = _updatesProcessor.readUpdates();
         if (updates.size() > 0) {
             if(updates.size() > 1) {
                 _trayMessage = SysTrayIcon::MessageGeneric;
-                _trayMsgUrl = QUrl("http://lightpack.tv");
-                _qsystray->showMessage("Updates are available", "click here to visit http://lightpack.tv");
+                _trayMsgUrl = QUrl("https://github.com/psieg/Lightpack/releases");
+                _qsystray->showMessage("Multiple updates are available", "Click to open the downloads page");
             } else {
                 _trayMessage = SysTrayIcon::MessageGeneric;
                 UpdateInfo update = updates.last();
                 _trayMsgUrl = QUrl(update.url);
                 _qsystray->showMessage(update.title, update.text);
             }
-            Settings::setLastReadUpdateId(updates.last().id);
         }
     }
 

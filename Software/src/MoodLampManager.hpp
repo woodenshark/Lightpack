@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include "LiquidColorGenerator.hpp"
 
 class MoodLampManager : public QObject
 {
@@ -57,25 +58,17 @@ private slots:
     void updateColors();
 
 private:
-    int generateDelay(int speed);
-    QColor generateColor();
     void initColors(int numberOfLeds);
     void fillColors(QRgb rgb);
 
 private:
+	LiquidColorGenerator m_generator;
     QList<QRgb> m_colors;
 
-    QTimer m_timer;
-    int    m_delay;
     bool   m_isMoodLampEnabled;
     QColor m_currentColor;
     bool   m_isLiquidMode;
-    int    m_liquidModeSpeed;
     bool   m_isSendDataOnlyIfColorsChanged;
 
     QRgb m_rgbSaved;
-
-    static const int ColorsMoodLampCount = 15;
-    static int m_checkColors[ColorsMoodLampCount];
-    static const QColor m_colorsMoodLamp[ColorsMoodLampCount];
 };

@@ -82,12 +82,6 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
         outColors[i].g = qGreen(inColors[i]) * k;
         outColors[i].b = qBlue(inColors[i])  * k;
 
-        if (isApplyWBAdjustments) {
-            outColors[i].r *= m_wbAdjustments[i].red;
-            outColors[i].g *= m_wbAdjustments[i].green;
-            outColors[i].b *= m_wbAdjustments[i].blue;
-        }
-
         PrismatikMath::gammaCorrection(m_gamma, outColors[i]);
     }
 
@@ -116,6 +110,12 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
         }
 
         PrismatikMath::brightnessCorrection(m_brightness, outColors[i]);
+
+		if (isApplyWBAdjustments) {
+			outColors[i].r *= m_wbAdjustments[i].red;
+			outColors[i].g *= m_wbAdjustments[i].green;
+			outColors[i].b *= m_wbAdjustments[i].blue;
+		}
     }
 
 }

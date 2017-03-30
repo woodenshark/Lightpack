@@ -50,8 +50,8 @@ public slots:
     void setSmoothSlowdown(int /*value*/);
     void setColorSequence(QString /*value*/);
     void requestFirmwareVersion();
-    size_t maxLedsCount() { return 1; }
-    size_t defaultLedsCount() { return 1; }
+	int maxLedsCount() { return 1; }
+	int defaultLedsCount() { return 1; }
 
 
 private:

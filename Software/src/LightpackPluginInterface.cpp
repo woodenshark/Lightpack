@@ -15,6 +15,10 @@ LightpackPluginInterface::LightpackPluginInterface(QObject *parent) :
 {
     m_isRequestBacklightStatusDone = true;
     m_backlightStatusResult = Backlight::StatusUnknown;
+    m_gamma = SettingsScope::Profile::Device::GammaDefault;
+    m_brightness = SettingsScope::Profile::Device::BrightnessDefault;
+    m_smooth = SettingsScope::Profile::Device::SmoothDefault;
+    
     initColors(10);
     m_timerLock = new QTimer(this);
     m_timerLock->start(5000); // check in 5000 ms
@@ -32,7 +36,7 @@ LightpackPluginInterface::~LightpackPluginInterface()
 //TODO timeout lock
 void LightpackPluginInterface::timeoutLock()
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
     if (lockAlive)
     {
         lockAlive = false;
@@ -137,7 +141,7 @@ void LightpackPluginInterface::changeProfile(QString profile)
 
 void LightpackPluginInterface::refreshAmbilightEvaluated(double updateResultMs)
 {
-    DEBUG_MID_LEVEL << Q_FUNC_INFO << updateResultMs;
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << updateResultMs;
 
     double secs = updateResultMs / 1000;
     hz = 0;
@@ -152,10 +156,29 @@ void LightpackPluginInterface::refreshScreenRect(QRect rect)
     screen = rect;
 }
 
-void LightpackPluginInterface::updateColors(const QList<QRgb> & colors)
+void LightpackPluginInterface::updateColorsCache(const QList<QRgb> & colors)
+{
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+    m_curColors = colors;
+}
+
+
+void LightpackPluginInterface::updateGammaCache(double value)
 {
     DEBUG_MID_LEVEL << Q_FUNC_INFO;
-    m_curColors = colors;
+    m_gamma = value;
+}
+
+void LightpackPluginInterface::updateBrightnessCache(int value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_brightness = value;
+}
+
+void LightpackPluginInterface::updateSmoothCache(int value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_smooth = value;
 }
 
 QString LightpackPluginInterface::Version()
@@ -365,6 +388,9 @@ bool LightpackPluginInterface::SetProfile(QString sessionKey,QString profile)
 
 bool LightpackPluginInterface::SetDevice(QString sessionKey,QString device)
 {
+	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetDevice";
+	return false;
+
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
      QStringList devices = Settings::getSupportedDevices();
@@ -465,6 +491,9 @@ bool LightpackPluginInterface::SetBacklight(QString sessionKey, int backlight)
 
 bool LightpackPluginInterface::SetCountLeds(QString sessionKey, int countLeds)
 {
+	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetCountLeds";
+	return false;
+
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
 
@@ -580,6 +609,21 @@ int LightpackPluginInterface::GetBacklight()
         // TODO: use more suitable value.
         return 0;
     }
+}
+
+double LightpackPluginInterface::GetGamma()
+{
+    return m_gamma;
+}
+
+int LightpackPluginInterface::GetBrightness()
+{
+    return m_brightness;
+}
+
+int LightpackPluginInterface::GetSmooth()
+{
+    return m_smooth;
 }
 
 QString LightpackPluginInterface::GetPluginsDir()

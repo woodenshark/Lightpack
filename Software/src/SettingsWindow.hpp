@@ -34,7 +34,9 @@
 #include "Settings.hpp"
 #include "GrabManager.hpp"
 #include "MoodLampManager.hpp"
-#include "SpeedTest.hpp"
+#ifdef BASS_SOUND_SUPPORT
+#include "SoundManager.hpp"
+#endif
 #include "ColorButton.hpp"
 #include "enums.hpp"
 
@@ -68,11 +70,13 @@ signals:
     void updateLedsColors(const QList<QRgb> &);
     void updateRefreshDelay(int value);
     void updateColorDepth(int value);
-    void updateSmoothSlowdown(int value);
     void updateSlowdown(int value);
     void updateGamma(double value);
     void updateBrightness(int percent);
     void requestFirmwareVersion();
+#ifdef BASS_SOUND_SUPPORT
+	void requestSoundVizDevices();
+#endif
     void recreateLedDevice();
     void resultBacklightStatus(Backlight::Status);
     void backlightStatusChanged(Backlight::Status);
@@ -87,6 +91,7 @@ public slots:
     void ledDeviceOpenSuccess(bool isSuccess);
     void ledDeviceCallSuccess(bool isSuccess);
     void ledDeviceFirmwareVersionResult(const QString & fwVersion);
+    void ledDeviceFirmwareVersionUnofficialResult(const int version);
     void refreshAmbilightEvaluated(double updateResultMs);
     void updateUiFromSettings();
 
@@ -104,6 +109,10 @@ public slots:
     void onApiServer_ErrorOnStartListening(QString errorMessage);
     void onPingDeviceEverySecond_Toggled(bool state);
     void processMessage(const QString &message);
+
+#ifdef BASS_SOUND_SUPPORT
+	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
+#endif
 
     void updatePlugin(QList<Plugin*> plugins);
 
@@ -123,9 +132,17 @@ private slots:
     void onLightpackModeChanged(Lightpack::Mode);
     void onMoodLampColor_changed(QColor color);
     void onMoodLampSpeed_valueChanged(int value);
-    void onMoodLampLiquidMode_Toggled(bool isConstantColor);
+    void onMoodLampLiquidMode_Toggled(bool isLiquidMode);
+#ifdef BASS_SOUND_SUPPORT
+	void onSoundVizDevice_currentIndexChanged(int index);
+	void onSoundVizMinColor_changed(QColor color);
+	void onSoundVizMaxColor_changed(QColor color);
+	void onSoundVizLiquidMode_Toggled(bool isLiquidMode);
+	void onSoundVizLiquidSpeed_valueChanged(int value);
+#endif
     void showAbout(); /* using in actions */
     void onPostInit();
+	void checkOutdatedGrabber();
 
     void scrollThanks();
 
@@ -134,17 +151,18 @@ private slots:
     void changePage(int page);
 
     void toggleBacklight();
-    void toggleBacklightMode();
     void nextProfile();
     void prevProfile();
 
     void onGrabberChanged();
     void onGrabSlowdown_valueChanged(int value);
-    void onLuminosityThreshold_valueChanged(int value);
-    void onMinimumLumosity_toggled(bool value);
-    void onGrabIsAvgColors_toggled(bool state);
+	void onGrabIsAvgColors_toggled(bool state);
+	void onGrabOverBrighten_valueChanged(int value);
+	void onLuminosityThreshold_valueChanged(int value);
+	void onMinimumLumosity_toggled(bool value);
 
     void onDeviceRefreshDelay_valueChanged(int value);
+    void onDisableUsbPowerLed_toggled(bool state);
     void onDeviceSmooth_valueChanged(int value);
     void onDeviceBrightness_valueChanged(int value);
     void onDeviceColorDepth_valueChanged(int value);
@@ -152,6 +170,7 @@ private slots:
     void onSliderDeviceGammaCorrection_valueChanged(int value);
     void onDeviceSendDataOnlyIfColorsChanged_toggled(bool state);
     void onDx1011CaptureEnabledChanged(bool isEnabled);
+    void onDx9CaptureEnabledChanged(bool isEnabled);
 
     void onDontShowLedWidgets_Toggled(bool checked);
     void onSetColoredLedWidgets(bool checked);
@@ -168,10 +187,7 @@ private slots:
 
     void loadTranslation(const QString & language);
 
-    void startTestsClick();
-
     void onExpertModeEnabled_Toggled(bool isEnabled);
-    void onKeepLightsAfterExit_Toggled(bool isEnabled);
     void onEnableApi_Toggled(bool isEnabled);
     void onListenOnlyOnLoInterface_Toggled(bool localOnly);
     void onApiKey_EditingFinished();
@@ -183,9 +199,13 @@ private slots:
     void on_pushButton_LightpackColorDepthHelp_clicked();
     void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
-    void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_GammaCorrectionHelp_clicked();
 
-    void on_pushButton_lumosityThresholdHelp_clicked();
+	void on_pushButton_lumosityThresholdHelp_clicked();
+
+	void on_pushButton_grabOverBrightenHelp_clicked();
+
+	void on_pushButton_AllPluginsHelp_clicked();
 
     void pluginSwitch(int index);
     void on_list_Plugins_itemClicked(QListWidgetItem*);
@@ -193,9 +213,13 @@ private slots:
     void MoveUpPlugin();
     void MoveDownPlugin();
 
-	void onKeepLightsAfterLock_Toggled(bool isEnabled);
+    void onKeepLightsAfterExit_Toggled(bool isEnabled);
+    void onKeepLightsAfterLock_Toggled(bool isEnabled);
+    void onKeepLightsAfterSuspend_Toggled(bool isEnabled);
 
     void on_pbRunConfigurationWizard_clicked();
+
+	void onCheckBox_checkForUpdates_Toggled(bool isEnabled);
 
 private:
     void updateExpertModeWidgetsVisibility();
@@ -238,8 +262,6 @@ private:
 
     QTimer m_smoothScrollTimer;
 
-    SpeedTest *m_speedTest;
-
     Grab::GrabberType getSelectedGrabberType();
 
     bool isDx1011CaptureEnabled();
@@ -263,11 +285,16 @@ private:
     static const QString DeviceFirmvareVersionUndef;
     static const QString LightpackDownloadsPageUrl;
     static const int GrabModeIndex;
-    static const int MoodLampModeIndex;
+	static const int MoodLampModeIndex;
+#ifdef BASS_SOUND_SUPPORT
+	static const int SoundVisualizeModeIndex;
+#endif
 
     QString fimwareVersion;
 
     QList<Plugin*> _plugins;
     static bool toPriority(Plugin* s1 , Plugin* s2 );
+
+    bool updatingFromSettings = false;
 };
 

@@ -31,6 +31,7 @@
 #include "src/GrabWidget.hpp"
 #include "calculations.hpp"
 
+
 class GrabberContext;
 
 enum GrabResult {
@@ -40,26 +41,25 @@ enum GrabResult {
 };
 
 struct ScreenInfo {
-    ScreenInfo()
-        : handle(NULL)
-    {}
-    QRect rect;
-    void * handle;
-    bool operator== (const ScreenInfo &other) const {
+    ScreenInfo() = default;
+
+    bool operator==(const ScreenInfo &other) const {
         return other.rect == this->rect;
     }
+
+    QRect rect;
+    void * handle = nullptr;
 };
 
 struct GrabbedScreen {
-    GrabbedScreen()
-        : imgFormat(BufferFormatUnknown)
-        , associatedData(NULL)
-    {}
-    unsigned char * imgData;
-    size_t imgDataSize;
-    BufferFormat imgFormat;
+    GrabbedScreen() = default;
+
+    const unsigned char * imgData = nullptr;
+
+    size_t imgDataSize = 0;
+    BufferFormat imgFormat = BufferFormatUnknown;
     ScreenInfo screenInfo;
-    void * associatedData;
+    void * associatedData = nullptr;
 };
 
 #define DECLARE_GRABBER_NAME(grabber_name) \

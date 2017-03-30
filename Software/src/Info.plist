@@ -19,6 +19,6 @@
 	<key>CFBundleExecutable</key>
 	<string>Prismatik</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.Prismatik</string>
+	<string>de.psieg.Prismatik</string>
 </dict>
 </plist>

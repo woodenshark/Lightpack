@@ -98,6 +98,7 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
     // Firmware version
     ReportData_u8[INDEX_FW_VER_MAJOR] = VERSION_OF_FIRMWARE_MAJOR;
     ReportData_u8[INDEX_FW_VER_MINOR] = VERSION_OF_FIRMWARE_MINOR;
+    ReportData_u8[INDEX_FW_VER_UNOFFICIAL] = VERSION_OF_FIRMWARE_UNOFFICIAL;
     return true;
 }
 
@@ -115,7 +116,7 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
-    
+
     uint8_t *ReportData_u8 = (uint8_t *)ReportData;
 
     uint8_t cmd = ReportData_u8[0]; //[0]; // command from enum COMMANDS{ ... };
@@ -209,6 +210,19 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
         break;
 
     case CMD_NOP:
+        break;
+
+
+    // Unofficial commands
+    case CMD_UNOFFICIAL_SET_USBLED:
+
+        g_Settings.isUsbLedEnabled = ReportData_u8[1];
+        if (g_Settings.isUsbLedEnabled) {
+            SET(USBLED);
+        } else {
+            CLR(USBLED);
+        }
+
         break;
 
     }

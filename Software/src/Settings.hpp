@@ -107,8 +107,10 @@ public:
     static void setExpertModeEnabled(bool isEnabled);
     static bool isKeepLightsOnAfterExit();
     static void setKeepLightsOnAfterExit(bool isEnabled);
-	static bool isKeepLightsOnAfterLock();
-	static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterLock();
+    static void setKeepLightsOnAfterLock(bool isEnabled);
+    static bool isKeepLightsOnAfterSuspend();
+    static void setKeepLightsOnAfterSuspend(bool isEnabled);
     static bool isPingDeviceEverySecond();
     static void setPingDeviceEverySecond(bool isEnabled);
     static bool isUpdateFirmwareMessageShown();
@@ -143,7 +145,9 @@ public:
     static bool isBacklightEnabled();
     static void setIsBacklightEnabled(bool isEnabled);
     static bool isGrabAvgColorsEnabled();
-    static void setGrabAvgColorsEnabled(bool isEnabled);
+	static void setGrabAvgColorsEnabled(bool isEnabled);
+	static int getGrabOverBrighten();
+	static void setGrabOverBrighten(int value);
     static bool isSendDataOnlyIfColorsChanges();
     static void setSendDataOnlyIfColorsChanges(bool isEnabled);
     static int getLuminosityThreshold();
@@ -153,6 +157,8 @@ public:
     // [Device]
     static int getDeviceRefreshDelay();
     static void setDeviceRefreshDelay(int value);
+    static bool isDeviceUsbPowerLedDisabled();
+    static void setDeviceUsbPowerLedDisabled(bool isDisabled);
     static int getDeviceBrightness();
     static void setDeviceBrightness(int value);
     static int getDeviceSmooth();
@@ -168,6 +174,8 @@ public:
 #ifdef D3D10_GRAB_SUPPORT
     static bool isDx1011GrabberEnabled();
     static void setDx1011GrabberEnabled(bool isEnabled);
+    static bool isDx9GrabbingEnabled();
+    static void setDx9GrabbingEnabled(bool isEnabled);
 #endif
 
     static Lightpack::Mode getLightpackMode();
@@ -178,6 +186,19 @@ public:
     static void setMoodLampColor(QColor color);
     static int getMoodLampSpeed();
     static void setMoodLampSpeed(int value);
+
+#ifdef BASS_SOUND_SUPPORT
+	static int getSoundVisualizerDevice();
+	static void setSoundVisualizerDevice(int value);
+	static QColor getSoundVisualizerMinColor();
+	static void setSoundVisualizerMinColor(QColor color);
+	static QColor getSoundVisualizerMaxColor();
+	static void setSoundVisualizerMaxColor(QColor color);
+	static bool isSoundVisualizerLiquidMode();
+	static void setSoundVisualizerLiquidMode(bool isLiquidMode);
+	static int getSoundVisualizerLiquidSpeed();
+	static void setSoundVisualizerLiquidSpeed(int value);
+#endif
 
     static QList<WBAdjustment> getLedCoefs();
 
@@ -196,8 +217,8 @@ public:
     static bool isLedEnabled(int ledIndex);
     static void setLedEnabled(int ledIndex, bool isEnabled);
 
-    static uint getLastReadUpdateId();
-    static void setLastReadUpdateId(const uint updateId);
+    static bool isCheckForUpdatesEnabled();
+	static void setCheckForUpdatesEnabled(bool isEnabled);
 
 private:        
     static int getValidDeviceRefreshDelay(int value);
@@ -207,7 +228,9 @@ private:
     static double getValidDeviceGamma(double value);
     static int getValidGrabSlowdown(int value);
     static int getValidMoodLampSpeed(int value);
-    static int getValidLuminosityThreshold(int value);
+	static int getValidSoundVisualizerLiquidSpeed(int value);
+	static int getValidLuminosityThreshold(int value);
+	static int getValidGrabOverBrighten(int value);
     static void setValidLedCoef(int ledIndex, const QString & keyCoef, double coef);
     static double getValidLedCoef(int ledIndex, const QString & keyCoef);
 
@@ -230,7 +253,6 @@ public:
     static QVariant value(const QString & key);
 
 signals:
-    void profileLoaded(const QString &);
     void currentProfileNameChanged(const QString &);
     void currentProfileRemoved();
     void currentProfileInited(const QString &);
@@ -238,7 +260,8 @@ signals:
     void apiKeyChanged(const QString &);
     void expertModeEnabledChanged(bool);
     void keepLightsOnAfterExitChanged(bool isEnabled);
-	void keepLightsOnAfterLockChanged(bool isEnabled);
+    void keepLightsOnAfterLockChanged(bool isEnabled);
+    void keepLightsOnAfterSuspendChanged(bool isEnabled);
     void pingDeviceEverySecondEnabledChanged(bool);
 
     void languageChanged(const QString &);
@@ -256,22 +279,34 @@ signals:
     void virtualNumberOfLedsChanged(int numberOfLeds);
     void grabSlowdownChanged(int value);
     void backlightEnabledChanged(bool isEnabled);
-    void grabAvgColorsEnabledChanged(bool isEnabled);
+	void grabAvgColorsEnabledChanged(bool isEnabled);
+	void grabOverBrightenChanged(int value);
     void sendDataOnlyIfColorsChangesChanged(bool isEnabled);
     void luminosityThresholdChanged(int value);
-    void minimumLuminosityEnabledChanged(bool value);
+	void minimumLuminosityEnabledChanged(bool value);
     void deviceRefreshDelayChanged(int value);
+    void deviceUsbPowerLedDisabledChanged(bool isDisabled);
     void deviceBrightnessChanged(int value);
     void deviceSmoothChanged(int value);
     void deviceColorDepthChanged(int value);
     void deviceGammaChanged(double gamma);
     void deviceColorSequenceChanged(QString value);
     void grabberTypeChanged(const Grab::GrabberType grabMode);
-    void dx1011GrabberEnabledChanged(const bool isEnabled);
+#ifdef D3D10_GRAB_SUPPORT
+    void dx1011GrabberEnabledChanged(bool isEnabled);
+    void dx9GrabberEnabledChanged(bool isEnabled);
+#endif
     void lightpackModeChanged(const Lightpack::Mode mode);
     void moodLampLiquidModeChanged(bool isLiquidMode);
     void moodLampColorChanged(const QColor color);
     void moodLampSpeedChanged(int value);
+#ifdef BASS_SOUND_SUPPORT
+	void soundVisualizerDeviceChanged(int value);
+	void soundVisualizerMinColorChanged(const QColor color);
+	void soundVisualizerMaxColorChanged(const QColor color);
+	void soundVisualizerLiquidModeChanged(bool isLiquidMode);
+	void soundVisualizerLiquidSpeedChanged(int value);
+#endif
     void ledCoefRedChanged(int ledIndex, double value);
     void ledCoefGreenChanged(int ledIndex, double value);
     void ledCoefBlueChanged(int ledIndex, double value);

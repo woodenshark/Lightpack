@@ -71,7 +71,7 @@ void WinAPIGrabber::freeScreens()
         delete d;
 
         if (_screensWithWidgets[i].imgData != NULL) {
-            free(_screensWithWidgets[i].imgData);
+            free((void*)_screensWithWidgets[i].imgData);
             _screensWithWidgets[i].imgData = NULL;
             _screensWithWidgets[i].imgDataSize = 0;
         }
@@ -156,7 +156,7 @@ bool WinAPIGrabber::reallocate(const QList< ScreenInfo > &screens)
 
         GrabbedScreen grabScreen;
         grabScreen.imgDataSize = pixelsBuffSizeNew;
-        grabScreen.imgData = (BYTE *)malloc(grabScreen.imgDataSize);
+        grabScreen.imgData = (unsigned char*)malloc(grabScreen.imgDataSize);
         grabScreen.imgFormat = BufferFormatArgb;
         grabScreen.screenInfo = screen;
         grabScreen.associatedData = d;
@@ -177,7 +177,7 @@ GrabResult WinAPIGrabber::grabScreens()
                 screenRect.left(), screenRect.top(), SRCCOPY );
 
         // Get the actual RGB data and put it into pbPixelsBuff
-        GetBitmapBits( d->hBitmap, (LONG)screen.imgDataSize, screen.imgData );
+        GetBitmapBits( d->hBitmap, (LONG)screen.imgDataSize, (unsigned char*)screen.imgData);
     }
     return GrabResultOk;
 }

@@ -54,7 +54,7 @@ struct ScreenInfo {
 struct GrabbedScreen {
     GrabbedScreen() = default;
 
-    unsigned char * imgData = nullptr;
+    const unsigned char * imgData = nullptr;
 
     size_t imgDataSize = 0;
     BufferFormat imgFormat = BufferFormatUnknown;

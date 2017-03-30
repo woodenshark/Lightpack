@@ -17,6 +17,7 @@ before_install:
   - qmake -v
 
 script:
+  - set -e
   - cd Software
   - ./update_locales.sh
   - qmake -r

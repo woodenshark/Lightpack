@@ -297,7 +297,7 @@ void DDuplGrabber::freeScreens()
 
         if (screen.imgData != NULL)
         {
-            free(screen.imgData);
+            free((void*)screen.imgData);
             screen.imgData = NULL;
             screen.imgDataSize = 0;
         }
@@ -469,7 +469,7 @@ GrabResult DDuplGrabber::returnBlackBuffer()
             qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
             return GrabResultError;
         }
-        ZeroMemory(screen.imgData, screen.imgDataSize);
+        ZeroMemory((void*)screen.imgData, screen.imgDataSize);
     }
 
     return GrabResultOk;
@@ -617,7 +617,7 @@ GrabResult DDuplGrabber::grabScreens()
 
             for (unsigned int i = 0; i < desc.Height; i++)
             {
-                memcpy_s(screen.imgData + (i * desc.Width) * 4, desc.Width * 4, map.pBits + i*map.Pitch, desc.Width * 4);
+                memcpy_s(((unsigned char*)screen.imgData) + (i * desc.Width) * 4, desc.Width * 4, map.pBits + i*map.Pitch, desc.Width * 4);
             }
 
             screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);

@@ -13,6 +13,18 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.12
+---------------
+April 13, 2017
+
+* Improve macOS performance (#70)
+* Add color calibration page to wizard (#86)
+* Re-enable tray on Linux / Unity (#77)
+* Increase tray icon resolution (#96)
+* Fix API setMode command (#94)
+* Fix lights stay off after resume in certain cases
+* Fix SoundViz using incorrect device after profile switch
+
 Version 5.11.2.11
 ---------------
 October 21, 2016

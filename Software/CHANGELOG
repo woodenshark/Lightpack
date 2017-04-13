@@ -19,7 +19,7 @@ April 13, 2017
 
 * Improve macOS performance (#70)
 * Add color calibration page to wizard (#86)
-* Re-enable tray on Linux / Unity (#77)
+* Re-enable tray on Linux / Unity (#36)
 * Increase tray icon resolution (#96)
 * Fix API setMode command (#94)
 * Fix lights stay off after resume in certain cases

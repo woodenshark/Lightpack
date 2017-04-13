@@ -83,6 +83,7 @@ void GlobalColorCoefPage::initializePage()
 
 	resetDeviceSettings();
 	onCoefValueChanged();
+	turnLightsOn(qRgb(255, 255, 255));
 }
 
 bool GlobalColorCoefPage::validatePage()
@@ -133,7 +134,18 @@ void GlobalColorCoefPage::cleanupPage()
 
 void GlobalColorCoefPage::onCoefValueChanged()
 {
-	turnLightsOn(qRgb(255 * (_ui->sbRed->value() / 100.0), 255 * (_ui->sbGreen->value() / 100.0), 255 * (_ui->sbBlue->value() / 100.0)));
+	QList<WBAdjustment> adjustments;
+	const int numOfLeds = device()->maxLedsCount();
+
+	for (int led = 0; led < numOfLeds; ++led) {
+		WBAdjustment wba;
+		wba.red = _ui->sbRed->value() / 100.0;
+		wba.green = _ui->sbGreen->value() / 100.0;
+		wba.blue = _ui->sbBlue->value() / 100.0;
+		adjustments.append(wba);
+	}
+
+	device()->updateWBAdjustments(adjustments);
 }
 
 void GlobalColorCoefPage::cleanupMonitors()

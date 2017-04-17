@@ -13,7 +13,7 @@ Lightpack project with Prismatik flavour
 
 **Lightpack** is a fully open-source and simple hardware implementation of the backlight for any computer. It's a USB content-driven ambient lighting system.
 
-**Prismatik** is an open-source software we buid to control Lightpack devices. It grabs the screen, analizes the picture,
+**Prismatik** is an open-source software we buid to control Lightpack devices. It grabs the screen, analyzes the picture,
 calculates resulting colors, and provides soft and gentle lighting with a Lightpack device. Moreother, you can
 handle other devices with Prismatik such as Adalight, Ardulight, or even Alienware LightFX system.
 
@@ -99,9 +99,14 @@ Instead of building a deb package, you can:
 
 #### Build Process:
 1. Download and unpack 5.0+ **Qt SDK** from www.qt-project.org
-2. Build **Prismatik** project
+2. Go to `<repo>/Software`
+3. Optional: if locales changed: run `./update_locales.sh`
+4. Run `qmake -r`
+5. Run `make`
 
-To run Prismatik please make sure PythonQt libs are available for load at runtime.
+
+#### Building a dmg package:
+1. Run `macdeployqt bin/Prismatik.app -dmg`
 
 ---
 

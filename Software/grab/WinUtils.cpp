@@ -364,4 +364,28 @@ VOID FreeRestrictedSD(PVOID ptr) {
     return;
 }
 
+
+
+void ApplyPrimaryGammaRamp(QList<QRgb>* colors) {
+	WORD GammaArray[3][256];
+
+	HDC dc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
+	if (!GetDeviceGammaRamp(dc, &GammaArray)) {
+		qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
+	} else {
+		for (QRgb& color : *colors) {
+			int red = qRed(color);
+			int green = qGreen(color);
+			int blue = qBlue(color);
+
+			red = GammaArray[0][red] >> 8;
+			green = GammaArray[1][green] >> 8;
+			blue = GammaArray[2][blue] >> 8;
+
+			color = qRgb(red, green, blue);
+		}
+	}
+	DeleteObject(dc);
+}
+
 } // namespace WinUtils

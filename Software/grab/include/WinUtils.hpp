@@ -37,6 +37,7 @@
 #endif
 #include <windows.h>
 #include <QList>
+#include <QRgb>
 
 namespace WinUtils
 {
@@ -62,6 +63,8 @@ PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);
 // The following function frees memory allocated in the
 // BuildRestrictedSD() function
 VOID FreeRestrictedSD(PVOID ptr);
+
+void ApplyPrimaryGammaRamp(QList<QRgb>* colors);
 }
 
 #endif // WINUTILS_HPP

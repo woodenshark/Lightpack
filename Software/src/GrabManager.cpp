@@ -355,10 +355,12 @@ void GrabManager::handleGrabbedColors()
     int avgR = 0, avgG = 0, avgB = 0;
     int countGrabEnabled = 0;
 
+#ifdef Q_OS_WIN
 	if (m_isApplyGammaRamp)
 	{
 		WinUtils::ApplyPrimaryGammaRamp(m_colorsNew);
 	}
+#endif
 
     if (m_avgColorsOnAllLeds)
     {

@@ -388,8 +388,8 @@ bool LightpackPluginInterface::SetProfile(QString sessionKey,QString profile)
 
 bool LightpackPluginInterface::SetDevice(QString sessionKey,QString device)
 {
-	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetDevice";
-	return false;
+    qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetDevice";
+    return false;
 
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
@@ -478,6 +478,10 @@ bool LightpackPluginInterface::SetBacklight(QString sessionKey, int backlight)
         status = Lightpack::AmbilightMode;
     else if (backlight == 2)
         status = Lightpack::MoodLampMode;
+#ifdef BASS_SOUND_SUPPORT
+    else if (backlight == 3)
+        status = Lightpack::SoundVisualizeMode;
+#endif
 
     if (status != Lightpack::UnknownMode)
     {
@@ -491,8 +495,8 @@ bool LightpackPluginInterface::SetBacklight(QString sessionKey, int backlight)
 
 bool LightpackPluginInterface::SetCountLeds(QString sessionKey, int countLeds)
 {
-	qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetCountLeds";
-	return false;
+    qWarning() << Q_FUNC_INFO << "Unsupported/deprectated API/Plugin command: SetCountLeds";
+    return false;
 
     if (lockSessionKeys.isEmpty()) return false;
     if (lockSessionKeys[0]!=sessionKey) return false;
@@ -604,6 +608,11 @@ int LightpackPluginInterface::GetBacklight()
     case Lightpack::MoodLampMode:
         return 2;
         break;
+#ifdef BASS_SOUND_SUPPORT
+    case Lightpack::SoundVisualizeMode:
+        return 3;
+        break;
+#endif
     default:
         qWarning() << "Unsupported Lightpack::Mode: " << (int)mode;
         // TODO: use more suitable value.

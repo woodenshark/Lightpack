@@ -101,6 +101,9 @@ const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 const char * ApiServer::CmdGetBacklight = "getmode";
 const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
 const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
+#endif
 
 const char * ApiServer::CmdGetGamma = "getgamma";
 const char * ApiServer::CmdResultGamma = "gamma:";
@@ -152,6 +155,9 @@ const char * ApiServer::CmdSetStatus_Off = "off";
 const char * ApiServer::CmdSetBacklight = "setmode:";
 const char * ApiServer::CmdSetBacklight_Ambilight = "ambilight";
 const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
+#endif
 
 const int ApiServer::SignalWaitTimeoutMs = 1000; // 1 second
 
@@ -539,6 +545,11 @@ void ApiServer::clientProcessCommands()
             case Lightpack::MoodLampMode:
                 result = CmdResultBacklight_Moodlamp;
                 break;
+#ifdef BASS_SOUND_SUPPORT
+            case Lightpack::SoundVisualizeMode:
+                result = CmdResultBacklight_SoundViz;
+                break;
+#endif
             default:
                 result = CmdSetResult_Error;
                 break;
@@ -1005,6 +1016,10 @@ void ApiServer::clientProcessCommands()
                     status = 1;
                 else if (cmdBuffer == CmdSetBacklight_Moodlamp)
                     status = 2;
+#ifdef BASS_SOUND_SUPPORT
+                else if (cmdBuffer == CmdSetBacklight_SoundViz)
+                    status = 3;
+#endif
 
                 if (status != 0)
                 {
@@ -1245,6 +1260,9 @@ void ApiServer::initHelpMessage()
                 "Get mode of the current profile",
                 formatHelp(CmdResultBacklight_Ambilight) +
                 formatHelp(CmdResultBacklight_Moodlamp)
+#ifdef BASS_SOUND_SUPPORT
+              + formatHelp(CmdResultBacklight_Moodlamp)
+#endif
                 );
     m_helpMessage += formatHelp(
                 CmdGetGamma,
@@ -1340,7 +1358,11 @@ void ApiServer::initHelpMessage()
                 CmdSetBacklight,
                 QString("Set backlight mode. Works only on locking time (see lock)."),
                 formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Ambilight)) +
-                formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp)),
+                formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp))
+#ifdef BASS_SOUND_SUPPORT
+              + formatHelp(CmdSetBacklight + QString(CmdSetBacklight_SoundViz))
+#endif
+                ,
                 helpCmdSetResults);
 
 

@@ -122,6 +122,9 @@ public:
     static const char * CmdGetBacklight;
     static const char * CmdResultBacklight_Ambilight;
     static const char * CmdResultBacklight_Moodlamp;
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdResultBacklight_SoundViz;
+#endif
 
     static const char * CmdGetGamma;
     static const char * CmdResultGamma;
@@ -171,6 +174,9 @@ public:
     static const char * CmdSetBacklight;
     static const char * CmdSetBacklight_Ambilight;
     static const char * CmdSetBacklight_Moodlamp;
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdSetBacklight_SoundViz;
+#endif
 
     static const int SignalWaitTimeoutMs;
 

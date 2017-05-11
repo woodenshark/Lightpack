@@ -148,12 +148,14 @@ public:
 	static void setGrabAvgColorsEnabled(bool isEnabled);
 	static int getGrabOverBrighten();
 	static void setGrabOverBrighten(int value);
+	static bool isGrabApplyGammaRampEnabled();
+	static void setGrabApplyGammaRampEnabled(bool value);
     static bool isSendDataOnlyIfColorsChanges();
     static void setSendDataOnlyIfColorsChanges(bool isEnabled);
     static int getLuminosityThreshold();
-    static void setLuminosityThreshold(int value);
-    static bool isMinimumLuminosityEnabled();
-    static void setMinimumLuminosityEnabled(bool value);
+	static void setLuminosityThreshold(int value);
+	static bool isMinimumLuminosityEnabled();
+	static void setMinimumLuminosityEnabled(bool value);
     // [Device]
     static int getDeviceRefreshDelay();
     static void setDeviceRefreshDelay(int value);
@@ -281,6 +283,7 @@ signals:
     void backlightEnabledChanged(bool isEnabled);
 	void grabAvgColorsEnabledChanged(bool isEnabled);
 	void grabOverBrightenChanged(int value);
+	void grabApplyGammaRampChanged(bool isEnabled);
     void sendDataOnlyIfColorsChangesChanged(bool isEnabled);
     void luminosityThresholdChanged(int value);
 	void minimumLuminosityEnabledChanged(bool value);

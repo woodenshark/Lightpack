@@ -27,9 +27,6 @@
 #include "GrabWidget.hpp"
 #include "GrabberBase.hpp"
 #include "src/debug.h"
-#ifdef Q_OS_WIN
-#include "WinUtils.hpp"
-#endif
 
 namespace
 {
@@ -187,8 +184,6 @@ void GrabberBase::grab()
                 _context->grabResult->append(qRgb(0,0,0));
             }
         }
-
-		WinUtils::ApplyPrimaryGammaRamp(_context->grabResult);
 
     }
     emit frameGrabAttempted(_lastGrabResult);

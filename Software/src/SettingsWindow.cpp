@@ -84,7 +84,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui->listWidget->setGridSize(QSize(115, 85));
 #endif
 
-    // Check windows reserved simbols in profile input name
+    // Check windows reserved symbols in profile input name
     QRegExpValidator *validatorProfileName = new QRegExpValidator(QRegExp("[^<>:\"/\\|?*]*"), this);
     ui->comboBox_Profiles->lineEdit()->setValidator(validatorProfileName);
 
@@ -124,6 +124,10 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	ui->label_licenseAndCredits->setText(ui->label_licenseAndCredits->text() + tr(" The sound visualizer uses the <a href=\"http://un4seen.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">BASS</span></a> library."));
 #else
 	ui->comboBox_LightpackModes->removeItem(2);
+#endif
+
+#ifndef Q_OS_WIN
+	ui->checkBox_GrabApplyGammaRamp->setVisible(false);
 #endif
 
     initGrabbersRadioButtonsVisibility();
@@ -191,6 +195,7 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->radioButton_LuminosityDeadZone, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
 	connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
 	connect(ui->spinBox_GrabOverBrighten, SIGNAL(valueChanged(int)), this, SLOT(onGrabOverBrighten_valueChanged(int)));
+	connect(ui->checkBox_GrabApplyGammaRamp, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyGammaRamp_toggled(bool)));
 
     connect(ui->radioButton_GrabWidgetsDontShow, SIGNAL(toggled(bool)), this, SLOT( onDontShowLedWidgets_Toggled(bool)));
     connect(ui->radioButton_Colored, SIGNAL(toggled(bool)), this, SLOT(onSetColoredLedWidgets(bool)));
@@ -1102,6 +1107,13 @@ void SettingsWindow::onGrabOverBrighten_valueChanged(int value)
 	Settings::setGrabOverBrighten(value);
 }
 
+void SettingsWindow::onGrabApplyGammaRamp_toggled(bool state)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+
+	Settings::setGrabApplyGammaRampEnabled(state);
+}
+
 
 void SettingsWindow::onLuminosityThreshold_valueChanged(int value)
 {
@@ -1644,6 +1656,7 @@ void SettingsWindow::updateUiFromSettings()
     ui->checkBox_GrabIsAvgColors->setChecked                         (Settings::isGrabAvgColorsEnabled());
     ui->spinBox_GrabSlowdown->setValue                               (Settings::getGrabSlowdown());
     ui->spinBox_GrabOverBrighten->setValue                           (Settings::getGrabOverBrighten());
+    ui->checkBox_GrabApplyGammaRamp->setChecked                      (Settings::isGrabApplyGammaRampEnabled());
     ui->spinBox_LuminosityThreshold->setValue                        (Settings::getLuminosityThreshold());
 
     // Check the selected moodlamp mode (setChecked(false) not working to select another)

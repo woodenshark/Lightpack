@@ -366,14 +366,14 @@ VOID FreeRestrictedSD(PVOID ptr) {
 
 
 
-void ApplyPrimaryGammaRamp(QList<QRgb>* colors) {
+void ApplyPrimaryGammaRamp(QList<QRgb>& colors) {
 	WORD GammaArray[3][256];
 
 	HDC dc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
 	if (!GetDeviceGammaRamp(dc, &GammaArray)) {
 		qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
 	} else {
-		for (QRgb& color : *colors) {
+		for (QRgb& color : colors) {
 			int red = qRed(color);
 			int green = qGreen(color);
 			int blue = qBlue(color);

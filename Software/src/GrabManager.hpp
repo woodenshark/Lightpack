@@ -59,8 +59,9 @@ public:
 public slots:
     void onGrabberTypeChanged(const Grab::GrabberType grabberType);
     void onGrabSlowdownChanged(int ms);
-    void onGrabAvgColorsEnabledChanged(bool state);
+	void onGrabAvgColorsEnabledChanged(bool state);
 	void onGrabOverBrightenChanged(int value);
+	void onGrabApplyGammaRampChanged(bool state);
     void onSendDataOnlyIfColorsEnabledChanged(bool state);
 #ifdef D3D10_GRAB_SUPPORT
     void onDx1011GrabberEnabledChanged(bool state);
@@ -124,6 +125,7 @@ private:
     bool m_avgColorsOnAllLeds;
     bool m_isGrabbingStarted;
 	int m_overBrighten;
+	bool m_isApplyGammaRamp;
 
     // Store last grabbing time in milliseconds
     double m_fpsMs;

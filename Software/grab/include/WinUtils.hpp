@@ -64,7 +64,7 @@ PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);
 // BuildRestrictedSD() function
 VOID FreeRestrictedSD(PVOID ptr);
 
-void ApplyPrimaryGammaRamp(QList<QRgb>* colors);
+void ApplyPrimaryGammaRamp(QList<QRgb>& colors);
 }
 
 #endif // WINUTILS_HPP

@@ -149,6 +149,7 @@ static const int LuminosityThresholdMax = 100;
 static const int OverBrightenMin = 0;
 static const int OverBrightenDefault = 0;
 static const int OverBrightenMax = 100;
+static const bool IsApplyGammaRampEnabledDefault = true;
 }
 // [MoodLamp]
 namespace MoodLamp

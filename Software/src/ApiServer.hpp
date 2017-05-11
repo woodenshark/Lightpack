@@ -62,8 +62,9 @@ public:
     void firstStart();
 
 public:
-    static const char * ApiVersion;   
+    static const char * ApiVersion;
     static const char * CmdUnknown;
+    static const char * CmdDeprecated;
     static const char * CmdExit;
     static const char * CmdHelp;
     static const char * CmdHelpShort;

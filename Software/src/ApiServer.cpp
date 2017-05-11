@@ -40,6 +40,7 @@ using namespace SettingsScope;
 // Immediatly after successful connection server sends to client -- ApiVersion
 const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
 const char * ApiServer::CmdUnknown = "unknown command\r\n";
+const char * ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
 const char * ApiServer::CmdExit = "exit";
 const char * ApiServer::CmdHelp = "help";
 const char * ApiServer::CmdHelpShort = "?";
@@ -838,17 +839,15 @@ void ApiServer::clientProcessCommands()
         {
             API_DEBUG_OUT << CmdSetDevice;
 
-			//TODO
-			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdSetResult_Error;
+            API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+			result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetCountLeds))
         {
-			API_DEBUG_OUT << CmdSetCountLeds;
+            API_DEBUG_OUT << CmdSetCountLeds;
 
-			//TODO
-			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdSetResult_Error;
+            API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+			result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetLeds))
         {

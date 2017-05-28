@@ -114,6 +114,14 @@ const char * ApiServer::CmdResultBrightness = "brightness:";
 const char * ApiServer::CmdGetSmooth = "getsmooth";
 const char * ApiServer::CmdResultSmooth = "smooth:";
 
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
+const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
+
+const char * ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
+const char * ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
+#endif
+
 const char * ApiServer::CmdGuid = "guid:";
 
 const char * ApiServer::CmdLockStatus = "getlockstatus";
@@ -139,6 +147,11 @@ const char * ApiServer::CmdSetGamma = "setgamma:";
 const char * ApiServer::CmdSetBrightness = "setbrightness:";
 const char * ApiServer::CmdSetSmooth = "setsmooth:";
 const char * ApiServer::CmdSetProfile = "setprofile:";
+
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
+const char * ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
+#endif
 
 const char * ApiServer::CmdSetDevice = "setdevice:";
 
@@ -573,6 +586,24 @@ void ApiServer::clientProcessCommands()
 
             result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
         }
+#ifdef BASS_SOUND_SUPPORT
+        else if (cmdBuffer == CmdGetSoundVizColors)
+        {
+            API_DEBUG_OUT << CmdGetSoundVizColors;
+
+            QPair<QColor, QColor> colors = lightpack->GetSoundVizColors();
+            result = QString("%1%2,%3,%4;%5,%6,%7\r\n").arg(CmdResultSoundVizColors)
+                .arg(colors.first.red()).arg(colors.first.green()).arg(colors.first.blue())
+                .arg(colors.second.red()).arg(colors.second.green()).arg(colors.second.blue());
+        }
+        else if (cmdBuffer == CmdGetSoundVizLiquid)
+        {
+            API_DEBUG_OUT << CmdGetSoundVizColors;
+
+            result = QString("%1%2\r\n").arg(CmdResultSoundVizLiquid).arg(lightpack->GetSoundVizLiquidMode() ? 1 : 0);
+        }
+
+#endif
         else if (cmdBuffer.startsWith(CmdGuid))
         {
             API_DEBUG_OUT << CmdGuid;
@@ -819,6 +850,105 @@ void ApiServer::clientProcessCommands()
                 result = CmdSetResult_Busy;
             }
         }
+#ifdef BASS_SOUND_SUPPORT
+        else if (cmdBuffer.startsWith(CmdSetSoundVizColors))
+        {
+            API_DEBUG_OUT << CmdSetSoundVizColors;
+
+            if (m_lockedClient == 1)
+            {
+                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
+
+                QString s = QString(cmdBuffer);
+                API_DEBUG_OUT << s;
+
+                QStringList colors = s.split(";");
+                if (colors.size() == 2) {
+                    QStringList colorMin = colors.at(0).split(",");
+                    QStringList colorMax = colors.at(1).split(",");
+
+                    if (colorMin.size() == 3 && colorMax.size() == 3) {
+                        bool ok;
+                        int r, g, b;
+                        r = colorMin.at(0).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        g = colorMin.at(1).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        b = colorMin.at(2).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        QColor min = QColor(r, g, b);
+
+                        r = colorMax.at(0).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        g = colorMax.at(1).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        b = colorMax.at(2).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        QColor max = QColor(r, g, b);
+
+
+                        if (lightpack->SetSoundVizColors(sessionKey, min, max))
+                        {
+                            API_DEBUG_OUT << CmdSetSmooth << "OK:" << min << max;
+                            result = CmdSetResult_Ok;
+                        } else {
+                            API_DEBUG_OUT << CmdSetSmooth << "Error:" << min << max;
+                            result = CmdSetResult_Error;
+                        }
+                    } else {
+                    parsefail:
+                        API_DEBUG_OUT << CmdSetSmooth << "Error (color parse fail)";
+                        result = CmdSetResult_Error;
+                    }
+                } else {
+                    API_DEBUG_OUT << CmdSetSmooth << "Error (need two colors)";
+                    result = CmdSetResult_Error;
+                }
+
+            } else if (m_lockedClient == 0)
+            {
+                result = CmdSetResult_NotLocked;
+            } else // m_lockedClient != client
+            {
+                result = CmdSetResult_Busy;
+            }
+        } else if (cmdBuffer.startsWith(CmdSetSoundVizLiquid))
+        {
+            API_DEBUG_OUT << CmdSetSoundVizLiquid;
+
+            if (m_lockedClient == 1)
+            {
+                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
+
+                QString s = QString(cmdBuffer);
+                API_DEBUG_OUT << s;
+
+                bool ok;
+                int value = s.toInt(&ok);
+
+                if (ok) {
+                    if (lightpack->SetSoundVizLiquidMode(sessionKey, value))
+                    {
+                        API_DEBUG_OUT << CmdSetSmooth << "OK:" << value;
+                        result = CmdSetResult_Ok;
+                    } else {
+                        API_DEBUG_OUT << CmdSetSmooth << "Error:" << value;
+                        result = CmdSetResult_Error;
+                    }
+                } else {
+                    API_DEBUG_OUT << CmdSetSmooth << "Error (convert fail)";
+                    result = CmdSetResult_Error;
+                }
+
+            } else if (m_lockedClient == 0)
+            {
+                result = CmdSetResult_NotLocked;
+            } else // m_lockedClient != client
+            {
+                result = CmdSetResult_Busy;
+            }
+        }
+#endif
         else if (cmdBuffer.startsWith(CmdSetProfile))
         {
             API_DEBUG_OUT << CmdSetProfile;
@@ -851,14 +981,14 @@ void ApiServer::clientProcessCommands()
             API_DEBUG_OUT << CmdSetDevice;
 
             API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdDeprecated;
+            result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetCountLeds))
         {
             API_DEBUG_OUT << CmdSetCountLeds;
 
             API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdDeprecated;
+            result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetLeds))
         {

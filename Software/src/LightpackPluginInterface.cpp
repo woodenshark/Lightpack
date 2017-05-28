@@ -181,6 +181,26 @@ void LightpackPluginInterface::updateSmoothCache(int value)
     m_smooth = value;
 }
 
+#ifdef BASS_SOUND_SUPPORT
+void LightpackPluginInterface::updateSoundVizMinColorCache(QColor color)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_soundVizMin = color;
+}
+
+void LightpackPluginInterface::updateSoundVizMaxColorCache(QColor color)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_soundVizMax = color;
+}
+
+void LightpackPluginInterface::updateSoundVizLiquidCache(bool value)
+{
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    m_soundVizLiquid = value;
+}
+#endif
+
 QString LightpackPluginInterface::Version()
 {
     return API_VERSION;
@@ -507,6 +527,32 @@ bool LightpackPluginInterface::SetCountLeds(QString sessionKey, int countLeds)
 
 }
 
+
+#ifdef BASS_SOUND_SUPPORT
+bool LightpackPluginInterface::SetSoundVizColors(QString sessionKey, QColor min, QColor max)
+{
+    if (lockSessionKeys.isEmpty()) return false;
+    if (lockSessionKeys[0] != sessionKey) return false;
+
+    emit updateSoundVizMinColor(min);
+    updateSoundVizMinColorCache(min);
+    emit updateSoundVizMaxColor(max);
+    updateSoundVizMaxColorCache(max);
+    return true;
+}
+
+bool LightpackPluginInterface::SetSoundVizLiquidMode(QString sessionKey, bool enabled)
+{
+    if (lockSessionKeys.isEmpty()) return false;
+    if (lockSessionKeys[0] != sessionKey) return false;
+
+    emit updateSoundVizLiquid(enabled);
+    updateSoundVizLiquidCache(enabled);
+    return true;
+
+}
+#endif
+
 int LightpackPluginInterface::GetCountLeds()
 {
     return Settings::getNumberOfLeds(Settings::getConnectedDevice());
@@ -634,6 +680,18 @@ int LightpackPluginInterface::GetSmooth()
 {
     return m_smooth;
 }
+
+#ifdef BASS_SOUND_SUPPORT
+QPair<QColor, QColor> LightpackPluginInterface::GetSoundVizColors()
+{
+    return QPair<QColor, QColor>(m_soundVizMin, m_soundVizMax);
+}
+
+bool LightpackPluginInterface::GetSoundVizLiquidMode()
+{
+    return m_soundVizLiquid;
+}
+#endif
 
 QString LightpackPluginInterface::GetPluginsDir()
 {

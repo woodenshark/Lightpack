@@ -135,6 +135,14 @@ public:
     static const char * CmdGetSmooth;
     static const char * CmdResultSmooth;
 
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdGetSoundVizColors;
+    static const char * CmdResultSoundVizColors;
+
+    static const char * CmdGetSoundVizLiquid;
+    static const char * CmdResultSoundVizLiquid;
+#endif
+
     static const char * CmdGuid;
 
     static const char * CmdLockStatus;
@@ -158,6 +166,11 @@ public:
     static const char * CmdSetBrightness;
     static const char * CmdSetSmooth;
     static const char * CmdSetProfile;
+
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdSetSoundVizColors;
+    static const char * CmdSetSoundVizLiquid;
+#endif
 
     static const char * CmdSetDevice;
 

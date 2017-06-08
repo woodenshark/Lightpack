@@ -40,6 +40,7 @@ using namespace SettingsScope;
 // Immediatly after successful connection server sends to client -- ApiVersion
 const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
 const char * ApiServer::CmdUnknown = "unknown command\r\n";
+const char * ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
 const char * ApiServer::CmdExit = "exit";
 const char * ApiServer::CmdHelp = "help";
 const char * ApiServer::CmdHelpShort = "?";
@@ -100,6 +101,9 @@ const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 const char * ApiServer::CmdGetBacklight = "getmode";
 const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
 const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
+#endif
 
 const char * ApiServer::CmdGetGamma = "getgamma";
 const char * ApiServer::CmdResultGamma = "gamma:";
@@ -109,6 +113,14 @@ const char * ApiServer::CmdResultBrightness = "brightness:";
 
 const char * ApiServer::CmdGetSmooth = "getsmooth";
 const char * ApiServer::CmdResultSmooth = "smooth:";
+
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
+const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
+
+const char * ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
+const char * ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
+#endif
 
 const char * ApiServer::CmdGuid = "guid:";
 
@@ -136,6 +148,11 @@ const char * ApiServer::CmdSetBrightness = "setbrightness:";
 const char * ApiServer::CmdSetSmooth = "setsmooth:";
 const char * ApiServer::CmdSetProfile = "setprofile:";
 
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
+const char * ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
+#endif
+
 const char * ApiServer::CmdSetDevice = "setdevice:";
 
 const char * ApiServer::CmdSetCountLeds = "setcountleds:";
@@ -151,6 +168,9 @@ const char * ApiServer::CmdSetStatus_Off = "off";
 const char * ApiServer::CmdSetBacklight = "setmode:";
 const char * ApiServer::CmdSetBacklight_Ambilight = "ambilight";
 const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
+#ifdef BASS_SOUND_SUPPORT
+const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
+#endif
 
 const int ApiServer::SignalWaitTimeoutMs = 1000; // 1 second
 
@@ -538,6 +558,11 @@ void ApiServer::clientProcessCommands()
             case Lightpack::MoodLampMode:
                 result = CmdResultBacklight_Moodlamp;
                 break;
+#ifdef BASS_SOUND_SUPPORT
+            case Lightpack::SoundVisualizeMode:
+                result = CmdResultBacklight_SoundViz;
+                break;
+#endif
             default:
                 result = CmdSetResult_Error;
                 break;
@@ -561,6 +586,24 @@ void ApiServer::clientProcessCommands()
 
             result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
         }
+#ifdef BASS_SOUND_SUPPORT
+        else if (cmdBuffer == CmdGetSoundVizColors)
+        {
+            API_DEBUG_OUT << CmdGetSoundVizColors;
+
+            QPair<QColor, QColor> colors = lightpack->GetSoundVizColors();
+            result = QString("%1%2,%3,%4;%5,%6,%7\r\n").arg(CmdResultSoundVizColors)
+                .arg(colors.first.red()).arg(colors.first.green()).arg(colors.first.blue())
+                .arg(colors.second.red()).arg(colors.second.green()).arg(colors.second.blue());
+        }
+        else if (cmdBuffer == CmdGetSoundVizLiquid)
+        {
+            API_DEBUG_OUT << CmdGetSoundVizColors;
+
+            result = QString("%1%2\r\n").arg(CmdResultSoundVizLiquid).arg(lightpack->GetSoundVizLiquidMode() ? 1 : 0);
+        }
+
+#endif
         else if (cmdBuffer.startsWith(CmdGuid))
         {
             API_DEBUG_OUT << CmdGuid;
@@ -807,6 +850,105 @@ void ApiServer::clientProcessCommands()
                 result = CmdSetResult_Busy;
             }
         }
+#ifdef BASS_SOUND_SUPPORT
+        else if (cmdBuffer.startsWith(CmdSetSoundVizColors))
+        {
+            API_DEBUG_OUT << CmdSetSoundVizColors;
+
+            if (m_lockedClient == 1)
+            {
+                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
+
+                QString s = QString(cmdBuffer);
+                API_DEBUG_OUT << s;
+
+                QStringList colors = s.split(";");
+                if (colors.size() == 2) {
+                    QStringList colorMin = colors.at(0).split(",");
+                    QStringList colorMax = colors.at(1).split(",");
+
+                    if (colorMin.size() == 3 && colorMax.size() == 3) {
+                        bool ok;
+                        int r, g, b;
+                        r = colorMin.at(0).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        g = colorMin.at(1).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        b = colorMin.at(2).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        QColor min = QColor(r, g, b);
+
+                        r = colorMax.at(0).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        g = colorMax.at(1).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        b = colorMax.at(2).toInt(&ok);
+                        if (!ok || r < 0 || r > 255) goto parsefail;
+                        QColor max = QColor(r, g, b);
+
+
+                        if (lightpack->SetSoundVizColors(sessionKey, min, max))
+                        {
+                            API_DEBUG_OUT << CmdSetSmooth << "OK:" << min << max;
+                            result = CmdSetResult_Ok;
+                        } else {
+                            API_DEBUG_OUT << CmdSetSmooth << "Error:" << min << max;
+                            result = CmdSetResult_Error;
+                        }
+                    } else {
+                    parsefail:
+                        API_DEBUG_OUT << CmdSetSmooth << "Error (color parse fail)";
+                        result = CmdSetResult_Error;
+                    }
+                } else {
+                    API_DEBUG_OUT << CmdSetSmooth << "Error (need two colors)";
+                    result = CmdSetResult_Error;
+                }
+
+            } else if (m_lockedClient == 0)
+            {
+                result = CmdSetResult_NotLocked;
+            } else // m_lockedClient != client
+            {
+                result = CmdSetResult_Busy;
+            }
+        } else if (cmdBuffer.startsWith(CmdSetSoundVizLiquid))
+        {
+            API_DEBUG_OUT << CmdSetSoundVizLiquid;
+
+            if (m_lockedClient == 1)
+            {
+                cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
+
+                QString s = QString(cmdBuffer);
+                API_DEBUG_OUT << s;
+
+                bool ok;
+                int value = s.toInt(&ok);
+
+                if (ok) {
+                    if (lightpack->SetSoundVizLiquidMode(sessionKey, value))
+                    {
+                        API_DEBUG_OUT << CmdSetSmooth << "OK:" << value;
+                        result = CmdSetResult_Ok;
+                    } else {
+                        API_DEBUG_OUT << CmdSetSmooth << "Error:" << value;
+                        result = CmdSetResult_Error;
+                    }
+                } else {
+                    API_DEBUG_OUT << CmdSetSmooth << "Error (convert fail)";
+                    result = CmdSetResult_Error;
+                }
+
+            } else if (m_lockedClient == 0)
+            {
+                result = CmdSetResult_NotLocked;
+            } else // m_lockedClient != client
+            {
+                result = CmdSetResult_Busy;
+            }
+        }
+#endif
         else if (cmdBuffer.startsWith(CmdSetProfile))
         {
             API_DEBUG_OUT << CmdSetProfile;
@@ -838,17 +980,15 @@ void ApiServer::clientProcessCommands()
         {
             API_DEBUG_OUT << CmdSetDevice;
 
-			//TODO
-			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdSetResult_Error;
+            API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+            result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetCountLeds))
         {
-			API_DEBUG_OUT << CmdSetCountLeds;
+            API_DEBUG_OUT << CmdSetCountLeds;
 
-			//TODO
-			API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
-			result = CmdSetResult_Error;
+            API_DEBUG_OUT << CmdSetDevice << "Error (operation unsupported/deprecated)";
+            result = CmdDeprecated;
         }
         else if (cmdBuffer.startsWith(CmdSetLeds))
         {
@@ -1006,6 +1146,10 @@ void ApiServer::clientProcessCommands()
                     status = 1;
                 else if (cmdBuffer == CmdSetBacklight_Moodlamp)
                     status = 2;
+#ifdef BASS_SOUND_SUPPORT
+                else if (cmdBuffer == CmdSetBacklight_SoundViz)
+                    status = 3;
+#endif
 
                 if (status != 0)
                 {
@@ -1246,6 +1390,9 @@ void ApiServer::initHelpMessage()
                 "Get mode of the current profile",
                 formatHelp(CmdResultBacklight_Ambilight) +
                 formatHelp(CmdResultBacklight_Moodlamp)
+#ifdef BASS_SOUND_SUPPORT
+              + formatHelp(CmdResultBacklight_Moodlamp)
+#endif
                 );
     m_helpMessage += formatHelp(
                 CmdGetGamma,
@@ -1341,7 +1488,11 @@ void ApiServer::initHelpMessage()
                 CmdSetBacklight,
                 QString("Set backlight mode. Works only on locking time (see lock)."),
                 formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Ambilight)) +
-                formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp)),
+                formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp))
+#ifdef BASS_SOUND_SUPPORT
+              + formatHelp(CmdSetBacklight + QString(CmdSetBacklight_SoundViz))
+#endif
+                ,
                 helpCmdSetResults);
 
 

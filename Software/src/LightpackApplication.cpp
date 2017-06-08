@@ -548,6 +548,12 @@ void LightpackApplication::startApiServer()
 	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)),                  m_pluginInterface, SLOT(updateGammaCache(double)),                  Qt::QueuedConnection);
 	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)),                m_pluginInterface, SLOT(updateBrightnessCache(int)),                Qt::QueuedConnection);
 
+#ifdef BASS_SOUND_SUPPORT
+	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)), m_pluginInterface, SLOT(updateSoundVizMinColorCache(QColor)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)), m_pluginInterface, SLOT(updateSoundVizMaxColorCache(QColor)), Qt::QueuedConnection);
+	connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)), m_pluginInterface, SLOT(updateSoundVizLiquidCache(bool)), Qt::QueuedConnection);
+#endif
+
 	m_apiServer->firstStart();
 
 	m_apiServer->moveToThread(m_apiServerThread);
@@ -680,6 +686,10 @@ void LightpackApplication::initGrabManager()
 	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),         m_soundManager,     SLOT(setMinColor(QColor)));
 	connect(settings(), SIGNAL(soundVisualizerLiquidSpeedChanged(int)),         m_soundManager,     SLOT(setLiquidModeSpeed(int)));
 	connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)),         m_soundManager,     SLOT(setLiquidMode(bool)));
+
+	connect(m_pluginInterface, SIGNAL(updateSoundVizMinColor(QColor)), m_soundManager, SLOT(setMinColor(QColor)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSoundVizMaxColor(QColor)), m_soundManager, SLOT(setMaxColor(QColor)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSoundVizLiquid(bool)),     m_soundManager, SLOT(setLiquidMode(bool)), Qt::QueuedConnection);
 #endif
 
 	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_grabManager,      SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);

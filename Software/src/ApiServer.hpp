@@ -62,8 +62,9 @@ public:
     void firstStart();
 
 public:
-    static const char * ApiVersion;   
+    static const char * ApiVersion;
     static const char * CmdUnknown;
+    static const char * CmdDeprecated;
     static const char * CmdExit;
     static const char * CmdHelp;
     static const char * CmdHelpShort;
@@ -121,6 +122,9 @@ public:
     static const char * CmdGetBacklight;
     static const char * CmdResultBacklight_Ambilight;
     static const char * CmdResultBacklight_Moodlamp;
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdResultBacklight_SoundViz;
+#endif
 
     static const char * CmdGetGamma;
     static const char * CmdResultGamma;
@@ -130,6 +134,14 @@ public:
 
     static const char * CmdGetSmooth;
     static const char * CmdResultSmooth;
+
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdGetSoundVizColors;
+    static const char * CmdResultSoundVizColors;
+
+    static const char * CmdGetSoundVizLiquid;
+    static const char * CmdResultSoundVizLiquid;
+#endif
 
     static const char * CmdGuid;
 
@@ -155,6 +167,11 @@ public:
     static const char * CmdSetSmooth;
     static const char * CmdSetProfile;
 
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdSetSoundVizColors;
+    static const char * CmdSetSoundVizLiquid;
+#endif
+
     static const char * CmdSetDevice;
 
     static const char * CmdSetCountLeds;
@@ -170,6 +187,9 @@ public:
     static const char * CmdSetBacklight;
     static const char * CmdSetBacklight_Ambilight;
     static const char * CmdSetBacklight_Moodlamp;
+#ifdef BASS_SOUND_SUPPORT
+    static const char * CmdSetBacklight_SoundViz;
+#endif
 
     static const int SignalWaitTimeoutMs;
 

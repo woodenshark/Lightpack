@@ -32,6 +32,10 @@ public:
     bool SetSmooth(QString sessionKey, int smooth);
     bool SetProfile(QString sessionKey, QString profile);
     bool SetDevice(QString sessionKey,QString device);
+#ifdef BASS_SOUND_SUPPORT
+    bool SetSoundVizColors(QString sessionKey, QColor min, QColor max);
+    bool SetSoundVizLiquidMode(QString sessionKey, bool enabled);
+#endif
 
     bool SetLeds(QString sessionKey, QList<QRect> leds);
     bool NewProfile(QString sessionKey, QString profile);
@@ -53,6 +57,10 @@ public:
     double GetGamma();
     int GetBrightness();
     int GetSmooth();
+#ifdef BASS_SOUND_SUPPORT
+    QPair<QColor, QColor> GetSoundVizColors();
+    bool GetSoundVizLiquidMode();
+#endif
 
 // Settings
     QString GetPluginsDir();
@@ -78,6 +86,11 @@ signals:
     void updateGamma(double value);
     void updateBrightness(int value);
     void updateSmooth(int value);
+#ifdef BASS_SOUND_SUPPORT
+    void updateSoundVizMinColor(QColor color);
+    void updateSoundVizMaxColor(QColor color);
+    void updateSoundVizLiquid(bool value);
+#endif
     void updateProfile(QString profileName);
     void updateStatus(Backlight::Status status);
     void updateBacklight(Lightpack::Mode status);
@@ -95,6 +108,11 @@ public slots:
     void updateGammaCache(double value);
     void updateBrightnessCache(int value);
     void updateSmoothCache(int value);
+#ifdef BASS_SOUND_SUPPORT
+    void updateSoundVizMinColorCache(QColor color);
+    void updateSoundVizMaxColorCache(QColor color);
+    void updateSoundVizLiquidCache(bool value);
+#endif
     void updatePlugin(QList<Plugin*> plugins);
 
 private slots:
@@ -120,6 +138,11 @@ private:
     double m_gamma;
     int m_brightness;
     int m_smooth;
+#ifdef BASS_SOUND_SUPPORT
+    QColor m_soundVizMin;
+    QColor m_soundVizMax;
+    bool m_soundVizLiquid;
+#endif
 
     void initColors(int numberOfLeds);
 

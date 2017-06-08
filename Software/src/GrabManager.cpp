@@ -658,7 +658,7 @@ void GrabManager::clearColorsCurrent()
 void GrabManager::initLedWidgets(int numberOfLeds)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
-	if (numberOfLeds) {
+	if (numberOfLeds == 0) {
 		qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
 	}
 

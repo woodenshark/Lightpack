@@ -1408,7 +1408,19 @@ void ApiServer::initHelpMessage()
                 CmdGetSmooth,
                 "Get the current smooth value",
                 formatHelp(CmdResultSmooth + QString("1"))
-                );
+				);
+#ifdef BASS_SOUND_SUPPORT
+	m_helpMessage += formatHelp(
+		CmdGetSoundVizColors,
+		"Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\"",
+		formatHelp(CmdResultSoundVizColors + QString("0,0,0;255,255,255"))
+		);
+	m_helpMessage += formatHelp(
+		CmdGetSoundVizLiquid,
+		"Get wether or not sound visualization is in liquid color mode",
+		formatHelp(CmdResultSoundVizLiquid + QString("1"))
+		);
+#endif
 
     // Set-commands
 
@@ -1493,7 +1505,20 @@ void ApiServer::initHelpMessage()
               + formatHelp(CmdSetBacklight + QString(CmdSetBacklight_SoundViz))
 #endif
                 ,
-                helpCmdSetResults);
+				helpCmdSetResults);
+
+#ifdef BASS_SOUND_SUPPORT
+	m_helpMessage += formatHelp(
+		CmdSetSoundVizColors,
+		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\"",
+		formatHelp(CmdSetSoundVizColors + QString("0,0,0;255,255,255"))
+		);
+	m_helpMessage += formatHelp(
+		CmdSetSoundVizLiquid,
+		"Set wether or not sound visualization is in liquid color mode",
+		formatHelp(CmdSetSoundVizLiquid + QString("0"))
+		);
+#endif
 
 
     m_helpMessage += formatHelp(CmdHelpShort, "Short version of this help");
@@ -1511,9 +1536,20 @@ void ApiServer::initShortHelpMessage()
     QList<QString> cmds;
     cmds << CmdApiKey << CmdLock << CmdUnlock
          << CmdGetStatus << CmdGetStatusAPI
-         << CmdGetProfile << CmdGetProfiles << CmdGetCountLeds
-         << CmdSetColor << CmdSetGamma << CmdSetBrightness
-         << CmdSetSmooth << CmdSetProfile << CmdSetStatus
+         << CmdGetProfile << CmdGetProfiles
+		 << CmdGetCountLeds << CmdGetLeds << CmdGetColors
+		 << CmdGetFPS << CmdGetScreenSize << CmdGetBacklight
+		 << CmdGetGamma << CmdGetBrightness << CmdGetSmooth
+#ifdef BASS_SOUND_SUPPORT
+		 << CmdGetSoundVizColors << CmdGetSoundVizLiquid
+#endif
+		 << CmdSetColor << CmdSetLeds
+		 << CmdSetGamma << CmdSetBrightness << CmdSetSmooth
+		 << CmdSetProfile << CmdNewProfile << CmdDeleteProfile
+		 << CmdSetStatus << CmdSetBacklight
+#ifdef BASS_SOUND_SUPPORT
+		 << CmdSetSoundVizColors << CmdSetSoundVizLiquid
+#endif
          << CmdExit << CmdHelp << CmdHelpShort;
 
     QString line = "    ";

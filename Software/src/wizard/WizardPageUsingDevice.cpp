@@ -84,7 +84,7 @@ void WizardPageUsingDevice::turnLightOn(int id)
 void WizardPageUsingDevice::turnLightsOn(QRgb color)
 {
 	QList<QRgb> lights;
-	for (int i = 0; i < device()->maxLedsCount(); i++)
+	for (int i = 0; i < _transSettings->zonePositions.size(); i++)
 	{
 		lights.append(color);
 	}

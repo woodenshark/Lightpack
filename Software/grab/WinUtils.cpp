@@ -368,8 +368,19 @@ VOID FreeRestrictedSD(PVOID ptr) {
 
 void ApplyPrimaryGammaRamp(QList<QRgb>& colors) {
 	WORD GammaArray[3][256];
+	POINT p;
+	MONITORINFOEX monInfo;
+	p.x = 0;
+	p.y = 0;
+	monInfo.cbSize = sizeof(MONITORINFOEX);
 
-	HDC dc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
+	HMONITOR mon = MonitorFromPoint(p, MONITOR_DEFAULTTOPRIMARY);
+	if (!GetMonitorInfo(mon, &monInfo)) {
+		qWarning() << Q_FUNC_INFO << "Unable to get monitor info:" << GetLastError();
+		return;
+	}
+
+	HDC dc = CreateDC(TEXT("DISPLAY"), monInfo.szDevice, NULL, NULL);
 	if (!GetDeviceGammaRamp(dc, &GammaArray)) {
 		qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
 	} else {
@@ -385,6 +396,7 @@ void ApplyPrimaryGammaRamp(QList<QRgb>& colors) {
 			color = qRgb(red, green, blue);
 		}
 	}
+
 	DeleteObject(dc);
 }
 

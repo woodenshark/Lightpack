@@ -63,6 +63,7 @@ Source: "content/prismatik-hooks.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; F
 Source: "content/prismatik-unhook.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: ignoreversion
 Source: "content/prismatik-hooks32.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit ignoreversion
 Source: "content/prismatik-unhook32.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit ignoreversion
+Source: "content/UpdateElevate.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 Source: "content/ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -84,11 +85,13 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
+Filename: "{app}\UpdateElevate"; Parameters: "install"; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "https://github.com/psieg/Lightpack/wiki"; Description: "{cm:OpenWiki}"; Flags: postinstall shellexec skipifsilent runasoriginaluser
+Filename: "https://github.com/psieg/Lightpack/wiki"; Description: "{cm:OpenWiki}"; Flags: postinstall unchecked shellexec skipifsilent runasoriginaluser
 Filename: "schtasks"; Parameters: "/create /f /RU Administrators /RL HIGHEST /SC onlogon /TN ""Prismatik with Admin Rights"" /TR ""{app}\{#MyAppExeName}"""; Tasks: adminstartuptask; Flags: runhidden skipifsilent
 
 [UninstallRun]
+Filename: "{app}\UpdateElevate"; Parameters: "uninstall"; Flags: runhidden
 Filename: "schtasks"; Parameters: "/delete /f /TN ""Prismatik with Admin Rights"""; Flags: runhidden
 
 [UninstallDelete]

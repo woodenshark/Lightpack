@@ -1,0 +1,1 @@
+"%VS120COMNTOOLS%\vsvars32.bat" && MSBuild.exe UpdateElevate\UpdateElevate.sln /p:Configuration=Release

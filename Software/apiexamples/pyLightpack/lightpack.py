@@ -41,6 +41,32 @@ class lightpack:
 		count = self.__readResult()
 		count = count.split(':')[1]
 		return int(count)
+	
+	def getLeds(self):
+		cmd = 'getleds\n'
+		self.connection.send(str.encode(cmd))
+		leds = self.__readResult()
+		leds = leds.split(':')[1].split(';')
+		leds2=[]
+		self.ledMap[:] = []
+		for led in leds:
+			if led.isspace():
+				continue
+			leds2.append(str(int(led.split('-')[0])+1) + '-' + led.split('-')[1]) # LED #, indexed at 1
+			self.ledMap.append(int(led.split('-')[0])+1)
+		return leds2
+		
+	def getLedMap(self):
+		cmd = 'getleds\n'
+		self.connection.send(str.encode(cmd))
+		leds = self.__readResult()
+		leds = leds.split(':')[1].split(';')
+		self.ledMap[:] = []
+		for led in leds:
+			if led.isspace():
+				continue
+			self.ledMap.append(int(led.split('-')[0])+1)
+		return self.ledMap
 		
 	def getAPIStatus(self):
 		self.connection.send(b"getstatusapi\n")
@@ -57,6 +83,7 @@ class lightpack:
 				cmd = 'apikey:' + self.apikey + '\n'			
 				self.connection.send(str.encode(cmd))
 				self.__readResult()
+			self.getLedMap()
 			return 0
 		except:
 			print('Lightpack API server is missing')

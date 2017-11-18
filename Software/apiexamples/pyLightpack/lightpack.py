@@ -89,7 +89,9 @@ class lightpack:
 			print('Lightpack API server is missing')
 			return -1
 		
-	def setColor(self, n, r, g, b): 	# Set color to the define LED		
+	def setColor(self, n, r, g, b): 	# Set color to the define LED
+		if n == 0 or n > len(self.ledMap):
+			return 'out of range\n'
 		cmd = 'setcolor:{0}-{1},{2},{3}\n'.format(self.ledMap[n-1], r, g, b)
 		self.connection.send(str.encode(cmd))
 		return self.__readResult()

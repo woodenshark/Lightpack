@@ -10,7 +10,7 @@ class lightpack:
 	def __init__(self, _host, _port, _ledMap = None, _apikey = None):
 		self.host = _host
 		self.port = _port
-		self.ledMap = _ledMap
+		self.ledMap = _ledMap if _ledMap is not None else []
 		self.apikey = _apikey		
 	
 	def __readResult(self):	# Return last-command API answer  (call in every local method)

@@ -1,4 +1,4 @@
-import socket, time, imaplib, re, sys
+import socket
 
 class lightpack:
 

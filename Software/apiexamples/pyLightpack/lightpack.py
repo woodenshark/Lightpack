@@ -7,7 +7,7 @@ class lightpack:
 #	apikey = 'key'		  # Secure API key which generates by Lightpack software on Dev tab
 #	ledMap = [1,2,3,4,5,6,7,8,9,10] 	#mapped LEDs
 	
-	def __init__(self, _host, _port, _ledMap, _apikey = None):
+	def __init__(self, _host, _port, _ledMap = None, _apikey = None):
 		self.host = _host
 		self.port = _port
 		self.ledMap = _ledMap

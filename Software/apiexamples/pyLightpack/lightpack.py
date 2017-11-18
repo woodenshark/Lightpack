@@ -55,7 +55,7 @@ class lightpack:
 			self.__readResult()
 			if self.apikey is not None:	
 				cmd = 'apikey:' + self.apikey + '\n'			
-				self.connection.send(cmd)
+				self.connection.send(str.encode(cmd))
 				self.__readResult()
 			return 0
 		except:

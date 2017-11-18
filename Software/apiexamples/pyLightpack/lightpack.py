@@ -40,7 +40,7 @@ class lightpack:
 		self.connection.send(b"getcountleds\n")
 		count = self.__readResult().decode()
 		count = count.split(':')[1]
-		return count
+		return int(count)
 		
 	def getAPIStatus(self):
 		self.connection.send(b"getstatusapi\n")

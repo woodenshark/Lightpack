@@ -17,34 +17,34 @@ class lightpack:
 		total_data=[]
 		data = self.connection.recv(8192)
 		total_data.append(data)
-		return b"".join(total_data)
+		return b"".join(total_data).decode()
 		
 	def getProfiles(self):
 		self.connection.send(b"getprofiles\n")
-		profiles = self.__readResult().decode()
+		profiles = self.__readResult()
 		return profiles.split(':')[1].rstrip(';\n\r').split(';')		
 		
 	def getProfile(self):
 		self.connection.send(b"getprofile\n")
-		profile = self.__readResult().decode()
+		profile = self.__readResult()
 		profile = profile.split(':')[1]
 		return profile
 		
 	def getStatus(self):
 		self.connection.send(b"getstatus\n")
-		status = self.__readResult().decode()
+		status = self.__readResult()
 		status = status.split(':')[1]
 		return status
 
 	def getCountLeds(self):
 		self.connection.send(b"getcountleds\n")
-		count = self.__readResult().decode()
+		count = self.__readResult()
 		count = count.split(':')[1]
 		return int(count)
 		
 	def getAPIStatus(self):
 		self.connection.send(b"getstatusapi\n")
-		status = self.__readResult().decode()
+		status = self.__readResult()
 		status = status.split(':')[1]
 		return status
 		
@@ -65,7 +65,7 @@ class lightpack:
 	def setColor(self, n, r, g, b): 	# Set color to the define LED		
 		cmd = 'setcolor:{0}-{1},{2},{3}\n'.format(self.ledMap[n-1], r, g, b)
 		self.connection.send(str.encode(cmd))
-		return self.__readResult().decode()
+		return self.__readResult()
 		
 	def setColorToAll(self, r, g, b): 	# Set one color to all LEDs
 		cmdstr = ''
@@ -74,7 +74,7 @@ class lightpack:
 		cmd = 'setcolor:%s\n' % cmdstr
 		#print("cmd: " + cmd, self.ledMap);
 		self.connection.send(str.encode(cmd))
-		return self.__readResult().decode()
+		return self.__readResult()
 
 	def setGamma(self, g):
 		cmd = 'setgamma:{0}\n'.format(g)
@@ -106,11 +106,11 @@ class lightpack:
 	
 	def turnOn(self):
 		self.connection.send(b"setstatus:on\n")
-		return self.__readResult().decode()
+		return self.__readResult()
 	
 	def turnOff(self):
 		self.connection.send(b"setstatus:off\n")
-		return self.__readResult().decode()
+		return self.__readResult()
 
 	def disconnect(self):
 		self.unlock()

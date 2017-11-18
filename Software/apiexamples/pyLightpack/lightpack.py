@@ -104,6 +104,14 @@ class lightpack:
 		self.connection.send(str.encode(cmd))
 		return self.__readResult()
 	
+	def setFrame(self, leds):
+		cmdstr = ''
+		for i, led in enumerate(leds):
+			cmdstr = str(cmdstr) + '{0}-{1},{2},{3};'.format(self.ledMap[i], led[0], led[1], led[2])
+		cmd = 'setcolor:' + cmdstr + '\n'
+		self.connection.send(str.encode(cmd))
+		self.__readResult()
+	
 	def setGamma(self, g):
 		cmd = 'setgamma:{0}\n'.format(g)
 		self.connection.send(str.encode(cmd))

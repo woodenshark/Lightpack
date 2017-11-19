@@ -124,7 +124,9 @@ struct UpdateInfo
 //        , firmwareVersion(NULL)
     {}
     unsigned int id;
-    QString      url;
+	QString      url;
+	QString      pkgUrl;
+	QString      sigUrl;
     QString      title;
     QString      text;
     QString      softwareVersion;
@@ -145,13 +147,16 @@ class UpdatesProcessor: public QObject
 public:
     UpdatesProcessor(QObject * parent = NULL);
     void requestUpdates();
-    QList<UpdateInfo> readUpdates();
+	QList<UpdateInfo> readUpdates();
+	void loadUpdate(UpdateInfo& info);
 
 signals:
 	void readyRead();
 
 private slots:
 	void error(QNetworkReply::NetworkError code);
+	void updatePgkLoaded();
+	void updateSigLoaded();
 
 private:
     QList<UpdateInfo> * readUpdates(QList<UpdateInfo> * readUpdates, QXmlStreamReader * xmlReader);
@@ -159,6 +164,7 @@ private:
 
     QNetworkAccessManager _networkMan;
     QNetworkReply * _reply;
+	QString _sigUrl;
 };
 
 #endif // NEWSPROCESSOR_HPP

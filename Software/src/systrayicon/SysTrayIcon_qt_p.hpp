@@ -227,7 +227,7 @@ public:
 private slots:
 
     void onCheckUpdate_Finished()
-    {
+	{
         using namespace SettingsScope;
         QList<UpdateInfo> updates = _updatesProcessor.readUpdates();
         if (updates.size() > 0) {
@@ -236,10 +236,18 @@ private slots:
                 _trayMsgUrl = QUrl("https://github.com/psieg/Lightpack/releases");
                 _qsystray->showMessage("Multiple updates are available", "Click to open the downloads page");
             } else {
-                _trayMessage = SysTrayIcon::MessageGeneric;
-                UpdateInfo update = updates.last();
-                _trayMsgUrl = QUrl(update.url);
-                _qsystray->showMessage(update.title, update.text);
+				if (true /* setting */) {
+					_trayMessage = SysTrayIcon::MessageNoAction;
+					_trayMsgUrl = QUrl("");
+					UpdateInfo update = updates.last();
+					_qsystray->showMessage("Prismatik Update", "An update is being downloaded and will be applied shortly.");
+					_updatesProcessor.loadUpdate(update);
+				} else {
+					_trayMessage = SysTrayIcon::MessageGeneric;
+					UpdateInfo update = updates.last();
+					_trayMsgUrl = QUrl(update.url);
+					_qsystray->showMessage(update.title, update.text);
+				}
             }
         }
     }
@@ -277,7 +285,7 @@ private slots:
     void onTrayIcon_Activated(QSystemTrayIcon::ActivationReason reason)
     {
         DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-        Q_Q(SysTrayIcon);
+		Q_Q(SysTrayIcon);
 
         switch (reason)
         {

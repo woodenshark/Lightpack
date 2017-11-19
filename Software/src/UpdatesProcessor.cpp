@@ -24,14 +24,17 @@
  *
  */
 
+#include <QCoreApplication>
 #include <QXmlStreamReader>
 #include <QNetworkReply>
+#include <QFile>
+#include <QProcess>
 #include "version.h"
 #include "debug.h"
 #include "UpdatesProcessor.hpp"
 
-//#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
-#define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
+#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
+//#define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
 
 const AppVersion kCurVersion(VERSION_STR);
 
@@ -42,7 +45,7 @@ UpdatesProcessor::UpdatesProcessor(QObject * parent)
 }
 
 void UpdatesProcessor::error(QNetworkReply::NetworkError code){
-	qWarning() << Q_FUNC_INFO << "Updatecheck failed: " << code << ": " << _reply->errorString();
+	qWarning() << Q_FUNC_INFO << "Updatecheck/updateload failed: " << code << ": " << _reply->errorString();
 }
 
 void UpdatesProcessor::requestUpdates()
@@ -57,7 +60,7 @@ void UpdatesProcessor::requestUpdates()
 	QNetworkRequest request(QUrl(UPDATE_CHECK_URL));
 	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
 	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
+	connect(_reply, SIGNAL(finished()), this, SIGNAL(readyRead()));
 	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
 }
 
@@ -83,6 +86,72 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
     }
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
     return updates;
+}
+
+void UpdatesProcessor::loadUpdate(UpdateInfo& info)
+{
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
+	_sigUrl = info.sigUrl;
+	if (_reply != NULL) {
+		_reply->disconnect();
+		delete _reply;
+		_reply = NULL;
+	}
+
+	QNetworkRequest request(QUrl(info.pkgUrl));
+	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+	_reply = _networkMan.get(request);
+	connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
+	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+}
+
+void UpdatesProcessor::updatePgkLoaded()
+{
+	if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
+		return;
+
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching " << _sigUrl;
+
+	QFile f("C:\\Windows\\Temp\\PsiegUpdateElevate_Prismatik.exe");
+	if (!f.open(QIODevice::WriteOnly)) {
+		qCritical() << Q_FUNC_INFO << "Failed to write update package";
+	}
+	f.write(_reply->readAll());
+	f.close();
+
+	_reply->deleteLater();
+	_reply = NULL;
+
+	QNetworkRequest request = QNetworkRequest(QUrl(_sigUrl));
+	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+	_reply = _networkMan.get(request);
+	connect(_reply, SIGNAL(finished()), this, SLOT(updateSigLoaded()));
+	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+}
+
+void UpdatesProcessor::updateSigLoaded()
+{
+	if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
+		return;
+	DEBUG_MID_LEVEL << Q_FUNC_INFO;
+
+	QFile f("C:\\Windows\\Temp\\PsiegUpdateElevate_Prismatik.exe.sig");
+	if (!f.open(QIODevice::WriteOnly)) {
+		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
+	}
+	f.write(_reply->readAll());
+	f.close();
+
+	_reply->deleteLater();
+	_reply = NULL;
+
+	// TODO: ensure use is not using the program
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
+	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", { "request" })) {
+		QCoreApplication::quit();
+	} else {
+		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
+	}
 }
 
 bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersion &version)
@@ -157,6 +226,12 @@ QList<UpdateInfo> * UpdatesProcessor::readUpdates(QList<UpdateInfo> *updates, QX
                 } else if (xmlReader->name() == "url") {
                     xmlReader->readNext();
                     updateInfo.url = xmlReader->text().toString();
+                } else if (xmlReader->name() == "pkgUrl") {
+                    xmlReader->readNext();
+                    updateInfo.pkgUrl = xmlReader->text().toString();
+                } else if (xmlReader->name() == "sigUrl") {
+                    xmlReader->readNext();
+                    updateInfo.sigUrl = xmlReader->text().toString();
                 } else if (xmlReader->name() == "title") {
                     xmlReader->readNext();
                     updateInfo.title = xmlReader->text().toString();
@@ -171,8 +246,6 @@ QList<UpdateInfo> * UpdatesProcessor::readUpdates(QList<UpdateInfo> *updates, QX
                     updateInfo.firmwareVersion = xmlReader->text().toString();
                 } else if (xmlReader->name() == "update") {
                     break;
-                } else {
-                    xmlReader->skipCurrentElement();
                 }
                 xmlReader->skipCurrentElement();
             }

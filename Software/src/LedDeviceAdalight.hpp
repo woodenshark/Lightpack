@@ -49,7 +49,7 @@ public slots:
     void setColorSequence(QString value);
     void requestFirmwareVersion();
     void updateDeviceSettings();
-	int maxLedsCount() { return 255; }
+	int maxLedsCount() { return 511; }
 	virtual int defaultLedsCount() { return 25; }
 
 private:

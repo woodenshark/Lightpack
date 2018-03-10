@@ -54,8 +54,9 @@ public:
         StatusOn,
         StatusOff,
         StatusError,
-        StatusLockedByApi,
-        StatusLockedByPlugin
+		StatusLockedByApi,
+		StatusLockedByPlugin,
+		StatusApiPersist
     };
 
     explicit SysTrayIcon(QObject *parent = 0);

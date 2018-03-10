@@ -280,8 +280,13 @@ bool LightpackPluginInterface::UnLock(QString sessionKey)
             lockSessionKeys.removeFirst();
             if (lockSessionKeys.count()==0)
             {
-                emit updateDeviceLockStatus(DeviceLocked::Unlocked, lockSessionKeys);
-                emit ChangeLockStatus(false);
+				if (true /*setting*/) {
+					emit updateDeviceLockStatus(DeviceLocked::ApiPersist, lockSessionKeys);
+					emit ChangeLockStatus(false);
+				} else {
+					emit updateDeviceLockStatus(DeviceLocked::Unlocked, lockSessionKeys);
+					emit ChangeLockStatus(false);
+				}
             }
             else
             {

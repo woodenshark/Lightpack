@@ -718,17 +718,23 @@ void SettingsWindow::updateTrayAndActionStates()
             m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
             if (m_trayIcon)
                 m_trayIcon->setStatus(SysTrayIcon::StatusLockedByApi);
-        } else
-            if (m_deviceLockStatus == DeviceLocked::Plugin)
-            {
-                m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
-                if (m_trayIcon)
-                    m_trayIcon->setStatus(SysTrayIcon::StatusLockedByPlugin, &m_deviceLockModule);
-            } else {
-                m_labelStatusIcon->setPixmap(*m_pixmapCache["on16"]);
-                if (m_trayIcon)
-                    m_trayIcon->setStatus(SysTrayIcon::StatusOn);
-            }
+		} else
+			if (m_deviceLockStatus == DeviceLocked::Plugin)
+			{
+				m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
+				if (m_trayIcon)
+					m_trayIcon->setStatus(SysTrayIcon::StatusLockedByPlugin, &m_deviceLockModule);
+			} else
+				if (m_deviceLockStatus == DeviceLocked::ApiPersist)
+				{
+					m_labelStatusIcon->setPixmap(*m_pixmapCache["persist16"]);
+					if (m_trayIcon)
+						m_trayIcon->setStatus(SysTrayIcon::StatusApiPersist);
+				} else {
+						m_labelStatusIcon->setPixmap(*m_pixmapCache["on16"]);
+						if (m_trayIcon)
+							m_trayIcon->setStatus(SysTrayIcon::StatusOn);
+				}
         break;
 
     case Backlight::StatusOff:
@@ -1524,10 +1530,11 @@ void SettingsWindow::settingsProfileChanged_UpdateUI(const QString &profileName)
 
 void SettingsWindow::initPixmapCache()
 {
-    m_pixmapCache.insert("lock16", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert("lock16", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(16, Qt::SmoothTransformation)));
     m_pixmapCache.insert("on16", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(16, Qt::SmoothTransformation)) );
     m_pixmapCache.insert("off16", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(16, Qt::SmoothTransformation)) );
     m_pixmapCache.insert("error16", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert("persist16", new QPixmap(QPixmap(":/icons/persist.png").scaledToWidth(16, Qt::SmoothTransformation)));
 }
 
 //void SettingsWindow::handleConnectedDeviceChange(const SupportedDevices::DeviceType deviceType) {

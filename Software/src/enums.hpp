@@ -43,7 +43,8 @@ namespace DeviceLocked
 enum DeviceLockStatus {
     Unlocked,
     Api,
-    Plugin
+    Plugin,
+	ApiPersist
 };
 }
 

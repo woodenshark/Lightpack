@@ -44,9 +44,9 @@ public:
     enum Message
     {
         MessageUpdateFirmware,
-		MessageAnotherInstance,
-		MessageGeneric,
-		MessageNoAction
+        MessageAnotherInstance,
+        MessageGeneric,
+        MessageNoAction
     };
 
     enum Status

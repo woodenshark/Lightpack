@@ -34,8 +34,8 @@
 #include "debug.h"
 #include "UpdatesProcessor.hpp"
 
-#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
-//#define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
+//#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
+#define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
 
 const AppVersion kCurVersion(VERSION_STR);
 
@@ -154,9 +154,8 @@ void UpdatesProcessor::updateSigLoaded()
     DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
     QStringList args;
     args.append("request");
-	args.append(QDir::tempPath());
-	args.append(QCoreApplication::applicationFilePath());
-	args.append(QCoreApplication::applicationFilePath());
+    args.append(QDir::tempPath());
+    args.append(QCoreApplication::applicationFilePath());
     if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
         QCoreApplication::quit();
     } else {

@@ -221,6 +221,7 @@ private slots:
     void on_pbRunConfigurationWizard_clicked();
 
 	void onCheckBox_checkForUpdates_Toggled(bool isEnabled);
+	void onCheckBox_installUpdates_Toggled(bool isEnabled);
 
 private:
     void updateExpertModeWidgetsVisibility();

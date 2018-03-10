@@ -236,7 +236,7 @@ private slots:
                 _trayMsgUrl = QUrl("https://github.com/psieg/Lightpack/releases");
                 _qsystray->showMessage("Multiple updates are available", "Click to open the downloads page");
             } else {
-				if (true /* setting */) {
+				if (Settings::isInstallUpdatesEnabled()) {
 					_trayMessage = SysTrayIcon::MessageNoAction;
 					_trayMsgUrl = QUrl("");
 					UpdateInfo update = updates.last();

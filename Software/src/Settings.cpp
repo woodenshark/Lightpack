@@ -75,6 +75,7 @@ static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShow
 static const QString ConnectedDevice = "ConnectedDevice";
 static const QString SupportedDevices = "SupportedDevices";
 static const QString CheckForUpdates = "CheckForUpdates";
+static const QString InstallUpdates = "InstallForUpdates";
 
 // [Hotkeys]
 namespace Hotkeys
@@ -292,7 +293,9 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
     setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,      Main::AlienFx::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,    Main::Lightpack::NumberOfLedsDefault);
     setNewOptionMain(Main::Key::Virtual::NumberOfLeds,      Main::Virtual::NumberOfLedsDefault);
+
     setNewOptionMain(Main::Key::CheckForUpdates,            Main::CheckForUpdates);
+    setNewOptionMain(Main::Key::InstallUpdates,             Main::InstallUpdates);
 
     if (isDebugLevelObtainedFromCmdArgs == false)
     {
@@ -1598,16 +1601,25 @@ double Settings::getValidLedCoef(int ledIndex, const QString & keyCoef)
 }
 
 QString Settings::getProfilesPath() {
-   return m_applicationDirPath + "Profiles/";
+    return m_applicationDirPath + "Profiles/";
 }
 
 bool Settings::isCheckForUpdatesEnabled() {
-   return valueMain(Main::Key::CheckForUpdates).toBool();
+    return valueMain(Main::Key::CheckForUpdates).toBool();
 
 }
 
 void Settings::setCheckForUpdatesEnabled(bool isEnabled) {
 	setValueMain(Main::Key::CheckForUpdates, isEnabled);
+}
+
+bool Settings::isInstallUpdatesEnabled() {
+	return valueMain(Main::Key::InstallUpdates).toBool();
+
+}
+
+void Settings::setInstallUpdatesEnabled(bool isEnabled) {
+	setValueMain(Main::Key::InstallUpdates, isEnabled);
 }
 
 //

@@ -128,6 +128,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 #ifndef Q_OS_WIN
 	ui->checkBox_GrabApplyGammaRamp->setVisible(false);
+	ui->checkBox_installUpdates->setVisible(false);
 #endif
 
     initGrabbersRadioButtonsVisibility();
@@ -285,8 +286,9 @@ void SettingsWindow::connectSignalsSlots()
     connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
 
 	// About page
-    connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
+	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
 	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
+	connect(ui->checkBox_installUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_installUpdates_Toggled(bool)));
 }
 
 // ----------------------------------------------------------------------------
@@ -1644,8 +1646,9 @@ void SettingsWindow::updateUiFromSettings()
     onLightpackModeChanged(mode);
 
     ui->checkBox_ExpertModeEnabled->setChecked                       (Settings::isExpertModeEnabled());
-
+	
 	ui->checkBox_checkForUpdates->setChecked                         (Settings::isCheckForUpdatesEnabled());
+	ui->checkBox_installUpdates->setChecked                          (Settings::isInstallUpdatesEnabled());
 
     ui->checkBox_SendDataOnlyIfColorsChanges->setChecked             (Settings::isSendDataOnlyIfColorsChanges());
     ui->checkBox_KeepLightsOnAfterExit->setChecked                   (Settings::isKeepLightsOnAfterExit());
@@ -2021,8 +2024,13 @@ void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
 	Settings::setKeepLightsOnAfterSuspend(isEnabled);
 }
 
-
 void SettingsWindow::onCheckBox_checkForUpdates_Toggled(bool isEnabled)
 {
 	Settings::setCheckForUpdatesEnabled(isEnabled);
+	ui->checkBox_installUpdates->setEnabled(isEnabled);
+}
+
+void SettingsWindow::onCheckBox_installUpdates_Toggled(bool isEnabled)
+{
+	Settings::setInstallUpdatesEnabled(isEnabled);
 }

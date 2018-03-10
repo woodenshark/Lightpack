@@ -45,24 +45,25 @@ UpdatesProcessor::UpdatesProcessor(QObject * parent)
 {
 }
 
-void UpdatesProcessor::error(QNetworkReply::NetworkError code){
-	qWarning() << Q_FUNC_INFO << "Updatecheck/updateload failed: " << code << ": " << _reply->errorString();
+void UpdatesProcessor::error(QNetworkReply::NetworkError code)
+{
+    qWarning() << Q_FUNC_INFO << "Updatecheck/updateload failed: " << code << ": " << _reply->errorString();
 }
 
 void UpdatesProcessor::requestUpdates()
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << "checking" << UPDATE_CHECK_URL;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << "checking" << UPDATE_CHECK_URL;
     if(_reply != NULL) {
         _reply->disconnect();
         delete _reply;
         _reply = NULL;
     }
 
-	QNetworkRequest request(QUrl(UPDATE_CHECK_URL));
-	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
-	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SIGNAL(readyRead()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+    QNetworkRequest request(QUrl(UPDATE_CHECK_URL));
+    request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    _reply = _networkMan.get(request);
+    connect(_reply, SIGNAL(finished()), this, SIGNAL(readyRead()));
+    connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
 }
 
 QList<UpdateInfo> UpdatesProcessor::readUpdates()
@@ -85,81 +86,82 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
             }
         }
     }
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << updates.size() << "updates available";
     return updates;
 }
 
 void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
-	if (info.pkgUrl.isEmpty())
-		return;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
+    if (info.pkgUrl.isEmpty())
+        return;
 
-	_sigUrl = info.sigUrl;
-	if (_reply != NULL) {
-		_reply->disconnect();
-		delete _reply;
-		_reply = NULL;
-	}
+    _sigUrl = info.sigUrl;
+    if (_reply != NULL) {
+        _reply->disconnect();
+        delete _reply;
+        _reply = NULL;
+    }
 
-	QNetworkRequest request(QUrl(info.pkgUrl));
-	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
-	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+    QNetworkRequest request(QUrl(info.pkgUrl));
+    request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    _reply = _networkMan.get(request);
+    connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
+    connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
 }
 
 void UpdatesProcessor::updatePgkLoaded()
 {
-	if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
-		return;
+    if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
+        return;
 
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching " << _sigUrl;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching " << _sigUrl;
 
-	QFile f(QDir::tempPath() + "\\PsiegUpdateElevate_Prismatik.exe");
-	if (!f.open(QIODevice::WriteOnly)) {
-		qCritical() << Q_FUNC_INFO << "Failed to write update package";
-	}
-	f.write(_reply->readAll());
-	f.close();
+    QFile f(QDir::tempPath() + "\\PsiegUpdateElevate_Prismatik.exe");
+    if (!f.open(QIODevice::WriteOnly)) {
+        qCritical() << Q_FUNC_INFO << "Failed to write update package";
+    }
+    f.write(_reply->readAll());
+    f.close();
 
-	_reply->deleteLater();
-	_reply = NULL;
+    _reply->deleteLater();
+    _reply = NULL;
 
-	QNetworkRequest request = QNetworkRequest(QUrl(_sigUrl));
-	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
-	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SLOT(updateSigLoaded()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+    QNetworkRequest request = QNetworkRequest(QUrl(_sigUrl));
+    request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    _reply = _networkMan.get(request);
+    connect(_reply, SIGNAL(finished()), this, SLOT(updateSigLoaded()));
+    connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
 }
 
 void UpdatesProcessor::updateSigLoaded()
 {
-	if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
-		return;
-	DEBUG_MID_LEVEL << Q_FUNC_INFO;
+    if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
+        return;
+    DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
-	QFile f(QDir::tempPath() +  + "\\PsiegUpdateElevate_Prismatik.exe.sig");
-	if (!f.open(QIODevice::WriteOnly)) {
-		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
-	}
-	f.write(_reply->readAll());
-	f.close();
+    QFile f(QDir::tempPath() + "\\PsiegUpdateElevate_Prismatik.exe.sig");
+    if (!f.open(QIODevice::WriteOnly)) {
+        qCritical() << Q_FUNC_INFO << "Failed to write update signature";
+    }
+    f.write(_reply->readAll());
+    f.close();
 
-	_reply->deleteLater();
-	_reply = NULL;
+    _reply->deleteLater();
+    _reply = NULL;
 
-	// TODO: ensure user is not using the program
-	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
-	QStringList args;
-	args.append("request");
+    // TODO: ensure user is not using the program
+    DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
+    QStringList args;
+    args.append("request");
 	args.append(QDir::tempPath());
 	args.append(QCoreApplication::applicationFilePath());
-	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
-		QCoreApplication::quit();
-	} else {
-		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
-	}
+	args.append(QCoreApplication::applicationFilePath());
+    if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
+        QCoreApplication::quit();
+    } else {
+        qCritical() << Q_FUNC_INFO << "Failed to write update signature";
+    }
 }
 
 bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersion &version)

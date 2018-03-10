@@ -16,3 +16,4 @@ rm -f Lightpack.sdf
 rm -f Lightpack.*.suo
 rm -rf */*.vcxproj
 rm -rf */*.vcxproj.filters
+rm -rf .qmake.stash

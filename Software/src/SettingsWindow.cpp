@@ -472,7 +472,7 @@ void SettingsWindow::onPostInit() {
 	this->requestSoundVizDevices();
 #endif
     if (m_trayIcon && Settings::isCheckForUpdatesEnabled())
-        m_trayIcon->checkUpdate();
+		QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
 
 	QTimer::singleShot(50, this, SLOT(checkOutdatedGrabber()));
 }

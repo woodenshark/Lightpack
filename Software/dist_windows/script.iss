@@ -74,6 +74,7 @@ Source: "content/basswasapi.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; These files are needed only when building with MSVC - otherwise just comment them
 Source: "content/msvcr*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "content/msvcp*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "content/vcruntime*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

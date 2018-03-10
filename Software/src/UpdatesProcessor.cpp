@@ -28,6 +28,7 @@
 #include <QXmlStreamReader>
 #include <QNetworkReply>
 #include <QFile>
+#include <QDir>
 #include <QProcess>
 #include "version.h"
 #include "debug.h"
@@ -91,6 +92,9 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
 void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
+	if (info.pkgUrl.isEmpty())
+		return;
+
 	_sigUrl = info.sigUrl;
 	if (_reply != NULL) {
 		_reply->disconnect();
@@ -112,7 +116,7 @@ void UpdatesProcessor::updatePgkLoaded()
 
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching " << _sigUrl;
 
-	QFile f("C:\\Windows\\Temp\\PsiegUpdateElevate_Prismatik.exe");
+	QFile f(QDir::tempPath() + "\\PsiegUpdateElevate_Prismatik.exe");
 	if (!f.open(QIODevice::WriteOnly)) {
 		qCritical() << Q_FUNC_INFO << "Failed to write update package";
 	}
@@ -135,7 +139,7 @@ void UpdatesProcessor::updateSigLoaded()
 		return;
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
-	QFile f("C:\\Windows\\Temp\\PsiegUpdateElevate_Prismatik.exe.sig");
+	QFile f(QDir::tempPath() +  + "\\PsiegUpdateElevate_Prismatik.exe.sig");
 	if (!f.open(QIODevice::WriteOnly)) {
 		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
 	}
@@ -145,9 +149,13 @@ void UpdatesProcessor::updateSigLoaded()
 	_reply->deleteLater();
 	_reply = NULL;
 
-	// TODO: ensure use is not using the program
+	// TODO: ensure user is not using the program
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
-	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", { "request" })) {
+	QStringList args;
+	args.append("request");
+	args.append(QDir::tempPath());
+	args.append(QCoreApplication::applicationFilePath());
+	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
 		QCoreApplication::quit();
 	} else {
 		qCritical() << Q_FUNC_INFO << "Failed to write update signature";

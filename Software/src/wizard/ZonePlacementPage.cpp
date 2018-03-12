@@ -69,7 +69,8 @@ void ZonePlacementPage::initializePage()
 
     if (_isInitFromSettings) {
         int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
-        _ui->sbNumberOfLeds->setValue(ledCount);
+		_ui->sbNumberOfLeds->setValue(ledCount);
+		_transSettings->ledCount = ledCount;
 
         for (int i = 0; i < ledCount; i++) {
             QPoint topLeft = Settings::getLedPosition(i);
@@ -78,7 +79,8 @@ void ZonePlacementPage::initializePage()
             addGrabArea(i, r);
         }
     } else {
-        _ui->sbNumberOfLeds->setValue(device()->defaultLedsCount());
+		_ui->sbNumberOfLeds->setValue(device()->defaultLedsCount());
+		_transSettings->ledCount = device()->defaultLedsCount();
         on_pbAndromeda_clicked();
     }
     connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(on_numberOfLeds_valueChanged(int)));
@@ -260,5 +262,7 @@ void ZonePlacementPage::on_numberOfLeds_valueChanged(int numOfLed)
             _newAreaRect.moveTo(_x0,_y0);
         }
     }
+
+	_transSettings->ledCount = numOfLed;
 }
 

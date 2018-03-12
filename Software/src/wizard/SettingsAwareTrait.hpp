@@ -40,6 +40,7 @@ struct TransientSettings {
     QSharedPointer<AbstractLedDevice>ledDevice;
 	QMap<int, QPoint> zonePositions;
 	QMap<int, QSize> zoneSizes;
+	int ledCount = 0;
 };
 
 class SettingsAwareTrait {

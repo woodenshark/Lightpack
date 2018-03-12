@@ -121,6 +121,9 @@ const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
 const char * ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
 const char * ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
 #endif
+const char * ApiServer::CmdGetPersistOnUnlock = "getpersistonunlock";
+const char * ApiServer::CmdGetPersistOnUnlock_On = "persistonunlock:on\r\n";
+const char * ApiServer::CmdGetPersistOnUnlock_Off = "persistonunlock:off\r\n";
 
 const char * ApiServer::CmdGuid = "guid:";
 
@@ -171,6 +174,10 @@ const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
 #ifdef BASS_SOUND_SUPPORT
 const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
 #endif
+
+const char * ApiServer::CmdSetPersistOnUnlock = "setpersistonunlock:";
+const char * ApiServer::CmdSetPersistOnUnlock_On = "on";
+const char * ApiServer::CmdSetPersistOnUnlock_Off = "off";
 
 const int ApiServer::SignalWaitTimeoutMs = 1000; // 1 second
 
@@ -602,8 +609,13 @@ void ApiServer::clientProcessCommands()
 
             result = QString("%1%2\r\n").arg(CmdResultSoundVizLiquid).arg(lightpack->GetSoundVizLiquidMode() ? 1 : 0);
         }
-
 #endif
+		else if (cmdBuffer == CmdGetPersistOnUnlock)
+		{
+			API_DEBUG_OUT << CmdGetPersistOnUnlock;
+
+			result = lightpack->GetPersistOnUnlock() ? CmdGetPersistOnUnlock_On : CmdGetPersistOnUnlock_Off;
+		}
         else if (cmdBuffer.startsWith(CmdGuid))
         {
             API_DEBUG_OUT << CmdGuid;
@@ -949,6 +961,43 @@ void ApiServer::clientProcessCommands()
             }
         }
 #endif
+		else if (cmdBuffer.startsWith(CmdSetPersistOnUnlock))
+		{
+			API_DEBUG_OUT << CmdSetPersistOnUnlock;
+
+			if (m_lockedClient == 1)
+			{
+				cmdBuffer.remove(0, cmdBuffer.indexOf(':') + 1);
+				API_DEBUG_OUT << QString(cmdBuffer);
+
+				int status = -1;
+
+				if (cmdBuffer == CmdSetPersistOnUnlock_On)
+					status = 1;
+				else if (cmdBuffer == CmdSetPersistOnUnlock_Off)
+					status = 0;
+
+				if (status != -1)
+				{
+					API_DEBUG_OUT << CmdSetPersistOnUnlock << "OK:" << status;
+
+					lightpack->SetPersistOnUnlock(sessionKey, status);
+
+					result = CmdSetResult_Ok;
+				} else {
+					API_DEBUG_OUT << CmdSetPersistOnUnlock << "Error (status not recognized):" << status;
+					result = CmdSetResult_Error;
+				}
+			}
+			else if (m_lockedClient == 0)
+			{
+				result = CmdSetResult_NotLocked;
+			}
+			else // m_lockedClient != client
+			{
+				result = CmdSetResult_Busy;
+			}
+		}
         else if (cmdBuffer.startsWith(CmdSetProfile))
         {
             API_DEBUG_OUT << CmdSetProfile;
@@ -1421,6 +1470,11 @@ void ApiServer::initHelpMessage()
 		formatHelp(CmdResultSoundVizLiquid + QString("1"))
 		);
 #endif
+	m_helpMessage += formatHelp(
+		CmdGetPersistOnUnlock,
+		"Get wether or not the last set colors should persist when unlocking",
+		formatHelp(CmdGetPersistOnUnlock_On)
+		);
 
     // Set-commands
 
@@ -1511,14 +1565,19 @@ void ApiServer::initHelpMessage()
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizColors,
 		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\"",
-		formatHelp(CmdSetSoundVizColors + QString("0,0,0;255,255,255"))
-		);
+		formatHelp(CmdSetSoundVizColors + QString("0,0,0;255,255,255")),
+		helpCmdSetResults);
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizLiquid,
 		"Set wether or not sound visualization is in liquid color mode",
-		formatHelp(CmdSetSoundVizLiquid + QString("0"))
-		);
+		formatHelp(CmdSetSoundVizLiquid + QString("0")),
+		helpCmdSetResults);
 #endif
+	m_helpMessage += formatHelp(
+		CmdSetPersistOnUnlock,
+		"Set wether or not the last set colors should persist when unlocking",
+		formatHelp(CmdSetPersistOnUnlock + QString(CmdSetPersistOnUnlock_On)),
+		helpCmdSetResults);
 
 
     m_helpMessage += formatHelp(CmdHelpShort, "Short version of this help");
@@ -1543,6 +1602,7 @@ void ApiServer::initShortHelpMessage()
 #ifdef BASS_SOUND_SUPPORT
 		 << CmdGetSoundVizColors << CmdGetSoundVizLiquid
 #endif
+		 << CmdGetPersistOnUnlock
 		 << CmdSetColor << CmdSetLeds
 		 << CmdSetGamma << CmdSetBrightness << CmdSetSmooth
 		 << CmdSetProfile << CmdNewProfile << CmdDeleteProfile
@@ -1550,6 +1610,7 @@ void ApiServer::initShortHelpMessage()
 #ifdef BASS_SOUND_SUPPORT
 		 << CmdSetSoundVizColors << CmdSetSoundVizLiquid
 #endif
+		 << CmdSetPersistOnUnlock
          << CmdExit << CmdHelp << CmdHelpShort;
 
     QString line = "    ";

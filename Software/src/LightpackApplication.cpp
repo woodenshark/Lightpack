@@ -206,6 +206,12 @@ void LightpackApplication::setStatusChanged(Backlight::Status status)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << status;
 	m_backlightStatus = status;
+
+	// In ApiPersist mode, we keep the colors left behind by API until the Backlight is restarted by some action
+	if (m_deviceLockStatus == DeviceLocked::ApiPersist) {
+		setDeviceLockViaAPI(DeviceLocked::Unlocked, QList<QString>());
+		m_settingsWindow->setDeviceLockViaAPI(DeviceLocked::Unlocked, QList<QString>());
+	}
 	startBacklight();
 }
 
@@ -215,6 +221,12 @@ void LightpackApplication::setBacklightChanged(Lightpack::Mode mode)
 	Settings::setLightpackMode(mode);
 	if (!m_noGui)
 		m_settingsWindow->setModeChanged(mode);
+
+	// In ApiPersist mode, we keep the colors left behind by API until the Backlight is restarted by some action
+	if (m_deviceLockStatus == DeviceLocked::ApiPersist) {
+		setDeviceLockViaAPI(DeviceLocked::Unlocked, QList<QString>());
+		m_settingsWindow->setDeviceLockViaAPI(DeviceLocked::Unlocked, QList<QString>());
+	}
 	startBacklight();
 }
 

@@ -85,8 +85,9 @@ public:
 
         _pixmapCache.insert("lock32", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(32, Qt::SmoothTransformation)) );
         _pixmapCache.insert("on32", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(32, Qt::SmoothTransformation)) );
-        _pixmapCache.insert("off32", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(32, Qt::SmoothTransformation)) );
-        _pixmapCache.insert("error32", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(32, Qt::SmoothTransformation)) );
+		_pixmapCache.insert("off32", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(32, Qt::SmoothTransformation)));
+		_pixmapCache.insert("error32", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(32, Qt::SmoothTransformation)));
+		_pixmapCache.insert("persist32", new QPixmap(QPixmap(":/icons/persist.png").scaledToWidth(32, Qt::SmoothTransformation)));
 
         setStatus(SysTrayIcon::StatusOn);
         _qsystray->show();
@@ -190,7 +191,13 @@ public:
         case SysTrayIcon::StatusLockedByPlugin:
             _qsystray->setIcon(QIcon(*_pixmapCache["lock32"]));
             _qsystray->setToolTip(tr("Device locked via Plugin")+" ("+(*arg)+")");
-            break;
+			break;
+		case SysTrayIcon::StatusApiPersist:
+			_switchOnBacklightAction->setEnabled(true);
+			_switchOffBacklightAction->setEnabled(true);
+			_qsystray->setIcon(QIcon(*_pixmapCache["persist32"]));
+			_qsystray->setToolTip(tr("API colors persisted"));
+			break;
 
         case SysTrayIcon::StatusOff:
             _switchOnBacklightAction->setEnabled(true);

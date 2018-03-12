@@ -230,20 +230,20 @@ void GrabManager::onGrabAvgColorsEnabledChanged(bool state)
 }
 
 void GrabManager::onGrabOverBrightenChanged(int value) {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-	m_overBrighten = value;
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+    m_overBrighten = value;
 }
 
 void GrabManager::onGrabApplyGammaRampChanged(bool state)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
-	m_isApplyGammaRamp = state;
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    m_isApplyGammaRamp = state;
 }
 
 void GrabManager::onSendDataOnlyIfColorsEnabledChanged(bool state)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
-	m_isSendDataOnlyIfColorsChanged = state;
+    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+    m_isSendDataOnlyIfColorsChanged = state;
 }
 
 #ifdef D3D10_GRAB_SUPPORT
@@ -286,8 +286,8 @@ void GrabManager::settingsProfileChanged(const QString &profileName)
 
     m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
     m_avgColorsOnAllLeds = Settings::isGrabAvgColorsEnabled();
-	m_overBrighten = Settings::getGrabOverBrighten();
-	m_isApplyGammaRamp = Settings::isGrabApplyGammaRampEnabled();
+    m_overBrighten = Settings::getGrabOverBrighten();
+    m_isApplyGammaRamp = Settings::isGrabApplyGammaRampEnabled();
 
     setNumberOfLeds(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 }
@@ -356,10 +356,10 @@ void GrabManager::handleGrabbedColors()
     int countGrabEnabled = 0;
 
 #ifdef Q_OS_WIN
-	if (m_isApplyGammaRamp)
-	{
-		WinUtils::ApplyPrimaryGammaRamp(m_colorsNew);
-	}
+    if (m_isApplyGammaRamp)
+    {
+        WinUtils::ApplyPrimaryGammaRamp(m_colorsNew);
+    }
 #endif
 
     if (m_avgColorsOnAllLeds)
@@ -392,19 +392,19 @@ void GrabManager::handleGrabbedColors()
 
     for (int i = 0; i < m_ledWidgets.size(); i++)
     {
-		QRgb newColor = m_colorsNew[i];
-		if (m_overBrighten) {
-			int dRed = qRed(newColor);
-			int dGreen = qGreen(newColor);
-			int dBlue = qBlue(newColor);
-			int highest = qMax(dRed, qMax(dGreen, dBlue));
-			double scaleFactor = qMin((100 + 5 * m_overBrighten) / 100.0, 255.0 / highest);
-			newColor = qRgb(dRed * scaleFactor, dGreen * scaleFactor, dBlue * scaleFactor);
-		}
+        QRgb newColor = m_colorsNew[i];
+        if (m_overBrighten) {
+            int dRed = qRed(newColor);
+            int dGreen = qGreen(newColor);
+            int dBlue = qBlue(newColor);
+            int highest = qMax(dRed, qMax(dGreen, dBlue));
+            double scaleFactor = qMin((100 + 5 * m_overBrighten) / 100.0, 255.0 / highest);
+            newColor = qRgb(dRed * scaleFactor, dGreen * scaleFactor, dBlue * scaleFactor);
+        }
 
-		if (m_colorsCurrent[i] != newColor)
+        if (m_colorsCurrent[i] != newColor)
         {
-			m_colorsCurrent[i] = newColor;
+            m_colorsCurrent[i] = newColor;
             isColorsChanged = true;
         }
     }
@@ -487,49 +487,58 @@ void GrabManager::scaleLedWidgets(int screenIndexResized)
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screen " << screenIndexResized << " is resized to " << screenGeometry;
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "was " << lastScreenGeometry;
 
-    // Move LedWidgets
     int deltaX = lastScreenGeometry.x() - screenGeometry.x();
     int deltaY = lastScreenGeometry.y() - screenGeometry.y();
 
-    double scaleX = (double) screenGeometry.width() / lastScreenGeometry.width();
-    double scaleY = (double) screenGeometry.height() / lastScreenGeometry.height();
+    double scaleX = (double)screenGeometry.width() / lastScreenGeometry.width();
+    double scaleY = (double)screenGeometry.height() / lastScreenGeometry.height();
 
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "deltaX =" << deltaX << "deltaY =" << deltaY;
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "scaleX =" << scaleX << "scaleY =" << scaleY;
 
-    m_lastScreenGeometry[screenIndexResized] = screenGeometry;
+    if ((deltaX != 0 || deltaY != 0) && (scaleX != 1 || scaleY != 1)) {
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Screen was resized and scaled, trying to restore configured widget positions";
 
-    for(int i=0; i < m_ledWidgets.size(); i++){
+        for (int i = 0; i < m_ledWidgets.size(); i++){
+            m_ledWidgets[i]->settingsProfileChanged();
+        }
+    } else {
+        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Screen was resized or scaled, temporarily adjusting";
 
-        if (!lastScreenGeometry.contains(m_ledWidgets[i]->geometry().center()))
-            continue;
+        for (int i = 0; i < m_ledWidgets.size(); i++){
 
-        int width  = PrismatikMath::round(scaleX * m_ledWidgets[i]->width());
-        int height = PrismatikMath::round(scaleY * m_ledWidgets[i]->height());
+            if (!lastScreenGeometry.contains(m_ledWidgets[i]->geometry().center()))
+                continue;
 
-        int x = m_ledWidgets[i]->x();
-        int y = m_ledWidgets[i]->y();
+            int width = PrismatikMath::round(scaleX * m_ledWidgets[i]->width());
+            int height = PrismatikMath::round(scaleY * m_ledWidgets[i]->height());
 
-        x -= screenGeometry.x();
-        y -= screenGeometry.y();
+            int x = m_ledWidgets[i]->x();
+            int y = m_ledWidgets[i]->y();
 
-        x = PrismatikMath::round(scaleX * x);
-        y = PrismatikMath::round(scaleY * y);
+            x -= screenGeometry.x();
+            y -= screenGeometry.y();
 
-        x += screenGeometry.x();
-        y += screenGeometry.y();
+            x = PrismatikMath::round(scaleX * x);
+            y = PrismatikMath::round(scaleY * y);
 
-        x -= deltaX;
-        y -= deltaY;
+            x += screenGeometry.x();
+            y += screenGeometry.y();
 
-        m_ledWidgets[i]->move(x,y);
-        m_ledWidgets[i]->resize(width, height);
+            x -= deltaX;
+            y -= deltaY;
 
-        m_ledWidgets[i]->saveSizeAndPosition();
+            m_ledWidgets[i]->move(x, y);
+            m_ledWidgets[i]->resize(width, height);
 
-        DEBUG_LOW_LEVEL << Q_FUNC_INFO << "new values [" << i << "]" << "x =" << x << "y =" << y << "w =" << width << "h =" << height;
+            // keep the original values in the configuration
+            // m_ledWidgets[i]->saveSizeAndPosition();
+
+            DEBUG_LOW_LEVEL << Q_FUNC_INFO << "new values [" << i << "]" << "x =" << x << "y =" << y << "w =" << width << "h =" << height;
+        }
     }
 
+    m_lastScreenGeometry[screenIndexResized] = screenGeometry;
 }
 
 void GrabManager::initGrabbers()
@@ -658,17 +667,17 @@ void GrabManager::clearColorsCurrent()
 void GrabManager::initLedWidgets(int numberOfLeds)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
-	if (numberOfLeds == 0) {
-		qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
-	}
+    if (numberOfLeds == 0) {
+        qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
+    }
 
-	int widgetFlags = SyncSettings | AllowCoefAndEnableConfig | AllowColorCycle;
+    int widgetFlags = SyncSettings | AllowCoefAndEnableConfig | AllowColorCycle;
 
     if (m_ledWidgets.size() == 0)
     {
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "First widget initialization";
 
-		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
+        GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
         connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
         connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
@@ -690,7 +699,7 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 
         for (int i = 0; i < diff; i++)
         {
-			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
+            GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
             connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
             connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));

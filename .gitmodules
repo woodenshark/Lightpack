@@ -1,0 +1,3 @@
+[submodule "Software/UpdateElevate"]
+	path = Software/UpdateElevate
+	url = ../UpdateElevate.git

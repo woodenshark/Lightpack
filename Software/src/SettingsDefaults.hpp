@@ -79,6 +79,7 @@ static const bool IsUpdateFirmwareMessageShown = false;
 static const QString ConnectedDeviceDefault = "Lightpack";
 static const QString SupportedDevices = SUPPORTED_DEVICES; /* comma separated values! */
 static const bool CheckForUpdates = true;
+static const bool InstallUpdates = true;
 
 // [HotKeys]
 namespace HotKeys

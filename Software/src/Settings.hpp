@@ -219,8 +219,10 @@ public:
     static bool isLedEnabled(int ledIndex);
     static void setLedEnabled(int ledIndex, bool isEnabled);
 
-    static bool isCheckForUpdatesEnabled();
+	static bool isCheckForUpdatesEnabled();
 	static void setCheckForUpdatesEnabled(bool isEnabled);
+	static bool isInstallUpdatesEnabled();
+	static void setInstallUpdatesEnabled(bool isEnabled);
 
 private:        
     static int getValidDeviceRefreshDelay(int value);

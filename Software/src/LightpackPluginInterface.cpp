@@ -18,6 +18,7 @@ LightpackPluginInterface::LightpackPluginInterface(QObject *parent) :
     m_gamma = SettingsScope::Profile::Device::GammaDefault;
     m_brightness = SettingsScope::Profile::Device::BrightnessDefault;
     m_smooth = SettingsScope::Profile::Device::SmoothDefault;
+	m_persistOnUnlock = false;
     
     initColors(10);
     m_timerLock = new QTimer(this);
@@ -280,7 +281,7 @@ bool LightpackPluginInterface::UnLock(QString sessionKey)
             lockSessionKeys.removeFirst();
             if (lockSessionKeys.count()==0)
             {
-				if (true /*setting*/) {
+				if (m_persistOnUnlock) {
 					emit updateDeviceLockStatus(DeviceLocked::ApiPersist, lockSessionKeys);
 					emit ChangeLockStatus(false);
 				} else {
@@ -558,6 +559,14 @@ bool LightpackPluginInterface::SetSoundVizLiquidMode(QString sessionKey, bool en
 }
 #endif
 
+bool LightpackPluginInterface::SetPersistOnUnlock(QString sessionKey, bool enabled) {
+	if (lockSessionKeys.isEmpty()) return false;
+	if (lockSessionKeys[0] != sessionKey) return false;
+
+	m_persistOnUnlock = enabled;
+	return true;
+}
+
 int LightpackPluginInterface::GetCountLeds()
 {
     return Settings::getNumberOfLeds(Settings::getConnectedDevice());
@@ -697,6 +706,11 @@ bool LightpackPluginInterface::GetSoundVizLiquidMode()
     return m_soundVizLiquid;
 }
 #endif
+
+bool LightpackPluginInterface::GetPersistOnUnlock()
+{
+	return m_persistOnUnlock;
+}
 
 QString LightpackPluginInterface::GetPluginsDir()
 {

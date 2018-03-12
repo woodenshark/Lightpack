@@ -143,6 +143,10 @@ public:
     static const char * CmdResultSoundVizLiquid;
 #endif
 
+	static const char * CmdGetPersistOnUnlock;
+	static const char * CmdGetPersistOnUnlock_On;
+	static const char * CmdGetPersistOnUnlock_Off;
+
     static const char * CmdGuid;
 
     static const char * CmdLockStatus;
@@ -190,6 +194,10 @@ public:
 #ifdef BASS_SOUND_SUPPORT
     static const char * CmdSetBacklight_SoundViz;
 #endif
+
+	static const char * CmdSetPersistOnUnlock;
+	static const char * CmdSetPersistOnUnlock_On;
+	static const char * CmdSetPersistOnUnlock_Off;
 
     static const int SignalWaitTimeoutMs;
 

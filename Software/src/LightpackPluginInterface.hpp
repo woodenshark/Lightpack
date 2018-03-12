@@ -36,6 +36,7 @@ public:
     bool SetSoundVizColors(QString sessionKey, QColor min, QColor max);
     bool SetSoundVizLiquidMode(QString sessionKey, bool enabled);
 #endif
+	bool SetPersistOnUnlock(QString sessionKey, bool enabled);
 
     bool SetLeds(QString sessionKey, QList<QRect> leds);
     bool NewProfile(QString sessionKey, QString profile);
@@ -61,6 +62,7 @@ public:
     QPair<QColor, QColor> GetSoundVizColors();
     bool GetSoundVizLiquidMode();
 #endif
+	bool GetPersistOnUnlock();
 
 // Settings
     QString GetPluginsDir();
@@ -130,7 +132,6 @@ private:
     QRect screen;
 
     QList<QString> lockSessionKeys;
-    //QString lockSessionKey;
     QList<QRgb> m_setColors;
     QList<QRgb> m_curColors;
     QTimer *m_timerLock;
@@ -143,6 +144,7 @@ private:
     QColor m_soundVizMax;
     bool m_soundVizLiquid;
 #endif
+	bool m_persistOnUnlock;
 
     void initColors(int numberOfLeds);
 

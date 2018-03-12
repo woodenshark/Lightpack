@@ -65,16 +65,22 @@ void ApiServerSetColorTask::startParseSetColorTask(QByteArray buffer)
         // Read led number
         int ledNumber = PrismatikMath::getDigit(buffer[0]); // first char of ledNumber
         int ledNumber2 = PrismatikMath::getDigit(buffer[1]); // second char of ledNumber
+        int ledNumber3 = PrismatikMath::getDigit(buffer[2]); // third char of ledNumber
         if (ledNumber > 0)
         {
-            if (buffer[1] == '-')
+            if (buffer[1] == '-') // single digit number
             {
                 buffer.remove(0, 2); // remove "2-"
             }
-            else if (ledNumber2 >= 0 && buffer[2] == '-')
+            else if (ledNumber2 >= 0 && buffer[2] == '-') // 2 digit number
             {
                 ledNumber = ledNumber * 10 + ledNumber2; // 10,11,12..99
                 buffer.remove(0, 3); // remove "10-"
+            }
+            else if (ledNumber3 >= 0 && buffer[3] == '-') // 3 digit number
+            {
+                ledNumber = (ledNumber * 100) + (ledNumber2 * 10) + ledNumber3;
+                buffer.remove(0, 4); // remove "100-" from the buffer
             } else {
                 API_DEBUG_OUT << "lednumber fail:" << QString(buffer);
                 isReadFail = true;

@@ -49,7 +49,7 @@ public slots:
     void setGamma(double value);
     void setBrightness(int value);
     void requestFirmwareVersion();
-	int maxLedsCount() { return 255; }
+	int maxLedsCount() { return 511; }
 	int defaultLedsCount() { return 10; }
 
 

@@ -100,7 +100,7 @@ enum Devices
     Adalight    = 511,
     Ardulight   = 255,
     AlienFx     = 1,
-    Virtual     = 255,
+    Virtual     = 511,
 
     Lightpack4  = 8,
     Lightpack5  = 10,

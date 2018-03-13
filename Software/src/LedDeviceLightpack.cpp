@@ -112,8 +112,9 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
         m_writeBuffer[buffIndex++] = (color.b & 0x000F);
 
         if ((i+1) % kLedsPerDevice == 0 || i == m_colorsBuffer.size() - 1) {
-            if (!writeBufferToDeviceWithCheck(CMD_UPDATE_LEDS, m_devices[(i+kLedsPerDevice)/kLedsPerDevice - 1])) {
+            if (m_devices.empty() || !writeBufferToDeviceWithCheck(CMD_UPDATE_LEDS, m_devices[(i+kLedsPerDevice)/kLedsPerDevice - 1])) {
                 ok = false;
+				break;
             }
             memset(m_writeBuffer, 0, sizeof(m_writeBuffer));
             buffIndex = WRITE_BUFFER_INDEX_DATA_START;

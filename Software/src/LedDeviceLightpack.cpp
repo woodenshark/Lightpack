@@ -69,6 +69,10 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 #if 0
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 #endif
+	if (m_devices.size() == 0) {
+		return;
+	}
+
 	if (static_cast<size_t>(colors.count()) > maxLedsCount()) {
 		qWarning() << Q_FUNC_INFO << "data size is greater than max leds count";
 

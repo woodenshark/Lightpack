@@ -70,7 +70,7 @@ signals:
 public slots:
 	void init();
 
-	void recreateLedDevice(const SupportedDevices::DeviceType deviceType);
+	void recreateLedDevice();
 
 	// This slots are protected from the overflow of queries
 	void setColors(const QList<QRgb> & colors);
@@ -92,6 +92,8 @@ public slots:
 private slots:
 	void ledDeviceCommandCompleted(bool ok);
 	void ledDeviceCommandTimedOut();
+	void ledDeviceOpenDeviceSuccess(bool isSuccess);
+	void ledDeviceIoDeviceSuccess(bool isSuccess);
 
 private:	
 	void initLedDevice();
@@ -101,6 +103,7 @@ private:
 	void cmdQueueAppend(LedDeviceCommands::Cmd);
 	void cmdQueueProcessNext();
 	void processOffLeds();
+	void triggerRecreateLedDevice();
 
 private:
 	bool m_isLastCommandCompleted;
@@ -124,4 +127,6 @@ private:
 	AbstractLedDevice *m_ledDevice;
 	QThread *m_ledDeviceThread;
 	QTimer *m_cmdTimeoutTimer;
+	QTimer *m_recreateTimer;
+	int m_failedCreationAttempts;
 };

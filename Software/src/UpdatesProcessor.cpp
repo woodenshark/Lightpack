@@ -94,7 +94,7 @@ void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 {
 #ifdef Q_OS_WIN
     DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
-    if (info.pkgUrl.isEmpty())
+    if (info.pkgUrl.isEmpty() || info.sigUrl.isEmpty())
         return;
 
     _sigUrl = info.sigUrl;

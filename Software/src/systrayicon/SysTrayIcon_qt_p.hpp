@@ -243,18 +243,17 @@ private slots:
                 _trayMsgUrl = QUrl("https://github.com/psieg/Lightpack/releases");
                 _qsystray->showMessage("Multiple updates are available", "Click to open the downloads page");
             } else {
+                UpdateInfo update = updates.last();
 #ifdef Q_OS_WIN
-                if (Settings::isInstallUpdatesEnabled()) {
+                if (Settings::isInstallUpdatesEnabled() && !update.pkgUrl.isEmpty() && !update.sigUrl.isEmpty()) {
                     _trayMessage = SysTrayIcon::MessageNoAction;
                     _trayMsgUrl = QUrl("");
-                    UpdateInfo update = updates.last();
                     _qsystray->showMessage("Prismatik Update", "An update is being downloaded and will be applied shortly.");
                     _updatesProcessor.loadUpdate(update);
-					return;
+                    return;
                 }
 #endif
                 _trayMessage = SysTrayIcon::MessageGeneric;
-                UpdateInfo update = updates.last();
                 _trayMsgUrl = QUrl(update.url);
                 _qsystray->showMessage(update.title, update.text);
             }

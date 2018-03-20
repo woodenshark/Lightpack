@@ -5,7 +5,7 @@ set -e
 # build UpdateElevate
 echo "#define NAME L\"Prismatik\"" > UpdateElevate/UpdateElevate/command.h
 echo "#define EXT L\".exe\"" >> UpdateElevate/UpdateElevate/command.h
-echo "#define ARGS L\" /VERYSILENT\"" >> UpdateElevate/UpdateElevate/command.h
+echo "#define ARGS L\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART\"" >> UpdateElevate/UpdateElevate/command.h
 cmd //c scripts\\win32\\build_UpdateElevate.bat
 cp UpdateElevate/x64/Release/UpdateElevate.exe dist_windows/content/
 

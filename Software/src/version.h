@@ -27,10 +27,10 @@
 #pragma once
 
 // Current version of Lightpack software
-#define VERSION_STR "5.11.2.13"
+#define VERSION_STR "5.11.2.14"
 
 // Resource defines using in Lightpack.rc
-#define VER_FILEVERSION				5,11,2,13
+#define VER_FILEVERSION				5,11,2,14
 #define VER_PRODUCTVERSION			VER_FILEVERSION
 
 #define VER_FILEVERSION_STR			VERSION_STR "\0"
@@ -46,4 +46,4 @@
 
 // Prismatik API version. When breaking compatibilty to Lightpack API v1.4,
 // change ApiServer::ApiVersion and the API help accordingly!
-#define API_VERSION "2.1"
+#define API_VERSION "2.2"

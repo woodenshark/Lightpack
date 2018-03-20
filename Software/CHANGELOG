@@ -13,6 +13,18 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.14
+---------------
+May 20, 2018
+
+* Add automatic self-updater (enabled by default)
+* Add API to persist last set colors when unlocking (#132)
+* Attempt to reconnect if the device is disconnected (#137)
+* Allow up to 512 LEDs for Adalight (#148, #189)
+* Fix API using more than 100 LEDs (#152)
+* Fix F.lux adjustment for multiple monitors (#127)
+* Fix data sent to device during setup wizard (#124)
+
 Version 5.11.2.13
 ---------------
 June 17, 2017

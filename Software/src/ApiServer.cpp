@@ -1461,12 +1461,12 @@ void ApiServer::initHelpMessage()
 #ifdef BASS_SOUND_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdGetSoundVizColors,
-		"Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\"",
+		"Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
 		formatHelp(CmdResultSoundVizColors + QString("0,0,0;255,255,255"))
 		);
 	m_helpMessage += formatHelp(
 		CmdGetSoundVizLiquid,
-		"Get wether or not sound visualization is in liquid color mode",
+		"Get wether or not sound visualization is in liquid color mode. Since API 2.1",
 		formatHelp(CmdResultSoundVizLiquid + QString("1"))
 		);
 #endif
@@ -1564,18 +1564,18 @@ void ApiServer::initHelpMessage()
 #ifdef BASS_SOUND_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizColors,
-		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\"",
+		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
 		formatHelp(CmdSetSoundVizColors + QString("0,0,0;255,255,255")),
 		helpCmdSetResults);
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizLiquid,
-		"Set wether or not sound visualization is in liquid color mode",
+		"Set wether or not sound visualization is in liquid color mode. Since API 2.1",
 		formatHelp(CmdSetSoundVizLiquid + QString("0")),
 		helpCmdSetResults);
 #endif
 	m_helpMessage += formatHelp(
 		CmdSetPersistOnUnlock,
-		"Set wether or not the last set colors should persist when unlocking",
+		"Set wether or not the last set colors should persist when unlocking. Since API 2.2",
 		formatHelp(CmdSetPersistOnUnlock + QString(CmdSetPersistOnUnlock_On)),
 		helpCmdSetResults);
 

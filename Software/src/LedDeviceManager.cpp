@@ -378,12 +378,10 @@ void LedDeviceManager::triggerRecreateLedDevice()
 			m_recreateTimer->setInterval(200);
 		} else if (m_failedCreationAttempts == 1) {
 			m_recreateTimer->setInterval(500);
-		} else if (m_failedCreationAttempts < 5) {
-			m_recreateTimer->setInterval(1000);
 		} else if (m_failedCreationAttempts < 10) {
-			m_recreateTimer->setInterval(5000);
+			m_recreateTimer->setInterval(1000);
 		} else {
-			m_recreateTimer->setInterval(10000);
+			m_recreateTimer->setInterval(5000);
 		}
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Will try to recreate device in" << m_recreateTimer->interval() << "msec";
 		m_recreateTimer->start();

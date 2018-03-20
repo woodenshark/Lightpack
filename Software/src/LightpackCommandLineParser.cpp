@@ -26,7 +26,9 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	m_parser.addOption(m_debugLevelLowOption);
 	m_parser.addOption(m_debugLevelZeroOption);
 	m_parser.addOption(m_optionSetProfile);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
 	m_startAfterUpdateOption.setFlags(QCommandLineOption::HiddenFromHelp);
+#endif
 	m_parser.addOption(m_startAfterUpdateOption);
 
 }

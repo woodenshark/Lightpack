@@ -1641,7 +1641,7 @@ void SettingsWindow::createTrayIcon(bool showUpdatedMessage)
     connect(this, SIGNAL(backlightStatusChanged(Backlight::Status)), this, SLOT(updateTrayAndActionStates()));
 
     if (showUpdatedMessage) {
-        m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1").arg(VERSION_STR));
+        m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
     }
 }
 

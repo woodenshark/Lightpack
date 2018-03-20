@@ -92,6 +92,7 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
 
 void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 {
+#ifdef Q_OS_WIN
     DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
     if (info.pkgUrl.isEmpty())
         return;
@@ -108,8 +109,12 @@ void UpdatesProcessor::loadUpdate(UpdateInfo& info)
     _reply = _networkMan.get(request);
     connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
     connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+#else
+    qWarning() << Q_FUNC_INFO << "Trying to load update on non-windows platform -- ignored";
+#endif
 }
 
+#ifdef Q_OS_WIN
 void UpdatesProcessor::updatePgkLoaded()
 {
     if (!(_reply->error() == QNetworkReply::NetworkError::NoError))
@@ -163,6 +168,7 @@ void UpdatesProcessor::updateSigLoaded()
         qCritical() << Q_FUNC_INFO << "Failed to write update signature";
     }
 }
+#endif
 
 bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersion &version)
 {

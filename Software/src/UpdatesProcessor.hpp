@@ -155,8 +155,10 @@ signals:
 
 private slots:
     void error(QNetworkReply::NetworkError code);
+#ifdef Q_OS_WIN
     void updatePgkLoaded();
     void updateSigLoaded();
+#endif
 
 private:
     QList<UpdateInfo> * readUpdates(QList<UpdateInfo> * readUpdates, QXmlStreamReader * xmlReader);

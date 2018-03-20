@@ -122,6 +122,7 @@ private:
     QString m_applicationDirPath;
     bool m_isDebugLevelObtainedFromCmdArgs;
     bool m_noGui;
+    bool m_isStartAfterUpdate;
     DeviceLocked::DeviceLockStatus m_deviceLockStatus;
     bool m_isSettingsWindowActive;
     Backlight::Status m_backlightStatus;

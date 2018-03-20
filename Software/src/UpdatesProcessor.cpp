@@ -156,6 +156,7 @@ void UpdatesProcessor::updateSigLoaded()
     args.append("request");
     args.append(QDir::tempPath());
     args.append(QCoreApplication::applicationFilePath());
+	args.append("--startafterupdate");
     if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
         QCoreApplication::quit();
     } else {

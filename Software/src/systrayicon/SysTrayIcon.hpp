@@ -37,8 +37,6 @@ class SysTrayIconPrivate;
 class SysTrayIcon : public QObject
 {
     Q_OBJECT
-
-    static const QString LightpackDownloadsPageUrl;
 public:
 
     enum Message

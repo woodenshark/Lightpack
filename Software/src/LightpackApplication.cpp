@@ -104,6 +104,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
 	m_applicationDirPath = appDirPath;
 	m_noGui = false;
+	m_isStartAfterUpdate = false;
 	m_isSessionLocked = false;
 
 
@@ -127,7 +128,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 		m_settingsWindow = new SettingsWindow();
 		if (trayAvailable) {
 			m_settingsWindow->setVisible(false); /* Load to tray */
-			m_settingsWindow->createTrayIcon();
+			m_settingsWindow->createTrayIcon(m_isStartAfterUpdate);
 		}
 		else
 			m_settingsWindow->setVisible(true);
@@ -451,6 +452,11 @@ void LightpackApplication::processCommandLineArguments()
         g_debugLevel = parser.debugLevel();
         m_isDebugLevelObtainedFromCmdArgs = true;
     }
+
+	if (parser.isSetStartAfterUpdate())
+	{
+		m_isStartAfterUpdate = true;
+	}
 
     if (m_isDebugLevelObtainedFromCmdArgs)
         qDebug() << "Debug level" << g_debugLevel;

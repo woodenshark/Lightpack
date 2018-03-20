@@ -28,8 +28,6 @@
 
 #include "SysTrayIcon_qt_p.hpp"
 
-const QString SysTrayIcon::LightpackDownloadsPageUrl = "http://code.google.com/p/lightpack/downloads/list";
-
 SysTrayIcon::SysTrayIcon(QObject *parent) :
     QObject(parent),
     d_ptr(new SysTrayIconPrivate(this))

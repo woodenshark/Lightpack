@@ -277,7 +277,7 @@ private slots:
             if (SettingsScope::Settings::getConnectedDevice() == SupportedDevices::DeviceTypeLightpack)
             {
                 // Open lightpack downloads page
-                QDesktopServices::openUrl(QUrl(SysTrayIcon::LightpackDownloadsPageUrl, QUrl::TolerantMode));
+                QDesktopServices::openUrl(QUrl("https://github.com/psieg/Lightpack/releases", QUrl::TolerantMode));
             }
             break;
         case SysTrayIcon::MessageGeneric:

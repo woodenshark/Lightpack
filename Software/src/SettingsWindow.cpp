@@ -40,6 +40,7 @@
 #include "debug.h"
 #include "Plugin.hpp"
 #include "systrayicon/SysTrayIcon.hpp"
+#include "version.h"
 #include <QStringBuilder>
 #include <QScrollBar>
 #include <QMessageBox>
@@ -1625,7 +1626,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 // Create tray icon
 // ----------------------------------------------------------------------------
 
-void SettingsWindow::createTrayIcon()
+void SettingsWindow::createTrayIcon(bool showUpdatedMessage)
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
     m_trayIcon = new SysTrayIcon();
@@ -1638,6 +1639,10 @@ void SettingsWindow::createTrayIcon()
 
     m_trayIcon->init();
     connect(this, SIGNAL(backlightStatusChanged(Backlight::Status)), this, SLOT(updateTrayAndActionStates()));
+
+    if (showUpdatedMessage) {
+        m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1").arg(VERSION_STR));
+    }
 }
 
 void SettingsWindow::updateUiFromSettings()

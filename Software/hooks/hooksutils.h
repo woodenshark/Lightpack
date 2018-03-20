@@ -22,7 +22,7 @@
 bool WriteToProtectedMem(void * mem, void * newVal, void * savedVal, size_t size);
 
 inline void * incPtr(void * ptr, UINT offset) {
-    return (void *)( (DWORD_PTR)ptr + offset );
+	return (void *)( (DWORD_PTR)ptr + offset );
 }
 
 #endif // HOOKSUTILS_H

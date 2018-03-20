@@ -1,25 +1,25 @@
 /*
  * SettingsDefaults.hpp
  *
- *  Created on: 01.10.2011
- *     Project: Lightpack
+ *	Created on: 01.10.2011
+ *		Project: Lightpack
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack a USB content-driving ambient lighting system
+ *	Lightpack a USB content-driving ambient lighting system
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -32,32 +32,32 @@
 #include "enums.hpp"
 
 #ifdef ALIEN_FX_SUPPORTED
-#   define SUPPORTED_DEVICES            "Lightpack,AlienFx,Adalight,Ardulight,Virtual"
+#	define SUPPORTED_DEVICES			"Lightpack,AlienFx,Adalight,Ardulight,Virtual"
 #else
-#   define SUPPORTED_DEVICES            "Lightpack,Adalight,Ardulight,Virtual"
+#	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual"
 #endif
 
 #ifdef DDUPL_GRAB_SUPPORT
-#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeDDupl
-#   define GRABMODE_DEFAULT_STR     "DDupl"
+#	define GRABMODE_DEFAULT			::Grab::GrabberTypeDDupl
+#	define GRABMODE_DEFAULT_STR		"DDupl"
 #elif defined(WINAPI_GRAB_SUPPORT)
-#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeWinAPI
-#   define GRABMODE_DEFAULT_STR     "WinAPI"
+#	define GRABMODE_DEFAULT			::Grab::GrabberTypeWinAPI
+#	define GRABMODE_DEFAULT_STR		"WinAPI"
 #elif defined(X11_GRAB_SUPPORT)
-#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeX11
-#   define GRABMODE_DEFAULT_STR     "X11"
+#	define GRABMODE_DEFAULT			::Grab::GrabberTypeX11
+#	define GRABMODE_DEFAULT_STR		"X11"
 #elif defined(MAC_OS_CG_GRAB_SUPPORT)
-#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeMacCoreGraphics
-#   define GRABMODE_DEFAULT_STR     "MacCoreGraphics"
+#	define GRABMODE_DEFAULT			::Grab::GrabberTypeMacCoreGraphics
+#	define GRABMODE_DEFAULT_STR		"MacCoreGraphics"
 #else
-#   define GRABMODE_DEFAULT         ::Grab::GrabberTypeQt
-#   define GRABMODE_DEFAULT_STR     "Qt"
+#	define GRABMODE_DEFAULT			::Grab::GrabberTypeQt
+#	define GRABMODE_DEFAULT_STR		"Qt"
 #endif
 
 #ifdef Q_OS_UNIX
-#   define SERIAL_PORT_DEFAULT    "/dev/ttyUSB0" /* For UART over USB on FT232RL */
+#	define SERIAL_PORT_DEFAULT	"/dev/ttyUSB0" /* For UART over USB on FT232RL */
 #elif defined(Q_OS_WIN)
-#   define SERIAL_PORT_DEFAULT    "COM1"
+#	define SERIAL_PORT_DEFAULT	"COM1"
 #endif
 
 namespace SettingsScope

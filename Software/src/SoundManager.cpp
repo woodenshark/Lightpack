@@ -1,25 +1,25 @@
 /*
  * SoundManager.cpp
  *
- *  Created on: 11.12.2011
- *     Project: Lightpack
+ *	Created on: 11.12.2011
+ *		Project: Lightpack
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack a USB content-driving ambient lighting system
+ *	Lightpack a USB content-driving ambient lighting system
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -107,7 +107,7 @@ void SoundManager::requestDeviceList()
 
 void SoundManager::start(bool isEnabled)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 
 	if (m_isEnabled == isEnabled)
 		return;
@@ -170,7 +170,7 @@ void SoundManager::start(bool isEnabled)
 		//m_timer = timeSetEvent(25, 25, (LPTIMECALLBACK)&UpdateSpectrum, 0, TIME_PERIODIC);
 		m_timer.start(25);
 		m_frames = 0;
-    }
+	}
 	else
 	{
 		m_timer.stop();
@@ -228,22 +228,22 @@ void SoundManager::setLiquidModeSpeed(int value)
 
 void SoundManager::setSendDataOnlyIfColorsChanged(bool state)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
-    m_isSendDataOnlyIfColorsChanged = state;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+	m_isSendDataOnlyIfColorsChanged = state;
 }
 
 void SoundManager::setNumberOfLeds(int numberOfLeds)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
 
-    initColors(numberOfLeds);
+	initColors(numberOfLeds);
 }
 
 void SoundManager::settingsProfileChanged(const QString &profileName)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-    Q_UNUSED(profileName)
-    initFromSettings();
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	Q_UNUSED(profileName)
+	initFromSettings();
 }
 
 void SoundManager::initFromSettings()
@@ -253,9 +253,9 @@ void SoundManager::initFromSettings()
 	m_maxColor = Settings::getSoundVisualizerMaxColor();
 	m_isLiquidMode = Settings::isSoundVisualizerLiquidMode();
 	m_generator.setSpeed(Settings::getSoundVisualizerLiquidSpeed());
-    m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
+	m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 
-    initColors(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
+	initColors(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 }
 
 void SoundManager::reset()
@@ -313,9 +313,9 @@ void SoundManager::updateColors()
 
 void SoundManager::initColors(int numberOfLeds)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << numberOfLeds;
 
-    m_colors.clear();
+	m_colors.clear();
 	m_peaks.clear();
 
 	for (int i = 0; i < numberOfLeds; i++) {

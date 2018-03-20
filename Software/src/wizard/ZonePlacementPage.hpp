@@ -1,26 +1,26 @@
 /*
  * ZoneConfiguration.hpp
  *
- *  Created on: 10/25/2013
- *     Project: Prismatik
+ *	Created on: 10/25/2013
+ *		Project: Prismatik
  *
- *  Copyright (c) 2013 Tim
+ *	Copyright (c) 2013 Tim
  *
- *  Lightpack is an open-source, USB content-driving ambient lighting
- *  hardware.
+ *	Lightpack is an open-source, USB content-driving ambient lighting
+ *	hardware.
  *
- *  Prismatik is a free, open-source software: you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License as published
- *  by the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Prismatik is a free, open-source software: you can redistribute it and/or
+ *	modify it under the terms of the GNU General Public License as published
+ *	by the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Prismatik and Lightpack files is distributed in the hope that it will be
- *  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  General Public License for more details.
+ *	Prismatik and Lightpack files is distributed in the hope that it will be
+ *	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+ *	General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -41,38 +41,38 @@ class GrabWidget;
 
 class ZonePlacementPage : public WizardPageUsingDevice
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit ZonePlacementPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent = 0);
-    ~ZonePlacementPage();
+	explicit ZonePlacementPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent = 0);
+	~ZonePlacementPage();
 
 protected:
-    void initializePage();
-    void cleanupPage();
-    bool validatePage();
+	void initializePage();
+	void cleanupPage();
+	bool validatePage();
 
 private slots:
-    void on_pbAndromeda_clicked();
+	void on_pbAndromeda_clicked();
 	void on_pbCassiopeia_clicked();
 	void on_pbPegasus_clicked();
 	void on_pbCustom_clicked();
 
-    void on_numberOfLeds_valueChanged(int arg1);
+	void on_numberOfLeds_valueChanged(int arg1);
 
 private:
-    void addGrabArea(int id, const QRect &rect);
-    void removeLastGrabArea();
-    void cleanupGrabAreas();
+	void addGrabArea(int id, const QRect &rect);
+	void removeLastGrabArea();
+	void cleanupGrabAreas();
 	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);
-    void resetNewAreaRect();
+	void resetNewAreaRect();
 
-    Ui::ZonePlacementPage *_ui;
-    int _screenId;
-    QList<GrabWidget*> _grabAreas;
-    QRect _newAreaRect;
-    int _x0;
-    int _y0;
+	Ui::ZonePlacementPage *_ui;
+	int _screenId;
+	QList<GrabWidget*> _grabAreas;
+	QRect _newAreaRect;
+	int _x0;
+	int _y0;
 
 };
 

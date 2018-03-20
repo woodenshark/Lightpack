@@ -1,26 +1,26 @@
 /*
  * MonitorsConfigurationPage.cpp
  *
- *  Created on: 15.2.2017
- *     Project: Prismatik
+ *	Created on: 15.2.2017
+ *		Project: Prismatik
  *
- *  Copyright (c) 2017 Patrick Siegler
+ *	Copyright (c) 2017 Patrick Siegler
  *
- *  Lightpack is an open-source, USB content-driving ambient lighting
- *  hardware.
+ *	Lightpack is an open-source, USB content-driving ambient lighting
+ *	hardware.
  *
- *  Prismatik is a free, open-source software: you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License as published
- *  by the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Prismatik is a free, open-source software: you can redistribute it and/or
+ *	modify it under the terms of the GNU General Public License as published
+ *	by the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Prismatik and Lightpack files is distributed in the hope that it will be
- *  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  General Public License for more details.
+ *	Prismatik and Lightpack files is distributed in the hope that it will be
+ *	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+ *	General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -34,7 +34,7 @@
 #include "debug.h"
 
 GlobalColorCoefPage::GlobalColorCoefPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
-    WizardPageUsingDevice(isInitFromSettings, ts, parent),
+	WizardPageUsingDevice(isInitFromSettings, ts, parent),
 	_ui(new Ui::GlobalColorCoefPage)
 {
 	_ui->setupUi(this);
@@ -45,7 +45,7 @@ GlobalColorCoefPage::GlobalColorCoefPage(bool isInitFromSettings, TransientSetti
 
 GlobalColorCoefPage::~GlobalColorCoefPage()
 {
-    delete _ui;
+	delete _ui;
 }
 
 void GlobalColorCoefPage::initializePage()
@@ -56,22 +56,22 @@ void GlobalColorCoefPage::initializePage()
 
 	QRect s = QApplication::desktop()->screenGeometry(_screenId);
 
-    int screenCount = QApplication::desktop()->screenCount();
-    for (int i = 0; i < screenCount; i++) {
-        QRect geom = QApplication::desktop()->screenGeometry(i);
-        MonitorIdForm *monitorIdForm = new MonitorIdForm();
+	int screenCount = QApplication::desktop()->screenCount();
+	for (int i = 0; i < screenCount; i++) {
+		QRect geom = QApplication::desktop()->screenGeometry(i);
+		MonitorIdForm *monitorIdForm = new MonitorIdForm();
 
 		monitorIdForm->setWindowFlags(Qt::FramelessWindowHint);
 		monitorIdForm->setStyleSheet("background: #fff");
 
-        monitorIdForm->move(geom.topLeft());
-        monitorIdForm->resize(geom.width(), geom.height());
+		monitorIdForm->move(geom.topLeft());
+		monitorIdForm->resize(geom.width(), geom.height());
 
-        monitorIdForm->setId(i+1);
+		monitorIdForm->setId(i+1);
 
-        monitorIdForm->show();
+		monitorIdForm->show();
 
-        _monitorForms.append(monitorIdForm);
+		_monitorForms.append(monitorIdForm);
 	}
 	this->activateWindow();
 
@@ -123,13 +123,13 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setLedCoefBlue(id, _ui->sbBlue->value() / 100.0);
 	}
 
-    cleanupMonitors();
-    return true;
+	cleanupMonitors();
+	return true;
 }
 
 void GlobalColorCoefPage::cleanupPage()
 {
-    cleanupMonitors();
+	cleanupMonitors();
 }
 
 void GlobalColorCoefPage::onCoefValueChanged()
@@ -150,8 +150,8 @@ void GlobalColorCoefPage::onCoefValueChanged()
 
 void GlobalColorCoefPage::cleanupMonitors()
 {
-    foreach ( MonitorIdForm *monitorIdForm, _monitorForms ) {
-        delete monitorIdForm;
-    }
-    _monitorForms.clear();
+	foreach ( MonitorIdForm *monitorIdForm, _monitorForms ) {
+		delete monitorIdForm;
+	}
+	_monitorForms.clear();
 }

@@ -1,26 +1,26 @@
 /*
  * ZoneConfiguration.cpp
  *
- *  Created on: 10/25/2013
- *     Project: Prismatik
+ *	Created on: 10/25/2013
+ *		Project: Prismatik
  *
- *  Copyright (c) 2013 Tim
+ *	Copyright (c) 2013 Tim
  *
- *  Lightpack is an open-source, USB content-driving ambient lighting
- *  hardware.
+ *	Lightpack is an open-source, USB content-driving ambient lighting
+ *	hardware.
  *
- *  Prismatik is a free, open-source software: you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License as published
- *  by the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Prismatik is a free, open-source software: you can redistribute it and/or
+ *	modify it under the terms of the GNU General Public License as published
+ *	by the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Prismatik and Lightpack files is distributed in the hope that it will be
- *  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  General Public License for more details.
+ *	Prismatik and Lightpack files is distributed in the hope that it will be
+ *	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+ *	General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -41,66 +41,66 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 	WizardPageUsingDevice(isInitFromSettings, ts, parent),
 	_ui(new Ui::ZonePlacementPage)
 {
-    _ui->setupUi(this);
+	_ui->setupUi(this);
 
-    QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
 
-    _x0 = screen.left() + 150;
-    _y0 = screen.top() + 150;
+	_x0 = screen.left() + 150;
+	_y0 = screen.top() + 150;
 
-    resetNewAreaRect();
+	resetNewAreaRect();
 }
 
 ZonePlacementPage::~ZonePlacementPage()
 {
-    delete _ui;
+	delete _ui;
 }
 
 void ZonePlacementPage::initializePage()
 {
-    using namespace SettingsScope;
+	using namespace SettingsScope;
 
-    _screenId = field("screenId").toInt();
-    registerField("numberOfLeds", _ui->sbNumberOfLeds);
+	_screenId = field("screenId").toInt();
+	registerField("numberOfLeds", _ui->sbNumberOfLeds);
 
-    device()->setSmoothSlowdown(70);
+	device()->setSmoothSlowdown(70);
 
-    _ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount()); 
+	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount()); 
 
-    if (_isInitFromSettings) {
-        int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
+	if (_isInitFromSettings) {
+		int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_ui->sbNumberOfLeds->setValue(ledCount);
 		_transSettings->ledCount = ledCount;
 
-        for (int i = 0; i < ledCount; i++) {
-            QPoint topLeft = Settings::getLedPosition(i);
-            QSize size = Settings::getLedSize(i);
-            QRect r(topLeft, size);
-            addGrabArea(i, r);
-        }
-    } else {
+		for (int i = 0; i < ledCount; i++) {
+			QPoint topLeft = Settings::getLedPosition(i);
+			QSize size = Settings::getLedSize(i);
+			QRect r(topLeft, size);
+			addGrabArea(i, r);
+		}
+	} else {
 		_ui->sbNumberOfLeds->setValue(device()->defaultLedsCount());
 		_transSettings->ledCount = device()->defaultLedsCount();
-        on_pbAndromeda_clicked();
-    }
-    connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(on_numberOfLeds_valueChanged(int)));
+		on_pbAndromeda_clicked();
+	}
+	connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(on_numberOfLeds_valueChanged(int)));
 
 	resetDeviceSettings();
-    turnLightsOff();
+	turnLightsOff();
 }
 
 void ZonePlacementPage::cleanupPage()
 {
-    cleanupGrabAreas();
-    _ui->sbNumberOfLeds->disconnect();
+	cleanupGrabAreas();
+	_ui->sbNumberOfLeds->disconnect();
 }
 
 void ZonePlacementPage::cleanupGrabAreas()
 {
-    for(int i = 0; i < _grabAreas.size(); i++) {
-        delete _grabAreas[i];
-    }
-    _grabAreas.clear();
+	for(int i = 0; i < _grabAreas.size(); i++) {
+		delete _grabAreas[i];
+	}
+	_grabAreas.clear();
 }
 
 bool ZonePlacementPage::validatePage()
@@ -112,55 +112,55 @@ bool ZonePlacementPage::validatePage()
 		_transSettings->zoneSizes.insert(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
 	}
 
-    cleanupGrabAreas();
-    return true;
+	cleanupGrabAreas();
+	return true;
 }
 
 void ZonePlacementPage::resetNewAreaRect()
 {
-    _newAreaRect.setX(_x0);
-    _newAreaRect.setY(_y0);
-    _newAreaRect.setWidth(100);
-    _newAreaRect.setHeight(100);
+	_newAreaRect.setX(_x0);
+	_newAreaRect.setY(_y0);
+	_newAreaRect.setWidth(100);
+	_newAreaRect.setHeight(100);
 }
 
 void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool invertIds, int idOffset) {
 
-    cleanupGrabAreas();
-    for(int i = 0; i < distributor->areaCount(); i++) {
-        ScreenArea *sf = distributor->next();
-        qDebug() << sf->hScanStart() << sf->vScanStart();
+	cleanupGrabAreas();
+	for(int i = 0; i < distributor->areaCount(); i++) {
+		ScreenArea *sf = distributor->next();
+		qDebug() << sf->hScanStart() << sf->vScanStart();
 
-        QRect s = QApplication::desktop()->screenGeometry(_screenId);
-        QRect r(sf->hScanStart(),
-                sf->vScanStart(),
-                (sf->hScanEnd() - sf->hScanStart()),
-                (sf->vScanEnd() - sf->vScanStart()));
+		QRect s = QApplication::desktop()->screenGeometry(_screenId);
+		QRect r(sf->hScanStart(),
+				sf->vScanStart(),
+				(sf->hScanEnd() - sf->hScanStart()),
+				(sf->vScanEnd() - sf->vScanStart()));
 		int id = ((invertIds ? distributor->areaCount() - (i + 1) : i) + idOffset) % distributor->areaCount();
 		id = (id + distributor->areaCount()) % distributor->areaCount();
 		addGrabArea(id, r);
 
-        delete sf;
-    }
-    resetNewAreaRect();
+		delete sf;
+	}
+	resetNewAreaRect();
 }
 
 void ZonePlacementPage::addGrabArea(int id, const QRect &r)
 {
 	GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith, &_grabAreas);
 
-    zone->move(r.topLeft());
-    zone->resize(r.size());
-    connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
-    connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
-    zone->show();
-    _grabAreas.append(zone);
+	zone->move(r.topLeft());
+	zone->resize(r.size());
+	connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
+	connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
+	zone->show();
+	_grabAreas.append(zone);
 }
 
 void ZonePlacementPage::removeLastGrabArea()
 {
-    delete _grabAreas.last();
-    _grabAreas.removeLast();
+	delete _grabAreas.last();
+	_grabAreas.removeLast();
 }
 
 void ZonePlacementPage::on_pbAndromeda_clicked()
@@ -244,24 +244,24 @@ void ZonePlacementPage::on_pbCustom_clicked()
 
 void ZonePlacementPage::on_numberOfLeds_valueChanged(int numOfLed)
 {
-    while (numOfLed < _grabAreas.size()) {
-        removeLastGrabArea();
-    }
-    QRect screen = QApplication::desktop()->screenGeometry(_screenId);
+	while (numOfLed < _grabAreas.size()) {
+		removeLastGrabArea();
+	}
+	QRect screen = QApplication::desktop()->screenGeometry(_screenId);
 
-    const int dx = 10;
-    const int dy = 10;
+	const int dx = 10;
+	const int dy = 10;
 
-    while (numOfLed > _grabAreas.size()) {
-        addGrabArea(_grabAreas.size(), _newAreaRect);
-        if (_newAreaRect.right() + dx < screen.right()) {
-            _newAreaRect.moveTo(_newAreaRect.x() + dx, _newAreaRect.y());
-        } else if (_newAreaRect.bottom() + dy < screen.bottom()) {
-            _newAreaRect.moveTo(_x0, _newAreaRect.y() + dy);
-        } else {
-            _newAreaRect.moveTo(_x0,_y0);
-        }
-    }
+	while (numOfLed > _grabAreas.size()) {
+		addGrabArea(_grabAreas.size(), _newAreaRect);
+		if (_newAreaRect.right() + dx < screen.right()) {
+			_newAreaRect.moveTo(_newAreaRect.x() + dx, _newAreaRect.y());
+		} else if (_newAreaRect.bottom() + dy < screen.bottom()) {
+			_newAreaRect.moveTo(_x0, _newAreaRect.y() + dy);
+		} else {
+			_newAreaRect.moveTo(_x0,_y0);
+		}
+	}
 
 	_transSettings->ledCount = numOfLed;
 }

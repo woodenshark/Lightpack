@@ -8,29 +8,29 @@ class Plugin;
 
 class PluginsManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    PluginsManager(QObject *parent = 0);
-    virtual ~PluginsManager();
+	PluginsManager(QObject *parent = 0);
+	virtual ~PluginsManager();
 
-    void LoadPlugins(QString path);
-    QList<Plugin*> getPluginList();
-    Plugin* getPlugin(const QString& name_);
-    
+	void LoadPlugins(QString path);
+	QList<Plugin*> getPluginList();
+	Plugin* getPlugin(const QString& name_);
+	
 private:
-    void dropPlugins();
-    QMap<QString, Plugin*> _plugins;
+	void dropPlugins();
+	QMap<QString, Plugin*> _plugins;
 
 signals:
-    void updatePlugin(QList<Plugin*>);
-    
+	void updatePlugin(QList<Plugin*>);
+	
 public slots:
-    void reloadPlugins();
-    void StartPlugins();
-    void StopPlugins();
+	void reloadPlugins();
+	void StartPlugins();
+	void StopPlugins();
 
 private slots:
-    void onPluginStateChangedHandler();
+	void onPluginStateChangedHandler();
 
 };
 

@@ -1,26 +1,26 @@
 /*
  * LightpackApplication.cpp
  *
- *  Created on: 06.09.2011
- *      Author: Mike Shatohin (brunql)
- *     Project: Lightpack
+ *	Created on: 06.09.2011
+ *		Author: Mike Shatohin (brunql)
+ *		Project: Lightpack
  *
- *  Lightpack is very simple implementation of the backlight for a laptop
+ *	Lightpack is very simple implementation of the backlight for a laptop
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -134,7 +134,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 			m_settingsWindow->setVisible(true);
 		m_settingsWindow->connectSignalsSlots();
 		connect(this, SIGNAL(postInitialization()), m_settingsWindow, SLOT(onPostInit()));
-//        m_settingsWindow->profileSwitch(Settings::getCurrentProfileName());
+//		m_settingsWindow->profileSwitch(Settings::getCurrentProfileName());
 		// Process messages from another instances in SettingsWindow
 		connect(this, SIGNAL(messageReceived(QString)), m_settingsWindow, SLOT(processMessage(QString)));
 		connect(this, SIGNAL(focusChanged(QWidget*,QWidget*)), this, SLOT(onFocusChanged(QWidget*,QWidget*)));
@@ -170,7 +170,7 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
 	this->settingsChanged();
 
-//    handleConnectedDeviceChange(settings()->getConnectedDevice());
+//	handleConnectedDeviceChange(settings()->getConnectedDevice());
 
 	startPluginManager();
 
@@ -198,7 +198,7 @@ void LightpackApplication::runWizardLoop(bool isInitFromSettings)
 #ifdef Q_OS_WIN
 HWND LightpackApplication::getMainWindowHandle() {
 	// to get HWND sometimes needed to activate window
-//    winFocus(m_settingsWindow, true);
+//	winFocus(m_settingsWindow, true);
 	return reinterpret_cast<HWND>(m_settingsWindow->winId());
 }
 #endif
@@ -382,84 +382,84 @@ void LightpackApplication::onSessionChange(int change)
 
 void LightpackApplication::processCommandLineArguments()
 {
-    g_debugLevel = SettingsScope::Main::DebugLevelDefault;
+	g_debugLevel = SettingsScope::Main::DebugLevelDefault;
 
-    m_isDebugLevelObtainedFromCmdArgs = false;
+	m_isDebugLevelObtainedFromCmdArgs = false;
 
-    LightpackCommandLineParser parser;
-    if (!parser.parse(arguments())) {
-        outputMessage(parser.errorText());
-        ::exit(WrongCommandLineArgument_ErrorCode);
-    }
+	LightpackCommandLineParser parser;
+	if (!parser.parse(arguments())) {
+		outputMessage(parser.errorText());
+		::exit(WrongCommandLineArgument_ErrorCode);
+	}
 
-    if (parser.isSetHelp()) {
-        outputMessage(parser.helpText());
-        ::exit(0);
-    }
-    if (parser.isSetVersion())
-    {
-        const QString versionString =
-            "Version: " VERSION_STR "\n"
+	if (parser.isSetHelp()) {
+		outputMessage(parser.helpText());
+		::exit(0);
+	}
+	if (parser.isSetVersion())
+	{
+		const QString versionString =
+			"Version: " VERSION_STR "\n"
 #ifdef GIT_REVISION
-            "Revision: " GIT_REVISION "\n"
+			"Revision: " GIT_REVISION "\n"
 #endif
-            "Build with Qt version " QT_VERSION_STR "\n";
-        outputMessage(versionString);
-        ::exit(0);
-    }
+			"Build with Qt version " QT_VERSION_STR "\n";
+		outputMessage(versionString);
+		::exit(0);
+	}
 
-    // these two options are mutually exclusive
-    if (parser.isSetNoGUI()) {
-        m_noGui = true;
-        DEBUG_LOW_LEVEL <<  "Application running no_GUI mode";
-    } else if (parser.isSetWizard()) {
-        if (isRunning()) {
-            DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
-            sendMessage("quitForWizard");
-            while (isRunning()) {
-                QThread::sleep(200);
-            }
-        }
-        bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
-        runWizardLoop(isInitFromSettings);
-    }
+	// these two options are mutually exclusive
+	if (parser.isSetNoGUI()) {
+		m_noGui = true;
+		DEBUG_LOW_LEVEL <<	"Application running no_GUI mode";
+	} else if (parser.isSetWizard()) {
+		if (isRunning()) {
+			DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
+			sendMessage("quitForWizard");
+			while (isRunning()) {
+				QThread::sleep(200);
+			}
+		}
+		bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+		runWizardLoop(isInitFromSettings);
+	}
 
-    // 'on' and 'off' are mutually exclusive also
-    if (parser.isSetBacklightOff()) {
-        if (!isRunning()) {
-            LedDeviceLightpack lightpackDevice;
-            lightpackDevice.switchOffLeds();
-        } else {
-            sendMessage("off");
-        }
-        ::exit(0);
-    }
-    else if (parser.isSetBacklightOn())
-    {
-        if (isRunning())
-            sendMessage("on");
-        ::exit(0);
-    }
+	// 'on' and 'off' are mutually exclusive also
+	if (parser.isSetBacklightOff()) {
+		if (!isRunning()) {
+			LedDeviceLightpack lightpackDevice;
+			lightpackDevice.switchOffLeds();
+		} else {
+			sendMessage("off");
+		}
+		::exit(0);
+	}
+	else if (parser.isSetBacklightOn())
+	{
+		if (isRunning())
+			sendMessage("on");
+		::exit(0);
+	}
 
-    if (parser.isSetProfile()) {
-        if (isRunning())
-            sendMessage("set-profile " + parser.profileName());
-        ::exit(0);
-    }
+	if (parser.isSetProfile()) {
+		if (isRunning())
+			sendMessage("set-profile " + parser.profileName());
+		::exit(0);
+	}
 
-    if (parser.isSetDebuglevel())
-    {
-        g_debugLevel = parser.debugLevel();
-        m_isDebugLevelObtainedFromCmdArgs = true;
-    }
+	if (parser.isSetDebuglevel())
+	{
+		g_debugLevel = parser.debugLevel();
+		m_isDebugLevelObtainedFromCmdArgs = true;
+	}
 
 	if (parser.isSetStartAfterUpdate())
 	{
 		m_isStartAfterUpdate = true;
 	}
 
-    if (m_isDebugLevelObtainedFromCmdArgs)
-        qDebug() << "Debug level" << g_debugLevel;
+	if (m_isDebugLevelObtainedFromCmdArgs)
+		qDebug() << "Debug level" << g_debugLevel;
 }
 
 void LightpackApplication::outputMessage(QString message) const
@@ -486,16 +486,16 @@ void LightpackApplication::printVersionsSoftwareQtOS() const
 
 #		ifdef Q_OS_WIN
 		switch(QSysInfo::windowsVersion()){
-		case QSysInfo::WV_NT:           qDebug() << "Windows NT (operating system version 4.0)"; break;
-		case QSysInfo::WV_2000:         qDebug() << "Windows 2000 (operating system version 5.0)"; break;
-		case QSysInfo::WV_XP:           qDebug() << "Windows XP (operating system version 5.1)"; break;
-		case QSysInfo::WV_2003:         qDebug() << "Windows Server 2003, Windows Server 2003 R2, Windows Home Server, Windows XP Professional x64 Edition (operating system version 5.2)"; break;
-		case QSysInfo::WV_VISTA:        qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
-		case QSysInfo::WV_WINDOWS7:     qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
-		case QSysInfo::WV_WINDOWS8:     qDebug() << "Windows 8 (operating system version 6.2)"; break;
-		case QSysInfo::WV_WINDOWS8_1:   qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
-		case QSysInfo::WV_WINDOWS10:    qDebug() << "Windows 10 (operating system version 10.0)"; break;
-		default:                        qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
+		case QSysInfo::WV_NT:			qDebug() << "Windows NT (operating system version 4.0)"; break;
+		case QSysInfo::WV_2000:			qDebug() << "Windows 2000 (operating system version 5.0)"; break;
+		case QSysInfo::WV_XP:			qDebug() << "Windows XP (operating system version 5.1)"; break;
+		case QSysInfo::WV_2003:			qDebug() << "Windows Server 2003, Windows Server 2003 R2, Windows Home Server, Windows XP Professional x64 Edition (operating system version 5.2)"; break;
+		case QSysInfo::WV_VISTA:		qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
+		case QSysInfo::WV_WINDOWS7:		qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
+		case QSysInfo::WV_WINDOWS8:		qDebug() << "Windows 8 (operating system version 6.2)"; break;
+		case QSysInfo::WV_WINDOWS8_1:	qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
+		case QSysInfo::WV_WINDOWS10:	qDebug() << "Windows 10 (operating system version 10.0)"; break;
+		default:						qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
 		}
 
 		if (WinUtils::IsUserAdmin()) {
@@ -548,23 +548,23 @@ void LightpackApplication::startApiServer()
 
 	connect(this, SIGNAL(clearColorBuffers()), m_apiServer, SIGNAL(clearColorBuffers()));
 
-	connect(settings(), SIGNAL(apiServerSettingsChanged()),     m_apiServer, SLOT(apiServerSettingsChanged()));
+	connect(settings(), SIGNAL(apiServerSettingsChanged()),		m_apiServer, SLOT(apiServerSettingsChanged()));
 	connect(settings(), SIGNAL(apiKeyChanged(const QString &)), m_apiServer, SLOT(updateApiKey(const QString &)));
 
-	connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-	connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),  m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-	connect(settings(), SIGNAL(ardulightNumberOfLedsChanged(int)), m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
-	connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)),   m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+	connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+	connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+	connect(settings(), SIGNAL(ardulightNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
+	connect(settings(), SIGNAL(virtualNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
 
 	if (!m_noGui)
 	{
 		connect(m_apiServer, SIGNAL(errorOnStartListening(QString)), m_settingsWindow, SLOT(onApiServer_ErrorOnStartListening(QString)));
 	}
 
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)),    m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)),    Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)),            m_pluginInterface, SLOT(updateSmoothCache(int)),                    Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)),                  m_pluginInterface, SLOT(updateGammaCache(double)),                  Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)),                m_pluginInterface, SLOT(updateBrightnessCache(int)),                Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)),	m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)),	Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)),			m_pluginInterface, SLOT(updateSmoothCache(int)),					Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)),					m_pluginInterface, SLOT(updateGammaCache(double)),					Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)),				m_pluginInterface, SLOT(updateBrightnessCache(int)),				Qt::QueuedConnection);
 
 #ifdef BASS_SOUND_SUPPORT
 	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)), m_pluginInterface, SLOT(updateSoundVizMinColorCache(QColor)), Qt::QueuedConnection);
@@ -584,61 +584,61 @@ void LightpackApplication::startLedDeviceManager()
 	m_ledDeviceManager = new LedDeviceManager();
 	m_ledDeviceManagerThread = new QThread();
 
-//    connect(settings(), SIGNAL(connectedDeviceChanged(const SupportedDevices::DeviceType)), this, SLOT(handleConnectedDeviceChange(const SupportedDevices::DeviceType)), Qt::DirectConnection);
-//    connect(settings(), SIGNAL(adalightSerialPortNameChanged(QString)),               m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
-//    connect(settings(), SIGNAL(adalightSerialPortBaudRateChanged(QString)),           m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
-//    connect(m_settingsWindow, SIGNAL(updateLedsColors(const QList<QRgb> &)),          m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+//	connect(settings(), SIGNAL(connectedDeviceChanged(const SupportedDevices::DeviceType)), this, SLOT(handleConnectedDeviceChange(const SupportedDevices::DeviceType)), Qt::DirectConnection);
+//	connect(settings(), SIGNAL(adalightSerialPortNameChanged(QString)),				m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
+//	connect(settings(), SIGNAL(adalightSerialPortBaudRateChanged(QString)),			m_ledDeviceManager, SLOT(recreateLedDevice()), Qt::DirectConnection);
+//	connect(m_settingsWindow, SIGNAL(updateLedsColors(const QList<QRgb> &)),			m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 	m_pluginInterface = new LightpackPluginInterface(NULL);
 
 	connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus, QList<QString>)), this, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus, QList<QString>)));
-	connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(updateGamma(double)),           m_ledDeviceManager, SLOT(setGamma(double)),       Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(updateBrightness(int)),         m_ledDeviceManager, SLOT(setBrightness(int)),     Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(updateSmooth(int)),             m_ledDeviceManager, SLOT(setSmoothSlowdown(int)), Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(requestBacklightStatus()),         this,            SLOT(requestBacklightStatus()));
-	connect(m_pluginInterface, SIGNAL(updateBacklight(Lightpack::Mode)), this,            SLOT(setBacklightChanged(Lightpack::Mode)));
-//    connect(m_pluginInterface, SIGNAL(changeDevice(QString)),        m_settingsWindow , SLOT(setDevice(QString)));
-//    connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),        m_settingsWindow , SLOT(updateUiFromSettings()));
-//    connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),        this , SLOT(numberOfLedsChanged(int)));
+	connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateGamma(double)),		m_ledDeviceManager, SLOT(setGamma(double)),		Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateBrightness(int)),	m_ledDeviceManager, SLOT(setBrightness(int)),		Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSmooth(int)),		m_ledDeviceManager, SLOT(setSmoothSlowdown(int)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(requestBacklightStatus()),			this,	SLOT(requestBacklightStatus()));
+	connect(m_pluginInterface, SIGNAL(updateBacklight(Lightpack::Mode)),	this,	SLOT(setBacklightChanged(Lightpack::Mode)));
+//	connect(m_pluginInterface, SIGNAL(changeDevice(QString)),		m_settingsWindow , SLOT(setDevice(QString)));
+//	connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),		m_settingsWindow , SLOT(updateUiFromSettings()));
+//	connect(m_pluginInterface, SIGNAL(updateCountLeds(int)),		this , SLOT(numberOfLedsChanged(int)));
 
 	if (!m_noGui)
 	{
-		connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),    m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)));
+		connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)));
 		connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus, QList<QString>)), m_settingsWindow, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus, QList<QString>)));
-		connect(m_pluginInterface, SIGNAL(updateProfile(QString)),                        m_settingsWindow, SLOT(profileSwitch(QString)));
-		connect(m_pluginInterface, SIGNAL(updateStatus(Backlight::Status)),               m_settingsWindow, SLOT(setBacklightStatus(Backlight::Status)));
+		connect(m_pluginInterface, SIGNAL(updateProfile(QString)),						m_settingsWindow, SLOT(profileSwitch(QString)));
+		connect(m_pluginInterface, SIGNAL(updateStatus(Backlight::Status)),				m_settingsWindow, SLOT(setBacklightStatus(Backlight::Status)));
 	}
 	else
 	{
-		connect(m_pluginInterface, SIGNAL(updateProfile(QString)),                        this, SLOT(profileSwitch(QString)));
-		connect(m_pluginInterface, SIGNAL(updateStatus(Backlight::Status)),               this, SLOT(setStatusChanged(Backlight::Status)));
+		connect(m_pluginInterface, SIGNAL(updateProfile(QString)),						this, SLOT(profileSwitch(QString)));
+		connect(m_pluginInterface, SIGNAL(updateStatus(Backlight::Status)),				this, SLOT(setStatusChanged(Backlight::Status)));
 	}
 
-	connect(settings(), SIGNAL(deviceColorDepthChanged(int)),           m_ledDeviceManager, SLOT(setColorDepth(int)),                   Qt::QueuedConnection);
-	connect(settings(), SIGNAL(deviceSmoothChanged(int)),               m_ledDeviceManager, SLOT(setSmoothSlowdown(int)),               Qt::QueuedConnection);
-	connect(settings(), SIGNAL(deviceRefreshDelayChanged(int)),         m_ledDeviceManager, SLOT(setRefreshDelay(int)),                 Qt::QueuedConnection);
-	connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)),         Qt::QueuedConnection);
-	connect(settings(), SIGNAL(deviceGammaChanged(double)),             m_ledDeviceManager, SLOT(setGamma(double)),                     Qt::QueuedConnection);
-	connect(settings(), SIGNAL(deviceBrightnessChanged(int)),			m_ledDeviceManager, SLOT(setBrightness(int)),                   Qt::QueuedConnection);
-//    connect(settings(), SIGNAL(deviceColorSequenceChanged(QString)),  m_ledDeviceManager, SLOT(setColorSequence(QString)),            Qt::QueuedConnection);
-	connect(settings(), SIGNAL(luminosityThresholdChanged(int)),        m_ledDeviceManager, SLOT(setLuminosityThreshold(int)),          Qt::QueuedConnection);
-	connect(settings(), SIGNAL(minimumLuminosityEnabledChanged(bool)),  m_ledDeviceManager, SLOT(setMinimumLuminosityEnabled(bool)),    Qt::QueuedConnection);
-	connect(settings(), SIGNAL(ledCoefBlueChanged(int,double)),         m_ledDeviceManager, SLOT(updateWBAdjustments()),                Qt::QueuedConnection);
-	connect(settings(), SIGNAL(ledCoefRedChanged(int,double)),          m_ledDeviceManager, SLOT(updateWBAdjustments()),                Qt::QueuedConnection);
-	connect(settings(), SIGNAL(ledCoefGreenChanged(int,double)),        m_ledDeviceManager, SLOT(updateWBAdjustments()),                Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceColorDepthChanged(int)),			m_ledDeviceManager, SLOT(setColorDepth(int)),					Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceSmoothChanged(int)),				m_ledDeviceManager, SLOT(setSmoothSlowdown(int)),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceRefreshDelayChanged(int)),			m_ledDeviceManager, SLOT(setRefreshDelay(int)),					Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)),			Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceGammaChanged(double)),				m_ledDeviceManager, SLOT(setGamma(double)),						Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceBrightnessChanged(int)),			m_ledDeviceManager, SLOT(setBrightness(int)),					Qt::QueuedConnection);
+//	connect(settings(), SIGNAL(deviceColorSequenceChanged(QString)),	m_ledDeviceManager, SLOT(setColorSequence(QString)),			Qt::QueuedConnection);
+	connect(settings(), SIGNAL(luminosityThresholdChanged(int)),		m_ledDeviceManager, SLOT(setLuminosityThreshold(int)),			Qt::QueuedConnection);
+	connect(settings(), SIGNAL(minimumLuminosityEnabledChanged(bool)),	m_ledDeviceManager, SLOT(setMinimumLuminosityEnabled(bool)),	Qt::QueuedConnection);
+	connect(settings(), SIGNAL(ledCoefBlueChanged(int,double)),			m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(ledCoefRedChanged(int,double)),			m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(ledCoefGreenChanged(int,double)),		m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
 
-//    connect(settingsObj, SIGNAL(settingsProfileChanged()),       m_ledDeviceManager, SLOT(updateDeviceSettings()), Qt::QueuedConnection);
+//	connect(settingsObj, SIGNAL(settingsProfileChanged()),		m_ledDeviceManager, SLOT(updateDeviceSettings()), Qt::QueuedConnection);
 
 
 	if (!m_noGui)
 	{
-		connect(m_settingsWindow, SIGNAL(requestFirmwareVersion()),         m_ledDeviceManager, SLOT(requestFirmwareVersion()),							Qt::QueuedConnection);
-		connect(m_settingsWindow, SIGNAL(switchOffLeds()),                  m_ledDeviceManager, SLOT(switchOffLeds()),                                  Qt::QueuedConnection);
-		connect(m_settingsWindow, SIGNAL(switchOnLeds()),                   m_ledDeviceManager, SLOT(switchOnLeds()),                                   Qt::QueuedConnection);
-		connect(m_ledDeviceManager, SIGNAL(openDeviceSuccess(bool)),        m_settingsWindow,   SLOT(ledDeviceOpenSuccess(bool)),                       Qt::QueuedConnection);
-		connect(m_ledDeviceManager, SIGNAL(ioDeviceSuccess(bool)),          m_settingsWindow,   SLOT(ledDeviceCallSuccess(bool)),                       Qt::QueuedConnection);
-		connect(m_ledDeviceManager, SIGNAL(firmwareVersion(QString)),       m_settingsWindow,   SLOT(ledDeviceFirmwareVersionResult(QString)),          Qt::QueuedConnection);
-		connect(m_ledDeviceManager, SIGNAL(firmwareVersionUnofficial(int)), m_settingsWindow,   SLOT(ledDeviceFirmwareVersionUnofficialResult(int)),    Qt::QueuedConnection);
+		connect(m_settingsWindow, SIGNAL(requestFirmwareVersion()),			m_ledDeviceManager, SLOT(requestFirmwareVersion()),							Qt::QueuedConnection);
+		connect(m_settingsWindow, SIGNAL(switchOffLeds()),					m_ledDeviceManager, SLOT(switchOffLeds()),									Qt::QueuedConnection);
+		connect(m_settingsWindow, SIGNAL(switchOnLeds()),					m_ledDeviceManager, SLOT(switchOnLeds()),									Qt::QueuedConnection);
+		connect(m_ledDeviceManager, SIGNAL(openDeviceSuccess(bool)),		m_settingsWindow,	SLOT(ledDeviceOpenSuccess(bool)),						Qt::QueuedConnection);
+		connect(m_ledDeviceManager, SIGNAL(ioDeviceSuccess(bool)),			m_settingsWindow,	SLOT(ledDeviceCallSuccess(bool)),						Qt::QueuedConnection);
+		connect(m_ledDeviceManager, SIGNAL(firmwareVersion(QString)),		m_settingsWindow,	SLOT(ledDeviceFirmwareVersionResult(QString)),			Qt::QueuedConnection);
+		connect(m_ledDeviceManager, SIGNAL(firmwareVersionUnofficial(int)), m_settingsWindow,	SLOT(ledDeviceFirmwareVersionUnofficialResult(int)),	Qt::QueuedConnection);
 		connect(m_ledDeviceManager, SIGNAL(setColors_VirtualDeviceCallback(QList<QRgb>)), m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)), Qt::QueuedConnection);
 	}
 	m_ledDeviceManager->moveToThread(m_ledDeviceManagerThread);
@@ -683,38 +683,38 @@ void LightpackApplication::initGrabManager()
 	m_soundManager->initFromSettings();
 #endif
 	
-	connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)),  m_grabManager,      SLOT(onGrabberTypeChanged(const Grab::GrabberType &)),  Qt::QueuedConnection);
-	connect(settings(), SIGNAL(grabSlowdownChanged(int)),                       m_grabManager,      SLOT(onGrabSlowdownChanged(int)),                       Qt::QueuedConnection);
-	connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)),              m_grabManager,      SLOT(onGrabAvgColorsEnabledChanged(bool)),              Qt::QueuedConnection);
-	connect(settings(), SIGNAL(grabOverBrightenChanged(int)),                   m_grabManager,      SLOT(onGrabOverBrightenChanged(int)),                   Qt::QueuedConnection);
-	connect(settings(), SIGNAL(grabApplyGammaRampChanged(bool)),                m_grabManager,      SLOT(onGrabApplyGammaRampChanged(bool)),                Qt::QueuedConnection);
-	connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)),       m_grabManager,      SLOT(onSendDataOnlyIfColorsEnabledChanged(bool)),       Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)),	m_grabManager,		SLOT(onGrabberTypeChanged(const Grab::GrabberType &)),	Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabSlowdownChanged(int)),						m_grabManager,		SLOT(onGrabSlowdownChanged(int)),						Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)),				m_grabManager,		SLOT(onGrabAvgColorsEnabledChanged(bool)),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabOverBrightenChanged(int)),					m_grabManager,		SLOT(onGrabOverBrightenChanged(int)),					Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabApplyGammaRampChanged(bool)),				m_grabManager,		SLOT(onGrabApplyGammaRampChanged(bool)),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)),		m_grabManager,		SLOT(onSendDataOnlyIfColorsEnabledChanged(bool)),		Qt::QueuedConnection);
 #ifdef D3D10_GRAB_SUPPORT
-	connect(settings(), SIGNAL(dx1011GrabberEnabledChanged(bool)),              m_grabManager,      SLOT(onDx1011GrabberEnabledChanged(bool)),              Qt::QueuedConnection);
-	connect(settings(), SIGNAL(dx9GrabberEnabledChanged(bool)),                 m_grabManager,      SLOT(onDx9GrabberEnabledChanged(bool)),                 Qt::QueuedConnection);
+	connect(settings(), SIGNAL(dx1011GrabberEnabledChanged(bool)),				m_grabManager,		SLOT(onDx1011GrabberEnabledChanged(bool)),				Qt::QueuedConnection);
+	connect(settings(), SIGNAL(dx9GrabberEnabledChanged(bool)),					m_grabManager,		SLOT(onDx9GrabberEnabledChanged(bool)),					Qt::QueuedConnection);
 #endif
 
-	connect(settings(), SIGNAL(moodLampColorChanged(QColor)),                   m_moodlampManager,  SLOT(setCurrentColor(QColor)));
-	connect(settings(), SIGNAL(moodLampSpeedChanged(int)),                      m_moodlampManager,  SLOT(setLiquidModeSpeed(int)));
-	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),                m_moodlampManager,  SLOT(setLiquidMode(bool)));
+	connect(settings(), SIGNAL(moodLampColorChanged(QColor)),					m_moodlampManager,	SLOT(setCurrentColor(QColor)));
+	connect(settings(), SIGNAL(moodLampSpeedChanged(int)),						m_moodlampManager,	SLOT(setLiquidModeSpeed(int)));
+	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),				m_moodlampManager,	SLOT(setLiquidMode(bool)));
 
 #ifdef BASS_SOUND_SUPPORT
-	connect(settings(), SIGNAL(soundVisualizerDeviceChanged(int)),              m_soundManager,     SLOT(setDevice(int)));
-	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)),         m_soundManager,     SLOT(setMaxColor(QColor)));
-	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),         m_soundManager,     SLOT(setMinColor(QColor)));
-	connect(settings(), SIGNAL(soundVisualizerLiquidSpeedChanged(int)),         m_soundManager,     SLOT(setLiquidModeSpeed(int)));
-	connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)),         m_soundManager,     SLOT(setLiquidMode(bool)));
+	connect(settings(), SIGNAL(soundVisualizerDeviceChanged(int)),				m_soundManager,		SLOT(setDevice(int)));
+	connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)),			m_soundManager,		SLOT(setMaxColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),			m_soundManager,		SLOT(setMinColor(QColor)));
+	connect(settings(), SIGNAL(soundVisualizerLiquidSpeedChanged(int)),			m_soundManager,		SLOT(setLiquidModeSpeed(int)));
+	connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)),			m_soundManager,		SLOT(setLiquidMode(bool)));
 
-	connect(m_pluginInterface, SIGNAL(updateSoundVizMinColor(QColor)), m_soundManager, SLOT(setMinColor(QColor)), Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(updateSoundVizMaxColor(QColor)), m_soundManager, SLOT(setMaxColor(QColor)), Qt::QueuedConnection);
-	connect(m_pluginInterface, SIGNAL(updateSoundVizLiquid(bool)),     m_soundManager, SLOT(setLiquidMode(bool)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSoundVizMinColor(QColor)),			m_soundManager,		SLOT(setMinColor(QColor)),								Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSoundVizMaxColor(QColor)),			m_soundManager,		SLOT(setMaxColor(QColor)),								Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateSoundVizLiquid(bool)),				m_soundManager,		SLOT(setLiquidMode(bool)),								Qt::QueuedConnection);
 #endif
 
-	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_grabManager,      SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_grabManager,		SLOT(settingsProfileChanged(const QString &)),			Qt::QueuedConnection);
 
-	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_moodlampManager,  SLOT(settingsProfileChanged(const QString &)),         Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_moodlampManager,	SLOT(settingsProfileChanged(const QString &)),			Qt::QueuedConnection);
 #ifdef BASS_SOUND_SUPPORT
-	connect(settings(), SIGNAL(currentProfileInited(const QString &)),          m_soundManager,     SLOT(settingsProfileChanged(const QString &)));
+	connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_soundManager,		SLOT(settingsProfileChanged(const QString &)));
 #endif
 
 	// Connections to signals which will be connected to ILedDevice
@@ -727,17 +727,17 @@ void LightpackApplication::initGrabManager()
 		connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_settingsWindow, SLOT(refreshAmbilightEvaluated(double)));
 
 #ifdef BASS_SOUND_SUPPORT
-		connect(m_settingsWindow, SIGNAL(requestSoundVizDevices()),                   m_soundManager,   SLOT(requestDeviceList()));
+		connect(m_settingsWindow, SIGNAL(requestSoundVizDevices()), m_soundManager, SLOT(requestDeviceList()));
 		connect(m_soundManager, SIGNAL(deviceList(const QList<SoundManagerDeviceInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> &, int)));
 #endif
 	}
 
 	connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
 
-	connect(m_grabManager,      SIGNAL(updateLedsColors(const QList<QRgb> &)),  m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_moodlampManager,  SIGNAL(updateLedsColors(const QList<QRgb> &)),  m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_grabManager,		SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_moodlampManager,	SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 #ifdef BASS_SOUND_SUPPORT
-	connect(m_soundManager,     SIGNAL(updateLedsColors(const QList<QRgb> &)),  m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_soundManager,		SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 #endif
 }
 
@@ -750,8 +750,8 @@ void LightpackApplication::commitData(QSessionManager &sessionManager)
 	if (m_ledDeviceManager != NULL)
 	{
 		// Disable signals with new colors
-		disconnect(m_settingsWindow, SIGNAL(updateLedsColors(QList<QRgb>)),  m_ledDeviceManager, SLOT(setColors(QList<QRgb>)));
-		disconnect(m_apiServer, SIGNAL(updateLedsColors(QList<QRgb>)),  m_ledDeviceManager, SLOT(setColors(QList<QRgb>)));
+		disconnect(m_settingsWindow, SIGNAL(updateLedsColors(QList<QRgb>)), m_ledDeviceManager, SLOT(setColors(QList<QRgb>)));
+		disconnect(m_apiServer, SIGNAL(updateLedsColors(QList<QRgb>)), m_ledDeviceManager, SLOT(setColors(QList<QRgb>)));
 
 		// Process all currently pending signals
 		QApplication::processEvents(QEventLoop::AllEvents, 1000);
@@ -786,7 +786,7 @@ void LightpackApplication::settingsChanged()
 	bool isBacklightEnabled = Settings::isBacklightEnabled();
 	bool isCanStart = (isBacklightEnabled && m_deviceLockStatus == DeviceLocked::Unlocked);
 
-//    numberOfLedsChanged(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
+//	numberOfLedsChanged(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 
 #ifdef BASS_SOUND_SUPPORT
 	m_soundManager->setSendDataOnlyIfColorsChanged(Settings::isSendDataOnlyIfColorsChanges());

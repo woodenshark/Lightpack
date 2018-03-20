@@ -1,25 +1,25 @@
 /*
  * MoodLampManager.hpp
  *
- *  Created on: 11.12.2011
- *     Project: Lightpack
+ *	Created on: 11.12.2011
+ *		Project: Lightpack
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack a USB content-driving ambient lighting system
+ *	Lightpack a USB content-driving ambient lighting system
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -32,43 +32,43 @@
 
 class MoodLampManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit MoodLampManager(QObject *parent = 0);
+	explicit MoodLampManager(QObject *parent = 0);
 
 signals:
-    void updateLedsColors(const QList<QRgb> & colors);
+	void updateLedsColors(const QList<QRgb> & colors);
 
 public:
-    void start(bool isMoodLampEnabled);
+	void start(bool isMoodLampEnabled);
 
-    // Common options
-    void setSendDataOnlyIfColorsChanged(bool state);
-    void reset();
+	// Common options
+	void setSendDataOnlyIfColorsChanged(bool state);
+	void reset();
 
 public slots:
-    void initFromSettings();
-    void setLiquidMode(bool isEnabled);
-    void setLiquidModeSpeed(int value);
-    void settingsProfileChanged(const QString &profileName);
-    void setNumberOfLeds(int value);
-    void setCurrentColor(QColor color);
+	void initFromSettings();
+	void setLiquidMode(bool isEnabled);
+	void setLiquidModeSpeed(int value);
+	void settingsProfileChanged(const QString &profileName);
+	void setNumberOfLeds(int value);
+	void setCurrentColor(QColor color);
 
 private slots:
-    void updateColors();
+	void updateColors();
 
 private:
-    void initColors(int numberOfLeds);
-    void fillColors(QRgb rgb);
+	void initColors(int numberOfLeds);
+	void fillColors(QRgb rgb);
 
 private:
 	LiquidColorGenerator m_generator;
-    QList<QRgb> m_colors;
+	QList<QRgb> m_colors;
 
-    bool   m_isMoodLampEnabled;
-    QColor m_currentColor;
-    bool   m_isLiquidMode;
-    bool   m_isSendDataOnlyIfColorsChanged;
+	bool	m_isMoodLampEnabled;
+	QColor m_currentColor;
+	bool	m_isLiquidMode;
+	bool	m_isSendDataOnlyIfColorsChanged;
 
-    QRgb m_rgbSaved;
+	QRgb m_rgbSaved;
 };

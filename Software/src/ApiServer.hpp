@@ -1,26 +1,26 @@
 /*
  * ApiServer.hpp
  *
- *  Created on: 07.09.2011
- *     Authors: Andrey Isupov && Mike Shatohin
- *     Project: Lightpack
+ *	Created on: 07.09.2011
+ *		Authors: Andrey Isupov && Mike Shatohin
+ *		Project: Lightpack
  *
- *  Lightpack is very simple implementation of the backlight for a laptop
+ *	Lightpack is very simple implementation of the backlight for a laptop
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -42,212 +42,212 @@
 
 struct ClientInfo
 {
-    bool isAuthorized;
-    QString sessionKey;
-    // Think about it. May be we need to save gamma,
-    // smooth and brightness and after success lock send
-    // this values to device?
+	bool isAuthorized;
+	QString sessionKey;
+	// Think about it. May be we need to save gamma,
+	// smooth and brightness and after success lock send
+	// this values to device?
 };
 
 class ApiServer : public QTcpServer
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ApiServer(QObject *parent = 0);
-    ApiServer(quint16 port, QObject *parent = 0);
-    ~ApiServer();
+	ApiServer(QObject *parent = 0);
+	ApiServer(quint16 port, QObject *parent = 0);
+	~ApiServer();
 
-    void setInterface(LightpackPluginInterface *lightpackInterface);
-    void firstStart();
+	void setInterface(LightpackPluginInterface *lightpackInterface);
+	void firstStart();
 
 public:
-    static const char * ApiVersion;
-    static const char * CmdUnknown;
-    static const char * CmdDeprecated;
-    static const char * CmdExit;
-    static const char * CmdHelp;
-    static const char * CmdHelpShort;
+	static const char * ApiVersion;
+	static const char * CmdUnknown;
+	static const char * CmdDeprecated;
+	static const char * CmdExit;
+	static const char * CmdHelp;
+	static const char * CmdHelpShort;
 
-    static const char * CmdApiKey;
-    static const char * CmdApiKeyResult_Ok;
-    static const char * CmdApiKeyResult_Fail;
-    static const char * CmdApiCheck_AuthRequired;
+	static const char * CmdApiKey;
+	static const char * CmdApiKeyResult_Ok;
+	static const char * CmdApiKeyResult_Fail;
+	static const char * CmdApiCheck_AuthRequired;
 
-    static const char * CmdGetStatus;
-    static const char * CmdResultStatus_On;
-    static const char * CmdResultStatus_Off;
-    static const char * CmdResultStatus_DeviceError;
-    static const char * CmdResultStatus_Unknown;
+	static const char * CmdGetStatus;
+	static const char * CmdResultStatus_On;
+	static const char * CmdResultStatus_Off;
+	static const char * CmdResultStatus_DeviceError;
+	static const char * CmdResultStatus_Unknown;
 
-    static const char * CmdGetStatusAPI;
-    static const char * CmdResultStatusAPI_Busy;
-    static const char * CmdResultStatusAPI_Idle;
+	static const char * CmdGetStatusAPI;
+	static const char * CmdResultStatusAPI_Busy;
+	static const char * CmdResultStatusAPI_Idle;
 
-    static const char * CmdGetProfiles;
-    static const char * CmdResultProfiles;
+	static const char * CmdGetProfiles;
+	static const char * CmdResultProfiles;
 
-    static const char * CmdGetProfile;
-    static const char * CmdResultProfile;
+	static const char * CmdGetProfile;
+	static const char * CmdResultProfile;
 
-    static const char * CmdGetDevices;
-    static const char * CmdResultDevices;
+	static const char * CmdGetDevices;
+	static const char * CmdResultDevices;
 
-    static const char * CmdGetDevice;
-    static const char * CmdResultDevice;
+	static const char * CmdGetDevice;
+	static const char * CmdResultDevice;
 
-    static const char * CmdGetMaxLeds;
-    static const char * CmdResultMaxLeds;
+	static const char * CmdGetMaxLeds;
+	static const char * CmdResultMaxLeds;
 
-    static const char * CmdGetCountLeds;
-    static const char * CmdResultCountLeds;
+	static const char * CmdGetCountLeds;
+	static const char * CmdResultCountLeds;
 
-    static const char * CmdGetLeds;
-    static const char * CmdResultLeds;
+	static const char * CmdGetLeds;
+	static const char * CmdResultLeds;
 
-    static const char * CmdGetColors;
-    static const char * CmdResultGetColors;
+	static const char * CmdGetColors;
+	static const char * CmdResultGetColors;
 
-    static const char * CmdGetFPS;
-    static const char * CmdResultFPS;
+	static const char * CmdGetFPS;
+	static const char * CmdResultFPS;
 
-    static const char * CmdGetScreenSize;
-    static const char * CmdResultScreenSize;
+	static const char * CmdGetScreenSize;
+	static const char * CmdResultScreenSize;
 
-    static const char * CmdGetCountMonitor;
-    static const char * CmdResultCountMonitor;
-    static const char * CmdGetSizeMonitor;
-    static const char * CmdResultSizeMonitor;
+	static const char * CmdGetCountMonitor;
+	static const char * CmdResultCountMonitor;
+	static const char * CmdGetSizeMonitor;
+	static const char * CmdResultSizeMonitor;
 
-    static const char * CmdGetBacklight;
-    static const char * CmdResultBacklight_Ambilight;
-    static const char * CmdResultBacklight_Moodlamp;
+	static const char * CmdGetBacklight;
+	static const char * CmdResultBacklight_Ambilight;
+	static const char * CmdResultBacklight_Moodlamp;
 #ifdef BASS_SOUND_SUPPORT
-    static const char * CmdResultBacklight_SoundViz;
+	static const char * CmdResultBacklight_SoundViz;
 #endif
 
-    static const char * CmdGetGamma;
-    static const char * CmdResultGamma;
+	static const char * CmdGetGamma;
+	static const char * CmdResultGamma;
 
-    static const char * CmdGetBrightness;
-    static const char * CmdResultBrightness;
+	static const char * CmdGetBrightness;
+	static const char * CmdResultBrightness;
 
-    static const char * CmdGetSmooth;
-    static const char * CmdResultSmooth;
+	static const char * CmdGetSmooth;
+	static const char * CmdResultSmooth;
 
 #ifdef BASS_SOUND_SUPPORT
-    static const char * CmdGetSoundVizColors;
-    static const char * CmdResultSoundVizColors;
+	static const char * CmdGetSoundVizColors;
+	static const char * CmdResultSoundVizColors;
 
-    static const char * CmdGetSoundVizLiquid;
-    static const char * CmdResultSoundVizLiquid;
+	static const char * CmdGetSoundVizLiquid;
+	static const char * CmdResultSoundVizLiquid;
 #endif
 
 	static const char * CmdGetPersistOnUnlock;
 	static const char * CmdGetPersistOnUnlock_On;
 	static const char * CmdGetPersistOnUnlock_Off;
 
-    static const char * CmdGuid;
+	static const char * CmdGuid;
 
-    static const char * CmdLockStatus;
+	static const char * CmdLockStatus;
 
-    static const char * CmdLock;
-    static const char * CmdResultLock_Success;
-    static const char * CmdResultLock_Busy;
+	static const char * CmdLock;
+	static const char * CmdResultLock_Success;
+	static const char * CmdResultLock_Busy;
 
-    static const char * CmdUnlock;
-    static const char * CmdResultUnlock_Success;
-    static const char * CmdResultUnlock_NotLocked;
+	static const char * CmdUnlock;
+	static const char * CmdResultUnlock_Success;
+	static const char * CmdResultUnlock_NotLocked;
 
-    // Set-commands works only after success lock
-    static const char * CmdSetResult_Ok;
-    static const char * CmdSetResult_Error;
-    static const char * CmdSetResult_Busy;
-    static const char * CmdSetResult_NotLocked;
+	// Set-commands works only after success lock
+	static const char * CmdSetResult_Ok;
+	static const char * CmdSetResult_Error;
+	static const char * CmdSetResult_Busy;
+	static const char * CmdSetResult_NotLocked;
 
-    static const char * CmdSetColor;
-    static const char * CmdSetGamma;
-    static const char * CmdSetBrightness;
-    static const char * CmdSetSmooth;
-    static const char * CmdSetProfile;
+	static const char * CmdSetColor;
+	static const char * CmdSetGamma;
+	static const char * CmdSetBrightness;
+	static const char * CmdSetSmooth;
+	static const char * CmdSetProfile;
 
 #ifdef BASS_SOUND_SUPPORT
-    static const char * CmdSetSoundVizColors;
-    static const char * CmdSetSoundVizLiquid;
+	static const char * CmdSetSoundVizColors;
+	static const char * CmdSetSoundVizLiquid;
 #endif
 
-    static const char * CmdSetDevice;
+	static const char * CmdSetDevice;
 
-    static const char * CmdSetCountLeds;
-    static const char * CmdSetLeds;
+	static const char * CmdSetCountLeds;
+	static const char * CmdSetLeds;
 
-    static const char * CmdNewProfile;
-    static const char * CmdDeleteProfile;
+	static const char * CmdNewProfile;
+	static const char * CmdDeleteProfile;
 
-    static const char * CmdSetStatus;
-    static const char * CmdSetStatus_On;
-    static const char * CmdSetStatus_Off;
+	static const char * CmdSetStatus;
+	static const char * CmdSetStatus_On;
+	static const char * CmdSetStatus_Off;
 
-    static const char * CmdSetBacklight;
-    static const char * CmdSetBacklight_Ambilight;
-    static const char * CmdSetBacklight_Moodlamp;
+	static const char * CmdSetBacklight;
+	static const char * CmdSetBacklight_Ambilight;
+	static const char * CmdSetBacklight_Moodlamp;
 #ifdef BASS_SOUND_SUPPORT
-    static const char * CmdSetBacklight_SoundViz;
+	static const char * CmdSetBacklight_SoundViz;
 #endif
 
 	static const char * CmdSetPersistOnUnlock;
 	static const char * CmdSetPersistOnUnlock_On;
 	static const char * CmdSetPersistOnUnlock_Off;
 
-    static const int SignalWaitTimeoutMs;
+	static const int SignalWaitTimeoutMs;
 
 signals:
-    void startParseSetColorTask(QByteArray buffer);
-    void errorOnStartListening(QString errorMessage);
-    void clearColorBuffers();
-    void updateApiDeviceNumberOfLeds(int value);
+	void startParseSetColorTask(QByteArray buffer);
+	void errorOnStartListening(QString errorMessage);
+	void clearColorBuffers();
+	void updateApiDeviceNumberOfLeds(int value);
 
 public slots:
-    void apiServerSettingsChanged();
-    void updateApiKey(const QString &key);
+	void apiServerSettingsChanged();
+	void updateApiKey(const QString &key);
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+	void incomingConnection(qintptr socketDescriptor);
 
 private slots:
-    void clientDisconnected();
-    void clientProcessCommands();
-    void taskSetColorIsSuccess(bool isSuccess);
+	void clientDisconnected();
+	void clientProcessCommands();
+	void taskSetColorIsSuccess(bool isSuccess);
 
 private:
-    LightpackPluginInterface *lightpack;
-    void initPrivateVariables();
-    void initApiSetColorTask();
-    void startListening();
-    void stopListening();
-    void writeData(QTcpSocket* client, const QString & data);
-    QString formatHelp(const QString & cmd);
-    QString formatHelp(const QString & cmd, const QString & description);
-    QString formatHelp(const QString & cmd, const QString & description, const QString & results);
-    QString formatHelp(const QString & cmd, const QString & description, const QString & examples, const QString & results);
-    void initHelpMessage();
-    void initShortHelpMessage();
+	LightpackPluginInterface *lightpack;
+	void initPrivateVariables();
+	void initApiSetColorTask();
+	void startListening();
+	void stopListening();
+	void writeData(QTcpSocket* client, const QString & data);
+	QString formatHelp(const QString & cmd);
+	QString formatHelp(const QString & cmd, const QString & description);
+	QString formatHelp(const QString & cmd, const QString & description, const QString & results);
+	QString formatHelp(const QString & cmd, const QString & description, const QString & examples, const QString & results);
+	void initHelpMessage();
+	void initShortHelpMessage();
 
 private:
-    int m_apiPort;
-    bool m_listenOnlyOnLoInterface;
-    QString m_apiAuthKey;
-    bool m_isAuthEnabled;
-    QTime m_time;
+	int m_apiPort;
+	bool m_listenOnlyOnLoInterface;
+	QString m_apiAuthKey;
+	bool m_isAuthEnabled;
+	QTime m_time;
 
-    QMap <QTcpSocket*, ClientInfo> m_clients;
+	QMap <QTcpSocket*, ClientInfo> m_clients;
 
-    QThread *m_apiSetColorTaskThread;
-    ApiServerSetColorTask *m_apiSetColorTask;
+	QThread *m_apiSetColorTaskThread;
+	ApiServerSetColorTask *m_apiSetColorTask;
 
-    bool m_isTaskSetColorDone;
-    bool m_isTaskSetColorParseSuccess;
+	bool m_isTaskSetColorDone;
+	bool m_isTaskSetColorParseSuccess;
 
-    QString m_helpMessage;
-    QString m_shortHelpMessage;
+	QString m_helpMessage;
+	QString m_shortHelpMessage;
 };

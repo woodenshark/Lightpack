@@ -1,25 +1,25 @@
 /*
  * D3D10Grabber.hpp
  *
- *  Created on: 29.05.2012
- *     Project: Lightpack
+ *	Created on: 29.05.2012
+ *		Project: Lightpack
  *
- *  Copyright (c) 2012 Timur Sattarov
+ *	Copyright (c) 2012 Timur Sattarov
  *
- *  Lightpack a USB content-driving ambient lighting system
+ *	Lightpack a USB content-driving ambient lighting system
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -37,30 +37,30 @@ class D3D10GrabberImpl;
 
 class D3D10Grabber : public GrabberBase
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    D3D10Grabber(QObject * parent, GrabberContext *context, GetHwndCallback_t getHwndCb, bool injectD3D9);
-    virtual ~D3D10Grabber();
+	D3D10Grabber(QObject * parent, GrabberContext *context, GetHwndCallback_t getHwndCb, bool injectD3D9);
+	virtual ~D3D10Grabber();
 
-    DECLARE_GRABBER_NAME("D3D10Grabber")
+	DECLARE_GRABBER_NAME("D3D10Grabber")
 
 public slots:
-    virtual void init();
-    virtual void startGrabbing();
-    virtual void stopGrabbing();
-    virtual bool isGrabbingStarted() const;
-    virtual void setGrabInterval(int msec);
+	virtual void init();
+	virtual void startGrabbing();
+	virtual void stopGrabbing();
+	virtual bool isGrabbingStarted() const;
+	virtual void setGrabInterval(int msec);
 
 protected slots:
-    virtual GrabResult grabScreens();
-    virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
-    virtual void showAdminMessage();
+	virtual GrabResult grabScreens();
+	virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
+	virtual void showAdminMessage();
 
-    virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
+	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
 private:
-    QScopedPointer<D3D10GrabberImpl> m_impl;
+	QScopedPointer<D3D10GrabberImpl> m_impl;
 };
 
 #endif

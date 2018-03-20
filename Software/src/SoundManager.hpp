@@ -1,25 +1,25 @@
 /*
  * MoodLampManager.hpp
  *
- *  Created on: 11.12.2011
- *     Project: Lightpack
+ *	Created on: 11.12.2011
+ *		Project: Lightpack
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack a USB content-driving ambient lighting system
+ *	Lightpack a USB content-driving ambient lighting system
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -41,26 +41,26 @@ Q_DECLARE_METATYPE(SoundManagerDeviceInfo);
 
 class SoundManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit SoundManager(int hWnd, QObject *parent = 0);
 	~SoundManager();
 
 signals:
-    void updateLedsColors(const QList<QRgb> & colors);
+	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 
 public:
-    void start(bool isMoodLampEnabled);
+	void start(bool isMoodLampEnabled);
 
-    // Common options
-    void setSendDataOnlyIfColorsChanged(bool state);
-    void reset();
+	// Common options
+	void setSendDataOnlyIfColorsChanged(bool state);
+	void reset();
 
 public slots:
-    void initFromSettings();
-    void settingsProfileChanged(const QString &profileName);
+	void initFromSettings();
+	void settingsProfileChanged(const QString &profileName);
 	void setNumberOfLeds(int value);
 	void setDevice(int value);
 	void setMinColor(QColor color);
@@ -70,7 +70,7 @@ public slots:
 	void requestDeviceList();
 
 private slots:
-    void updateColors();
+	void updateColors();
 
 private:
 	bool init();
@@ -87,11 +87,11 @@ private:
 	int m_hWnd;
 
 
-	bool   m_isEnabled;
-	bool   m_isInited;
-	bool   m_isLiquidMode;
+	bool	m_isEnabled;
+	bool	m_isInited;
+	bool	m_isLiquidMode;
 	QColor m_minColor;
 	QColor m_maxColor;
-	int    m_device;
-    bool   m_isSendDataOnlyIfColorsChanged;
+	int	m_device;
+	bool	m_isSendDataOnlyIfColorsChanged;
 };

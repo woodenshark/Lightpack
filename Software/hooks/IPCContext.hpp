@@ -15,19 +15,19 @@
 class IPCContext : public LoggableTrait
 {
 public:
-    IPCContext(Logger *logger): LoggableTrait(logger) {}
-    ~IPCContext();
+	IPCContext(Logger *logger): LoggableTrait(logger) {}
+	~IPCContext();
 
-    bool init();
-    void free();
+	bool init();
+	void free();
 
-    HANDLE m_hSharedMem;
-    HANDLE m_hMutex;
-    HANDLE m_hFrameGrabbedEvent;
+	HANDLE m_hSharedMem;
+	HANDLE m_hMutex;
+	HANDLE m_hFrameGrabbedEvent;
 
-    HOOKSGRABBER_SHARED_MEM_DESC *m_pMemDesc;
+	HOOKSGRABBER_SHARED_MEM_DESC *m_pMemDesc;
 
-    PVOID m_pMemMap;
+	PVOID m_pMemMap;
 };
 
 #endif // IPCCONTEXT_HPP

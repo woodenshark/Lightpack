@@ -1,28 +1,28 @@
 //
-//  Values are 32 bit values laid out as follows:
+//	Values are 32 bit values laid out as follows:
 //
-//   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
-//   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-//  +---+-+-+-----------------------+-------------------------------+
-//  |Sev|C|R|     Facility          |               Code            |
-//  +---+-+-+-----------------------+-------------------------------+
+//	3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+//	1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+//	+---+-+-+-----------------------+-------------------------------+
+//	|Sev|C|R|		Facility			|				Code			|
+//	+---+-+-+-----------------------+-------------------------------+
 //
-//  where
+//	where
 //
-//      Sev - is the severity code
+//		Sev - is the severity code
 //
-//          00 - Success
-//          01 - Informational
-//          10 - Warning
-//          11 - Error
+//			00 - Success
+//			01 - Informational
+//			10 - Warning
+//			11 - Error
 //
-//      C - is the Customer code flag
+//		C - is the Customer code flag
 //
-//      R - is a reserved bit
+//		R - is a reserved bit
 //
-//      Facility - is the facility code
+//		Facility - is the facility code
 //
-//      Code - is the facility's status code
+//		Code - is the facility's status code
 //
 //
 // Define the facility codes
@@ -32,10 +32,10 @@
 //
 // Define the severity codes
 //
-#define PRISMATIK_LOG_SEVERITY_DEBUG     0x0
-#define PRISMATIK_LOG_SEVERITY_INFO      0x1
-#define PRISMATIK_LOG_SEVERITY_WARNING   0x2
-#define PRISMATIK_LOG_SEVERITY_ERROR     0x3
+#define PRISMATIK_LOG_SEVERITY_DEBUG		0x0
+#define PRISMATIK_LOG_SEVERITY_INFO		0x1
+#define PRISMATIK_LOG_SEVERITY_WARNING	0x2
+#define PRISMATIK_LOG_SEVERITY_ERROR		0x3
 
 
 //
@@ -45,7 +45,7 @@
 //
 // %1
 //
-#define PRISMATIK_LOG_MSG_DEBUG          ((DWORD)0x00000100L)
+#define PRISMATIK_LOG_MSG_DEBUG			((DWORD)0x00000100L)
 
 //
 // MessageId: PRISMATIK_LOG_MSG_INFO
@@ -54,7 +54,7 @@
 //
 // %1
 //
-#define PRISMATIK_LOG_MSG_INFO           ((DWORD)0x40000101L)
+#define PRISMATIK_LOG_MSG_INFO			((DWORD)0x40000101L)
 
 //
 // MessageId: PRISMATIK_LOG_MSG_WARNING
@@ -63,7 +63,7 @@
 //
 // %1
 //
-#define PRISMATIK_LOG_MSG_WARNING        ((DWORD)0x80000102L)
+#define PRISMATIK_LOG_MSG_WARNING		((DWORD)0x80000102L)
 
 //
 // MessageId: PRISMATIK_LOG_MSG_ERROR
@@ -72,5 +72,5 @@
 //
 // %1
 //
-#define PRISMATIK_LOG_MSG_ERROR          ((DWORD)0xC0000103L)
+#define PRISMATIK_LOG_MSG_ERROR			((DWORD)0xC0000103L)
 

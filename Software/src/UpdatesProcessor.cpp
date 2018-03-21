@@ -106,6 +106,14 @@ void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 
 	QNetworkRequest request(QUrl(info.pkgUrl));
 	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+#else
+#	if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+	request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#	endif
+#endif
+
 	_reply = _networkMan.get(request);
 	connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
 	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
@@ -134,6 +142,14 @@ void UpdatesProcessor::updatePgkLoaded()
 
 	QNetworkRequest request = QNetworkRequest(QUrl(_sigUrl));
 	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+#else
+#	if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+	request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#	endif
+#endif
+
 	_reply = _networkMan.get(request);
 	connect(_reply, SIGNAL(finished()), this, SLOT(updateSigLoaded()));
 	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));

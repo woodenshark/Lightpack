@@ -172,7 +172,7 @@ void UpdatesProcessor::updateSigLoaded()
 	_reply = NULL;
 
 	// TODO: ensure user is not using the program
-	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "triggering update process";
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "triggering update process";
 	QStringList args;
 	args.append("request");
 	args.append(QDir::tempPath());
@@ -181,7 +181,7 @@ void UpdatesProcessor::updateSigLoaded()
 	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
 		QCoreApplication::quit();
 	} else {
-		qCritical() << Q_FUNC_INFO << "Failed to write update signature";
+		qCritical() << Q_FUNC_INFO << "Failed to start UpdateElevate.exe";
 	}
 }
 #endif

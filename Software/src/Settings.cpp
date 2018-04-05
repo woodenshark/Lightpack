@@ -820,6 +820,17 @@ QStringList Settings::getSupportedSerialPortBaudRates()
 	QStringList list;
 
 	// TODO: Add more baud rates if need it
+	list.append("2000000");
+	list.append("1500000");
+	list.append("1000000");
+	list.append("921600");
+	list.append("500000");
+	list.append("460800");
+	list.append("256000");
+	list.append("230400");
+	list.append("153600");
+	list.append("128000");
+
 	list.append("115200");
 	list.append("57600");
 	list.append("9600");

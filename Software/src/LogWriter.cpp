@@ -24,8 +24,6 @@ LogWriter::~LogWriter()
 
 int LogWriter::initWith(const QString& logsDirPath)
 {
-	QMutexLocker locker(&m_mutex);
-
 	// Using locale codec for console output in messageHandler(..) function ( cout << qstring.toStdString() )
 	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
 
@@ -44,6 +42,8 @@ int LogWriter::initWith(const QString& logsDirPath)
 	const QString logFilePath = logsDirPath + "/Prismatik.0.log";
 	QScopedPointer<QFile> logFile(new QFile(logFilePath));
 	if (logFile->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+		QMutexLocker locker(&m_mutex);
+
 		m_logStream.setDevice(logFile.take());
 		m_logStream << endl;
 

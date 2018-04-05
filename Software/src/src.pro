@@ -291,17 +291,8 @@ HEADERS += \
     wizard/AreaDistributor.hpp \
     wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
-    systrayicon/SysTrayIcon_p.hpp \
     UpdatesProcessor.hpp \
     LightpackCommandLineParser.hpp
-
-!contains(DEFINES,UNITY_DESKTOP) {
-    HEADERS += systrayicon/SysTrayIcon_qt_p.hpp
-}
-
-contains(DEFINES,UNITY_DESKTOP) {
-    HEADERS += systrayicon/SysTrayIcon_unity_p.hpp
-}
 
 contains(DEFINES,BASS_SOUND_SUPPORT) {
     SOURCES += SoundManager.cpp

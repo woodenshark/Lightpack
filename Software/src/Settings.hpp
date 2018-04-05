@@ -223,6 +223,8 @@ public:
 	static void setCheckForUpdatesEnabled(bool isEnabled);
 	static bool isInstallUpdatesEnabled();
 	static void setInstallUpdatesEnabled(bool isEnabled);
+	static QString getAutoUpdatingVersion();
+	static void setAutoUpdatingVersion(const QString & version);
 
 private:		
 	static int getValidDeviceRefreshDelay(int value);

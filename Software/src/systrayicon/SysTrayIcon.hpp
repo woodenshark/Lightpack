@@ -28,7 +28,13 @@
 #define SYSTRAYICON_HPP
 
 #include <QObject>
+#include <QSystemTrayIcon>
+#include <QCache>
+#include <QAction>
+#include <QMenu>
+#include <QUrl>
 #include "enums.hpp"
+#include "UpdatesProcessor.hpp"
 
 class QMenu;
 class SysTrayIconPrivate;
@@ -62,7 +68,7 @@ public:
 	
 	void init();
 	bool isVisible() const;
-	void showMessage(const QString &title, const QString &text);
+	void showMessage(const QString &title, const QString &text, QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information);
 	void showMessage(const Message msg);
 	void setStatus(const Status status, const QString *arg = NULL);
 	void updateProfiles();
@@ -82,10 +88,30 @@ public slots:
 	void retranslateUi();
 	void checkUpdate();
 
+private slots:
+	void onCheckUpdate_Finished();
+	void onProfileAction_Triggered();
+	void onTrayIcon_MessageClicked();
+	void onTrayIcon_Activated(QSystemTrayIcon::ActivationReason reason);
+
 private:
-	SysTrayIconPrivate * const d_ptr;
-	Q_DECLARE_PRIVATE(SysTrayIcon)
-	Q_DISABLE_COPY(SysTrayIcon)
+	void createActions();
+	void fillProfilesFromSettings();
+
+private:
+	UpdatesProcessor _updatesProcessor;
+
+	QSystemTrayIcon * _qsystray;
+	QAction * _switchOnBacklightAction;
+	QAction * _switchOffBacklightAction;
+	QAction * _settingsAction;
+	QAction * _quitAction;
+	QMenu * _profilesMenu;
+	SysTrayIcon::Message _trayMessage;
+	QUrl _trayMsgUrl;
+	SysTrayIcon::Status _status;
+
+	QCache<QString, QPixmap> _pixmapCache;
 
 };
 

@@ -75,7 +75,6 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 
 	if (static_cast<size_t>(colors.count()) > maxLedsCount()) {
 		qWarning() << Q_FUNC_INFO << "data size is greater than max leds count";
-
 		// skip command with wrong data size
 		return;
 	}

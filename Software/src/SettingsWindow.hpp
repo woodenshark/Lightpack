@@ -58,7 +58,7 @@ public:
 
 public:
 	void startBacklight();
-	void createTrayIcon(bool showUpdatedMessage = false);
+	void createTrayIcon();
 	void connectSignalsSlots();
 	QWidget* getSettingBox();
 

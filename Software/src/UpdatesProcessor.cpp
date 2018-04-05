@@ -33,6 +33,7 @@
 #include "version.h"
 #include "debug.h"
 #include "UpdatesProcessor.hpp"
+#include "Settings.hpp"
 
 //#define UPDATE_CHECK_URL "https://psieg.de/lightpack/update.xml"
 #define UPDATE_CHECK_URL "https://psieg.github.io/Lightpack/update.xml"
@@ -94,8 +95,10 @@ void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 {
 #ifdef Q_OS_WIN
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << "fetching" << info.pkgUrl;
-	if (info.pkgUrl.isEmpty() || info.sigUrl.isEmpty())
+	if (info.pkgUrl.isEmpty() || info.sigUrl.isEmpty()) {
+		qCritical() << Q_FUNC_INFO << "UpdateInfo is missing required links";
 		return;
+	}
 
 	_sigUrl = info.sigUrl;
 	if (_reply != NULL) {
@@ -173,11 +176,12 @@ void UpdatesProcessor::updateSigLoaded()
 
 	// TODO: ensure user is not using the program
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "triggering update process";
+	SettingsScope::Settings::setAutoUpdatingVersion(VERSION_STR);
+
 	QStringList args;
 	args.append("request");
 	args.append(QDir::tempPath());
 	args.append(QCoreApplication::applicationFilePath());
-	args.append("--startafterupdate");
 	if (QProcess::startDetached(QCoreApplication::applicationDirPath() + "\\UpdateElevate.exe", args)) {
 		QCoreApplication::quit();
 	} else {

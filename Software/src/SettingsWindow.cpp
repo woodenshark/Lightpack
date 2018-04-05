@@ -474,8 +474,26 @@ void SettingsWindow::onPostInit() {
 #ifdef BASS_SOUND_SUPPORT
 	this->requestSoundVizDevices();
 #endif
-	if (m_trayIcon && Settings::isCheckForUpdatesEnabled())
-		QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
+
+	if (m_trayIcon) {
+		bool updateJustFailed = false;
+		if (!Settings::getAutoUpdatingVersion().isEmpty()) {
+			if (Settings::getAutoUpdatingVersion() != VERSION_STR) {
+				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
+			} else {
+				m_trayIcon->showMessage(
+					tr("Prismatik update failed"), 
+					tr("There was a problem installing the update. You are still on version %1.").arg(VERSION_STR),
+					QSystemTrayIcon::Critical);
+				updateJustFailed = true;
+			}
+			Settings::setAutoUpdatingVersion("");
+		}
+
+		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
+			QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
+	}
+
 
 	QTimer::singleShot(50, this, SLOT(checkOutdatedGrabber()));
 }
@@ -1626,7 +1644,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 // Create tray icon
 // ----------------------------------------------------------------------------
 
-void SettingsWindow::createTrayIcon(bool showUpdatedMessage)
+void SettingsWindow::createTrayIcon()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	m_trayIcon = new SysTrayIcon();
@@ -1639,10 +1657,6 @@ void SettingsWindow::createTrayIcon(bool showUpdatedMessage)
 
 	m_trayIcon->init();
 	connect(this, SIGNAL(backlightStatusChanged(Backlight::Status)), this, SLOT(updateTrayAndActionStates()));
-
-	if (showUpdatedMessage) {
-		m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
-	}
 }
 
 void SettingsWindow::updateUiFromSettings()

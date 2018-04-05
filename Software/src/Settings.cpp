@@ -76,6 +76,7 @@ static const QString ConnectedDevice = "ConnectedDevice";
 static const QString SupportedDevices = "SupportedDevices";
 static const QString CheckForUpdates = "CheckForUpdates";
 static const QString InstallUpdates = "InstallForUpdates";
+static const QString AutoUpdatingVersion = "AutoUpdatingVersion";
 
 // [Hotkeys]
 namespace Hotkeys
@@ -1620,6 +1621,14 @@ bool Settings::isInstallUpdatesEnabled() {
 
 void Settings::setInstallUpdatesEnabled(bool isEnabled) {
 	setValueMain(Main::Key::InstallUpdates, isEnabled);
+}
+
+QString Settings::getAutoUpdatingVersion() {
+	return valueMain(Main::Key::AutoUpdatingVersion).toString();
+}
+
+void Settings::setAutoUpdatingVersion(const QString & version) {
+	setValueMain(Main::Key::AutoUpdatingVersion, version);
 }
 
 //

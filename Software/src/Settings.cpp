@@ -259,7 +259,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	QString mainConfigPath = getMainConfigPath();
 	bool settingsWasPresent = QFileInfo(mainConfigPath).exists();
 
-	m_mainConfig = new QSettings(getMainConfigPath(), QSettings::IniFormat);
+	m_mainConfig = new QSettings(mainConfigPath, QSettings::IniFormat);
 	m_mainConfig->setIniCodec("UTF-8");
 
 	setNewOptionMain(Main::Key::MainConfigVersion,		Main::Value::MainConfigVersion /* rewrite */);

@@ -125,10 +125,6 @@ int main(int argc, char **argv)
 	const QString appDirPath = getApplicationDirectoryPath(argv[0]);
 
 	LogWriter logWriter;
-	const int logInitResult = logWriter.initWith(appDirPath + "/Logs");
-	if (logInitResult != LightpackApplication::OK_ErrorCode) {
-		exit(logInitResult);
-	}
 
 	LogWriter::ScopedMessageHandler messageHandlerGuard(&logWriter);
 	Q_UNUSED(messageHandlerGuard);
@@ -136,6 +132,16 @@ int main(int argc, char **argv)
 	LightpackApplication lightpackApp(argc, argv);
 	lightpackApp.setLibraryPaths(QStringList(appDirPath + "/plugins"));
 	lightpackApp.initializeAll(appDirPath);
+	
+	// init the logger after initializeAll to know the configured debugLevel
+	if (g_debugLevel > 0) {
+		const int logInitResult = logWriter.initWith(appDirPath + "/Logs");
+		if (logInitResult != LightpackApplication::OK_ErrorCode) {
+			exit(logInitResult);
+		}
+	} else {
+		logWriter.initDisabled();
+	}
 
 	if (lightpackApp.isRunning())
 	{

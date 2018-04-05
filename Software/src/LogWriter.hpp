@@ -30,10 +30,11 @@ class LogWriter
 public:
 	enum Level { Debug, Warn, Critical, Fatal, LevelCount };
 
-	LogWriter() { Q_ASSERT(g_logWriter == NULL); }
-	~LogWriter() { Q_ASSERT(g_logWriter == NULL); }
+	LogWriter();
+	~LogWriter();
 
 	int initWith(const QString& logsDirPath);
+	void initDisabled();
 	void writeMessage(const QString& msg, Level level = Debug);
 
 	struct ScopedMessageHandler
@@ -62,4 +63,6 @@ private:
 
 	QTextStream m_logStream;
 	QMutex m_mutex;
+	QString m_startupLogStore;
+	bool m_disabled;
 };

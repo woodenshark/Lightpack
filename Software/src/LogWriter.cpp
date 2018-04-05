@@ -8,8 +8,24 @@
 
 using namespace std;
 
+
+
+LogWriter::LogWriter()
+{
+	Q_ASSERT(g_logWriter == NULL);
+	m_logStream.setString(&m_startupLogStore);
+	m_disabled = false;
+}
+
+LogWriter::~LogWriter()
+{
+	Q_ASSERT(g_logWriter == NULL);
+}
+
 int LogWriter::initWith(const QString& logsDirPath)
 {
+	QMutexLocker locker(&m_mutex);
+
 	// Using locale codec for console output in messageHandler(..) function ( cout << qstring.toStdString() )
 	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
 
@@ -34,8 +50,11 @@ int LogWriter::initWith(const QString& logsDirPath)
 		const QDateTime currentDateTime(QDateTime::currentDateTime());
 		m_logStream << currentDateTime.date().toString("yyyy_MM_dd") << " ";
 		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR << endl;
-	}
-	else {
+
+		// write the cached log
+		m_logStream << m_startupLogStore;
+		m_startupLogStore.clear();
+	} else {
 		cerr << "Failed to open logs file: '" << logFilePath.toStdString() << "'. Exit." << endl;
 		return LightpackApplication::OpenLogsFail_ErrorCode;
 	}
@@ -43,6 +62,13 @@ int LogWriter::initWith(const QString& logsDirPath)
 	qDebug() << "Logs file:" << logFilePath;
 
 	return LightpackApplication::OK_ErrorCode;
+}
+
+void LogWriter::initDisabled()
+{
+	QMutexLocker locker(&m_mutex);
+	m_startupLogStore.clear();
+	m_disabled = true;
 }
 
 void LogWriter::writeMessage(const QString& msg, Level level)
@@ -55,8 +81,10 @@ void LogWriter::writeMessage(const QString& msg, Level level)
 	const QString finalMsg = QString("%1 %2: %3\n").arg(timeMark, s_logLevelNames[level], msg);
 	QMutexLocker locker(&m_mutex);
 	cerr << finalMsg.toStdString();
-	m_logStream << finalMsg;
-	m_logStream.flush();
+	if (!m_disabled) {
+		m_logStream << finalMsg;
+		m_logStream.flush();
+	}
 }
 
 void LogWriter::messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)

@@ -67,10 +67,8 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
 	m_parentWidget = parent;
 
-	m_timeEval = new TimeEvaluations();
-
-	m_fpsMs = 0;
-	m_noGrabCount = 0;
+	m_grabCountLastInterval = 0;
+	m_grabCountThisInterval = 0;
 
 	m_grabberContext = new GrabberContext();
 
@@ -111,7 +109,6 @@ GrabManager::~GrabManager()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	delete m_timeEval;
 	m_grabber = NULL;
 	delete m_timerFakeGrab;
 	delete m_timerUpdateFPS;
@@ -417,9 +414,7 @@ void GrabManager::handleGrabbedColors()
 		emit updateLedsColors(m_colorsCurrent);
 	}
 
-	m_fpsMs = m_timeEval->howLongItEnd();
-	m_noGrabCount = 0;
-	m_timeEval->howLongItStart();
+	m_grabCountThisInterval++;
 
 	if (m_isSendDataOnlyIfColorsChanged == false)
 	{
@@ -442,9 +437,10 @@ void GrabManager::timeoutFakeGrab()
 void GrabManager::timeoutUpdateFPS()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
-	m_noGrabCount++;
-	if (m_noGrabCount > 2) m_fpsMs = 0;
-	emit ambilightTimeOfUpdatingColors(m_fpsMs);
+	emit ambilightTimeOfUpdatingColors((2.0 * FPS_UPDATE_INTERVAL) / (m_grabCountLastInterval + m_grabCountThisInterval));
+
+	m_grabCountLastInterval = m_grabCountThisInterval;
+	m_grabCountThisInterval = 0;
 }
 
 void GrabManager::pauseWhileResizeOrMoving()

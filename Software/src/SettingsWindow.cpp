@@ -69,7 +69,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 
-	m_trayIcon = NULL	;
+	m_trayIcon = NULL;
 
 	ui->setupUi(this);
 

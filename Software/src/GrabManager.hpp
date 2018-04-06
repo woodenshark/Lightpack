@@ -112,7 +112,6 @@ private:
 	QList<GrabWidget *> m_ledWidgets;
 	QList<QRgb> m_grabResult;
 	const static QColor m_backgroundAndTextColors[10][2];
-	TimeEvaluations *m_timeEval;
 
 	QList<QRgb> m_colorsCurrent;
 	QList<QRgb> m_colorsNew;
@@ -128,9 +127,8 @@ private:
 	int m_overBrighten;
 	bool m_isApplyGammaRamp;
 
-	// Store last grabbing time in milliseconds
-	double m_fpsMs;
-	int m_noGrabCount;
+	int m_grabCountThisInterval;
+	int m_grabCountLastInterval;
 
 	bool m_isGrabWidgetsVisible;
 	GrabberContext * m_grabberContext;

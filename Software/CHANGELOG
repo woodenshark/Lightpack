@@ -13,6 +13,16 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.16
+---------------
+April 6, 2018
+
+* Add untested higher baud rates (#116)
+* Fix f.lux flickering (#158)
+* Do not create a log file if logging is disabled (#93)
+* Tweaks to the Auto Updater
+* Change the FPS counter to be closer to reality
+
 Version 5.11.2.15
 ---------------
 March 21, 2018

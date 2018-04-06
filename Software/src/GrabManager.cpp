@@ -350,6 +350,9 @@ void GrabManager::handleGrabbedColors()
 		return;
 	}	
 
+	// Work on a copy
+	m_colorsProcessing = m_colorsNew;
+
 	bool isColorsChanged = false;
 
 	int avgR = 0, avgG = 0, avgB = 0;
@@ -358,7 +361,7 @@ void GrabManager::handleGrabbedColors()
 #ifdef Q_OS_WIN
 	if (m_isApplyGammaRamp)
 	{
-		WinUtils::ApplyPrimaryGammaRamp(m_colorsNew);
+		WinUtils::ApplyPrimaryGammaRamp(m_colorsProcessing);
 	}
 #endif
 
@@ -368,10 +371,10 @@ void GrabManager::handleGrabbedColors()
 		{
 			if (m_ledWidgets[i]->isAreaEnabled())
 			{
-					avgR += qRed(m_colorsNew[i]);
-					avgG += qGreen(m_colorsNew[i]);
-					avgB += qBlue(m_colorsNew[i]);
-					countGrabEnabled++;
+				avgR += qRed(m_colorsProcessing[i]);
+				avgG += qGreen(m_colorsProcessing[i]);
+				avgB += qBlue(m_colorsProcessing[i]);
+				countGrabEnabled++;
 			}
 		}
 		if (countGrabEnabled != 0)
@@ -385,14 +388,14 @@ void GrabManager::handleGrabbedColors()
 		{
 			if (m_ledWidgets[ledIndex]->isAreaEnabled())
 			{
-				m_colorsNew[ledIndex] = qRgb(avgR, avgG, avgB);
+				m_colorsProcessing[ledIndex] = qRgb(avgR, avgG, avgB);
 			}
 		}
 	}
 
 	for (int i = 0; i < m_ledWidgets.size(); i++)
 	{
-		QRgb newColor = m_colorsNew[i];
+		QRgb newColor = m_colorsProcessing[i];
 		if (m_overBrighten) {
 			int dRed = qRed(newColor);
 			int dGreen = qGreen(newColor);

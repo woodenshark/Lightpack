@@ -116,6 +116,7 @@ private:
 
 	QList<QRgb> m_colorsCurrent;
 	QList<QRgb> m_colorsNew;
+	QList<QRgb> m_colorsProcessing;
 
 	QRect m_screenSavedRect;
 	int m_screenSavedIndex;

@@ -517,7 +517,7 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 	disconnect(this, SIGNAL(ledDeviceOpen()),								m_ledDevice, SLOT(open()));
 	disconnect(this, SIGNAL(ledDeviceSetColors(QList<QRgb>)),				m_ledDevice, SLOT(setColors(QList<QRgb>)));
 	disconnect(this, SIGNAL(ledDeviceOffLeds()),							m_ledDevice, SLOT(switchOffLeds()));
-	disconnect(this, SIGNAL(ledDeviceSetUsbPowerLedDisabled(int)),			m_ledDevice, SLOT(setUsbPowerLedDisabled(bool)));
+	disconnect(this, SIGNAL(ledDeviceSetUsbPowerLedDisabled(bool)),			m_ledDevice, SLOT(setUsbPowerLedDisabled(bool)));
 	disconnect(this, SIGNAL(ledDeviceSetRefreshDelay(int)),					m_ledDevice, SLOT(setRefreshDelay(int)));
 	disconnect(this, SIGNAL(ledDeviceSetColorDepth(int)),					m_ledDevice, SLOT(setColorDepth(int)));
 	disconnect(this, SIGNAL(ledDeviceSetSmoothSlowdown(int)),				m_ledDevice, SLOT(setSmoothSlowdown(int)));

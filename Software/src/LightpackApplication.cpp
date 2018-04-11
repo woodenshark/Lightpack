@@ -285,9 +285,9 @@ void LightpackApplication::startBacklight()
 	}
 
 	if (m_backlightStatus == Backlight::StatusOff)
-		m_ledDeviceManager->switchOffLeds();
+		QMetaObject::invokeMethod(m_ledDeviceManager, "switchOffLeds", Qt::QueuedConnection);
 	else
-		m_ledDeviceManager->switchOnLeds();
+		QMetaObject::invokeMethod(m_ledDeviceManager, "switchOnLeds", Qt::QueuedConnection);
 
 
 	switch (m_backlightStatus)
@@ -374,7 +374,8 @@ void LightpackApplication::onSessionChange(int change)
 					getLightpackApp()->settingsWnd()->switchOnLeds();
 				}
 			}
-			m_ledDeviceManager->updateDeviceSettings();
+
+			QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
 			break;
 	}
 }
@@ -751,7 +752,7 @@ void LightpackApplication::commitData(QSessionManager &sessionManager)
 		QApplication::processEvents(QEventLoop::AllEvents, 1000);
 
 		// Send signal and process it
-		m_ledDeviceManager->switchOffLeds();
+		QMetaObject::invokeMethod(m_ledDeviceManager, "switchOffLeds", Qt::QueuedConnection);
 		QApplication::processEvents(QEventLoop::AllEvents, 1000);
 	}
 }

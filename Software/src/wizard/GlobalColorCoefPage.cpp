@@ -135,9 +135,8 @@ void GlobalColorCoefPage::cleanupPage()
 void GlobalColorCoefPage::onCoefValueChanged()
 {
 	QList<WBAdjustment> adjustments;
-	const int numOfLeds = device()->maxLedsCount();
 
-	for (int led = 0; led < numOfLeds; ++led) {
+	for (int led = 0; led < _transSettings->ledCount; ++led) {
 		WBAdjustment wba;
 		wba.red = _ui->sbRed->value() / 100.0;
 		wba.green = _ui->sbGreen->value() / 100.0;

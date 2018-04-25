@@ -74,7 +74,7 @@ public slots:
 protected slots:
 	virtual GrabResult grabScreens();
 	virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
-	virtual bool _reallocate(const QList< ScreenInfo > &grabScreens);
+	virtual bool _reallocate(const QList< ScreenInfo > &grabScreens, bool noRecursion = false);
 
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
 
@@ -82,6 +82,7 @@ protected slots:
 
 protected:
 	bool init();
+	bool recreateAdapters();
 	void freeScreens();
 	GrabResult returnBlackBuffer();
 	bool runThreadCommand(DWORD timeout);

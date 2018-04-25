@@ -128,21 +128,8 @@ bool DDuplGrabber::init()
 	if (!m_createDXGIFactory1Func || !m_D3D11CreateDeviceFunc)
 		return false;
 
-	IDXGIFactory1Ptr factory;
-	HRESULT hr = ((CreateDXGIFactory1Func)m_createDXGIFactory1Func)(__uuidof(IDXGIFactory1), (void**)&factory);
-	if (FAILED(hr))
-	{
-		qCritical(Q_FUNC_INFO " Failed to CreateDXGIFactory1: 0x%X", hr);
+	if (!recreateAdapters()) {
 		return false;
-	}
-
-	IDXGIAdapter1Ptr adapter;
-	for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
-	{
-		DXGI_ADAPTER_DESC1 desc;
-		adapter->GetDesc1(&desc);
-		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Found Adapter: " << QString::fromWCharArray(desc.Description);
-		m_adapters.push_back(adapter);
 	}
 
 	if (NULL == (m_threadEvent = CreateEventW(NULL, false, false, DDUPL_THREAD_EVENT_NAME))) {
@@ -161,6 +148,29 @@ bool DDuplGrabber::init()
 	}
 
 	m_state = Ready;
+	return true;
+}
+
+bool DDuplGrabber::recreateAdapters() {
+	m_adapters.clear();
+
+	IDXGIFactory1Ptr factory;
+	HRESULT hr = ((CreateDXGIFactory1Func)m_createDXGIFactory1Func)(__uuidof(IDXGIFactory1), (void**)&factory);
+	if (FAILED(hr))
+	{
+		qCritical(Q_FUNC_INFO " Failed to CreateDXGIFactory1: 0x%X", hr);
+		return false;
+	}
+
+	IDXGIAdapter1Ptr adapter;
+	for (int i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
+	{
+		DXGI_ADAPTER_DESC1 desc;
+		adapter->GetDesc1(&desc);
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Found Adapter: " << QString::fromWCharArray(desc.Description);
+		m_adapters.push_back(adapter);
+	}
+
 	return true;
 }
 
@@ -320,7 +330,7 @@ bool DDuplGrabber::reallocate(const QList< ScreenInfo > &grabScreens)
 }
 
 // Must be called from DDuplGrabberThreadProc !
-bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
+bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens, bool noRecursion)
 {
 	if (m_state == Uninitialized)
 	{
@@ -396,6 +406,18 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens)
 						m_state = Unavailable;
 						qCritical(Q_FUNC_INFO " Desktop Duplication not available on this system / in this configuration (desktop 0x%X, 0x%X)", screenInfo.handle, hr);
 						return false;
+					}
+					else if (hr == DXGI_ERROR_MODE_CHANGE_IN_PROGRESS) {
+						if (!noRecursion) {
+							qWarning(Q_FUNC_INFO " DXGI mode change in progress. Recreating adapters");
+							if (!recreateAdapters()) {
+								return false;
+							}
+							return _reallocate(grabScreens, true);
+						} else {
+							qCritical(Q_FUNC_INFO " Failed to reallocate: DXGI mode change in progress (after recreation)");
+							return false;
+						}
 					}
 					else if (FAILED(hr))
 					{

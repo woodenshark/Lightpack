@@ -13,6 +13,13 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.17
+---------------
+April 26, 2018
+
+* Fix broken white balance in wizard (#176)
+* Fix stops working after switching display (DDupl) (#181)
+
 Version 5.11.2.16
 ---------------
 April 6, 2018

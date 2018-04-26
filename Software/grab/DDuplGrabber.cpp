@@ -222,6 +222,11 @@ bool anyWidgetOnThisMonitor(HMONITOR monitor, const QList<GrabWidget *> &grabWid
 
 QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets)
 {
+	return __screensWithWidgets(result, grabWidgets);
+}
+
+QList< ScreenInfo > * DDuplGrabber::__screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets, bool noRecursion)
+{
 	result->clear();
 
 	if (m_state == Uninitialized)
@@ -237,6 +242,17 @@ QList< ScreenInfo > * DDuplGrabber::screensWithWidgets(QList< ScreenInfo > * res
 		{
 			DXGI_OUTPUT_DESC outputDesc;
 			output->GetDesc(&outputDesc);
+			if (outputDesc.Monitor == NULL) {
+				if (!noRecursion) {
+					qWarning() << Q_FUNC_INFO << "Found a monitor with NULL handle. Recreating adapters";
+					recreateAdapters();
+					return __screensWithWidgets(result, grabWidgets, true);
+				} else {
+					qWarning() << Q_FUNC_INFO << "Found a monitor with NULL handle (after recreation)";
+					continue;
+				}
+			}
+
 			if (anyWidgetOnThisMonitor(outputDesc.Monitor, grabWidgets))
 			{
 				ScreenInfo screenInfo;
@@ -357,6 +373,7 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens, bool noRe
 	}
 
 	BOOL success = SetThreadDesktop(screensaverDesk);
+	CloseHandle(screensaverDesk);
 	if (!success) {
 		qCritical(Q_FUNC_INFO " Failed to set grab desktop: %x", GetLastError());
 		return false;

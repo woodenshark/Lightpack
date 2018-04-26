@@ -119,6 +119,11 @@ void GrabberBase::grab()
 	QList< ScreenInfo > screens2Grab;
 	screens2Grab.reserve(5);
 	screensWithWidgets(&screens2Grab, *_context->grabWidgets);
+	if (screens2Grab.empty()) {
+		qCritical() << Q_FUNC_INFO << "No screens with widgets found";
+		emit frameGrabAttempted(GrabResultError);
+		return;
+	}
 	if (isReallocationNeeded(screens2Grab)) {
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "reallocating";
 		if (!reallocate(screens2Grab)) {

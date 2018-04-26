@@ -74,9 +74,10 @@ public slots:
 protected slots:
 	virtual GrabResult grabScreens();
 	virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
-	virtual bool _reallocate(const QList< ScreenInfo > &grabScreens, bool noRecursion = false);
+	bool _reallocate(const QList< ScreenInfo > &grabScreens, bool noRecursion = false);
 
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
+	QList< ScreenInfo > * __screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets, bool noRecursion = false);
 
 	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
 

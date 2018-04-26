@@ -10,7 +10,6 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	, m_debugLevelMidOption("debug-mid", "sets application debug level to mid.")
 	, m_debugLevelLowOption("debug-low", "sets application debug level to low.")
 	, m_debugLevelZeroOption("debug-zero", "sets application debug level to zero.")
-	, m_startAfterUpdateOption("startafterupdate")
 	, m_versionOption(m_parser.addVersionOption())
 	, m_helpOption(m_parser.addHelpOption())
 	, m_optionSetProfile("set-profile", "switch to another profile in already running instance", "profile")
@@ -26,11 +25,6 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	m_parser.addOption(m_debugLevelLowOption);
 	m_parser.addOption(m_debugLevelZeroOption);
 	m_parser.addOption(m_optionSetProfile);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
-	m_startAfterUpdateOption.setFlags(QCommandLineOption::HiddenFromHelp);
-#endif
-	m_parser.addOption(m_startAfterUpdateOption);
-
 }
 
 bool LightpackCommandLineParser::isSetNoGUI() const
@@ -70,11 +64,6 @@ bool LightpackCommandLineParser::isSetDebuglevel() const
 		m_parser.isSet(m_debugLevelMidOption) ||
 		m_parser.isSet(m_debugLevelLowOption) ||
 		m_parser.isSet(m_debugLevelZeroOption);
-}
-
-bool LightpackCommandLineParser::isSetStartAfterUpdate() const
-{
-	return m_parser.isSet(m_startAfterUpdateOption);
 }
 
 bool LightpackCommandLineParser::isSetProfile() const

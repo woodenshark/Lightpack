@@ -69,12 +69,12 @@ public slots:
 	*/
 	virtual void setRefreshDelay(int value) = 0;
 	virtual void setSmoothSlowdown(int value) = 0;
-	virtual void setGamma(double value);
-	virtual void setBrightness(int value);
+	virtual void setGamma(double value, bool updateColors = true);
+	virtual void setBrightness(int value, bool updateColors = true);
 	virtual void setColorSequence(QString value) = 0;
-	virtual void setLuminosityThreshold(int value);
-	virtual void setMinimumLuminosityThresholdEnabled(bool value);
-	virtual void updateWBAdjustments(const QList<WBAdjustment> &coefs);
+	virtual void setLuminosityThreshold(int value, bool updateColors = true);
+	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
+	virtual void updateWBAdjustments(const QList<WBAdjustment> &coefs, bool updateColors = true);
 	virtual void requestFirmwareVersion() = 0;
 	virtual void updateDeviceSettings();
 

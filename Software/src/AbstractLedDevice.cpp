@@ -29,40 +29,47 @@
 #include "PrismatikMath.hpp"
 #include "Settings.hpp"
 
-void AbstractLedDevice::setGamma(double value) {
+void AbstractLedDevice::setGamma(double value, bool updateColors) {
 	m_gamma = value;
-	setColors(m_colorsSaved);
+	if (updateColors)
+		setColors(m_colorsSaved);
 }
 
-void AbstractLedDevice::setBrightness(int value) {
+void AbstractLedDevice::setBrightness(int value, bool updateColors) {
 	m_brightness = value;
-	setColors(m_colorsSaved);
+	if (updateColors)
+		setColors(m_colorsSaved);
 }
 
-void AbstractLedDevice::setLuminosityThreshold(int value) {
+void AbstractLedDevice::setLuminosityThreshold(int value, bool updateColors) {
 	m_luminosityThreshold = value;
-	setColors(m_colorsSaved);
+	if (updateColors)
+		setColors(m_colorsSaved);
 }
 
-void AbstractLedDevice::setMinimumLuminosityThresholdEnabled(bool value) {
+void AbstractLedDevice::setMinimumLuminosityThresholdEnabled(bool value, bool updateColors) {
 	m_isMinimumLuminosityEnabled = value;
-	setColors(m_colorsSaved);
+	if (updateColors)
+		setColors(m_colorsSaved);
 }
 
-void AbstractLedDevice::updateWBAdjustments(const QList<WBAdjustment> &coefs) {
+void AbstractLedDevice::updateWBAdjustments(const QList<WBAdjustment> &coefs, bool updateColors) {
 	m_wbAdjustments.clear();
 	m_wbAdjustments.append(coefs);
-	setColors(m_colorsSaved);
+	if (updateColors)
+		setColors(m_colorsSaved);
 }
 
 void AbstractLedDevice::updateDeviceSettings()
 {
 	using namespace SettingsScope;
-	setGamma(Settings::getDeviceGamma());
-	setBrightness(Settings::getDeviceBrightness());
-	setLuminosityThreshold(Settings::getLuminosityThreshold());
-	setMinimumLuminosityThresholdEnabled(Settings::isMinimumLuminosityEnabled());
-	updateWBAdjustments(Settings::getLedCoefs());
+	setGamma(Settings::getDeviceGamma(), false);
+	setBrightness(Settings::getDeviceBrightness(), false);
+	setLuminosityThreshold(Settings::getLuminosityThreshold(), false);
+	setMinimumLuminosityThresholdEnabled(Settings::isMinimumLuminosityEnabled(), false);
+	updateWBAdjustments(Settings::getLedCoefs(), false);
+
+	setColors(m_colorsSaved);
 }
 
 /*!

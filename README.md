@@ -45,11 +45,11 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
 1. Go to `<repo>/Software`
 2. Copy and edit `build-vars.prf` according to your machine
 3. Optional: if locales changed: run `update_locales.bat` or `./update_locales.sh` (slow on Windows)
-4. Run `scripts/win32/generate_sln.bat`
+4. Run `scripts/win32/generate_sln.bat` (from the Visual Studio Developer prompt / `vcvarsall.bat`)
 5. Build `Lightpack.sln` with MSBuild / VisualStudio
 
 #### Building an Installer:
-1. Run `scripts/win32/prepare_installer.sh`
+1. Run `scripts/win32/prepare_installer.sh`. (This builds the autoupdater (UpdateElevate), needs the submodule checked out and currently works only with VS2015).
 2. Build `dist_windows/script.iss` (64bit) or `script32.iss` (32bit) with ISCC (the InnoSetup compiler)
 
 ---

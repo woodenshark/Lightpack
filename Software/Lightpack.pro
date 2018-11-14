@@ -34,10 +34,10 @@ CONFIG += ordered
 
 include(build-config.prf)
 
-SUBDIRS = math grab
+SUBDIRS = src
+SUBDIRS += math grab
 
 win32:SUBDIRS += libraryinjector hooks unhook tests
-SUBDIRS += src
 contains(QMAKE_TARGET.arch, x86_64) {
     SUBDIRS += offsetfinder hooks32 unhook32
     hooks32.file = hooks/hooks32.pro

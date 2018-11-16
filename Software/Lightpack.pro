@@ -30,7 +30,6 @@
 # -------------------------------------------------
 
 TEMPLATE = subdirs
-CONFIG += ordered
 
 include(build-config.prf)
 

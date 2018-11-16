@@ -35,8 +35,7 @@ include(build-config.prf)
 
 SUBDIRS = src
 SUBDIRS += math grab
-src.depends = math
-src.depends = grab
+src.depends = math grab
 
 win32:SUBDIRS += libraryinjector hooks unhook tests
 contains(QMAKE_TARGET.arch, x86_64) {

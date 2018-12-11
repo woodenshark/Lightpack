@@ -65,3 +65,5 @@ Software/.vs
 *.sdf
 *.opensdf
 vc*.pdb
+*.xcodeproj
+*~

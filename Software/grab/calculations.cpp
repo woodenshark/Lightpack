@@ -24,6 +24,7 @@
  */
 
 #include "calculations.hpp"
+#include <stdint.h>
 
 #define PIXEL_FORMAT_ARGB 2,1,0 // channel positions in a 4 byte color
 #define PIXEL_FORMAT_ABGR 0,1,2

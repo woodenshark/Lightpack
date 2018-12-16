@@ -67,3 +67,4 @@ Software/.vs
 vc*.pdb
 *.xcodeproj
 *~
+Software/.qmake.stash

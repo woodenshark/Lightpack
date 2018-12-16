@@ -71,8 +71,13 @@ You will need the following packages, usually all of them are in distro's reposi
 #### Build Process:
 1. Go to `<repo>/Software`
 2. Optional: if locales changed: run `./update_locales.sh`
-3. Run `qmake -r`
-4. Run `make`
+3. CLI
+   1. Run `qmake -r`
+   2. Run `make`
+4. or Xcode
+   1. Run `./scripts/macos/generate_xcode_project.sh`
+   2. Open `Lightpack.xcodeproj`
+
 
 #### Building a deb Package:
 1. Run `scripts/linux/prepare_installer.sh`

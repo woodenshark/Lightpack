@@ -42,7 +42,12 @@
 #include "GrabManager.hpp"
 #ifdef Q_OS_WIN
 #include "WinUtils.hpp"
-#endif
+
+#ifdef NIGHTLIGHT_SUPPORT
+#include "NightLightLibrary.h"
+#endif // NIGHTLIGHT_SUPPORT
+
+#endif // Q_OS_WIN
 
 using namespace SettingsScope;
 
@@ -235,7 +240,32 @@ void GrabManager::onGrabApplyGammaRampChanged(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 	m_isApplyGammaRamp = state;
+#if defined(Q_OS_WIN) && defined(NIGHTLIGHT_SUPPORT)
+	if (m_isApplyGammaRamp && NightLightLibrary::NightLightWrapper::isSupported(true))
+		startNightLight();
+	else
+		stopNightLight();
+#endif // NIGHTLIGHT_SUPPORT
 }
+
+#if defined(Q_OS_WIN) && defined(NIGHTLIGHT_SUPPORT)
+void GrabManager::startNightLight()
+{
+	if (m_nightLight)
+		return;
+	m_nightLight = std::make_unique<NightLightLibrary::NightLightWrapper>();
+	m_nightLight->startWatching();
+}
+
+void GrabManager::stopNightLight()
+{
+	if (m_nightLight)
+	{
+		m_nightLight->stopWatching();
+		m_nightLight.reset();
+	}
+}
+#endif // NIGHTLIGHT_SUPPORT
 
 void GrabManager::onGrabApplyColorTemperatureChanged(bool state)
 {
@@ -383,9 +413,17 @@ void GrabManager::handleGrabbedColors()
 #ifdef Q_OS_WIN
 	else if (m_isApplyGammaRamp)
 	{
-		WinUtils::ApplyPrimaryGammaRamp(m_colorsProcessing);
+#ifdef NIGHTLIGHT_SUPPORT
+		if (m_nightLight) {
+			PrismatikMath::applyColorTemperature(m_colorsProcessing,
+				m_nightLight->getSmoothenedColorTemperature(), // CAVEAT: depends on grabbing framerate
+				SettingsScope::Profile::Grab::GammaDefault); // TODO: actual setting?
+		}
+		else
+#endif // NIGHTLIGHT_SUPPORT
+			WinUtils::ApplyPrimaryGammaRamp(m_colorsProcessing);
 	}
-#endif
+#endif // Q_OS_WIN
 
 	if (m_avgColorsOnAllLeds)
 	{

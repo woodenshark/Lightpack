@@ -63,7 +63,7 @@ public slots:
 	void onGrabSlowdownChanged(int ms);
 	void onGrabAvgColorsEnabledChanged(bool state);
 	void onGrabOverBrightenChanged(int value);
-	void onGrabApplyGammaRampChanged(bool state);
+	void onGrabApplyBlueLightReductionChanged(bool state);
 	void onGrabApplyColorTemperatureChanged(bool state);
 	void onGrabColorTemperatureChanged(int value);
 	void onGrabGammaChanged(double value);
@@ -132,7 +132,7 @@ private:
 	bool m_avgColorsOnAllLeds;
 	bool m_isGrabbingStarted;
 	int m_overBrighten;
-	bool m_isApplyGammaRamp;
+	bool m_isApplyBlueLightReduction;
 	bool m_isApplyColorTemperature;
 	double m_gamma;
 	int m_colorTemperature;

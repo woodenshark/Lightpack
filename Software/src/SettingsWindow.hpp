@@ -158,7 +158,7 @@ private slots:
 	void onGrabSlowdown_valueChanged(int value);
 	void onGrabIsAvgColors_toggled(bool state);
 	void onGrabOverBrighten_valueChanged(int value);
-	void onGrabApplyGammaRamp_toggled(bool state);
+	void onGrabApplyBlueLightReduction_toggled(bool state);
 	void onGrabApplyColorTemperature_toggled(bool state);
 	void onGrabColorTemperature_valueChanged(int value);
 	void onGrabGamma_valueChanged(double value);

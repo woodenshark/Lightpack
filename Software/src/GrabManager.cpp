@@ -236,14 +236,14 @@ void GrabManager::onGrabOverBrightenChanged(int value) {
 	m_overBrighten = value;
 }
 
-void GrabManager::onGrabApplyGammaRampChanged(bool state)
+void GrabManager::onGrabApplyBlueLightReductionChanged(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
-	m_isApplyGammaRamp = state;
+	m_isApplyBlueLightReduction = state;
 
-	if (m_isApplyGammaRamp && m_blueLightClient == nullptr)
+	if (m_isApplyBlueLightReduction && m_blueLightClient == nullptr)
 		m_blueLightClient = BlueLightReduction::create();
-	else if (!m_isApplyGammaRamp && m_blueLightClient != nullptr)
+	else if (!m_isApplyBlueLightReduction && m_blueLightClient != nullptr)
 	{
 		delete m_blueLightClient;
 		m_blueLightClient = nullptr;
@@ -315,7 +315,7 @@ void GrabManager::settingsProfileChanged(const QString &profileName)
 	m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 	m_avgColorsOnAllLeds = Settings::isGrabAvgColorsEnabled();
 	m_overBrighten = Settings::getGrabOverBrighten();
-	m_isApplyGammaRamp = Settings::isGrabApplyGammaRampEnabled();
+	m_isApplyBlueLightReduction = Settings::isGrabApplyBlueLightReductionEnabled();
 	m_isApplyColorTemperature = Settings::isGrabApplyColorTemperatureEnabled();
 	m_colorTemperature = Settings::getGrabColorTemperature();
 	m_gamma = Settings::getGrabGamma();
@@ -393,7 +393,7 @@ void GrabManager::handleGrabbedColors()
 	{
 		PrismatikMath::applyColorTemperature(m_colorsProcessing, m_colorTemperature, m_gamma);
 	}
-	else if (m_isApplyGammaRamp && m_blueLightClient)
+	else if (m_isApplyBlueLightReduction && m_blueLightClient)
 		m_blueLightClient->apply(m_colorsProcessing, SettingsScope::Profile::Grab::GammaDefault);
 
 	if (m_avgColorsOnAllLeds)

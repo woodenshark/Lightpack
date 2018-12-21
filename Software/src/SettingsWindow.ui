@@ -285,7 +285,7 @@
             <item>
              <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0">
               <item row="3" column="0" colspan="3">
-               <widget class="QCheckBox" name="checkBox_GrabApplyGammaRamp">
+               <widget class="QCheckBox" name="checkBox_GrabApplyBlueLightReduction">
                 <property name="text">
                  <string>Apply screen color modifications (F.lux, redshift)</string>
                 </property>

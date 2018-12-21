@@ -69,12 +69,14 @@ HEADERS += \
     include/GrabberBase.hpp \
     include/ColorProvider.hpp \
     include/GrabberContext.hpp \
+    include/BlueLightReduction.hpp \
     $${GRABBERS_HEADERS}
 
 SOURCES += \
     calculations.cpp \
     GrabberBase.cpp \
     include/ColorProvider.cpp \
+    BlueLightReduction.cpp \
     $${GRABBERS_SOURCES}
 
 win32 {
@@ -85,6 +87,13 @@ win32 {
         QMAKE_CXXFLAGS += /MP
         # Create "fake" project dependencies of the libraries used dynamically
         LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
+    }
+
+    contains(DEFINES,NIGHTLIGHT_SUPPORT) {
+      contains(QMAKE_TARGET.arch, x86_64) {
+        Release:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Release/
+        Debug:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Debug/
+      }
     }
 
     HEADERS += \

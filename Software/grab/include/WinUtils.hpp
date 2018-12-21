@@ -38,6 +38,11 @@
 #include <windows.h>
 #include <QList>
 #include <QRgb>
+#include "BlueLightReduction.hpp"
+
+#if defined(NIGHTLIGHT_SUPPORT)
+namespace NightLightLibrary { class NightLightWrapper; };
+#endif // NIGHTLIGHT_SUPPORT
 
 namespace WinUtils
 {
@@ -64,7 +69,29 @@ PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);
 // BuildRestrictedSD() function
 VOID FreeRestrictedSD(PVOID ptr);
 
-void ApplyPrimaryGammaRamp(QList<QRgb>& colors);
+#if defined(NIGHTLIGHT_SUPPORT)
+	class NightLight : public BlueLightReduction::Client
+	{
+	public:
+		NightLight();
+		~NightLight();
+		void apply(QList<QRgb>& colors, const double gamma);
+		static bool isSupported();
+	private:
+		NightLightLibrary::NightLightWrapper* _client;
+	};
+#endif // NIGHTLIGHT_SUPPORT
+	class GammaRamp : public BlueLightReduction::Client
+	{
+	public:
+		GammaRamp() = default;
+		~GammaRamp() = default;
+		void apply(QList<QRgb>& colors, const double/*gamma*/);
+		static bool isSupported();
+	private:
+		WORD _gammaArray[3][256];
+		static bool loadGamma(LPVOID gamma, HDC* dc);
+	};
 }
 
 #endif // WINUTILS_HPP

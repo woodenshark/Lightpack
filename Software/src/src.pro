@@ -155,13 +155,8 @@ win32 {
 
 	contains(DEFINES,NIGHTLIGHT_SUPPORT) {
 		contains(QMAKE_TARGET.arch, x86_64) {
-
-			Release:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Release/
 			Release:LIBS += -L$${NIGHTLIGHT_DIR}/Release/
-
-			Debug:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Debug/
 			Debug:LIBS += -L$${NIGHTLIGHT_DIR}/Debug/
-
 			LIBS += -lNightLightLibrary
 		}
 	}

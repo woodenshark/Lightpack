@@ -127,7 +127,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	ui->comboBox_LightpackModes->removeItem(2);
 #endif
 
-#ifndef Q_OS_WIN
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
 	ui->checkBox_GrabApplyBlueLightReduction->setVisible(false);
 	ui->checkBox_installUpdates->setVisible(false);
 #endif

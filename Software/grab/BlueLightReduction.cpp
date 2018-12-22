@@ -17,6 +17,8 @@ namespace BlueLightReduction
 		if (WinUtils::GammaRamp::isSupported())
 			return new WinUtils::GammaRamp();
 #elif defined(Q_OS_MACOS)
+        if (MacUtils::NightShift::isSupported())
+            return new MacUtils::NightShift();
         if (MacUtils::GammaRamp::isSupported())
             return new MacUtils::GammaRamp();
 #endif

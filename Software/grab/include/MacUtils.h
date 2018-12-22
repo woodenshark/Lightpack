@@ -11,6 +11,18 @@
 #include "BlueLightReduction.hpp"
 
 namespace MacUtils {
+    class NightShift : public BlueLightReduction::Client
+    {
+    public:
+        NightShift();
+        ~NightShift();
+        void apply(QList<QRgb>& colors, const double gamma);
+        static bool isSupported();
+    private:
+        class NightShiftImpl;
+        NightShiftImpl* _impl;
+    };
+
     class GammaRamp : public BlueLightReduction::Client
     {
     public:

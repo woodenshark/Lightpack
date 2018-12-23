@@ -176,7 +176,7 @@ SettingsWindow::~SettingsWindow()
 	if (m_trayIcon)
 		delete m_trayIcon;
 
-	delete ui;
+	//delete ui;
 }
 
 void SettingsWindow::connectSignalsSlots()
@@ -188,7 +188,6 @@ void SettingsWindow::connectSignalsSlots()
 //		connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onTrayIcon_Activated(QSystemTrayIcon::ActivationReason)));
 //		connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(onTrayIcon_MessageClicked()));
 //	}
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << "tr";
 
 	connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(changePage(int)));
 	connect(ui->spinBox_GrabSlowdown, SIGNAL(valueChanged(int)), this, SLOT(onGrabSlowdown_valueChanged(int)));
@@ -253,6 +252,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
+	connect(ui->checkBox_KeepLightsOnAfterScreenOff, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterScreenOff_Toggled(bool)));
 
 	// Dev tab
 #ifdef WINAPI_GRAB_SUPPORT
@@ -1725,6 +1725,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->checkBox_KeepLightsOnAfterExit->setChecked					(Settings::isKeepLightsOnAfterExit());
 	ui->checkBox_KeepLightsOnAfterLockComputer->setChecked			(Settings::isKeepLightsOnAfterLock());
 	ui->checkBox_KeepLightsOnAfterSuspend->setChecked				(Settings::isKeepLightsOnAfterSuspend());
+	ui->checkBox_KeepLightsOnAfterScreenOff->setChecked				(Settings::isKeepLightsOnAfterScreenOff());
 	ui->checkBox_PingDeviceEverySecond->setChecked					(Settings::isPingDeviceEverySecond());
 
 	ui->checkBox_GrabIsAvgColors->setChecked							(Settings::isGrabAvgColorsEnabled());
@@ -2108,6 +2109,11 @@ void SettingsWindow::onKeepLightsAfterLock_Toggled(bool isEnabled)
 void SettingsWindow::onKeepLightsAfterSuspend_Toggled(bool isEnabled)
 {
 	Settings::setKeepLightsOnAfterSuspend(isEnabled);
+}
+
+void SettingsWindow::onKeepLightsAfterScreenOff_Toggled(bool isEnabled)
+{
+	Settings::setKeepLightsOnAfterScreenOff(isEnabled);
 }
 
 void SettingsWindow::onCheckBox_checkForUpdates_Toggled(bool isEnabled)

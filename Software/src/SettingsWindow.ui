@@ -213,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -1264,7 +1264,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         <property name="rightMargin">
          <number>20</number>
         </property>
-        <item row="12" column="0">
+        <item row="13" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <property name="bottomMargin">
            <number>13</number>
@@ -1291,47 +1291,35 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_15">
+          <property name="styleSheet">
+           <string notr="true">margin:0px;</string>
           </property>
           <property name="text">
-           <string>Overall brightness:</string>
+           <string>%</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>60</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
-          </property>
+        <item row="2" column="0">
+         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
           <property name="minimum">
            <number>0</number>
           </property>
           <property name="maximum">
            <number>100</number>
           </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
           <property name="value">
            <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -1355,69 +1343,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
           <property name="flat">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_15">
-          <property name="styleSheet">
-           <string notr="true">margin:0px;</string>
-          </property>
-          <property name="text">
-           <string>%</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QSlider" name="horizontalSlider_GammaCorrection">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="whatsThis">
-           <string>&lt;h4&gt;Gamma correction&lt;/h4&gt; It controls the level of saturation. The effect is clearly detectable in a video in screen grabbing mode&lt;br/&gt;Recommended value: 2.00</string>
-          </property>
-          <property name="minimum">
-           <number>5</number>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="singleStep">
-           <number>5</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
-          </property>
-          <property name="tickInterval">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="pageStep">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -1455,33 +1380,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
          </widget>
         </item>
-        <item row="14" column="0">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_GammaCorrection">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Gamma correction:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0" colspan="3">
+        <item row="14" column="0" colspan="3">
          <widget class="QTabWidget" name="tabDevices">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1860,14 +1759,115 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
          </widget>
         </item>
-        <item row="6" column="0" colspan="3">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
-          <property name="text">
-           <string>Keep lights ON after system suspend / display sleep</string>
+        <item row="4" column="0">
+         <widget class="QSlider" name="horizontalSlider_GammaCorrection">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;h4&gt;Gamma correction&lt;/h4&gt; It controls the level of saturation. The effect is clearly detectable in a video in screen grabbing mode&lt;br/&gt;Recommended value: 2.00</string>
+          </property>
+          <property name="minimum">
+           <number>5</number>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+          <property name="singleStep">
+           <number>5</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::NoTicks</enum>
+          </property>
+          <property name="tickInterval">
+           <number>100</number>
           </property>
          </widget>
         </item>
-        <item row="11" column="0" colspan="3">
+        <item row="15" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_GammaCorrection">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Gamma correction:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Overall brightness:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="3">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
+          <property name="text">
+           <string>Keep lights ON after system suspend</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0" colspan="3">
          <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
           <property name="minimumSize">
            <size>
@@ -1877,6 +1877,13 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
           <property name="text">
            <string>Keep lights ON after exit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterScreenOff">
+          <property name="text">
+           <string>Keep lights ON after display sleep</string>
           </property>
          </widget>
         </item>
@@ -3019,29 +3026,93 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>listWidget</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboBox_LightpackModes</tabstop>
+  <tabstop>spinBox_GrabSlowdown</tabstop>
+  <tabstop>checkBox_GrabIsAvgColors</tabstop>
+  <tabstop>checkBox_GrabApplyGammaRamp</tabstop>
+  <tabstop>checkBox_GrabApplyColorTemperature</tabstop>
+  <tabstop>pushButton_grabApplyColorTemperatureHelp</tabstop>
+  <tabstop>horizontalSlider_GrabColorTemperature</tabstop>
+  <tabstop>spinBox_GrabColorTemperature</tabstop>
+  <tabstop>horizontalSlider_GrabGamma</tabstop>
+  <tabstop>doubleSpinBox_GrabGamma</tabstop>
+  <tabstop>pushButton_grabGammaHelp</tabstop>
+  <tabstop>horizontalSlider_GrabOverBrighten</tabstop>
+  <tabstop>spinBox_GrabOverBrighten</tabstop>
+  <tabstop>pushButton_grabOverBrightenHelp</tabstop>
+  <tabstop>radioButton_GrabWidgetsDontShow</tabstop>
+  <tabstop>radioButton_Colored</tabstop>
+  <tabstop>radioButton_White</tabstop>
+  <tabstop>radioButton_ConstantColorMoodLampMode</tabstop>
+  <tabstop>pushButton_SelectColorMoodLamp</tabstop>
+  <tabstop>radioButton_LiquidColorMoodLampMode</tabstop>
+  <tabstop>horizontalSlider_MoodLampSpeed</tabstop>
+  <tabstop>comboBox_SoundVizDevice</tabstop>
+  <tabstop>radioButton_SoundVizConstantMode</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMin</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMax</tabstop>
+  <tabstop>radioButton_SoundVizLiquidMode</tabstop>
+  <tabstop>horizontalSlider_SoundVizLiquidSpeed</tabstop>
+  <tabstop>horizontalSlider_LuminosityThreshold</tabstop>
+  <tabstop>spinBox_LuminosityThreshold</tabstop>
+  <tabstop>pushButton_lumosityThresholdHelp</tabstop>
+  <tabstop>radioButton_MinimumLuminosity</tabstop>
+  <tabstop>radioButton_LuminosityDeadZone</tabstop>
+  <tabstop>pushButton_EnableDisableDevice</tabstop>
   <tabstop>horizontalSlider_DeviceBrightness</tabstop>
-  <tabstop>horizontalSlider_GammaCorrection</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
   <tabstop>spinBox_DeviceBrightness</tabstop>
+  <tabstop>horizontalSlider_GammaCorrection</tabstop>
   <tabstop>doubleSpinBox_DeviceGamma</tabstop>
+  <tabstop>pushButton_GammaCorrectionHelp</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterLockComputer</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterScreenOff</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterSuspend</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
+  <tabstop>pbRunConfigurationWizard</tabstop>
+  <tabstop>tabDevices</tabstop>
+  <tabstop>checkBox_DisableUsbPowerLed</tabstop>
+  <tabstop>horizontalSlider_DeviceColorDepth</tabstop>
+  <tabstop>spinBox_DeviceColorDepth</tabstop>
+  <tabstop>pushButton_LightpackColorDepthHelp</tabstop>
   <tabstop>horizontalSlider_DeviceSmooth</tabstop>
   <tabstop>spinBox_DeviceSmooth</tabstop>
+  <tabstop>pushButton_LightpackSmoothnessHelp</tabstop>
+  <tabstop>horizontalSlider_DeviceRefreshDelay</tabstop>
+  <tabstop>spinBox_DeviceRefreshDelay</tabstop>
+  <tabstop>pushButton_LightpackRefreshDelayHelp</tabstop>
   <tabstop>comboBox_Profiles</tabstop>
-  <tabstop>radioButton_GrabX11</tabstop>
-  <tabstop>radioButton_GrabMacCoreGraphics</tabstop>
-  <tabstop>radioButton_GrabWinAPI</tabstop>
-  <tabstop>spinBox_LoggingLevel</tabstop>
-  <tabstop>checkBox_PingDeviceEverySecond</tabstop>
-  <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
-  <tabstop>pushButton_EnableDisableDevice</tabstop>
   <tabstop>pushButton_ProfileNew</tabstop>
   <tabstop>pushButton_ProfileResetToDefault</tabstop>
   <tabstop>pushButton_DeleteProfile</tabstop>
   <tabstop>commandLinkButton_OpenSettings</tabstop>
   <tabstop>comboBox_Language</tabstop>
-  <tabstop>groupBox_Api</tabstop>
-  <tabstop>spinBox_GrabSlowdown</tabstop>
+  <tabstop>checkBox_ExpertModeEnabled</tabstop>
+  <tabstop>pushButton_AllPluginsHelp</tabstop>
+  <tabstop>list_Plugins</tabstop>
+  <tabstop>pushButton_UpPriority</tabstop>
+  <tabstop>pushButton_DownPriority</tabstop>
+  <tabstop>pushButton_ReloadPlugins</tabstop>
   <tabstop>tabPlugin</tabstop>
+  <tabstop>tb_PluginDescription</tabstop>
+  <tabstop>groupBox_Api</tabstop>
+  <tabstop>checkBox_listenOnlyOnLoInterface</tabstop>
+  <tabstop>lineEdit_ApiPort</tabstop>
+  <tabstop>lineEdit_ApiKey</tabstop>
+  <tabstop>pushButton_GenerateNewApiKey</tabstop>
+  <tabstop>radioButton_GrabX11</tabstop>
+  <tabstop>radioButton_GrabMacCoreGraphics</tabstop>
+  <tabstop>radioButton_GrabWinAPI</tabstop>
+  <tabstop>radioButton_GrabDDupl</tabstop>
+  <tabstop>checkBox_EnableDx1011Capture</tabstop>
+  <tabstop>checkBox_EnableDx9Capture</tabstop>
+  <tabstop>spinBox_LoggingLevel</tabstop>
+  <tabstop>checkBox_PingDeviceEverySecond</tabstop>
+  <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
+  <tabstop>checkBox_checkForUpdates</tabstop>
+  <tabstop>checkBox_installUpdates</tabstop>
+  <tabstop>textBrowser</tabstop>
  </tabstops>
  <resources>
   <include location="../res/LightpackResources.qrc"/>
@@ -3054,12 +3125,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>84</y>
+     <x>341</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>84</y>
+     <x>429</x>
+     <y>358</y>
     </hint>
    </hints>
   </connection>
@@ -3070,12 +3141,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>84</y>
+     <x>429</x>
+     <y>358</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>84</y>
+     <x>341</x>
+     <y>354</y>
     </hint>
    </hints>
   </connection>
@@ -3086,12 +3157,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>75</y>
+     <x>341</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>75</y>
+     <x>429</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -3102,12 +3173,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>75</y>
+     <x>429</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>75</y>
+     <x>341</x>
+     <y>318</y>
     </hint>
    </hints>
   </connection>
@@ -3118,12 +3189,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>46</y>
+     <x>429</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
-     <x>167</x>
-     <y>46</y>
+     <x>324</x>
+     <y>58</y>
     </hint>
    </hints>
   </connection>
@@ -3134,12 +3205,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>167</x>
-     <y>46</y>
+     <x>324</x>
+     <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>46</y>
+     <x>429</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -3150,12 +3221,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>65</y>
+     <x>341</x>
+     <y>282</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>65</y>
+     <x>429</x>
+     <y>286</y>
     </hint>
    </hints>
   </connection>
@@ -3166,12 +3237,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>65</y>
+     <x>429</x>
+     <y>286</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>65</y>
+     <x>341</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -3182,12 +3253,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>393</x>
-     <y>289</y>
+     <x>368</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>492</x>
-     <y>292</y>
+     <x>422</x>
+     <y>384</y>
     </hint>
    </hints>
   </connection>
@@ -3198,12 +3269,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>299</y>
+     <x>422</x>
+     <y>384</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>297</y>
+     <x>368</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>
@@ -3214,12 +3285,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>385</x>
-     <y>196</y>
+     <x>422</x>
+     <y>246</y>
     </hint>
     <hint type="destinationlabel">
-     <x>258</x>
-     <y>196</y>
+     <x>368</x>
+     <y>242</y>
     </hint>
    </hints>
   </connection>
@@ -3230,12 +3301,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>258</x>
-     <y>196</y>
+     <x>368</x>
+     <y>242</y>
     </hint>
     <hint type="destinationlabel">
-     <x>385</x>
-     <y>196</y>
+     <x>422</x>
+     <y>246</y>
     </hint>
    </hints>
   </connection>
@@ -3246,12 +3317,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>253</x>
-     <y>223</y>
+     <x>368</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
-     <x>381</x>
-     <y>223</y>
+     <x>422</x>
+     <y>188</y>
     </hint>
    </hints>
   </connection>
@@ -3262,12 +3333,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>381</x>
-     <y>223</y>
+     <x>422</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>253</x>
-     <y>223</y>
+     <x>368</x>
+     <y>184</y>
     </hint>
    </hints>
   </connection>
@@ -3278,12 +3349,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>198</y>
+     <x>422</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
-     <x>253</x>
-     <y>223</y>
+     <x>368</x>
+     <y>184</y>
     </hint>
    </hints>
   </connection>
@@ -3294,12 +3365,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>198</y>
+     <x>422</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
-     <x>253</x>
-     <y>251</y>
+     <x>368</x>
+     <y>206</y>
     </hint>
    </hints>
   </connection>
@@ -3310,12 +3381,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>198</y>
+     <x>422</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
-     <x>381</x>
-     <y>223</y>
+     <x>422</x>
+     <y>188</y>
     </hint>
    </hints>
   </connection>
@@ -3326,12 +3397,12 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>198</y>
+     <x>422</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
-     <x>381</x>
-     <y>251</y>
+     <x>422</x>
+     <y>210</y>
     </hint>
    </hints>
   </connection>

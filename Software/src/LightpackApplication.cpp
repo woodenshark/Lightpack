@@ -342,42 +342,61 @@ void LightpackApplication::onSessionChange(int change)
 			break;
 		case SessionChangeDetector::SessionChange::Locking:
 			if (!m_isSessionLocked)
-				m_isLightsWereOn = m_backlightStatus;
+				m_isLightsWereOnBeforeLock = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
 
 			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
 			{
 				getLightpackApp()->settingsWnd()->switchOffLeds();
+				m_isLightsTurnedOffBySessionChange = true;
 			}
 			m_isSessionLocked = true;
 			break;
 		case SessionChangeDetector::SessionChange::Unlocking:
-			if (!SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOn)
+			if (m_isSessionLocked && !SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOnBeforeLock)
 			{
 				getLightpackApp()->settingsWnd()->switchOnLeds();
+				m_isLightsTurnedOffBySessionChange = false;
 			}
 			m_isSessionLocked = false;
 			break;
-		case SessionChangeDetector::SessionChange::DisplayOff:
 		case SessionChangeDetector::SessionChange::Sleeping:
-			if (!m_isSessionLocked)
-				m_isLightsWereOn = m_backlightStatus;
+			if (!m_isSuspending)
+				m_isLightsWereOnBeforeSuspend = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
 
 			if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
 			{
 				getLightpackApp()->settingsWnd()->switchOffLeds();
+				m_isLightsTurnedOffBySessionChange = true;
 			}
+			m_isSuspending = true;
+			break;
+		case SessionChangeDetector::SessionChange::Resuming:
+			if (m_isSuspending && !SettingsScope::Settings::isKeepLightsOnAfterSuspend() && m_isLightsWereOnBeforeSuspend)
+			{
+				getLightpackApp()->settingsWnd()->switchOnLeds();
+				m_isLightsTurnedOffBySessionChange = false;
+			}
+			m_isSuspending = false;
+			QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
+			break;
+		case SessionChangeDetector::SessionChange::DisplayOff:
+			if (!m_isDisplayOff)
+				m_isLightsWereOnBeforeDisplaySleep = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
+
+			if (!SettingsScope::Settings::isKeepLightsOnAfterScreenOff())
+			{
+				getLightpackApp()->settingsWnd()->switchOffLeds();
+				m_isLightsTurnedOffBySessionChange = true;
+			}
+			m_isDisplayOff = true;
 			break;
 		case SessionChangeDetector::SessionChange::DisplayOn:
-		case SessionChangeDetector::SessionChange::Resuming:
-			if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
+			if (m_isDisplayOff && !SettingsScope::Settings::isKeepLightsOnAfterScreenOff() && m_isLightsWereOnBeforeDisplaySleep)
 			{
-				if ((!m_isSessionLocked || SettingsScope::Settings::isKeepLightsOnAfterLock()) && m_isLightsWereOn)
-				{
-					getLightpackApp()->settingsWnd()->switchOnLeds();
-				}
+				getLightpackApp()->settingsWnd()->switchOnLeds();
+				m_isLightsTurnedOffBySessionChange = false;
 			}
-
-			QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
+			m_isDisplayOff = false;
 			break;
 	}
 }

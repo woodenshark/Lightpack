@@ -224,6 +224,7 @@ private slots:
 	void onKeepLightsAfterExit_Toggled(bool isEnabled);
 	void onKeepLightsAfterLock_Toggled(bool isEnabled);
 	void onKeepLightsAfterSuspend_Toggled(bool isEnabled);
+	void onKeepLightsAfterScreenOff_Toggled(bool isEnabled);
 
 	void on_pbRunConfigurationWizard_clicked();
 

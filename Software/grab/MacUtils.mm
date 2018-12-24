@@ -59,6 +59,7 @@ namespace MacUtils
         }
         ~NightShiftImpl()
         {
+            [_client setStatusNotificationBlock:nil];
             [_client release];
             _client = nullptr;
         }

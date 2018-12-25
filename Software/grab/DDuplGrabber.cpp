@@ -615,10 +615,17 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
+			// 0 = /1 (no scaling)
+			// 1 = /2
+			// 2 = /4
+			// 3 = /8 (best value for now)
+			// 4+ seems to be counter-productive
+			const int mipLevel = 3;
+
 			D3D11_TEXTURE2D_DESC texDesc;
 			ZeroMemory(&texDesc, sizeof(texDesc));
-			texDesc.Width = desc.Width;
-			texDesc.Height = desc.Height;
+			texDesc.Width = desc.Width >> mipLevel;
+			texDesc.Height = desc.Height >> mipLevel;
 			texDesc.MipLevels = 1;
 			texDesc.ArraySize = 1;
 			texDesc.SampleDesc.Count = 1;
@@ -629,6 +636,7 @@ GrabResult DDuplGrabber::grabScreens()
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 			texDesc.MiscFlags = 0;
 			ID3D11Texture2DPtr textureCopy;
+
 			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &textureCopy);
 			if (FAILED(hr))
 			{
@@ -636,7 +644,46 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			screenData->context->CopyResource(textureCopy, texture);
+			if (mipLevel > 0) {
+				D3D11_TEXTURE2D_DESC scaledTextureDesc;
+				ZeroMemory(&scaledTextureDesc, sizeof(scaledTextureDesc));
+				scaledTextureDesc.Width = desc.Width;
+				scaledTextureDesc.Height = desc.Height;
+				scaledTextureDesc.MipLevels = mipLevel + 1;
+				scaledTextureDesc.ArraySize = 1;
+				scaledTextureDesc.SampleDesc.Count = 1;
+				scaledTextureDesc.SampleDesc.Quality = 0;
+				scaledTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+				scaledTextureDesc.Format = desc.Format;
+				scaledTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+				scaledTextureDesc.CPUAccessFlags = 0;
+				scaledTextureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+				ID3D11Texture2DPtr scaledTexture;
+				hr = screenData->device->CreateTexture2D(&scaledTextureDesc, NULL, &scaledTexture);
+				if (FAILED(hr))
+				{
+					qCritical(Q_FUNC_INFO " Failed to CreateTexture2D: 0x%X", hr);
+					return GrabResultError;
+				}
+				ID3D11ShaderResourceView* scaledTextureView;
+				hr = screenData->device->CreateShaderResourceView(scaledTexture, NULL, &scaledTextureView);
+				if (FAILED(hr))
+				{
+					qCritical(Q_FUNC_INFO " Failed to CreateShaderResourceView: 0x%X", hr);
+					return GrabResultError;
+				}
+
+				screenData->context->CopySubresourceRegion(scaledTexture, 0, 0, 0, 0, texture, 0, NULL);
+				screenData->context->GenerateMips(scaledTextureView);
+
+				screenData->context->CopySubresourceRegion(textureCopy, 0, 0, 0, 0, scaledTexture, mipLevel, NULL);
+
+				scaledTextureView->Release();
+				scaledTexture->Release();
+			}
+			else
+				screenData->context->CopyResource(textureCopy, texture);
 
 			IDXGISurface1Ptr surface;
 			hr = textureCopy->QueryInterface(IID_IDXGISurface1, (void**)&surface);
@@ -654,12 +701,14 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			for (unsigned int i = 0; i < desc.Height; i++)
+			for (unsigned int i = 0; i < texDesc.Height; i++)
 			{
-				memcpy_s(((unsigned char*)screen.imgData) + (i * desc.Width) * 4, desc.Width * 4, map.pBits + i*map.Pitch, desc.Width * 4);
+				memcpy_s(((unsigned char*)screen.imgData) + (i * texDesc.Width) * 4, texDesc.Width * 4, map.pBits + i*map.Pitch, texDesc.Width * 4);
 			}
 
 			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
+			screen.scale = 1.0 / (1 << mipLevel);
+			screen.bytesPerRow = texDesc.Width * 4;
 
 			screenData->duplication->ReleaseFrame();
 		}

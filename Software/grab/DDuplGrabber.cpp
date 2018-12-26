@@ -62,6 +62,15 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
 #define DDUPL_THREAD_EVENT_NAME L"Lightpack.DDuplGrabber.Event.Thread"
 #define DDUPL_THREADRETURN_EVENT_NAME L"Lightpack.DDuplGrabber.Event.ThreadReturn"
 
+namespace {
+	// 0 = /1 (no scaling)
+	// 1 = /2
+	// 2 = /4
+	// 3 = /8 (best value for now)
+	// 4+ seems to be counter-productive
+	static const uint8_t DownscaleMipLevel = 3;
+}
+
 struct DDuplScreenData
 {
 	DDuplScreenData(IDXGIOutputPtr _output, IDXGIOutputDuplicationPtr _duplication, ID3D11DevicePtr _device, ID3D11DeviceContextPtr _context)
@@ -609,17 +618,10 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			// 0 = /1 (no scaling)
-			// 1 = /2
-			// 2 = /4
-			// 3 = /8 (best value for now)
-			// 4+ seems to be counter-productive
-			const int mipLevel = 3;
-
 			D3D11_TEXTURE2D_DESC texDesc;
 			ZeroMemory(&texDesc, sizeof(texDesc));
-			texDesc.Width = desc.Width >> mipLevel;
-			texDesc.Height = desc.Height >> mipLevel;
+			texDesc.Width = desc.Width >> DownscaleMipLevel;
+			texDesc.Height = desc.Height >> DownscaleMipLevel;
 			texDesc.MipLevels = 1;
 			texDesc.ArraySize = 1;
 			texDesc.SampleDesc.Count = 1;
@@ -630,10 +632,7 @@ GrabResult DDuplGrabber::grabScreens()
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 			texDesc.MiscFlags = 0;
 
-
-
 			ID3D11Texture2DPtr textureCopy;
-
 			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &textureCopy);
 			if (FAILED(hr))
 			{
@@ -641,12 +640,12 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			if (mipLevel > 0) {
+			if (DownscaleMipLevel > 0) {
 				D3D11_TEXTURE2D_DESC scaledTextureDesc;
 				ZeroMemory(&scaledTextureDesc, sizeof(scaledTextureDesc));
 				scaledTextureDesc.Width = desc.Width;
 				scaledTextureDesc.Height = desc.Height;
-				scaledTextureDesc.MipLevels = mipLevel + 1;
+				scaledTextureDesc.MipLevels = DownscaleMipLevel + 1;
 				scaledTextureDesc.ArraySize = 1;
 				scaledTextureDesc.SampleDesc.Count = 1;
 				scaledTextureDesc.SampleDesc.Quality = 0;
@@ -674,7 +673,7 @@ GrabResult DDuplGrabber::grabScreens()
 				screenData->context->CopySubresourceRegion(scaledTexture, 0, 0, 0, 0, texture, 0, NULL);
 				screenData->context->GenerateMips(scaledTextureView);
 
-				screenData->context->CopySubresourceRegion(textureCopy, 0, 0, 0, 0, scaledTexture, mipLevel, NULL);
+				screenData->context->CopySubresourceRegion(textureCopy, 0, 0, 0, 0, scaledTexture, DownscaleMipLevel, NULL);
 
 				scaledTextureView->Release();
 				scaledTexture->Release();
@@ -714,7 +713,7 @@ GrabResult DDuplGrabber::grabScreens()
 			memcpy_s((void*)screen.imgData, sizeNeeded, map.pBits, sizeNeeded);
 
 			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
-			screen.scale = 1.0 / (1 << mipLevel);
+			screen.scale = 1.0 / (1 << DownscaleMipLevel);
 			screen.bytesPerRow = map.Pitch;
 
 			screenData->duplication->ReleaseFrame();

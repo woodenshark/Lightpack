@@ -630,18 +630,7 @@ GrabResult DDuplGrabber::grabScreens()
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 			texDesc.MiscFlags = 0;
 
-			const size_t sizeNeeded = texDesc.Height * texDesc.Width * 4; // Assumes 4 bytes per pixel
-			if (screen.imgData == NULL)
-			{
-				screen.imgData = (unsigned char*)malloc(sizeNeeded);
-				screen.imgDataSize = sizeNeeded;
-			}
-			else if (screen.imgDataSize != sizeNeeded)
-			{
-				qWarning(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
-				screen.imgData = (unsigned char*)realloc((void*)screen.imgData, sizeNeeded);
-				screen.imgDataSize = sizeNeeded;
-			}
+
 
 			ID3D11Texture2DPtr textureCopy;
 
@@ -709,14 +698,24 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			for (unsigned int i = 0; i < texDesc.Height; i++)
+			const size_t sizeNeeded = texDesc.Height * map.Pitch;
+			if (screen.imgData == NULL)
 			{
-				memcpy_s(((unsigned char*)screen.imgData) + (i * texDesc.Width) * 4, texDesc.Width * 4, map.pBits + i*map.Pitch, texDesc.Width * 4);
+				screen.imgData = (unsigned char*)malloc(sizeNeeded);
+				screen.imgDataSize = sizeNeeded;
 			}
+			else if (screen.imgDataSize != sizeNeeded)
+			{
+				qWarning(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+				screen.imgData = (unsigned char*)realloc((void*)screen.imgData, sizeNeeded);
+				screen.imgDataSize = sizeNeeded;
+			}
+
+			memcpy_s((void*)screen.imgData, sizeNeeded, map.pBits, sizeNeeded);
 
 			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
 			screen.scale = 1.0 / (1 << mipLevel);
-			screen.bytesPerRow = texDesc.Width * 4;
+			screen.bytesPerRow = map.Pitch;
 
 			screenData->duplication->ReleaseFrame();
 		}

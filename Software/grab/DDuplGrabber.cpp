@@ -511,7 +511,9 @@ GrabResult DDuplGrabber::returnBlackBuffer()
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 	for (GrabbedScreen& screen : _screensWithWidgets)
 	{
-		size_t sizeNeeded = screen.screenInfo.rect.height() * screen.screenInfo.rect.width() * 4; // Assumes 4 bytes per pixel
+		screen.scale = 1.0 / (1 << DownscaleMipLevel);
+		screen.bytesPerRow = screen.screenInfo.rect.width() >> DownscaleMipLevel; // doesn't need to be perfectly padded
+		const size_t sizeNeeded = (screen.screenInfo.rect.height() >> DownscaleMipLevel) * screen.bytesPerRow;
 		if (screen.imgData == NULL)
 		{
 			screen.imgData = (unsigned char*)malloc(sizeNeeded);

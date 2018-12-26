@@ -603,18 +603,6 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			size_t sizeNeeded = desc.Height * desc.Width * 4; // Assumes 4 bytes per pixel
-			if (screen.imgData == NULL)
-			{
-				screen.imgData = (unsigned char*)malloc(sizeNeeded);
-				screen.imgDataSize = sizeNeeded;
-			}
-			else if (screen.imgDataSize != sizeNeeded)
-			{
-				qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
-				return GrabResultError;
-			}
-
 			// 0 = /1 (no scaling)
 			// 1 = /2
 			// 2 = /4
@@ -635,6 +623,19 @@ GrabResult DDuplGrabber::grabScreens()
 			texDesc.BindFlags = 0;
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 			texDesc.MiscFlags = 0;
+
+			const size_t sizeNeeded = texDesc.Height * texDesc.Width * 4; // Assumes 4 bytes per pixel
+			if (screen.imgData == NULL)
+			{
+				screen.imgData = (unsigned char*)malloc(sizeNeeded);
+				screen.imgDataSize = sizeNeeded;
+			}
+			else if (screen.imgDataSize != sizeNeeded)
+			{
+				qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+				return GrabResultError;
+			}
+
 			ID3D11Texture2DPtr textureCopy;
 
 			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &textureCopy);

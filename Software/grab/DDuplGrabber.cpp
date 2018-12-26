@@ -718,6 +718,8 @@ GrabResult DDuplGrabber::grabScreens()
 			screen.scale = 1.0 / (1 << DownscaleMipLevel);
 			screen.bytesPerRow = map.Pitch;
 
+			surface->Unmap();
+			textureCopy->Release();
 			screenData->duplication->ReleaseFrame();
 		}
 

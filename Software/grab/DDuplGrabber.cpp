@@ -510,8 +510,9 @@ GrabResult DDuplGrabber::returnBlackBuffer()
 		}
 		else if (screen.imgDataSize != sizeNeeded)
 		{
-			qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
-			return GrabResultError;
+			qWarning(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+			screen.imgData = (unsigned char*)realloc((void*)screen.imgData, sizeNeeded);
+			screen.imgDataSize = sizeNeeded;
 		}
 		ZeroMemory((void*)screen.imgData, screen.imgDataSize);
 	}
@@ -637,8 +638,9 @@ GrabResult DDuplGrabber::grabScreens()
 			}
 			else if (screen.imgDataSize != sizeNeeded)
 			{
-				qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
-				return GrabResultError;
+				qWarning(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+				screen.imgData = (unsigned char*)realloc((void*)screen.imgData, sizeNeeded);
+				screen.imgDataSize = sizeNeeded;
 			}
 
 			ID3D11Texture2DPtr textureCopy;

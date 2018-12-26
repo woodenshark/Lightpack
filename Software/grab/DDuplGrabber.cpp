@@ -327,6 +327,9 @@ void DDuplGrabber::freeScreens()
 			screen.imgData = NULL;
 			screen.imgDataSize = 0;
 		}
+
+		screen.scale = 1.0;
+		screen.bytesPerRow = 0;
 	}
 
 	_screensWithWidgets.clear();
@@ -446,6 +449,8 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens, bool noRe
 					grabScreen.imgData = (unsigned char *)NULL;
 					grabScreen.imgFormat = BufferFormatArgb;
 					grabScreen.screenInfo = screenInfo;
+					grabScreen.scale = 1.0;
+					grabScreen.bytesPerRow = 0;
 					grabScreen.associatedData = new DDuplScreenData(output, duplication, device, context);
 
 					_screensWithWidgets.append(grabScreen);

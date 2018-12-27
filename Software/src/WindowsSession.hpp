@@ -23,54 +23,27 @@
  *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
+#ifndef WINDOWS_SESSION_HPP
+#define WINDOWS SESSION_HPP
 
-#ifndef SESSION_CHANGE_DETECTOR
-#define SESSION_CHANGE_DETECTOR
-#include "QObject"
-#include "QAbstractNativeEventFilter"
+#include "SystemSession.hpp"
 
-#ifdef Q_OS_WIN
 #if !defined WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
 
-class SessionChangeDetector :
-	public QObject,
-	public QAbstractNativeEventFilter
-{
-	Q_OBJECT
 
-public:
-
-	enum SessionChange : int {
-		Ending,
-		Locking,
-		Unlocking,
-		Sleeping,
-		Resuming,
-		DisplayOn,
-		DisplayOff,
-		DisplayDimmed
+namespace SystemSession {
+	class WindowsEventFilter : public EventFilter
+	{
+	public:
+		WindowsEventFilter();
+		~WindowsEventFilter();
+		bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) Q_DECL_OVERRIDE;
+	private:
+		HPOWERNOTIFY m_powerSettingNotificationHandle;
 	};
-
-	SessionChangeDetector();
-
-	bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) Q_DECL_OVERRIDE;
-
-	~SessionChangeDetector();
-
-signals:
-	void sessionChangeDetected(int change);
-
-private:
-	void Destroy();
-
-	bool m_isDestroyed;
-
-#ifdef Q_OS_WIN
-	HPOWERNOTIFY m_powerSettingNotificationHandle;
-#endif
-};
-#endif
+}
+#endif // WINDOWS_SESSION_HPP

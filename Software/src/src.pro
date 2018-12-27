@@ -325,8 +325,11 @@ contains(DEFINES,BASS_SOUND_SUPPORT) {
 }
 
 win32 {
-    SOURCES += LedDeviceAlienFx.cpp
-    HEADERS += LedDeviceAlienFx.hpp
+    SOURCES += LedDeviceAlienFx.cpp \
+    WindowsSession.cpp
+
+    HEADERS += LedDeviceAlienFx.hpp \
+    WindowsSession.hpp
 }
 
 FORMS += SettingsWindow.ui \

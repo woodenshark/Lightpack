@@ -45,7 +45,7 @@
 #include <windows.h>
 #endif
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
 #import <Foundation/NSProcessInfo.h>
 #import <CoreServices/CoreServices.h>
 #endif
@@ -106,12 +106,21 @@ QString getApplicationDirectoryPath(const char * firstCmdArgument)
 int main(int argc, char **argv)
 {
 
-#if defined Q_OS_MACX && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_9
-	id activity;
-	SInt32 version = 0;
-	Gestalt( gestaltSystemVersion, &version );
-	bool endActivityRequired = false;
-	if ( version >= 0x1090 ) {
+#if defined Q_OS_MACOS && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_9
+    bool canUseLatencyCriticalOption = false;
+    if ([[NSProcessInfo processInfo] respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)]) // available since 10.10, so canUseLatencyCriticalOption will always be true
+        canUseLatencyCriticalOption = [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:NSOperatingSystemVersion{10,9,0}];
+    else {// fallback to old method, deprecation can be suppressed
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        SInt32 version = 0;
+        Gestalt(gestaltSystemVersion, &version);
+        canUseLatencyCriticalOption = (version >= 0x1090);
+#pragma clang diagnostic pop
+    }
+    id activity;
+    bool endActivityRequired = false;
+    if (canUseLatencyCriticalOption) {
 		activity = [[NSProcessInfo processInfo] beginActivityWithOptions: NSActivityLatencyCritical reason:@"Prismatik is latency-critical app"];
 		endActivityRequired = true;
 		DEBUG_LOW_LEVEL << "Latency critical activity is started";
@@ -159,7 +168,7 @@ int main(int argc, char **argv)
 
 	int returnCode = lightpackApp.exec();
 
-#if defined Q_OS_MACX && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_9
+#if defined Q_OS_MACOS && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_9
 	if (endActivityRequired)
 		[[NSProcessInfo processInfo] endActivity: activity];
 #elif defined Q_OS_WIN

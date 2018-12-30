@@ -128,7 +128,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 #endif
 
 #ifndef Q_OS_WIN
-	ui->checkBox_GrabApplyGammaRamp->setVisible(false);
+	ui->checkBox_GrabApplyBlueLightReduction->setVisible(false);
 	ui->checkBox_installUpdates->setVisible(false);
 #endif
 
@@ -196,7 +196,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->radioButton_LuminosityDeadZone, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
 	connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
 	connect(ui->spinBox_GrabOverBrighten, SIGNAL(valueChanged(int)), this, SLOT(onGrabOverBrighten_valueChanged(int)));
-	connect(ui->checkBox_GrabApplyGammaRamp, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyGammaRamp_toggled(bool)));
+	connect(ui->checkBox_GrabApplyBlueLightReduction, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyBlueLightReduction_toggled(bool)));
 	connect(ui->checkBox_GrabApplyColorTemperature, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyColorTemperature_toggled(bool)));
 	connect(ui->horizontalSlider_GrabColorTemperature, SIGNAL(valueChanged(int)), this, SLOT(onGrabColorTemperature_valueChanged(int)));
 	connect(ui->horizontalSlider_GrabGamma, SIGNAL(valueChanged(int)), this, SLOT(onSliderGrabGamma_valueChanged(int)));
@@ -1141,11 +1141,11 @@ void SettingsWindow::onGrabOverBrighten_valueChanged(int value)
 	Settings::setGrabOverBrighten(value);
 }
 
-void SettingsWindow::onGrabApplyGammaRamp_toggled(bool state)
+void SettingsWindow::onGrabApplyBlueLightReduction_toggled(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 
-	Settings::setGrabApplyGammaRampEnabled(state);
+	Settings::setGrabApplyBlueLightReductionEnabled(state);
 	if (state == true && ui->checkBox_GrabApplyColorTemperature->isChecked())
 	{
 		ui->checkBox_GrabApplyColorTemperature->setChecked(false);
@@ -1158,10 +1158,10 @@ void SettingsWindow::onGrabApplyColorTemperature_toggled(bool state)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 
 	Settings::setGrabApplyColorTemperatureEnabled(state);
-	if (state == true && ui->checkBox_GrabApplyGammaRamp->isChecked())
+	if (state == true && ui->checkBox_GrabApplyBlueLightReduction->isChecked())
 	{
-		ui->checkBox_GrabApplyGammaRamp->setChecked(false);
-		Settings::setGrabApplyGammaRampEnabled(false);
+		ui->checkBox_GrabApplyBlueLightReduction->setChecked(false);
+		Settings::setGrabApplyBlueLightReductionEnabled(false);
 	}
 }
 
@@ -1731,7 +1731,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->checkBox_GrabIsAvgColors->setChecked							(Settings::isGrabAvgColorsEnabled());
 	ui->spinBox_GrabSlowdown->setValue								(Settings::getGrabSlowdown());
 	ui->spinBox_GrabOverBrighten->setValue							(Settings::getGrabOverBrighten());
-	ui->checkBox_GrabApplyGammaRamp->setChecked						(Settings::isGrabApplyGammaRampEnabled());
+	ui->checkBox_GrabApplyBlueLightReduction->setChecked						(Settings::isGrabApplyBlueLightReductionEnabled());
 	ui->checkBox_GrabApplyColorTemperature->setChecked              (Settings::isGrabApplyColorTemperatureEnabled());
 	ui->spinBox_GrabColorTemperature->setValue                      (Settings::getGrabColorTemperature());
 	ui->horizontalSlider_GrabColorTemperature->setValue             (Settings::getGrabColorTemperature());

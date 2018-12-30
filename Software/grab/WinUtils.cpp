@@ -25,6 +25,11 @@
 
 #include "WinUtils.hpp"
 
+#ifdef NIGHTLIGHT_SUPPORT
+#include "NightLightLibrary.h"
+#include "PrismatikMath.hpp"
+#endif // NIGHTLIGHT_SUPPORT
+
 #include <psapi.h>
 #include <tlhelp32.h>
 #include <shlwapi.h>
@@ -364,40 +369,77 @@ VOID FreeRestrictedSD(PVOID ptr) {
 	return;
 }
 
-
-
-void ApplyPrimaryGammaRamp(QList<QRgb>& colors) {
-	WORD GammaArray[3][256];
-	POINT p;
-	MONITORINFOEX monInfo;
-	p.x = 0;
-	p.y = 0;
-	monInfo.cbSize = sizeof(MONITORINFOEX);
-
-	HMONITOR mon = MonitorFromPoint(p, MONITOR_DEFAULTTOPRIMARY);
-	if (!GetMonitorInfo(mon, &monInfo)) {
-		qWarning() << Q_FUNC_INFO << "Unable to get monitor info:" << GetLastError();
-		return;
+#if defined(NIGHTLIGHT_SUPPORT)
+	NightLight::NightLight() : _client(new NightLightLibrary::NightLightWrapper())
+	{
+		_client->startWatching();
 	}
 
-	HDC dc = CreateDC(TEXT("DISPLAY"), monInfo.szDevice, NULL, NULL);
-	if (!GetDeviceGammaRamp(dc, &GammaArray)) {
-		qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
-	} else {
+	NightLight::~NightLight()
+	{
+		_client->stopWatching();
+		delete _client;
+	}
+
+	bool NightLight::isSupported()
+	{
+		return NightLightLibrary::NightLightWrapper::isSupported(true);
+	}
+
+	void NightLight::apply(QList<QRgb>& colors, const double gamma)
+	{
+		PrismatikMath::applyColorTemperature(colors, _client->getSmoothenedColorTemperature(), gamma);
+	}
+#endif // NIGHTLIGHT_SUPPORT
+
+	bool GammaRamp::isSupported()
+	{
+		HDC dc = NULL;
+		WORD GammaArray[3][256];
+		return loadGamma(&GammaArray, &dc);
+	}
+
+	bool GammaRamp::loadGamma(LPVOID gamma, HDC* dc)
+	{
+		POINT p;
+		MONITORINFOEX monInfo;
+		p.x = 0;
+		p.y = 0;
+		monInfo.cbSize = sizeof(MONITORINFOEX);
+
+		HMONITOR mon = MonitorFromPoint(p, MONITOR_DEFAULTTOPRIMARY);
+		if (!GetMonitorInfo(mon, &monInfo)) {
+			qWarning() << Q_FUNC_INFO << "Unable to get monitor info:" << GetLastError();
+			return false;
+		}
+
+		*dc = CreateDC(TEXT("DISPLAY"), monInfo.szDevice, NULL, NULL);
+		if (!GetDeviceGammaRamp(*dc, gamma)) {
+			qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
+			return false;
+		}
+		return true;
+	}
+
+	void GammaRamp::apply(QList<QRgb>& colors, const double/*gamma*/)
+	{
+		HDC dc = NULL;
+		if (!loadGamma(&_gammaArray, &dc))
+			return;
+
 		for (QRgb& color : colors) {
 			int red = qRed(color);
 			int green = qGreen(color);
 			int blue = qBlue(color);
 
-			red = GammaArray[0][red] >> 8;
-			green = GammaArray[1][green] >> 8;
-			blue = GammaArray[2][blue] >> 8;
+			red = _gammaArray[0][red] >> 8;
+			green = _gammaArray[1][green] >> 8;
+			blue = _gammaArray[2][blue] >> 8;
 
 			color = qRgb(red, green, blue);
 		}
-	}
 
-	DeleteObject(dc);
-}
+		DeleteObject(dc);
+	}
 
 } // namespace WinUtils

@@ -40,13 +40,9 @@
 #include "MacOSGrabber.hpp"
 #include "D3D10Grabber.hpp"
 #include "GrabManager.hpp"
+#include "BlueLightReduction.hpp"
 #ifdef Q_OS_WIN
 #include "WinUtils.hpp"
-
-#ifdef NIGHTLIGHT_SUPPORT
-#include "NightLightLibrary.h"
-#endif // NIGHTLIGHT_SUPPORT
-
 #endif // Q_OS_WIN
 
 using namespace SettingsScope;
@@ -74,6 +70,8 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
 	m_grabCountLastInterval = 0;
 	m_grabCountThisInterval = 0;
+
+	m_blueLightClient = nullptr;
 
 	m_grabberContext = new GrabberContext();
 
@@ -117,6 +115,9 @@ GrabManager::~GrabManager()
 	m_grabber = NULL;
 	delete m_timerFakeGrab;
 	delete m_timerUpdateFPS;
+
+	if (m_blueLightClient)
+		delete m_blueLightClient;
 
 	for (int i = 0; i < m_ledWidgets.size(); i++)
 	{
@@ -236,36 +237,23 @@ void GrabManager::onGrabOverBrightenChanged(int value) {
 	m_overBrighten = value;
 }
 
-void GrabManager::onGrabApplyGammaRampChanged(bool state)
+void GrabManager::onGrabApplyBlueLightReductionChanged(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
-	m_isApplyGammaRamp = state;
-#if defined(Q_OS_WIN) && defined(NIGHTLIGHT_SUPPORT)
-	if (m_isApplyGammaRamp && NightLightLibrary::NightLightWrapper::isSupported(true))
-		startNightLight();
-	else
-		stopNightLight();
-#endif // NIGHTLIGHT_SUPPORT
-}
+	m_isApplyBlueLightReduction = state;
 
-#if defined(Q_OS_WIN) && defined(NIGHTLIGHT_SUPPORT)
-void GrabManager::startNightLight()
-{
-	if (m_nightLight)
-		return;
-	m_nightLight = std::make_unique<NightLightLibrary::NightLightWrapper>();
-	m_nightLight->startWatching();
-}
-
-void GrabManager::stopNightLight()
-{
-	if (m_nightLight)
+	if (m_isApplyBlueLightReduction && m_blueLightClient == nullptr)
 	{
-		m_nightLight->stopWatching();
-		m_nightLight.reset();
+		m_blueLightClient = BlueLightReduction::create();
+		if (m_blueLightClient == nullptr)
+			qWarning() << Q_FUNC_INFO << "could not create Blue Light Reduction client";
+	}
+	else if (!m_isApplyBlueLightReduction && m_blueLightClient != nullptr)
+	{
+		delete m_blueLightClient;
+		m_blueLightClient = nullptr;
 	}
 }
-#endif // NIGHTLIGHT_SUPPORT
 
 void GrabManager::onGrabApplyColorTemperatureChanged(bool state)
 {
@@ -332,7 +320,7 @@ void GrabManager::settingsProfileChanged(const QString &profileName)
 	m_isSendDataOnlyIfColorsChanged = Settings::isSendDataOnlyIfColorsChanges();
 	m_avgColorsOnAllLeds = Settings::isGrabAvgColorsEnabled();
 	m_overBrighten = Settings::getGrabOverBrighten();
-	m_isApplyGammaRamp = Settings::isGrabApplyGammaRampEnabled();
+	m_isApplyBlueLightReduction = Settings::isGrabApplyBlueLightReductionEnabled();
 	m_isApplyColorTemperature = Settings::isGrabApplyColorTemperatureEnabled();
 	m_colorTemperature = Settings::getGrabColorTemperature();
 	m_gamma = Settings::getGrabGamma();
@@ -410,20 +398,8 @@ void GrabManager::handleGrabbedColors()
 	{
 		PrismatikMath::applyColorTemperature(m_colorsProcessing, m_colorTemperature, m_gamma);
 	}
-#ifdef Q_OS_WIN
-	else if (m_isApplyGammaRamp)
-	{
-#ifdef NIGHTLIGHT_SUPPORT
-		if (m_nightLight) {
-			PrismatikMath::applyColorTemperature(m_colorsProcessing,
-				m_nightLight->getSmoothenedColorTemperature(), // CAVEAT: depends on grabbing framerate
-				SettingsScope::Profile::Grab::GammaDefault); // TODO: actual setting?
-		}
-		else
-#endif // NIGHTLIGHT_SUPPORT
-			WinUtils::ApplyPrimaryGammaRamp(m_colorsProcessing);
-	}
-#endif // Q_OS_WIN
+	else if (m_isApplyBlueLightReduction && m_blueLightClient)
+		m_blueLightClient->apply(m_colorsProcessing, SettingsScope::Profile::Grab::GammaDefault);
 
 	if (m_avgColorsOnAllLeds)
 	{

@@ -156,7 +156,7 @@ static const QString OverBrighten = "Grab/OverBrighten";
 static const QString IsMinimumLuminosityEnabled = "Grab/IsMinimumLuminosityEnabled";
 static const QString IsDx1011GrabberEnabled = "Grab/IsDX1011GrabberEnabled";
 static const QString IsDx9GrabbingEnabled = "Grab/IsDX9GrabbingEnabled";
-static const QString IsApplyGammaRampEnabled = "Grab/IsApplyGammaRampEnabled";
+static const QString IsApplyBlueLightReductionEnabled = "Grab/IsApplyBlueLightReductionEnabled";
 static const QString IsApplyColorTemperatureEnabled = "Grab/IsApplyColorTemperatureEnabled";
 static const QString ColorTemperature = "Grab/ColorTemperature";
 static const QString Gamma = "Grab/Gamma";
@@ -1007,16 +1007,16 @@ void Settings::setGrabOverBrighten(int value)
 	m_this->grabOverBrightenChanged(value);
 }
 
-bool Settings::isGrabApplyGammaRampEnabled()
+bool Settings::isGrabApplyBlueLightReductionEnabled()
 {
-	return value(Profile::Key::Grab::IsApplyGammaRampEnabled).toBool();
+	return value(Profile::Key::Grab::IsApplyBlueLightReductionEnabled).toBool();
 }
 
-void Settings::setGrabApplyGammaRampEnabled(bool value)
+void Settings::setGrabApplyBlueLightReductionEnabled(bool value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValue(Profile::Key::Grab::IsApplyGammaRampEnabled, value);
-	m_this->grabApplyGammaRampChanged(value);
+	setValue(Profile::Key::Grab::IsApplyBlueLightReductionEnabled, value);
+	m_this->grabApplyBlueLightReductionChanged(value);
 }
 
 bool Settings::isGrabApplyColorTemperatureEnabled()
@@ -1710,7 +1710,7 @@ void Settings::initCurrentProfile(bool isResetDefault)
 	setNewOption(Profile::Key::Grab::IsMinimumLuminosityEnabled,	Profile::Grab::IsMinimumLuminosityEnabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Grab::IsDx1011GrabberEnabled,		Profile::Grab::IsDx1011GrabberEnabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Grab::IsDx9GrabbingEnabled,			Profile::Grab::IsDx9GrabbingEnabledDefault, isResetDefault);
-	setNewOption(Profile::Key::Grab::IsApplyGammaRampEnabled,		Profile::Grab::IsApplyGammaRampEnabledDefault, isResetDefault);
+	setNewOption(Profile::Key::Grab::IsApplyBlueLightReductionEnabled,		Profile::Grab::IsApplyBlueLightReductionEnabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Grab::IsApplyColorTemperatureEnabled,Profile::Grab::IsApplyColorTemperatureEnabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Grab::ColorTemperature,              Profile::Grab::ColorTemperatureDefault, isResetDefault);
 	setNewOption(Profile::Key::Grab::Gamma,                         Profile::Grab::GammaDefault, isResetDefault);

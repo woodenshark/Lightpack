@@ -34,7 +34,7 @@
 #include "PluginsManager.hpp"
 #include "wizard/Wizard.hpp"
 #include "Plugin.hpp"
-#include "SessionChangeDetector.hpp"
+#include "SystemSession.hpp"
 #include "LightpackCommandLineParser.hpp"
 
 #ifdef Q_OS_WIN
@@ -173,11 +173,14 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 
 	startPluginManager();
 
-	QSharedPointer<SessionChangeDetector> sessionChangeDetector(new SessionChangeDetector());
-	connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
-	connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
-	m_EventFilters.push_back(sessionChangeDetector);
-
+    SystemSession::EventFilter* eventFilter = SystemSession::EventFilter::create();
+    if (eventFilter)
+    {
+        QSharedPointer<SystemSession::EventFilter> sessionChangeDetector(eventFilter);
+        connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), this, SLOT(onSessionChange(int)));
+        connect(sessionChangeDetector.data(), SIGNAL(sessionChangeDetected(int)), m_grabManager, SIGNAL(onSessionChange(int)));
+        m_EventFilters.push_back(sessionChangeDetector);
+    }
 	for (EventFilters::const_iterator it = m_EventFilters.begin(); it != m_EventFilters.end(); ++it)
 		this->installNativeEventFilter(it->data());
 
@@ -330,7 +333,7 @@ void LightpackApplication::onSessionChange(int change)
 {
 	switch (change)
 	{
-		case SessionChangeDetector::SessionChange::Ending:
+		case SystemSession::Status::Ending:
 			if (!SettingsScope::Settings::isKeepLightsOnAfterExit())
 			{
 				// Process all currently pending signals (which may include updating the color signals)
@@ -340,7 +343,7 @@ void LightpackApplication::onSessionChange(int change)
 				QApplication::processEvents(QEventLoop::AllEvents, 500);
 			}
 			break;
-		case SessionChangeDetector::SessionChange::Locking:
+		case SystemSession::Status::Locking:
 			if (!m_isSessionLocked)
 				m_isLightsWereOnBeforeLock = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
 
@@ -351,7 +354,7 @@ void LightpackApplication::onSessionChange(int change)
 			}
 			m_isSessionLocked = true;
 			break;
-		case SessionChangeDetector::SessionChange::Unlocking:
+		case SystemSession::Status::Unlocking:
 			if (m_isSessionLocked && !SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOnBeforeLock)
 			{
 				getLightpackApp()->settingsWnd()->switchOnLeds();
@@ -359,7 +362,7 @@ void LightpackApplication::onSessionChange(int change)
 			}
 			m_isSessionLocked = false;
 			break;
-		case SessionChangeDetector::SessionChange::Sleeping:
+		case SystemSession::Status::Sleeping:
 			if (!m_isSuspending)
 				m_isLightsWereOnBeforeSuspend = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
 
@@ -370,7 +373,7 @@ void LightpackApplication::onSessionChange(int change)
 			}
 			m_isSuspending = true;
 			break;
-		case SessionChangeDetector::SessionChange::Resuming:
+		case SystemSession::Status::Resuming:
 			if (m_isSuspending && !SettingsScope::Settings::isKeepLightsOnAfterSuspend() && m_isLightsWereOnBeforeSuspend)
 			{
 				getLightpackApp()->settingsWnd()->switchOnLeds();
@@ -379,7 +382,7 @@ void LightpackApplication::onSessionChange(int change)
 			m_isSuspending = false;
 			QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
 			break;
-		case SessionChangeDetector::SessionChange::DisplayOff:
+		case SystemSession::Status::DisplayOff:
 			if (!m_isDisplayOff)
 				m_isLightsWereOnBeforeDisplaySleep = m_backlightStatus && !m_isLightsTurnedOffBySessionChange;
 
@@ -390,7 +393,7 @@ void LightpackApplication::onSessionChange(int change)
 			}
 			m_isDisplayOff = true;
 			break;
-		case SessionChangeDetector::SessionChange::DisplayOn:
+		case SystemSession::Status::DisplayOn:
 			if (m_isDisplayOff && !SettingsScope::Settings::isKeepLightsOnAfterScreenOff() && m_isLightsWereOnBeforeDisplaySleep)
 			{
 				getLightpackApp()->settingsWnd()->switchOnLeds();

@@ -174,7 +174,12 @@ unix:!macx{
 macx{
     QMAKE_LFLAGS += -F/System/Library/Frameworks
     # MacOS version using libusb and hidapi codes
-    SOURCES += hidapi/mac/hid.c
+    SOURCES += hidapi/mac/hid.c \
+    MacOSSession.mm
+
+    HEADERS += \
+    MacOSSession.h
+
     LIBS += \
             -framework Cocoa \
             -framework Carbon \
@@ -185,6 +190,7 @@ macx{
             -framework ApplicationServices \
             -framework OpenGL \
             -framework IOKit \
+            -framework AppKit \
 
     ICON = ../res/icons/Prismatik.icns
 
@@ -240,7 +246,7 @@ SOURCES += \
     Plugin.cpp \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
-    SessionChangeDetector.cpp \
+    SystemSession.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
     wizard/WizardPageUsingDevice.cpp \
@@ -289,7 +295,7 @@ HEADERS += \
     PluginsManager.hpp \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
-    SessionChangeDetector.hpp \
+    SystemSession.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
     wizard/WizardPageUsingDevice.hpp \
@@ -314,8 +320,11 @@ contains(DEFINES,BASS_SOUND_SUPPORT) {
 }
 
 win32 {
-    SOURCES += LedDeviceAlienFx.cpp
-    HEADERS += LedDeviceAlienFx.hpp
+    SOURCES += LedDeviceAlienFx.cpp \
+    WindowsSession.cpp
+
+    HEADERS += LedDeviceAlienFx.hpp \
+    WindowsSession.hpp
 }
 
 FORMS += SettingsWindow.ui \

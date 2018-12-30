@@ -121,6 +121,7 @@ void toGrabbedScreen(CGImageRef imageRef, GrabbedScreen *screen)
 		((MacOSScreenData*)screen->associatedData)->displayImageRef = imageRef;
 		((MacOSScreenData*)screen->associatedData)->imageDataRef = CGDataProviderCopyData(provider);
 	}
+	screen->scale = ((QGuiApplication*)QCoreApplication::instance())->devicePixelRatio();
 	screen->bytesPerRow = CGImageGetBytesPerRow(imageRef);
 	screen->imgData = CFDataGetBytePtr(((MacOSScreenData*)screen->associatedData)->imageDataRef);
 }

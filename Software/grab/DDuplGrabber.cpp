@@ -24,7 +24,7 @@
 */
 
 #include "DDuplGrabber.hpp"
-#include "SessionChangeDetector.hpp"
+#include "SystemSession.hpp"
 #include "debug.h"
 
 #ifdef DDUPL_GRAB_SUPPORT
@@ -272,11 +272,11 @@ QList< ScreenInfo > * DDuplGrabber::__screensWithWidgets(QList< ScreenInfo > * r
 
 void DDuplGrabber::onSessionChange(int change)
 {
-	if (change == SessionChangeDetector::Locking)
+	if (change == SystemSession::Status::Locking)
 	{
 		m_isSessionLocked = true;
 	}
-	else if (change == SessionChangeDetector::Unlocking)
+	else if (change == SystemSession::Status::Unlocking)
 	{
 		m_isSessionLocked = false;
 	}

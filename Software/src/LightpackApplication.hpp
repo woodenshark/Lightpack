@@ -29,7 +29,6 @@
 #include "SettingsWindow.hpp"
 #include "LedDeviceManager.hpp"
 #include "qtsingleapplication.h"
-#include "SessionChangeDetector.hpp"
 
 #include <memory>
 
@@ -129,6 +128,11 @@ private:
 	typedef std::vector<QSharedPointer<QAbstractNativeEventFilter> > EventFilters;
 	EventFilters m_EventFilters;
 
+	bool m_isLightsTurnedOffBySessionChange;
 	bool m_isSessionLocked;
-	bool m_isLightsWereOn;
+	bool m_isDisplayOff;
+	bool m_isSuspending;
+	bool m_isLightsWereOnBeforeLock;
+	bool m_isLightsWereOnBeforeDisplaySleep;
+	bool m_isLightsWereOnBeforeSuspend;
 };

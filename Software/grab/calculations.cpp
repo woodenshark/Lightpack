@@ -51,7 +51,7 @@ namespace {
 		const unsigned int pitch,
 		const QRect &rect,
 		ColorValue *resultColor) {
-		register unsigned int r = 0, g = 0, b = 0;
+		unsigned int r = 0, g = 0, b = 0;
 		unsigned int count = 0; // count the amount of pixels taken into account
 		for (int currentY = 0; currentY < rect.height(); currentY++) {
 			int index = pitch * (rect.y() + currentY) + rect.x()*bytesPerPixel;

@@ -48,6 +48,20 @@ function add_to_scheme()
     sed -i '' -E 's#(\<BuildActionEntries\>)#\1'"$entry"'#g' $prismatikScheme && echo -e "\nAdded $depname"
 }
 
+function remove_optimizations_from_debug()
+{
+    depfolder=$1
+    depname=$2
+    depxcodeproj=$depfolder/$depname.xcodeproj/project.pbxproj
+    
+    # replace first 2 occurencies (debug section should be first) of O2
+    # qt bug, never fixed https://bugreports.qt.io/browse/QTBUG-54791
+    sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj && sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj
+}
+
+remove_optimizations_from_debug grab grab && \
+remove_optimizations_from_debug math prismatik-math && \
+remove_optimizations_from_debug src Prismatik && \
 add_to_scheme grab grab && add_to_scheme math prismatik-math && \
 echo -e "\n\nOpen Lightpack.xcodeproj\n\n" || \
 echo -e "\n\nFailed to add grab and prismatik-math dependencies\ntry manually through Xcode (Prismatik > Edit scheme > Build > +, put them above Prismatik)"

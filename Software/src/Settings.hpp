@@ -111,6 +111,8 @@ public:
 	static void setKeepLightsOnAfterLock(bool isEnabled);
 	static bool isKeepLightsOnAfterSuspend();
 	static void setKeepLightsOnAfterSuspend(bool isEnabled);
+	static bool isKeepLightsOnAfterScreenOff();
+	static void setKeepLightsOnAfterScreenOff(bool isEnabled);
 	static bool isPingDeviceEverySecond();
 	static void setPingDeviceEverySecond(bool isEnabled);
 	static bool isUpdateFirmwareMessageShown();
@@ -274,6 +276,7 @@ signals:
 	void keepLightsOnAfterExitChanged(bool isEnabled);
 	void keepLightsOnAfterLockChanged(bool isEnabled);
 	void keepLightsOnAfterSuspendChanged(bool isEnabled);
+	void keepLightsOnAfterScreenOffChanged(bool isEnabled);
 	void pingDeviceEverySecondEnabledChanged(bool);
 
 	void languageChanged(const QString &);

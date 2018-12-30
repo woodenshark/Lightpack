@@ -1,6 +1,7 @@
 #pragma once
 #include <QList>
 #include <QRgb>
+#include <cassert>
 
 namespace BlueLightReduction
 {

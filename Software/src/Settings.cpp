@@ -70,6 +70,7 @@ static const QString IsExpertModeEnabled = "IsExpertModeEnabled";
 static const QString IsKeepLightsOnAfterExit = "IsKeepLightsOnAfterExit";
 static const QString IsKeepLightsOnAfterLock = "IsKeepLightsOnAfterLock";
 static const QString IsKeepLightsOnAfterSuspend = "IsKeepLightsOnAfterSuspend";
+static const QString IsKeepLightsOnAfterScreenOff = "IsKeepLightsOnAfterScreenOff";
 static const QString IsPingDeviceEverySecond = "IsPingDeviceEverySecond";
 static const QString IsUpdateFirmwareMessageShown = "IsUpdateFirmwareMessageShown";
 static const QString ConnectedDevice = "ConnectedDevice";
@@ -273,6 +274,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit, Main::IsKeepLightsOnAfterExit);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterSuspend, Main::IsKeepLightsOnAfterSuspend);
+	setNewOptionMain(Main::Key::IsKeepLightsOnAfterScreenOff, Main::IsKeepLightsOnAfterScreenOff);
 	setNewOptionMain(Main::Key::IsPingDeviceEverySecond,Main::IsPingDeviceEverySecond);
 	setNewOptionMain(Main::Key::IsUpdateFirmwareMessageShown, Main::IsUpdateFirmwareMessageShown);
 	setNewOptionMain(Main::Key::ConnectedDevice,		Main::ConnectedDeviceDefault);
@@ -664,6 +666,18 @@ void Settings::setKeepLightsOnAfterSuspend(bool isEnabled)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	setValueMain(Main::Key::IsKeepLightsOnAfterSuspend, isEnabled);
 	m_this->keepLightsOnAfterSuspendChanged(isEnabled);
+}
+
+bool Settings::isKeepLightsOnAfterScreenOff()
+{
+	return valueMain(Main::Key::IsKeepLightsOnAfterScreenOff).toBool();
+}
+
+void Settings::setKeepLightsOnAfterScreenOff(bool isEnabled)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::IsKeepLightsOnAfterScreenOff, isEnabled);
+	m_this->keepLightsOnAfterScreenOffChanged(isEnabled);
 }
 
 bool Settings::isPingDeviceEverySecond()

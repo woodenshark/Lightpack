@@ -69,11 +69,12 @@ namespace Main
 // [General]
 static const QString ProfileNameDefault = "Lightpack";
 static const QString LanguageDefault = "<System>";
-static const Debug::DebugLevels DebugLevelDefault = Debug::LowLevel;
+static const Debug::DebugLevels DebugLevelDefault = Debug::ZeroLevel;
 static const bool IsExpertModeEnabledDefault = false;
 static const bool IsKeepLightsOnAfterExit = false;
 static const bool IsKeepLightsOnAfterLock = true;
 static const bool IsKeepLightsOnAfterSuspend = false;
+static const bool IsKeepLightsOnAfterScreenOff = true;
 static const bool IsPingDeviceEverySecond = true;
 static const bool IsUpdateFirmwareMessageShown = false;
 static const QString ConnectedDeviceDefault = "Lightpack";

@@ -243,7 +243,11 @@ void GrabManager::onGrabApplyBlueLightReductionChanged(bool state)
 	m_isApplyBlueLightReduction = state;
 
 	if (m_isApplyBlueLightReduction && m_blueLightClient == nullptr)
+	{
 		m_blueLightClient = BlueLightReduction::create();
+		if (m_blueLightClient == nullptr)
+			qWarning() << Q_FUNC_INFO << "could not create Blue Light Reduction client";
+	}
 	else if (!m_isApplyBlueLightReduction && m_blueLightClient != nullptr)
 	{
 		delete m_blueLightClient;

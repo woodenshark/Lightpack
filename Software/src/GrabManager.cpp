@@ -116,7 +116,8 @@ GrabManager::~GrabManager()
 	delete m_timerFakeGrab;
 	delete m_timerUpdateFPS;
 
-	delete m_blueLightClient;
+	if (m_blueLightClient)
+		delete m_blueLightClient;
 
 	for (int i = 0; i < m_ledWidgets.size(); i++)
 	{

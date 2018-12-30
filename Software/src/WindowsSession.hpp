@@ -25,7 +25,7 @@
  */
 #pragma once
 #ifndef WINDOWS_SESSION_HPP
-#define WINDOWS SESSION_HPP
+#define WINDOWS_SESSION_HPP
 
 #include "SystemSession.hpp"
 

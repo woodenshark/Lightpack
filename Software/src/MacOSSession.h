@@ -5,7 +5,7 @@
 //  Created by zomfg on 27/12/2018.
 //
 #pragma once
-//#ifdef Q_OS_MACOS
+
 #ifndef MACOSSESSIONCHANGEDETECTOR_H
 #define MACOSSESSIONCHANGEDETECTOR_H
 #include "SystemSession.hpp"
@@ -24,4 +24,3 @@ namespace SystemSession {
 }
 
 #endif /* MACOSSESSIONCHANGEDETECTOR_H */
-//#endif /* Q_OS_MACOS */

@@ -17,7 +17,7 @@ namespace SystemSession {
     EventFilter* EventFilter::create()
     {
 #if defined(Q_OS_WIN)
-		return new WindowsEventFilter();
+        return new WindowsEventFilter();
 #elif defined(Q_OS_MACOS)
         return new MacOSEventFilter();
 #endif

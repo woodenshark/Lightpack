@@ -57,13 +57,12 @@ bool allocateScreenBuffer(const ScreenInfo& screen,
     CGDirectDisplayID screenId = reinterpret_cast<intptr_t>(screen.handle);
     const size_t width = CGDisplayPixelsWide(screenId) * pixelRatio;
     const size_t height = CGDisplayPixelsHigh(screenId) * pixelRatio;
-    const size_t imgSize = height * width * kBytesPerPixel;
 
     DEBUG_HIGH_LEVEL << "dimensions " << width << "x" << height << pixelRatio << screen.handle;
     grabScreen.imgData = nullptr;
     grabScreen.imgFormat = BufferFormatArgb;
     grabScreen.screenInfo = screen;
-    grabScreen.imgDataSize = imgSize;
+    grabScreen.imgDataSize = 0;
     return true;
 }
 
@@ -108,11 +107,6 @@ void freeScreenImageData(GrabbedScreen& screen)
 
 void toGrabbedScreen(CGImageRef imageRef, GrabbedScreen *screen)
 {
-    const size_t width = CGImageGetWidth(imageRef);
-    const size_t height = CGImageGetHeight(imageRef);
-    const size_t screenBufferSize = width * height * kBytesPerPixel;
-    Q_ASSERT(screen->imgDataSize == screenBufferSize);
-
 	CGDataProviderRef provider = CGImageGetDataProvider(imageRef);
 
 	if (!screen->associatedData) {
@@ -121,8 +115,11 @@ void toGrabbedScreen(CGImageRef imageRef, GrabbedScreen *screen)
 		((MacOSScreenData*)screen->associatedData)->displayImageRef = imageRef;
 		((MacOSScreenData*)screen->associatedData)->imageDataRef = CGDataProviderCopyData(provider);
 	}
-	screen->scale = ((QGuiApplication*)QCoreApplication::instance())->devicePixelRatio();
+	CGDirectDisplayID display = reinterpret_cast<intptr_t>(screen->screenInfo.handle);
+	// get pixel ratio of the actual display being grabbed
+	screen->scale = static_cast<double>(CGImageGetWidth(imageRef)) / static_cast<double>(CGDisplayPixelsWide(display));
 	screen->bytesPerRow = CGImageGetBytesPerRow(imageRef);
+	screen->imgDataSize = screen->bytesPerRow * CGImageGetHeight(imageRef);
 	screen->imgData = CFDataGetBytePtr(((MacOSScreenData*)screen->associatedData)->imageDataRef);
 }
 

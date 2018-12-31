@@ -51,14 +51,13 @@ struct MacOSScreenData
 };
 
 bool allocateScreenBuffer(const ScreenInfo& screen,
-                          const qreal pixelRatio,
                           GrabbedScreen& grabScreen)
 {
     CGDirectDisplayID screenId = reinterpret_cast<intptr_t>(screen.handle);
-    const size_t width = CGDisplayPixelsWide(screenId) * pixelRatio;
-    const size_t height = CGDisplayPixelsHigh(screenId) * pixelRatio;
+    const size_t width = CGDisplayPixelsWide(screenId);
+    const size_t height = CGDisplayPixelsHigh(screenId);
 
-    DEBUG_HIGH_LEVEL << "dimensions " << width << "x" << height << pixelRatio << screen.handle;
+    DEBUG_HIGH_LEVEL << "dimensions " << width << "x" << height << screen.handle;
     grabScreen.imgData = nullptr;
     grabScreen.imgFormat = BufferFormatArgb;
     grabScreen.screenInfo = screen;
@@ -172,11 +171,10 @@ QList< ScreenInfo > * MacOSGrabber::screensWithWidgets(
 
 bool MacOSGrabber::reallocate(const QList<ScreenInfo> &screens)
 {
-    const qreal pixelRatio = ((QGuiApplication*)QCoreApplication::instance())->devicePixelRatio();
     freeScreens();
     for (int i = 0; i < screens.size(); ++i) {
         GrabbedScreen grabScreen;
-        if (!allocateScreenBuffer(screens[i], pixelRatio, grabScreen)) {
+        if (!allocateScreenBuffer(screens[i], grabScreen)) {
             qCritical() << "couldn't allocate image buffer";
             freeScreens();
             return false;

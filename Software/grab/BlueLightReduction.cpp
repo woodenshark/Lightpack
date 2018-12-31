@@ -1,6 +1,8 @@
 #include "BlueLightReduction.hpp"
 #if defined(Q_OS_WIN)
 #include "WinUtils.hpp"
+#elif defined(Q_OS_MACOS)
+#include "MacUtils.h"
 #endif
 
 namespace BlueLightReduction
@@ -14,6 +16,11 @@ namespace BlueLightReduction
 #endif // NIGHTLIGHT_SUPPORT
 		if (WinUtils::GammaRamp::isSupported())
 			return new WinUtils::GammaRamp();
+#elif defined(Q_OS_MACOS)
+        if (MacUtils::NightShift::isSupported())
+            return new MacUtils::NightShift();
+        if (MacUtils::GammaRamp::isSupported())
+            return new MacUtils::GammaRamp();
 #endif
 		return nullptr;
 	}

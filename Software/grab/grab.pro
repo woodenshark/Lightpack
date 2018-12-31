@@ -110,6 +110,11 @@ macx {
 
     INCLUDEPATH += /System/Library/Frameworks
 
+    HEADERS += \
+            include/MacUtils.h
+    SOURCES += \
+            MacUtils.mm
+
     #LIBS += \
     #        -framework CoreGraphics
     #        -framework CoreFoundation

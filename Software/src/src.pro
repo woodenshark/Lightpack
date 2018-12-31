@@ -172,7 +172,7 @@ unix:!macx{
 }
 
 macx{
-    QMAKE_LFLAGS += -F/System/Library/Frameworks
+    QMAKE_LFLAGS += -F/System/Library/Frameworks -F"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/PrivateFrameworks"
     # MacOS version using libusb and hidapi codes
     SOURCES += hidapi/mac/hid.c \
     MacOSSession.mm
@@ -190,6 +190,8 @@ macx{
             -framework ApplicationServices \
             -framework OpenGL \
             -framework IOKit \
+            # private framework
+            -weak_framework CoreBrightness \
             -framework AppKit \
 
     ICON = ../res/icons/Prismatik.icns

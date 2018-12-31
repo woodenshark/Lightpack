@@ -71,12 +71,8 @@ You will need the following packages, usually all of them are in distro's reposi
 #### Build Process:
 1. Go to `<repo>/Software`
 2. Optional: if locales changed: run `./update_locales.sh`
-3. CLI
-   1. Run `qmake -r`
-   2. Run `make`
-4. or Xcode
-   1. Run `./scripts/macos/generate_xcode_project.sh`
-   2. Open `Lightpack.xcodeproj`
+3. Run `qmake -r`
+4. Run `make`
 
 
 #### Building a deb Package:
@@ -106,8 +102,12 @@ Instead of building a deb package, you can:
 1. Download and unpack 5.0+ **Qt SDK** from www.qt-project.org
 2. Go to `<repo>/Software`
 3. Optional: if locales changed: run `./update_locales.sh`
-4. Run `qmake -r`
-5. Run `make`
+4. CLI
+   1. Run `qmake -r`
+   2. Run `make`
+5. or Xcode
+   1. Run `./scripts/macos/generate_xcode_project.sh`
+   2. Open `Lightpack.xcodeproj`
 
 
 #### Building a dmg package:

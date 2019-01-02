@@ -122,6 +122,7 @@ namespace {
 {
 	dispatch_async(_sessionQueue, ^{
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_14
 		if (@available(macOS 10.14, *)) {
 			if (notification.name == AVCaptureSessionWasInterruptedNotification)
 			{
@@ -135,6 +136,7 @@ namespace {
 				return;
 			}
 		}
+#endif // __MAC_10_14
 
 		if (notification.name == AVCaptureSessionDidStartRunningNotification)
 		{

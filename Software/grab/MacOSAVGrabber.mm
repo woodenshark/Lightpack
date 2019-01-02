@@ -48,7 +48,7 @@ namespace {
 		
 		_sessionQueue = dispatch_queue_create("com.prismatik.avcapture.session", DISPATCH_QUEUE_SERIAL);
 		_videoDataOutputQueue = dispatch_queue_create("com.prismatik.avcapture.videodata", DISPATCH_QUEUE_SERIAL);
-//		dispatch_set_target_queue(_videoDataOutputQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+		dispatch_set_target_queue(_videoDataOutputQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
     }
     return self;
 }

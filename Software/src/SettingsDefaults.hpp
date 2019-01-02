@@ -37,21 +37,27 @@
 #	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual"
 #endif
 
+#define _GRABMODE_ENUM(_name_)		::Grab::GrabberType##_name_
+#define _GRABMODE_STR(_name_)		#_name_
+
 #ifdef DDUPL_GRAB_SUPPORT
-#	define GRABMODE_DEFAULT			::Grab::GrabberTypeDDupl
-#	define GRABMODE_DEFAULT_STR		"DDupl"
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(DDupl)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(DDupl)
 #elif defined(WINAPI_GRAB_SUPPORT)
-#	define GRABMODE_DEFAULT			::Grab::GrabberTypeWinAPI
-#	define GRABMODE_DEFAULT_STR		"WinAPI"
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(WinAPI)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(WinAPI)
 #elif defined(X11_GRAB_SUPPORT)
-#	define GRABMODE_DEFAULT			::Grab::GrabberTypeX11
-#	define GRABMODE_DEFAULT_STR		"X11"
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(X11)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(X11)
+#elif defined(MAC_OS_AV_GRAB_SUPPORT)
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(MacAVFoundation)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(MacAVFoundation)
 #elif defined(MAC_OS_CG_GRAB_SUPPORT)
-#	define GRABMODE_DEFAULT			::Grab::GrabberTypeMacCoreGraphics
-#	define GRABMODE_DEFAULT_STR		"MacCoreGraphics"
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(MacCoreGraphics)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(MacCoreGraphics)
 #else
-#	define GRABMODE_DEFAULT			::Grab::GrabberTypeQt
-#	define GRABMODE_DEFAULT_STR		"Qt"
+#	define GRABMODE_DEFAULT			_GRABMODE_ENUM(Qt)
+#	define GRABMODE_DEFAULT_STR		_GRABMODE_STR(Qt)
 #endif
 
 #ifdef Q_OS_UNIX

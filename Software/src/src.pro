@@ -191,6 +191,9 @@ macx{
             -framework OpenGL \
             -framework IOKit \
             -framework AppKit \
+            -framework AVFoundation \
+            -framework CoreMedia \
+            -framework CoreVideo \
 
     ICON = ../res/icons/Prismatik.icns
 

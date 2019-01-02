@@ -220,6 +220,7 @@ static const QString WinAPIEachWidget = "WinAPIEachWidget";
 static const QString X11 = "X11";
 static const QString D3D9 = "D3D9";
 static const QString MacCoreGraphics = "MacCoreGraphics";
+static const QString MacAVFoundation = "MacAVFoundation";
 static const QString DDupl = "DDupl";
 }
 
@@ -1197,6 +1198,10 @@ Grab::GrabberType Settings::getGrabberType()
 	if (strGrabber == Profile::Value::GrabberType::MacCoreGraphics)
 		return Grab::GrabberTypeMacCoreGraphics;
 #endif
+#ifdef MAC_OS_AV_GRAB_SUPPORT
+	if (strGrabber == Profile::Value::GrabberType::MacAVFoundation)
+		return Grab::GrabberTypeMacAVFoundation;
+#endif
 
 	qWarning() << Q_FUNC_INFO << Profile::Key::Grab::Grabber << "contains invalid value:" << strGrabber << ", reset it to default:" << Profile::Grab::GrabberDefaultString;
 	setGrabberType(Profile::Grab::GrabberDefault);
@@ -1250,6 +1255,11 @@ void Settings::setGrabberType(Grab::GrabberType grabberType)
 #ifdef MAC_OS_CG_GRAB_SUPPORT
 	case Grab::GrabberTypeMacCoreGraphics:
 		strGrabber = Profile::Value::GrabberType::MacCoreGraphics;
+		break;
+#endif
+#ifdef MAC_OS_AV_GRAB_SUPPORT
+	case Grab::GrabberTypeMacAVFoundation:
+		strGrabber = Profile::Value::GrabberType::MacAVFoundation;
 		break;
 #endif
 
@@ -1931,7 +1941,9 @@ void Settings::migrateSettings()
 		Settings::setGrabberType(Grab::GrabberTypeX11);
 #endif
 
-#ifdef MAC_OS_CG_GRAB_SUPPORT
+#if defined(MAC_OS_AV_GRAB_SUPPORT)
+		Settings::setGrabberType(Grab::GrabberTypeMacAVFoundation);
+#elif defined(MAC_OS_CG_GRAB_SUPPORT)
 		Settings::setGrabberType(Grab::GrabberTypeMacCoreGraphics);
 #endif
 

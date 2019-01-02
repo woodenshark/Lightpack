@@ -60,6 +60,9 @@ struct GrabbedScreen {
 	BufferFormat imgFormat = BufferFormatUnknown;
 	ScreenInfo screenInfo;
 	void * associatedData = nullptr;
+
+	double scale = 1.0; // if grabber has ability to scale frames
+	size_t bytesPerRow = 0; // some grabbing methods won't return values equal to (width * bytesPerPixel) because of alignment / padding
 };
 
 #define DECLARE_GRABBER_NAME(grabber_name) \

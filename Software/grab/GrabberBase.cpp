@@ -27,6 +27,7 @@
 #include "GrabWidget.hpp"
 #include "GrabberBase.hpp"
 #include "src/debug.h"
+#include <cmath>
 
 namespace
 {
@@ -165,8 +166,18 @@ void GrabberBase::grab()
 			// Convert coordinates from "Main" desktop coord-system to capture-monitor coord-system
 			QRect preparedRect = clippedRect.translated(-monitorRect.x(), -monitorRect.y());
 
+			// grabbed screen was scaled => scale the widget
+			if (grabbedScreen->scale != 1.0)
+				preparedRect.setCoords(
+					std::floor(grabbedScreen->scale * preparedRect.left()),
+					std::floor(grabbedScreen->scale * preparedRect.top()),
+					std::floor(grabbedScreen->scale * preparedRect.right()),
+					std::floor(grabbedScreen->scale * preparedRect.bottom())
+				);
+
 			// Align width by 4 for accelerated calculations
 			preparedRect.setWidth(preparedRect.width() - (preparedRect.width() % 4));
+
 
 			if( !preparedRect.isValid() ){
 				qWarning() << Q_FUNC_INFO << " preparedRect is not valid:" << Debug::toString(preparedRect);
@@ -183,7 +194,7 @@ void GrabberBase::grab()
 				Q_ASSERT(grabbedScreen->imgData);
 				Calculations::calculateAvgColor(
 					&avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat,
-					grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
+					grabbedScreen->bytesPerRow > 0 ? grabbedScreen->bytesPerRow : grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
 					preparedRect);
 				_context->grabResult->append(avgColor);
 			} else {

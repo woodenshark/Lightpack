@@ -135,8 +135,9 @@ void GrabberBase::grab()
 		}
 	}
 	_lastGrabResult = grabScreens();
-	++grabScreensCount;
+
 	if (_lastGrabResult == GrabResultOk) {
+		++grabScreensCount;
 		_context->grabResult->clear();
 
 		for (int i = 0; i < _context->grabWidgets->size(); ++i) {

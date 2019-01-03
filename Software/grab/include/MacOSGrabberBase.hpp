@@ -51,6 +51,9 @@ protected slots:
 protected:
 	static bool allocateScreenBuffer(const ScreenInfo& screen, GrabbedScreen& grabScreen);
 	static bool getScreenInfoFromRect(const CGDirectDisplayID display, const QList<GrabWidget *>& grabWidgets, ScreenInfo& screenInfo);
+#ifndef QT_NO_DEBUG
+	static void saveGrabbedScreenToBMP(const GrabbedScreen& screen);
+#endif // QT_NO_DEBUG
 private:
 	void freeScreens();
 	virtual GrabResult grabDisplay(CGDirectDisplayID display, GrabbedScreen& screen) = 0;

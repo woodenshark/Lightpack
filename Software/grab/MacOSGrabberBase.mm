@@ -28,6 +28,7 @@
 #if defined (MAC_OS_CG_GRAB_SUPPORT) || defined(MAC_OS_AV_GRAB_SUPPORT)
 
 #include <ApplicationServices/ApplicationServices.h>
+#include <Cocoa/Cocoa.h>
 #include "debug.h"
 
 namespace {
@@ -161,6 +162,11 @@ void MacOSGrabberBase::freeScreenImageData(GrabbedScreen& screen)
 
 GrabResult MacOSGrabberBase::grabScreens()
 {
+#ifndef QT_NO_DEBUG
+	static unsigned long _count = 0;
+	_count += m_timer->interval();
+#endif
+
 	for (GrabbedScreen& grabScreen : _screensWithWidgets)
 	{
 		freeScreenImageData(grabScreen);
@@ -173,8 +179,50 @@ GrabResult MacOSGrabberBase::grabScreens()
 			return GrabResultError;
 		} else if (result == GrabResultFrameNotReady)
 			return GrabResultFrameNotReady;
+
+#ifndef QT_NO_DEBUG
+		if (_count > 20000) // save every 20sec
+			saveGrabbedScreenToBMP(grabScreen);
+#endif
+
 	}
+
+#ifndef QT_NO_DEBUG
+	if (_count > 20000)
+		_count = 0;
+#endif
+
 	return GrabResultOk;
 }
+
+#ifndef QT_NO_DEBUG
+void MacOSGrabberBase::saveGrabbedScreenToBMP(const GrabbedScreen& screen)
+{
+	CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, screen.imgData, screen.imgDataSize, NULL);
+	CGColorSpaceRef cspace = CGColorSpaceCreateDeviceRGB();
+	CGImageRef image = CGImageCreate(screen.bytesPerRow / 4,
+									 screen.imgDataSize / screen.bytesPerRow,
+									 8,
+									 32,
+									 screen.bytesPerRow,
+									 cspace,
+									 kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little, // BGRA
+									 provider,
+									 NULL,
+									 false,
+									 kCGRenderingIntentDefault);
+	CGDataProviderRelease(provider);
+	CGColorSpaceRelease(cspace);
+	NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithCGImage:image];
+	CGImageRelease(image);
+	NSData *imageData = [bitmap representationUsingType:NSBitmapImageFileTypeBMP properties:@{}];
+	[bitmap release];
+	NSString* fileName = [[NSString alloc] initWithFormat:@"/tmp/screen_%p.bmp", screen.screenInfo.handle];
+	[imageData writeToFile:fileName
+				atomically:NO];
+	[imageData release];
+	[fileName release];
+}
+#endif // QT_NO_DEBUG
 
 #endif // MAC_OS_XX_GRAB_SUPPORT

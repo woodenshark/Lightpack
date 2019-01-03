@@ -42,12 +42,12 @@ unix:!macx {
 macx {
     contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) || contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/MacOSGrabberBase.hpp
-        GRABBERS_SOURCES += MacOSGrabberBase.cpp
+        GRABBERS_SOURCES += MacOSGrabberBase.mm
     }
 
     contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/MacOSCGGrabber.hpp
-        GRABBERS_SOURCES += MacOSCGGrabber.cpp
+        GRABBERS_SOURCES += MacOSCGGrabber.mm
     }
 
     contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {

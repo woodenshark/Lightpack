@@ -56,9 +56,10 @@ namespace {
 
 - (void) dealloc
 {
+	self.captureError = nil;
 	CVPixelBufferRelease(_currentPixelBuffer);
 	[self destroyCaptureSession];
-	
+
 	dispatch_release(_sessionQueue);
 	dispatch_release(_videoDataOutputQueue);
 

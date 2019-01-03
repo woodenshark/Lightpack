@@ -329,4 +329,8 @@ namespace PrismatikMath
 	StructRgb toRgb(const StructLab &lab) {
 		return toRgb(toXyz(lab));
 	}
+
+	quint8 getBrightness(const QRgb rgb) {
+		return static_cast<quint8>(qRed(rgb) * 0.299 + qGreen(rgb) * 0.587 + qBlue(rgb) * 0.114);
+	}
 }

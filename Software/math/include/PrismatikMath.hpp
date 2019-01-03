@@ -51,6 +51,7 @@ namespace PrismatikMath
 	StructLab toLab(const StructXyz &);
 	StructRgb toRgb(const StructXyz &);
 	StructRgb toRgb(const StructLab &);
+	quint8 getBrightness(const QRgb);
 
 	// Convert ASCII char '5' to 5
 	inline char getDigit(const char d)

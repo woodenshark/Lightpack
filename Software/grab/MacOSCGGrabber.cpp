@@ -66,6 +66,7 @@ namespace {
 		screen.bytesPerRow = CGImageGetBytesPerRow(imageRef);
 		screen.imgDataSize = screen.bytesPerRow * CGImageGetHeight(imageRef);
 		screen.imgData = CFDataGetBytePtr(((MacOSCGScreenData*)screen.associatedData)->imageDataRef);
+		// resizing with vImageScale_ARGB8888 from Accelerate.framework is too expensive
 	}
 }
 

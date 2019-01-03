@@ -17,7 +17,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 namespace {
-	static const double kScaleFactor = 0.05;
+	// see notes below about pixel format and scaling
+	static const double kScaleFactor = [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:NSOperatingSystemVersion{10,14,0}] ? 0.05 : 0.17;
 }
 
 @interface MacOSNativeAVCapture : NSDocument <AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -28,7 +29,7 @@ namespace {
 @end
 
 @implementation MacOSNativeAVCapture {
-    CGDirectDisplayID		_display;
+	CGDirectDisplayID		_display;
 	
 	AVCaptureSession*		_captureSession;
 	AVCaptureScreenInput*	_captureScreenInput; // setting scale + framerate
@@ -40,17 +41,17 @@ namespace {
 
 - (instancetype) initWithDisplay:(CGDirectDisplayID)display
 {
-    self = [super init];
-    if (self)
-    {
+	self = [super init];
+	if (self)
+	{
 		_running = NO;
-        _display = display;
+		_display = display;
 		
 		_sessionQueue = dispatch_queue_create("com.prismatik.avcapture.session", DISPATCH_QUEUE_SERIAL);
 		_videoDataOutputQueue = dispatch_queue_create("com.prismatik.avcapture.videodata", DISPATCH_QUEUE_SERIAL);
 		dispatch_set_target_queue(_videoDataOutputQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void) dealloc
@@ -60,53 +61,88 @@ namespace {
 	
 	dispatch_release(_sessionQueue);
 	dispatch_release(_videoDataOutputQueue);
-	
-    [super dealloc];
+
+	[super dealloc];
 }
 
 - (BOOL) createCaptureSession
 {
 	if (_captureSession)
 		return YES;
-    /* Create a capture session. */
-    _captureSession = [[AVCaptureSession alloc] init];
-    if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset320x240])
-        [_captureSession setSessionPreset:AVCaptureSessionPreset320x240];
-    
-    /* Add the display as a capture input. */
-    AVCaptureScreenInput* captureScreenInput = [[AVCaptureScreenInput alloc] initWithDisplayID:_display];
+	/* Create a capture session. */
+	_captureSession = [[AVCaptureSession alloc] init];
+	
+	/*
+	 - scaleFactor overrides SessionPreset's Width / Height (they are removed from output.videoSettings)
+	 - setting Width / Height manually in videoSettings is technically possible, but does not provide advantage over scaleFactor
+	 - AVCaptureSessionPresetLow limits framerate to ~15
+	 */
+//	if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetLow])
+//		[_captureSession setSessionPreset:AVCaptureSessionPresetLow];
+	
+	/* Add the display as a capture input. */
+	AVCaptureScreenInput* captureScreenInput = [[AVCaptureScreenInput alloc] initWithDisplayID:_display];
 	captureScreenInput.scaleFactor = kScaleFactor / MacOSAVGrabber::getDisplayScalingRatio(_display);
 	captureScreenInput.minFrameDuration = CMTimeMake(1, 1); // default to 1 FPS
-    if ([_captureSession canAddInput:captureScreenInput])
-        [_captureSession addInput:captureScreenInput];
+	if ([_captureSession canAddInput:captureScreenInput])
+		[_captureSession addInput:captureScreenInput];
 	else {
 		[_captureSession release];
 		_captureSession = nil;
 		[captureScreenInput release];
-        return NO;
+		return NO;
 	}
 	_captureScreenInput = captureScreenInput;
 	[captureScreenInput release];
 
-    /* Add a movie file output + delegate. */
-    AVCaptureVideoDataOutput* captureDataOutput = [[AVCaptureVideoDataOutput alloc] init];
-    [captureDataOutput setSampleBufferDelegate:self queue:_videoDataOutputQueue];
+	/* Add a movie file output + delegate. */
+	AVCaptureVideoDataOutput* captureDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+	[captureDataOutput setSampleBufferDelegate:self queue:_videoDataOutputQueue];
 	captureDataOutput.alwaysDiscardsLateVideoFrames = YES;
+
+	/*
+
+	 On macOS 10.12.6 / 10.13 SDK
+	 depending on pixel format, downscaled dimensions (through scaleFactor or Width/Height videoSettings keys) seem bugged:
+	 vertical scaling is non-linear and does not follow horizontal scaling
+	 @0.15 scaleFactor : vert scale is ~98% of what it should be
+	 @0.05 scaleFactor : vert scale is ~74%
+	 @0.03 scaleFactor : vert scale is ~25%
+	 
+	 The resulting image/data itself still has the desired dimensions
+	 but the content is vertically squeeshed towards the top and the remaining bottom part contains garbage pixels
+	 
+	 among these available (on the test device) formats
+		kCVPixelFormatType_422YpCbCr8
+		kCVPixelFormatType_422YpCbCr8_yuvs
+		kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+		kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+		kCVPixelFormatType_32ARGB
+		kCVPixelFormatType_32BGRA
+	 
+	 only kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange was not having this issue
+	 
+	 On macOS 10.14.2 / 10.14 SDK no such issue
+	 
+	 Bundling AVFoundation, CoreVideo, CoreMedia frameworks from 10.14 SDK does not help
+	 
+	 */
 	captureDataOutput.videoSettings = @{ (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA) };
-    if ([_captureSession canAddOutput:captureDataOutput])
-        [_captureSession addOutput:captureDataOutput];
+
+	if ([_captureSession canAddOutput:captureDataOutput])
+		[_captureSession addOutput:captureDataOutput];
 	else {
 		[_captureSession release];
 		_captureSession = nil;
 		_captureScreenInput = nil;
 		[captureDataOutput release];
-        return NO;
+		return NO;
 	}
 	[captureDataOutput release];
 	
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:_captureSession];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:_captureSession];
 	
-    return YES;
+	return YES;
 }
 
 - (void) destroyCaptureSession
@@ -236,8 +272,8 @@ namespace {
 /* Set the screen input maximum frame rate. */
 - (void) setMaximumScreenInputFramerate:(float)maximumFramerate
 {
-    CMTime minimumFrameDuration = CMTimeMake(1, (int32_t)maximumFramerate);
-    /* Set the screen input's minimum frame duration. */
+	CMTime minimumFrameDuration = CMTimeMake(1, (int32_t)maximumFramerate);
+	/* Set the screen input's minimum frame duration. */
 	@synchronized (self) {
 		dispatch_async(_sessionQueue, ^{[_captureScreenInput setMinFrameDuration:minimumFrameDuration];});
 	}
@@ -250,11 +286,12 @@ namespace {
 
 - (void) captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    Q_UNUSED(output);
-    Q_UNUSED(connection);
+	Q_UNUSED(output);
+	Q_UNUSED(connection);
 	@synchronized (self) {
 		self.currentPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 	}
+	
 }
 
 - (CVPixelBufferRef) getLastPixelBuffer:(NSError **)error
@@ -275,39 +312,39 @@ namespace {
 
 namespace {
 	struct MacOSAVScreenData : public MacOSGrabberBase::MacOSScreenData
-    {
-        MacOSAVScreenData() = default;
-        ~MacOSAVScreenData()
-        {
+	{
+		MacOSAVScreenData() = default;
+		~MacOSAVScreenData()
+		{
 			setImageRef(nullptr);
-        }
-        
-        void setImageRef(CVPixelBufferRef _displayImageRef)
-        {
-            if (_displayImageRef == displayImageRef)
-                return;
+		}
+		
+		void setImageRef(CVPixelBufferRef _displayImageRef)
+		{
+			if (_displayImageRef == displayImageRef)
+				return;
 			if (displayImageRef) {
 				CVPixelBufferUnlockBaseAddress(displayImageRef, kCVPixelBufferLock_ReadOnly);
 				CVPixelBufferRelease(displayImageRef);
 			}
-            displayImageRef = CVPixelBufferRetain(_displayImageRef);
+			displayImageRef = CVPixelBufferRetain(_displayImageRef);
 			if (displayImageRef)
 				CVPixelBufferLockBaseAddress(displayImageRef, kCVPixelBufferLock_ReadOnly);
-        }
-        
+		}
+		
 		CVPixelBufferRef displayImageRef{nullptr};
-    };
-    
-    void toGrabbedScreen(CVPixelBufferRef imageRef, GrabbedScreen& screen)
-    {
-        if (!screen.associatedData)
-            screen.associatedData = new MacOSAVScreenData;
-        ((MacOSAVScreenData*)screen.associatedData)->setImageRef(imageRef);
-        screen.bytesPerRow = CVPixelBufferGetBytesPerRow(imageRef);
+	};
+	
+	void toGrabbedScreen(CVPixelBufferRef imageRef, GrabbedScreen& screen)
+	{
+		if (!screen.associatedData)
+			screen.associatedData = new MacOSAVScreenData;
+		((MacOSAVScreenData*)screen.associatedData)->setImageRef(imageRef);
+		screen.bytesPerRow = CVPixelBufferGetBytesPerRow(imageRef);
 		screen.scale = kScaleFactor;
-        screen.imgData = (unsigned char*)CVPixelBufferGetBaseAddress(imageRef);
-        screen.imgDataSize = CVPixelBufferGetHeight(imageRef) * screen.bytesPerRow;
-    }
+		screen.imgData = (unsigned char*)CVPixelBufferGetBaseAddress(imageRef);
+		screen.imgDataSize = CVPixelBufferGetHeight(imageRef) * screen.bytesPerRow;
+	}
 }
 
 
@@ -330,11 +367,11 @@ MacOSAVGrabber::~MacOSAVGrabber()
 
 void MacOSAVGrabber::setGrabInterval(int msec)
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO <<    this->metaObject()->className();
-    m_timer->setInterval(msec);
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO <<	this->metaObject()->className();
+	m_timer->setInterval(msec);
 
 	double framerate = 1000.0 / msec;
-    foreach (MacOSNativeAVCapture* capture, _captures)
+	foreach (MacOSNativeAVCapture* capture, _captures)
 	{
 		double maxCaptureFramerate = [capture maximumPossibleFramerate];
 		[capture setMaximumScreenInputFramerate:MIN(framerate, maxCaptureFramerate == 0.0 ? framerate : maxCaptureFramerate)];
@@ -343,8 +380,8 @@ void MacOSAVGrabber::setGrabInterval(int msec)
 
 void MacOSAVGrabber::startGrabbing()
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
-    grabScreensCount = 0;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+	grabScreensCount = 0;
 
 	if (_screensWithWidgets.empty())
 	{
@@ -354,35 +391,35 @@ void MacOSAVGrabber::startGrabbing()
 	}
 
 	foreach (MacOSNativeAVCapture* capture, _captures)
-    {
-        [capture stop];
-        [capture release];
-    }
+	{
+		[capture stop];
+		[capture release];
+	}
 	_captures.clear();
 	foreach (const GrabbedScreen& grabScreen, _screensWithWidgets)
 	{
-        CGDirectDisplayID display = static_cast<CGDirectDisplayID>(reinterpret_cast<intptr_t>(grabScreen.screenInfo.handle));
-        MacOSNativeAVCapture* capture = [[MacOSNativeAVCapture alloc] initWithDisplay:display];
+		CGDirectDisplayID display = static_cast<CGDirectDisplayID>(reinterpret_cast<intptr_t>(grabScreen.screenInfo.handle));
+		MacOSNativeAVCapture* capture = [[MacOSNativeAVCapture alloc] initWithDisplay:display];
 		if ([capture createCaptureSession]) {
 			[capture setMaximumScreenInputFramerate:(m_timer->interval() > 0 ? 1000.0f / m_timer->interval() : 1.0f)];
 			_captures.insert(display, capture);
 			[capture start];
 		}
-    }
+	}
 
 	m_timer->start();
 }
 
 void MacOSAVGrabber::stopGrabbing()
 {
-    DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
-    DEBUG_MID_LEVEL << "grabbed" << grabScreensCount << "frames";
-    m_timer->stop();
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
+	DEBUG_MID_LEVEL << "grabbed" << grabScreensCount << "frames";
+	m_timer->stop();
 	
-    foreach (MacOSNativeAVCapture* capture, _captures) {
-        [capture stop];
+	foreach (MacOSNativeAVCapture* capture, _captures) {
+		[capture stop];
 		[capture release];
-    }
+	}
 	_captures.clear();
 }
 
@@ -405,11 +442,11 @@ GrabResult MacOSAVGrabber::grabDisplay(const CGDirectDisplayID display, GrabbedS
 		}
 		return GrabResultFrameNotReady;
 	}
-
+	
 	toGrabbedScreen(imageRef, screen);
 	CVPixelBufferRelease(imageRef);
 
-    return GrabResultOk;
+	return GrabResultOk;
 }
 
 #endif // MAC_OS_AV_GRAB_SUPPORT

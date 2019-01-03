@@ -56,7 +56,9 @@ function remove_optimizations_from_debug()
     
     # replace first 2 occurencies (debug section should be first) of O2
     # qt bug, never fixed https://bugreports.qt.io/browse/QTBUG-54791
-    sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj && sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj
+    sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj && sed -i '' -E '1,/"-O[1-9]",/s/"-O[1-9]",/"-O0","-g",/' $depxcodeproj && \
+    # disable QT_NO_DEBUG
+    sed -i '' -E '1,/"-DQT_NO_DEBUG",/s/"-DQT_NO_DEBUG",//' $depxcodeproj && sed -i '' -E '1,/"-DQT_NO_DEBUG",/s/"-DQT_NO_DEBUG",//' $depxcodeproj
 }
 
 remove_optimizations_from_debug grab grab && \

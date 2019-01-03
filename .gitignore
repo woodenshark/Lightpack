@@ -46,6 +46,7 @@ stuff/
 *.tmp
 *.dmg
 *moc_*.cpp
+moc_*.h
 *.eep
 *.elf
 *.lss
@@ -68,3 +69,4 @@ vc*.pdb
 *.xcodeproj
 *~
 Software/.qmake.stash
+.DS_Store

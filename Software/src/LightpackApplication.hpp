@@ -29,7 +29,6 @@
 #include "SettingsWindow.hpp"
 #include "LedDeviceManager.hpp"
 #include "qtsingleapplication.h"
-#include "SessionChangeDetector.hpp"
 
 #include <memory>
 

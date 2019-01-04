@@ -605,10 +605,10 @@ void GrabManager::initGrabbers()
 #endif
 
 #ifdef MAC_OS_CG_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeMacCoreGraphics] = initGrabber(new MacOSCGGrabber(NULL, m_grabberContext));
+	m_grabbers[Grab::GrabberTypeMacCoreGraphics] = initGrabber(new MacOSCGGrabber(NULL, m_grabberContext));
 #endif
 #ifdef MAC_OS_AV_GRAB_SUPPORT
-    m_grabbers[Grab::GrabberTypeMacAVFoundation] = initGrabber(new MacOSAVGrabber(NULL, m_grabberContext));
+	m_grabbers[Grab::GrabberTypeMacAVFoundation] = initGrabber(new MacOSAVGrabber(NULL, m_grabberContext));
 #endif
 #ifdef D3D10_GRAB_SUPPORT
 	if (Settings::isDx1011GrabberEnabled()) {

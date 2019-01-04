@@ -375,7 +375,7 @@ void MacOSAVGrabber::setGrabInterval(int msec)
 	foreach (MacOSNativeAVCapture* capture, _captures)
 	{
 		double maxCaptureFramerate = [capture maximumPossibleFramerate];
-		[capture setMaximumScreenInputFramerate:MIN(framerate, maxCaptureFramerate == 0.0 ? framerate : maxCaptureFramerate)];
+		[capture setMaximumScreenInputFramerate:(maxCaptureFramerate == 0.0 ? framerate : MIN(framerate, maxCaptureFramerate))];
 	}
 }
 

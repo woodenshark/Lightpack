@@ -107,7 +107,7 @@ double MacOSGrabberBase::getDisplayRefreshRate(const CGDirectDisplayID display)
 {
 	CGDisplayModeRef mode = CGDisplayCopyDisplayMode(display);
 	if (mode == NULL)
-		return 60.0;
+		return 0.0;
 	const double hz = CGDisplayModeGetRefreshRate(mode);
 	CGDisplayModeRelease(mode);
 	return hz;

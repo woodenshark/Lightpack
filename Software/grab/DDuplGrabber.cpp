@@ -62,16 +62,34 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
 #define DDUPL_THREAD_EVENT_NAME L"Lightpack.DDuplGrabber.Event.Thread"
 #define DDUPL_THREADRETURN_EVENT_NAME L"Lightpack.DDuplGrabber.Event.ThreadReturn"
 
+namespace {
+	// 0 = /1 (no scaling)
+	// 1 = /2
+	// 2 = /4
+	// 3 = /8 (best value for now)
+	// 4+ seems to be counter-productive
+	static const uint8_t DownscaleMipLevel = 3;
+}
+
 struct DDuplScreenData
 {
 	DDuplScreenData(IDXGIOutputPtr _output, IDXGIOutputDuplicationPtr _duplication, ID3D11DevicePtr _device, ID3D11DeviceContextPtr _context)
 		: output(_output), duplication(_duplication), device(_device), context(_context)
 	{}
 
-	IDXGIOutputPtr output;
-	IDXGIOutputDuplicationPtr duplication;
-	ID3D11DevicePtr device;
-	ID3D11DeviceContextPtr context;
+	~DDuplScreenData()
+	{
+		if (textureCopy)
+			textureCopy->Release();
+	}
+
+	IDXGIOutputPtr output{nullptr};
+	IDXGIOutputDuplicationPtr duplication{nullptr};
+	ID3D11DevicePtr device{nullptr};
+	ID3D11DeviceContextPtr context{nullptr};
+
+	ID3D11Texture2DPtr textureCopy{nullptr};
+	DXGI_MAPPED_RECT surfaceMap;
 };
 
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
@@ -315,18 +333,22 @@ void DDuplGrabber::freeScreens()
 {
 	for (GrabbedScreen& screen : _screensWithWidgets)
 	{
+		if (screen.imgData != NULL)
+		{
+			if (((DDuplScreenData*)screen.associatedData)->textureCopy == nullptr)
+				free((void*)screen.imgData);// if we don't have a texture we have a manually allocated black frame
+			screen.imgData = NULL;
+			screen.imgDataSize = 0;
+		}
+
 		if (screen.associatedData != NULL)
 		{
 			delete (DDuplScreenData*)screen.associatedData;
 			screen.associatedData = NULL;
 		}
 
-		if (screen.imgData != NULL)
-		{
-			free((void*)screen.imgData);
-			screen.imgData = NULL;
-			screen.imgDataSize = 0;
-		}
+		screen.scale = 1.0;
+		screen.bytesPerRow = 0;
 	}
 
 	_screensWithWidgets.clear();
@@ -446,6 +468,8 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens, bool noRe
 					grabScreen.imgData = (unsigned char *)NULL;
 					grabScreen.imgFormat = BufferFormatArgb;
 					grabScreen.screenInfo = screenInfo;
+					grabScreen.scale = 1.0;
+					grabScreen.bytesPerRow = 0;
 					grabScreen.associatedData = new DDuplScreenData(output, duplication, device, context);
 
 					_screensWithWidgets.append(grabScreen);
@@ -497,17 +521,31 @@ GrabResult DDuplGrabber::returnBlackBuffer()
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 	for (GrabbedScreen& screen : _screensWithWidgets)
 	{
-		size_t sizeNeeded = screen.screenInfo.rect.height() * screen.screenInfo.rect.width() * 4; // Assumes 4 bytes per pixel
-		if (screen.imgData == NULL)
-		{
-			screen.imgData = (unsigned char*)malloc(sizeNeeded);
-			screen.imgDataSize = sizeNeeded;
+		DDuplScreenData* screenData = (DDuplScreenData*)screen.associatedData;
+		if (screenData->textureCopy) {
+			// if we have a texture, imgData points to surfaceMap.pBits
+			// so here we only need to free the texture and null everything
+			screenData->textureCopy->Release();
+			screenData->textureCopy = nullptr;
+			screen.imgData = NULL;
+			screen.imgDataSize = 0;
 		}
+		screen.scale = 1.0 / (1 << DownscaleMipLevel);
+		screen.bytesPerRow = screen.screenInfo.rect.width() >> DownscaleMipLevel; // doesn't need to be perfectly padded
+		const size_t sizeNeeded = (screen.screenInfo.rect.height() >> DownscaleMipLevel) * screen.bytesPerRow;
+		if (screen.imgData == NULL)
+			screen.imgData = (unsigned char*)malloc(sizeNeeded);
 		else if (screen.imgDataSize != sizeNeeded)
 		{
-			qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+			qWarning(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
+			screen.imgData = (unsigned char*)realloc((void*)screen.imgData, sizeNeeded);
+		}
+		if (screen.imgData == NULL) {
+			qCritical(Q_FUNC_INFO " Failed to allocate black buffer");
 			return GrabResultError;
 		}
+
+		screen.imgDataSize = sizeNeeded;
 		ZeroMemory((void*)screen.imgData, screen.imgDataSize);
 	}
 
@@ -603,22 +641,10 @@ GrabResult DDuplGrabber::grabScreens()
 				return GrabResultError;
 			}
 
-			size_t sizeNeeded = desc.Height * desc.Width * 4; // Assumes 4 bytes per pixel
-			if (screen.imgData == NULL)
-			{
-				screen.imgData = (unsigned char*)malloc(sizeNeeded);
-				screen.imgDataSize = sizeNeeded;
-			}
-			else if (screen.imgDataSize != sizeNeeded)
-			{
-				qCritical(Q_FUNC_INFO " Unexpected buffer size %d where %d is expected", screen.imgDataSize, sizeNeeded);
-				return GrabResultError;
-			}
-
 			D3D11_TEXTURE2D_DESC texDesc;
 			ZeroMemory(&texDesc, sizeof(texDesc));
-			texDesc.Width = desc.Width;
-			texDesc.Height = desc.Height;
+			texDesc.Width = desc.Width >> DownscaleMipLevel;
+			texDesc.Height = desc.Height >> DownscaleMipLevel;
 			texDesc.MipLevels = 1;
 			texDesc.ArraySize = 1;
 			texDesc.SampleDesc.Count = 1;
@@ -628,38 +654,86 @@ GrabResult DDuplGrabber::grabScreens()
 			texDesc.BindFlags = 0;
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 			texDesc.MiscFlags = 0;
-			ID3D11Texture2DPtr textureCopy;
-			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &textureCopy);
+
+			// reset texture and data before getting new one
+			if (screenData->textureCopy) {
+				screenData->textureCopy->Release();
+				screenData->textureCopy = nullptr;
+			}
+			else if (screen.imgData)
+				free((void*)screen.imgData);
+
+			screen.imgData = NULL;
+			screen.imgDataSize = 0;
+
+			hr = screenData->device->CreateTexture2D(&texDesc, NULL, &screenData->textureCopy);
 			if (FAILED(hr))
 			{
 				qCritical(Q_FUNC_INFO " Failed to CreateTexture2D: 0x%X", hr);
 				return GrabResultError;
 			}
 
-			screenData->context->CopyResource(textureCopy, texture);
+			if (DownscaleMipLevel > 0) {
+				D3D11_TEXTURE2D_DESC scaledTextureDesc;
+				ZeroMemory(&scaledTextureDesc, sizeof(scaledTextureDesc));
+				scaledTextureDesc.Width = desc.Width;
+				scaledTextureDesc.Height = desc.Height;
+				scaledTextureDesc.MipLevels = DownscaleMipLevel + 1;
+				scaledTextureDesc.ArraySize = 1;
+				scaledTextureDesc.SampleDesc.Count = 1;
+				scaledTextureDesc.SampleDesc.Quality = 0;
+				scaledTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+				scaledTextureDesc.Format = desc.Format;
+				scaledTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+				scaledTextureDesc.CPUAccessFlags = 0;
+				scaledTextureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+				ID3D11Texture2DPtr scaledTexture;
+				hr = screenData->device->CreateTexture2D(&scaledTextureDesc, NULL, &scaledTexture);
+				if (FAILED(hr))
+				{
+					qCritical(Q_FUNC_INFO " Failed to CreateTexture2D: 0x%X", hr);
+					return GrabResultError;
+				}
+				ID3D11ShaderResourceView* scaledTextureView;
+				hr = screenData->device->CreateShaderResourceView(scaledTexture, NULL, &scaledTextureView);
+				if (FAILED(hr))
+				{
+					qCritical(Q_FUNC_INFO " Failed to CreateShaderResourceView: 0x%X", hr);
+					return GrabResultError;
+				}
+
+				screenData->context->CopySubresourceRegion(scaledTexture, 0, 0, 0, 0, texture, 0, NULL);
+				screenData->context->GenerateMips(scaledTextureView);
+
+				screenData->context->CopySubresourceRegion(screenData->textureCopy, 0, 0, 0, 0, scaledTexture, DownscaleMipLevel, NULL);
+
+				scaledTextureView->Release();
+				scaledTexture->Release();
+			}
+			else
+				screenData->context->CopyResource(screenData->textureCopy, texture);
 
 			IDXGISurface1Ptr surface;
-			hr = textureCopy->QueryInterface(IID_IDXGISurface1, (void**)&surface);
+			hr = screenData->textureCopy->QueryInterface(IID_IDXGISurface1, (void**)&surface);
 			if (FAILED(hr))
 			{
 				qCritical(Q_FUNC_INFO " Failed to cast textureCopy to IID_IDXGISurface1: 0x%X", hr);
 				return GrabResultError;
 			}
 
-			DXGI_MAPPED_RECT map;
-			hr = surface->Map(&map, DXGI_MAP_READ);
+			hr = surface->Map(&screenData->surfaceMap, DXGI_MAP_READ);
 			if (FAILED(hr))
 			{
 				qCritical(Q_FUNC_INFO " Failed to get surface map: 0x%X", hr);
 				return GrabResultError;
 			}
 
-			for (unsigned int i = 0; i < desc.Height; i++)
-			{
-				memcpy_s(((unsigned char*)screen.imgData) + (i * desc.Width) * 4, desc.Width * 4, map.pBits + i*map.Pitch, desc.Width * 4);
-			}
-
+			screen.imgData = screenData->surfaceMap.pBits;
+			screen.imgDataSize = texDesc.Height * screenData->surfaceMap.Pitch;
 			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
+			screen.scale = 1.0 / (1 << DownscaleMipLevel);
+			screen.bytesPerRow = screenData->surfaceMap.Pitch;
 
 			screenData->duplication->ReleaseFrame();
 		}

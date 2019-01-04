@@ -211,17 +211,18 @@ void MacOSGrabberBase::saveGrabbedScreenToBMP(const GrabbedScreen& screen)
 									 NULL,
 									 false,
 									 kCGRenderingIntentDefault);
+
+	NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithCGImage:image];
+	@autoreleasepool {
+		// forced autorelease because natural process keeps it around way too long
+		NSData *imageData = [bitmap representationUsingType:NSBitmapImageFileTypeBMP properties:@{}];
+		[imageData writeToFile:[NSString stringWithFormat:@"/tmp/screen_%p.bmp", screen.screenInfo.handle]
+					atomically:NO];
+	}
+	[bitmap release];
+	CGImageRelease(image);
 	CGDataProviderRelease(provider);
 	CGColorSpaceRelease(cspace);
-	NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithCGImage:image];
-	CGImageRelease(image);
-	NSData *imageData = [bitmap representationUsingType:NSBitmapImageFileTypeBMP properties:@{}];
-	[bitmap release];
-	NSString* fileName = [[NSString alloc] initWithFormat:@"/tmp/screen_%p.bmp", screen.screenInfo.handle];
-	[imageData writeToFile:fileName
-				atomically:NO];
-	[imageData release];
-	[fileName release];
 }
 #endif // QT_NO_DEBUG
 

@@ -169,10 +169,10 @@ void GrabberBase::grab()
 			// grabbed screen was scaled => scale the widget
 			if (grabbedScreen->scale != 1.0)
 				preparedRect.setCoords(
-					std::floor(grabbedScreen->scale * preparedRect.left()),
-					std::floor(grabbedScreen->scale * preparedRect.top()),
-					std::ceil(grabbedScreen->scale * preparedRect.right()),
-					std::ceil(grabbedScreen->scale * preparedRect.bottom())
+					std::ceil(grabbedScreen->scale * preparedRect.left()),
+					std::ceil(grabbedScreen->scale * preparedRect.top()),
+					std::floor(grabbedScreen->scale * preparedRect.right()),
+					std::floor(grabbedScreen->scale * preparedRect.bottom())
 				);
 
 			// Align width by 4 for accelerated calculations

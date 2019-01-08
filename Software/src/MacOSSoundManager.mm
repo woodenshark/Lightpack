@@ -330,12 +330,17 @@
 
 	NSError* error = nil;
 	[audioDevice lockForConfiguration:&error];
-	audioDevice.activeFormat = audioDevice.compatibleFormat; // get lpcm 44100 Hz
-	[audioDevice unlockForConfiguration];
-	if (error != nil) {
-		_running = NO;
-		qCritical() << Q_FUNC_INFO << "could not set audio format: " << error.localizedDescription;
-		return NO;
+	if (error == nil) {
+		audioDevice.activeFormat = audioDevice.compatibleFormat; // get lpcm 44100 Hz
+		[audioDevice unlockForConfiguration];
+	} else {
+		qWarning() << Q_FUNC_INFO << "could not set audio format: " << error.localizedDescription;
+		if (!audioDevice.activeFormat.isCompatible)
+		{
+			qCritical() << Q_FUNC_INFO << "active format is not supported: " << audioDevice.activeFormat.description;
+			_running = NO;
+			return NO;
+		}
 	}
 	if (_running)
 		[_captureSession startRunning];

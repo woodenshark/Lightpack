@@ -13,6 +13,49 @@
 #include <AVFoundation/AVFoundation.h>
 #include <CoreMedia/CoreMedia.h>
 
+@interface AVCaptureDeviceFormat (CompatiblityCheck)
+- (size_t) score;
+- (BOOL) isCompatible;
+@end
+
+@implementation AVCaptureDeviceFormat (CompatiblityCheck)
+
+- (size_t) score
+{
+	size_t score = 0;
+
+	if (![self.mediaType isEqualToString:AVMediaTypeAudio])
+		return 0;
+	const AudioStreamBasicDescription *description = CMAudioFormatDescriptionGetStreamBasicDescription(self.formatDescription);
+	if (description == NULL)
+		return 0;
+	if (description->mFormatID != kAudioFormatLinearPCM)
+		return 0;
+	
+	if (description->mBitsPerChannel == 16)
+		score += 3;
+	else if (description->mBitsPerChannel == 24)
+		score += 1;
+	else if (description->mBitsPerChannel == 32)
+		score += 1;
+	
+	if (description->mSampleRate == 44100)
+		score += 3;
+	else if (description->mSampleRate == 48000)
+		score += 1;
+	else if (description->mSampleRate == 32000)
+		score += 1;
+
+	return score;
+}
+
+- (BOOL) isCompatible
+{
+	return (self.score > 0);
+}
+
+@end
+
 @interface AVCaptureDevice (CompatibilityCheck)
 - (BOOL) isCompatible;
 - (AVCaptureDeviceFormat *) compatibleFormat;
@@ -65,26 +108,7 @@
 	size_t bestScore = 0;
 	for (AVCaptureDeviceFormat *format in self.formats)
 	{
-		if (![format.mediaType isEqualToString:AVMediaTypeAudio])
-			continue;
-		const AudioStreamBasicDescription *description = CMAudioFormatDescriptionGetStreamBasicDescription(format.formatDescription);
-		if (description->mFormatID != kAudioFormatLinearPCM)
-			continue;
-
-		size_t score = 0;
-		if (description->mBitsPerChannel == 16)
-			score += 3;
-		else if (description->mBitsPerChannel == 24)
-			score += 1;
-		else if (description->mBitsPerChannel == 32)
-			score += 1;
-		
-		if (description->mSampleRate == 44100)
-			score += 3;
-		else if (description->mSampleRate == 48000)
-			score += 1;
-		else if (description->mSampleRate == 32000)
-			score += 1;
+		size_t score = format.score;
 
 		if (score == 0 || score < bestScore)
 			continue;

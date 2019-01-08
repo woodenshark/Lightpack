@@ -3040,7 +3040,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>comboBox_LightpackModes</tabstop>
   <tabstop>spinBox_GrabSlowdown</tabstop>
   <tabstop>checkBox_GrabIsAvgColors</tabstop>
-  <tabstop>checkBox_GrabApplyGammaRamp</tabstop>
   <tabstop>checkBox_GrabApplyColorTemperature</tabstop>
   <tabstop>pushButton_grabApplyColorTemperatureHelp</tabstop>
   <tabstop>horizontalSlider_GrabColorTemperature</tabstop>

@@ -25,6 +25,7 @@
 
 
 #include "WindowsSoundManager.hpp"
+#include "debug.h"
 #include "bass.h"
 #include "basswasapi.h"
 
@@ -82,7 +83,7 @@ void WindowsSoundManager::populateDeviceList(QList<SoundManagerDeviceInfo>& devi
 	}
 }
 
-void SoundManager::start(bool isEnabled)
+void WindowsSoundManager::start(bool isEnabled)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 

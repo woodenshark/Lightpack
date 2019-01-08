@@ -175,10 +175,12 @@ void SoundManager::updateColors()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 	updateFft();
-	applyFft();
+	bool colorsChanged = applyFft();
+	if (colorsChanged || !m_isSendDataOnlyIfColorsChanged)
+		emit updateLedsColors(m_colors);
 }
 
-void SoundManager::applyFft()
+bool SoundManager::applyFft()
 {
 	m_frames++;
 #define SPECHEIGHT 1000
@@ -215,9 +217,7 @@ void SoundManager::applyFft()
 		} else
 			m_colors[i] = 0;
 	}
-
-	if (changed || !m_isSendDataOnlyIfColorsChanged)
-		emit updateLedsColors(m_colors);
+	return changed;
 }
 
 void SoundManager::initColors(int numberOfLeds)

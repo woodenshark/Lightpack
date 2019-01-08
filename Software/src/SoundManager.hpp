@@ -77,7 +77,7 @@ protected:
 	void initColors(int numberOfLeds);
 	virtual void populateDeviceList(QList<SoundManagerDeviceInfo>& devices, int& recommended) = 0;
 	virtual void updateFft() {};
-	void applyFft();
+	bool applyFft();
 
 protected:
 	LiquidColorGenerator m_generator;

@@ -183,7 +183,7 @@ void SoundManager::updateColors()
 bool SoundManager::applyFft()
 {
 	m_frames++;
-#define SPECHEIGHT 1000
+	const size_t specHeight = 1000;
 	size_t b0 = 0;
 	bool changed = false;
 	for (int i = 0; i < m_colors.size(); i++)
@@ -194,23 +194,23 @@ bool SoundManager::applyFft()
 		if (b1 <= b0) b1 = b0 + 1; // make sure it uses at least 1 FFT bin
 		for (; b0<b1; b0++)
 			if (peak<m_fft[1 + b0]) peak = m_fft[1 + b0];
-		int val = sqrt(peak) * /* 3 * */ SPECHEIGHT - 4; // scale it (sqrt to make low values more visible)
-		if (val>SPECHEIGHT) val = SPECHEIGHT; // cap it
+		int val = sqrt(peak) * /* 3 * */ specHeight - 4; // scale it (sqrt to make low values more visible)
+		if (val>specHeight) val = specHeight; // cap it
 		if (val<0) val = 0; // cap it
 
 		if (m_frames % 5 == 0) m_peaks[i] -= 1;
 		if (m_peaks[i] < 0) m_peaks[i] = 0;
 		if (val > m_peaks[i]) m_peaks[i] = val;
 		if (val < m_peaks[i] - 5) 
-			val = (val * SPECHEIGHT) / m_peaks[i]; // scale val according to peak
+			val = (val * specHeight) / m_peaks[i]; // scale val according to peak
 
 		if (Settings::isLedEnabled(i)) {
 			QColor from = m_isLiquidMode ? QColor(0, 0, 0) : m_minColor;
 			QColor to = m_isLiquidMode ? m_generator.current() : m_maxColor;
 			QColor rgb;
-			rgb.setRed(from.red() + (to.red() - from.red()) * (val / (double)SPECHEIGHT));
-			rgb.setGreen(from.green() + (to.green() - from.green()) * (val / (double)SPECHEIGHT));
-			rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (val / (double)SPECHEIGHT));
+			rgb.setRed(from.red() + (to.red() - from.red()) * (val / (double)specHeight));
+			rgb.setGreen(from.green() + (to.green() - from.green()) * (val / (double)specHeight));
+			rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (val / (double)specHeight));
 			if (m_colors[i] != rgb.rgb()) changed = true;
 
 			m_colors[i] = rgb.rgb();

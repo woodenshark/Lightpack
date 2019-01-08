@@ -1032,7 +1032,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <item>
              <widget class="QLabel" name="label_7">
               <property name="text">
-               <string>Please note: The sound visualizer works best with low smoothness settings (2 ticks and below, 1 recommended)</string>
+               <string>Please note: The sound visualizer works best with low smoothness settings (3 ticks and below, 2 recommended)</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>

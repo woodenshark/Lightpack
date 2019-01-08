@@ -174,6 +174,7 @@ void SoundManager::reset()
 void SoundManager::updateColors()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+	m_frames++;
 	updateFft();
 	bool colorsChanged = applyFft();
 	if (colorsChanged || !m_isSendDataOnlyIfColorsChanged)
@@ -182,7 +183,6 @@ void SoundManager::updateColors()
 
 bool SoundManager::applyFft()
 {
-	m_frames++;
 	const size_t specHeight = 1000;
 	size_t b0 = 0;
 	bool changed = false;

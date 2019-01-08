@@ -139,6 +139,9 @@ private slots:
 	void onSoundVizMaxColor_changed(QColor color);
 	void onSoundVizLiquidMode_Toggled(bool isLiquidMode);
 	void onSoundVizLiquidSpeed_valueChanged(int value);
+#ifdef Q_OS_MACOS
+	void on_pushButton_SoundVizDeviceHelp_clicked();
+#endif
 #endif
 	void showAbout(); /* using in actions */
 	void onPostInit();

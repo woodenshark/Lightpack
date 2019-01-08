@@ -247,7 +247,13 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
 	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
 	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
-#endif
+#ifdef Q_OS_MACOS
+	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(on_pushButton_SoundVizDeviceHelp_clicked()));
+#else
+	ui->pushButton_SoundVizDeviceHelp->hide();
+#endif // Q_OS_MACOS
+	
+#endif// SOUNDVIZ_SUPPORT
 	connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
@@ -1908,6 +1914,13 @@ void SettingsWindow::showHelpOf(QObject *object)
 {
 	QCoreApplication::postEvent(object, new QHelpEvent(QEvent::WhatsThis, QPoint(0,0), QCursor::pos()));
 }
+
+#if defined(SOUNDVIZ_SUPPORT) && defined(Q_OS_MACOS)
+void SettingsWindow::on_pushButton_SoundVizDeviceHelp_clicked()
+{
+	showHelpOf(ui->pushButton_SoundVizDeviceHelp);
+}
+#endif
 
 void SettingsWindow::on_pushButton_LightpackSmoothnessHelp_clicked()
 {

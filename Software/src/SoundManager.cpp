@@ -28,51 +28,48 @@
 #include "PrismatikMath.hpp"
 #include "Settings.hpp"
 #include <QTime>
-#include "bass.h"
-#include "basswasapi.h"
 
-#define MAX_DEVICE_ID 100
+#if defined(Q_OS_MACOS)
+#include "MacOSSoundManager.h"
+#elif defined(Q_OS_WIN) && defined(BASS_SOUND_SUPPORT)
+#include "WindowsSoundManager.hpp"
+#endif
 
 using namespace SettingsScope;
 
-SoundManager::SoundManager(int hWnd, QObject *parent) : QObject(parent)
+SoundManager* SoundManager::create(int hWnd, QObject* parent)
 {
-	m_hWnd = hWnd;
+#if defined(Q_OS_MACOS)
+	Q_UNUSED(hWnd);
+	return new MacOSSoundManager(parent);
+#elif defined(Q_OS_WIN) && defined(BASS_SOUND_SUPPORT)
+	return new WindowsSoundManager(hWnd, parent);
+#endif
+	return nullptr;
+}
 
-	m_isEnabled = false;
-	m_isInited = false;
-
+SoundManager::SoundManager(QObject *parent) : QObject(parent)
+{
 	initFromSettings();
-
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	m_fft = (float *)calloc(fftSize(), sizeof(*m_fft));
 }
 
 SoundManager::~SoundManager()
 {
 	if (m_isEnabled) start(false);
-	if (m_isInited) BASS_Free();
+	if (m_fft)
+		free((void *)m_fft);
 }
 
-bool SoundManager::init() {
-	BASS_SetConfig(BASS_CONFIG_UNICODE, true);
-	// initialize "no sound" BASS device
-	if (!BASS_Init(0, 44100, 0, (HWND)m_hWnd, NULL)) {
-		qCritical() << Q_FUNC_INFO << "Can't initialize BASS" << BASS_ErrorGetCode();
-		m_isInited = false;
-		return false;
-	}
-
-	m_isInited = true;
-	return true;
-}
-
-// WASAPI callback - not doing anything with the data
-DWORD CALLBACK DuffRecording(void *buffer, DWORD length, void *user)
+size_t SoundManager::fftSize() const
 {
-	Q_UNUSED(buffer);
-	Q_UNUSED(length);
-	Q_UNUSED(user);
-	return TRUE; // continue recording
+	// has to be a power of 2
+	return 1024;
+}
+
+float* SoundManager::fft() const
+{
+	return m_fft;
 }
 
 void SoundManager::requestDeviceList()
@@ -87,100 +84,10 @@ void SoundManager::requestDeviceList()
 
 	QList<SoundManagerDeviceInfo> devices;
 	int recommended = -1;
-
-	for (int i = 0; i < MAX_DEVICE_ID; i++) {
-		BASS_WASAPI_DEVICEINFO inf;
-		if (BASS_WASAPI_GetDeviceInfo(i, &inf)) {
-			if (inf.flags & BASS_DEVICE_ENABLED) {
-				devices.append(SoundManagerDeviceInfo(inf.name, i));
-
-				if (inf.flags & BASS_DEVICE_LOOPBACK) {
-					devices.last().name.append(tr(" (loopback)"));
-					if (!recommended) recommended = i;
-				}
-			}
-		}
-	}
+	
+	populateDeviceList(devices, recommended);
 
 	emit deviceList(devices, recommended);
-}
-
-void SoundManager::start(bool isEnabled)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-
-	if (m_isEnabled == isEnabled)
-		return;
-
-	m_isEnabled = isEnabled;
-
-	if (m_isEnabled)
-	{
-		if (!m_isInited)
-		{
-			if (!init()) {
-				m_isEnabled = false;
-				return;
-			}
-		}
-
-		int device = -2;
-		if (m_device == -1) {
-			// Fallback: first enabled loopback device (recommended)
-			for (int i = 0; i < MAX_DEVICE_ID; i++) {
-				BASS_WASAPI_DEVICEINFO inf;
-				if (BASS_WASAPI_GetDeviceInfo(i, &inf)) {
-					if ((inf.flags & BASS_DEVICE_ENABLED) &&
-						(inf.flags & BASS_DEVICE_LOOPBACK)) {
-						device = i;
-						break;
-					}
-				}
-			}
-			if (device == -2) {
-				qWarning() << Q_FUNC_INFO << "No saved device. No auto fallback device found.";
-			} else {
-				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "No saved device. Falling back to first enabled loopback: " << device;
-			}
-		} else {
-			BASS_WASAPI_DEVICEINFO inf;
-			if (BASS_WASAPI_GetDeviceInfo(m_device, &inf)) {
-				if (!(inf.flags & BASS_DEVICE_ENABLED)) {
-					qCritical() << Q_FUNC_INFO << "Selected device is not enabled!";
-					return;
-				}
-				if (!(inf.flags & BASS_DEVICE_LOOPBACK)) {
-					qWarning() << Q_FUNC_INFO << "Selected device is not a loopback device";
-				}
-			} else {
-				qCritical() << Q_FUNC_INFO << "Unable to get device info for" << m_device;
-				return;
-			}
-			device = m_device;
-		}
-
-		// initialize input WASAPI device
-		if (!BASS_WASAPI_Init(device, 0, 0, BASS_WASAPI_BUFFER, 1, 0.1f, &DuffRecording, NULL)) {
-			qCritical() << Q_FUNC_INFO << "Can't initialize WASAPI device" << BASS_ErrorGetCode();
-			return;
-		}
-
-		BASS_WASAPI_Start();
-		// setup update timer (40hz)
-		//m_timer = timeSetEvent(25, 25, (LPTIMECALLBACK)&UpdateSpectrum, 0, TIME_PERIODIC);
-		m_timer.start(25);
-		m_frames = 0;
-	}
-	else
-	{
-		m_timer.stop();
-		BASS_WASAPI_Free();
-	}
-
-	if (m_isEnabled && m_isLiquidMode)
-		m_generator.start();
-	else
-		m_generator.stop();
 }
 
 void SoundManager::setDevice(int value)
@@ -267,22 +174,24 @@ void SoundManager::reset()
 void SoundManager::updateColors()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+	updateFft();
+	applyFft();
+}
 
-	float fft[1024];
-	BASS_WASAPI_GetData(fft, BASS_DATA_FFT2048); // get the FFT data
-
+void SoundManager::applyFft()
+{
 	m_frames++;
 #define SPECHEIGHT 1000
-	int b0 = 0;
+	size_t b0 = 0;
 	bool changed = false;
 	for (int i = 0; i < m_colors.size(); i++)
 	{
 		float peak = 0;
-		int b1 = pow(2, i*9.0 / (m_colors.size() - 1)); // 9 was 10, but the last bucket rarely saw any action
-		if (b1>1023) b1 = 1023;
+		size_t b1 = pow(2, i*9.0 / (m_colors.size() - 1)); // 9 was 10, but the last bucket rarely saw any action
+		if (b1>fftSize() - 1) b1 = fftSize() - 1;
 		if (b1 <= b0) b1 = b0 + 1; // make sure it uses at least 1 FFT bin
 		for (; b0<b1; b0++)
-			if (peak<fft[1 + b0]) peak = fft[1 + b0];
+			if (peak<m_fft[1 + b0]) peak = m_fft[1 + b0];
 		int val = sqrt(peak) * /* 3 * */ SPECHEIGHT - 4; // scale it (sqrt to make low values more visible)
 		if (val>SPECHEIGHT) val = SPECHEIGHT; // cap it
 		if (val<0) val = 0; // cap it
@@ -307,7 +216,7 @@ void SoundManager::updateColors()
 			m_colors[i] = 0;
 	}
 
-	if (changed || m_isSendDataOnlyIfColorsChanged)
+	if (changed || !m_isSendDataOnlyIfColorsChanged)
 		emit updateLedsColors(m_colors);
 }
 

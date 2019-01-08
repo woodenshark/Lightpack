@@ -43,7 +43,7 @@ LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 	qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
 	m_isEnabled = false;
-
+	m_timer.setTimerType(Qt::PreciseTimer);
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColor()));
 }
 

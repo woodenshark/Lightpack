@@ -182,7 +182,7 @@ void LightpackPluginInterface::updateSmoothCache(int value)
 	m_smooth = value;
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 void LightpackPluginInterface::updateSoundVizMinColorCache(QColor color)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
@@ -504,7 +504,7 @@ bool LightpackPluginInterface::SetBacklight(QString sessionKey, int backlight)
 		status = Lightpack::AmbilightMode;
 	else if (backlight == 2)
 		status = Lightpack::MoodLampMode;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	else if (backlight == 3)
 		status = Lightpack::SoundVisualizeMode;
 #endif
@@ -534,7 +534,7 @@ bool LightpackPluginInterface::SetCountLeds(QString sessionKey, int countLeds)
 }
 
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 bool LightpackPluginInterface::SetSoundVizColors(QString sessionKey, QColor min, QColor max)
 {
 	if (lockSessionKeys.isEmpty()) return false;
@@ -668,7 +668,7 @@ int LightpackPluginInterface::GetBacklight()
 	case Lightpack::MoodLampMode:
 		return 2;
 		break;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	case Lightpack::SoundVisualizeMode:
 		return 3;
 		break;
@@ -695,7 +695,7 @@ int LightpackPluginInterface::GetSmooth()
 	return m_smooth;
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 QPair<QColor, QColor> LightpackPluginInterface::GetSoundVizColors()
 {
 	return QPair<QColor, QColor>(m_soundVizMin, m_soundVizMax);

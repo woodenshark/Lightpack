@@ -34,7 +34,7 @@
 #include "Settings.hpp"
 #include "GrabManager.hpp"
 #include "MoodLampManager.hpp"
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 #include "SoundManager.hpp"
 #endif
 #include "ColorButton.hpp"
@@ -74,7 +74,7 @@ signals:
 	void updateGamma(double value);
 	void updateBrightness(int percent);
 	void requestFirmwareVersion();
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	void requestSoundVizDevices();
 #endif
 	void recreateLedDevice();
@@ -110,7 +110,7 @@ public slots:
 	void onPingDeviceEverySecond_Toggled(bool state);
 	void processMessage(const QString &message);
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 #endif
 
@@ -133,7 +133,7 @@ private slots:
 	void onMoodLampColor_changed(QColor color);
 	void onMoodLampSpeed_valueChanged(int value);
 	void onMoodLampLiquidMode_Toggled(bool isLiquidMode);
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	void onSoundVizDevice_currentIndexChanged(int index);
 	void onSoundVizMinColor_changed(QColor color);
 	void onSoundVizMaxColor_changed(QColor color);
@@ -296,7 +296,7 @@ private:
 	static const QString LightpackDownloadsPageUrl;
 	static const int GrabModeIndex;
 	static const int MoodLampModeIndex;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	static const int SoundVisualizeModeIndex;
 #endif
 

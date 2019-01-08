@@ -2,23 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSUIElement</key>
-	<string>1</string>
-	<key>NSPrincipalClass</key>
-        <string>NSApplication</string>
-        <key>NSHighResolutionCapable</key>
-        <string>True</string>
-	<key>CFBundleIconFile</key>
-	<string>Prismatik.icns</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleGetInfoString</key>
-	<string>Created by Qt/QMake</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleExecutable</key>
 	<string>Prismatik</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Created by Qt/QMake</string>
+	<key>CFBundleIconFile</key>
+	<string>Prismatik.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>de.psieg.Prismatik</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSUIElement</key>
+	<string>1</string>
+	<key>NSHighResolutionCapable</key>
+	<string>True</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Required for sound visualization feature (optional)</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

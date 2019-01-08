@@ -101,7 +101,7 @@ const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 const char * ApiServer::CmdGetBacklight = "getmode";
 const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
 const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const char * ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
 #endif
 
@@ -114,7 +114,7 @@ const char * ApiServer::CmdResultBrightness = "brightness:";
 const char * ApiServer::CmdGetSmooth = "getsmooth";
 const char * ApiServer::CmdResultSmooth = "smooth:";
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const char * ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
 const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
 
@@ -151,7 +151,7 @@ const char * ApiServer::CmdSetBrightness = "setbrightness:";
 const char * ApiServer::CmdSetSmooth = "setsmooth:";
 const char * ApiServer::CmdSetProfile = "setprofile:";
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const char * ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
 const char * ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
 #endif
@@ -171,7 +171,7 @@ const char * ApiServer::CmdSetStatus_Off = "off";
 const char * ApiServer::CmdSetBacklight = "setmode:";
 const char * ApiServer::CmdSetBacklight_Ambilight = "ambilight";
 const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
 #endif
 
@@ -565,7 +565,7 @@ void ApiServer::clientProcessCommands()
 			case Lightpack::MoodLampMode:
 				result = CmdResultBacklight_Moodlamp;
 				break;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 			case Lightpack::SoundVisualizeMode:
 				result = CmdResultBacklight_SoundViz;
 				break;
@@ -593,7 +593,7 @@ void ApiServer::clientProcessCommands()
 
 			result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
 		}
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 		else if (cmdBuffer == CmdGetSoundVizColors)
 		{
 			API_DEBUG_OUT << CmdGetSoundVizColors;
@@ -862,7 +862,7 @@ void ApiServer::clientProcessCommands()
 				result = CmdSetResult_Busy;
 			}
 		}
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 		else if (cmdBuffer.startsWith(CmdSetSoundVizColors))
 		{
 			API_DEBUG_OUT << CmdSetSoundVizColors;
@@ -1195,7 +1195,7 @@ void ApiServer::clientProcessCommands()
 					status = 1;
 				else if (cmdBuffer == CmdSetBacklight_Moodlamp)
 					status = 2;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 				else if (cmdBuffer == CmdSetBacklight_SoundViz)
 					status = 3;
 #endif
@@ -1439,7 +1439,7 @@ void ApiServer::initHelpMessage()
 				"Get mode of the current profile",
 				formatHelp(CmdResultBacklight_Ambilight) +
 				formatHelp(CmdResultBacklight_Moodlamp)
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 				+ formatHelp(CmdResultBacklight_Moodlamp)
 #endif
 				);
@@ -1458,7 +1458,7 @@ void ApiServer::initHelpMessage()
 				"Get the current smooth value",
 				formatHelp(CmdResultSmooth + QString("1"))
 				);
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdGetSoundVizColors,
 		"Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
@@ -1555,13 +1555,13 @@ void ApiServer::initHelpMessage()
 				QString("Set backlight mode. Works only on locking time (see lock)."),
 				formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Ambilight)) +
 				formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp))
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 				+ formatHelp(CmdSetBacklight + QString(CmdSetBacklight_SoundViz))
 #endif
 				,
 				helpCmdSetResults);
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizColors,
 		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
@@ -1599,7 +1599,7 @@ void ApiServer::initShortHelpMessage()
 			<< CmdGetCountLeds << CmdGetLeds << CmdGetColors
 			<< CmdGetFPS << CmdGetScreenSize << CmdGetBacklight
 			<< CmdGetGamma << CmdGetBrightness << CmdGetSmooth
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 			<< CmdGetSoundVizColors << CmdGetSoundVizLiquid
 #endif
 			<< CmdGetPersistOnUnlock
@@ -1607,7 +1607,7 @@ void ApiServer::initShortHelpMessage()
 			<< CmdSetGamma << CmdSetBrightness << CmdSetSmooth
 			<< CmdSetProfile << CmdNewProfile << CmdDeleteProfile
 			<< CmdSetStatus << CmdSetBacklight
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 			<< CmdSetSoundVizColors << CmdSetSoundVizLiquid
 #endif
 			<< CmdSetPersistOnUnlock

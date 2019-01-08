@@ -27,7 +27,6 @@
 
 #include <QObject>
 #include <QColor>
-#include <QTimer>
 #include "LiquidColorGenerator.hpp"
 
 
@@ -44,19 +43,22 @@ class SoundManager : public QObject
 	Q_OBJECT
 
 public:
-	explicit SoundManager(int hWnd, QObject *parent = 0);
-	~SoundManager();
+	SoundManager(QObject *parent = 0);
+	virtual ~SoundManager();
+	static SoundManager* create(int hWnd = 0, QObject* parent = 0);
 
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 
 public:
-	void start(bool isMoodLampEnabled);
+	virtual void start(bool isMoodLampEnabled) { Q_UNUSED(isMoodLampEnabled); Q_ASSERT(("Not implemented", false)); };
 
 	// Common options
 	void setSendDataOnlyIfColorsChanged(bool state);
 	void reset();
+	virtual size_t fftSize() const;
+	float* fft() const;
 
 public slots:
 	void initFromSettings();
@@ -68,30 +70,29 @@ public slots:
 	void setLiquidMode(bool isEnabled);
 	void setLiquidModeSpeed(int value);
 	void requestDeviceList();
-
-private slots:
 	void updateColors();
 
-private:
-	bool init();
+protected:
+	virtual bool init() = 0;
 	void initColors(int numberOfLeds);
+	virtual void populateDeviceList(QList<SoundManagerDeviceInfo>& devices, int& recommended) = 0;
+	virtual void updateFft() {};
+	void applyFft();
 
-private:
+protected:
 	LiquidColorGenerator m_generator;
 
 	QList<QRgb> m_colors;
 	QList<int> m_peaks;
-	int m_frames;
+	int 	m_frames{0};
 
-	QTimer m_timer;
-	int m_hWnd;
-
-
-	bool	m_isEnabled;
-	bool	m_isInited;
-	bool	m_isLiquidMode;
-	QColor m_minColor;
-	QColor m_maxColor;
-	int	m_device;
-	bool	m_isSendDataOnlyIfColorsChanged;
+	bool	m_isEnabled{false};
+	bool	m_isInited{false};
+	bool	m_isLiquidMode{false};
+	QColor 	m_minColor;
+	QColor 	m_maxColor;
+	int		m_device{-1};
+	bool	m_isSendDataOnlyIfColorsChanged{false};
+	
+	float*	m_fft{nullptr};
 };

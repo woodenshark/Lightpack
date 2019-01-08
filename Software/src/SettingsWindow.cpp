@@ -58,7 +58,7 @@ const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.co
 // Indexes of supported modes listed in ui->comboBox_Modes and ui->stackedWidget_Modes
 const int SettingsWindow::GrabModeIndex = 0;
 const int SettingsWindow::MoodLampModeIndex = 1;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const int SettingsWindow::SoundVisualizeModeIndex = 2;
 #endif
 
@@ -121,7 +121,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 	updateStatusBar();
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	ui->label_licenseAndCredits->setText(ui->label_licenseAndCredits->text() + tr(" The sound visualizer uses the <a href=\"http://un4seen.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">BASS</span></a> library."));
 #else
 	ui->comboBox_LightpackModes->removeItem(2);
@@ -241,7 +241,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->pushButton_DeleteProfile, SIGNAL(clicked()), this, SLOT(profileDeleteCurrent()));
 
 	connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
 	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
@@ -475,7 +475,7 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
 	updateUiFromSettings();
 	this->requestFirmwareVersion();
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	this->requestSoundVizDevices();
 #endif
 
@@ -916,7 +916,7 @@ void SettingsWindow::processMessage(const QString &message)
 	}
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 void SettingsWindow::updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended)
 {
 	ui->comboBox_SoundVizDevice->blockSignals(true);
@@ -1264,7 +1264,7 @@ void SettingsWindow::onLightpackModes_currentIndexChanged(int index)
 		case MoodLampModeIndex:
 			Settings::setLightpackMode(MoodLampMode);
 			break;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 		case SoundVisualizeModeIndex:
 			Settings::setLightpackMode(SoundVisualizeMode);
 			break;
@@ -1293,7 +1293,7 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
 		emit showLedWidgets(false);
 		break;
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	case SoundVisualizeModeIndex:
 		ui->comboBox_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
 		ui->stackedWidget_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
@@ -1335,7 +1335,7 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
 	}
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
 {
 	if (!updatingFromSettings) {
@@ -1749,7 +1749,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->pushButton_SelectColorMoodLamp->setColor						(Settings::getMoodLampColor());
 	ui->horizontalSlider_MoodLampSpeed->setValue						(Settings::getMoodLampSpeed());
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	for (int i = 0; i < ui->comboBox_SoundVizDevice->count(); i++) {
 		if (ui->comboBox_SoundVizDevice->itemData(i).toInt() == Settings::getSoundVisualizerDevice()) {
 			ui->comboBox_SoundVizDevice->setCurrentIndex(i);

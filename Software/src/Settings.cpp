@@ -1295,7 +1295,7 @@ Lightpack::Mode Settings::getLightpackMode()
 	{
 		return Lightpack::MoodLampMode;
 	}
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	else if (strMode == Profile::Value::LightpackMode::SoundVisualizer)
 	{
 		return Lightpack::SoundVisualizeMode;
@@ -1324,7 +1324,7 @@ void Settings::setLightpackMode(Lightpack::Mode mode)
 		setValue(Profile::Key::LightpackMode, Profile::Value::LightpackMode::MoodLamp);
 		m_this->lightpackModeChanged(mode);
 	}
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	else if (mode == Lightpack::SoundVisualizeMode)
 	{
 		setValue(Profile::Key::LightpackMode, Profile::Value::LightpackMode::SoundVisualizer);
@@ -1376,7 +1376,7 @@ void Settings::setMoodLampSpeed(int value)
 	m_this->moodLampSpeedChanged(value);
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 int Settings::getSoundVisualizerDevice()
 {
 	return value(Profile::Key::SoundVisualizer::Device).toInt();
@@ -1718,7 +1718,7 @@ void Settings::initCurrentProfile(bool isResetDefault)
 	setNewOption(Profile::Key::MoodLamp::IsLiquidMode,				Profile::MoodLamp::IsLiquidModeDefault, isResetDefault);
 	setNewOption(Profile::Key::MoodLamp::Color,						Profile::MoodLamp::ColorDefault, isResetDefault);
 	setNewOption(Profile::Key::MoodLamp::Speed,						Profile::MoodLamp::SpeedDefault, isResetDefault);
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	// [SoundVisualizer]
 	setNewOption(Profile::Key::SoundVisualizer::Device,				Profile::SoundVisualizer::DeviceDefault, isResetDefault);
 	setNewOption(Profile::Key::SoundVisualizer::MinColor,			Profile::SoundVisualizer::MinColorDefault, isResetDefault);

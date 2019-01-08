@@ -86,9 +86,11 @@ LightpackApplication::~LightpackApplication()
 	m_apiServerThread = NULL;
 	delete m_grabManager;
 	m_grabManager = NULL;
+#ifdef SOUNDVIZ_SUPPORT
 	if (m_soundManager)
 		delete m_soundManager;
 	m_soundManager = NULL;
+#endif// SOUNDVIZ_SUPPORT
 	delete m_moodlampManager;
 	m_moodlampManager = NULL;
 

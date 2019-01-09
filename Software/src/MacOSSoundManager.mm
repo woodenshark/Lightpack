@@ -13,6 +13,15 @@
 #include <AVFoundation/AVFoundation.h>
 #include <CoreMedia/CoreMedia.h>
 
+namespace {
+	template <typename T>
+	inline void floatcpy(const char* src, const uint8_t stride, float* dest, const size_t len) {
+		const T* csrc = reinterpret_cast<const T*>(src);
+		for (size_t i = 0; i < len; i++)
+			dest[i] = static_cast<float>(csrc[i * stride]);
+	}
+}
+
 @interface AVCaptureDeviceFormat (CompatiblityCheck)
 - (size_t) score;
 - (BOOL) isCompatible;
@@ -363,6 +372,34 @@
 	});
 }
 
+- (void) copySamples:(const char*)buffer count:(size_t)count description:(const AudioStreamBasicDescription*)desc
+{
+	count = MIN(count, _delegate->fftSize() * 2 - _samplePosition);
+	
+	const uint8_t stride = (desc->mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved) || desc->mChannelsPerFrame == 1 ? 1 : 2; // get 1 channel
+	if (desc->mFormatFlags & kLinearPCMFormatFlagIsSignedInteger)
+	{
+		if (desc->mBitsPerChannel == 16)
+			vDSP_vflt16((short *)buffer, stride, _samples + _samplePosition, 1, count);
+		else if (desc->mBitsPerChannel == 24)
+			vDSP_vflt24((vDSP_int24 *)buffer, stride, _samples + _samplePosition, 1, count);
+		else if (desc->mBitsPerChannel == 32)
+			vDSP_vflt32((int *)buffer, stride, _samples + _samplePosition, 1, count);
+		else
+			return;
+	} else if (desc->mFormatFlags & kLinearPCMFormatFlagIsFloat) {
+		if (desc->mBitsPerChannel == sizeof(*_samples) * 8) // float to float
+			floatcpy<float>(buffer, stride, _samples + _samplePosition, count);
+		else if (desc->mBitsPerChannel == sizeof(double) * 8) // double to float
+			floatcpy<double>(buffer, stride, _samples + _samplePosition, count);
+		else
+			return;
+	} else
+		return;
+	
+	_samplePosition += count;
+}
+
 - (void) captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
 	Q_UNUSED(output);
@@ -374,40 +411,28 @@
 	CMBlockBufferRef audioBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
 	if (audioBuffer == NULL)
 		return;
+
 	size_t lengthAtOffset = 0;
 	size_t totalLength = 0;
 	char *inSamples = NULL;
 	if (CMBlockBufferGetDataPointer(audioBuffer, 0, &lengthAtOffset, &totalLength, &inSamples) != kCMBlockBufferNoErr)
 		return;
-	// check what sample format we have
-	// this should always be linear PCM
-	// but may have 1 or 2 channels
+
 	CMAudioFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sampleBuffer);
 	if (format == NULL)
 		return;
 	const AudioStreamBasicDescription *desc = CMAudioFormatDescriptionGetStreamBasicDescription(format);
 	if (desc == NULL || desc->mFormatID != kAudioFormatLinearPCM)
 		return;
-
 	
 	@synchronized (self) {
-		numSamples = MIN((size_t)numSamples, _delegate->fftSize() * 2 - _samplePosition);
+		[self copySamples:inSamples count:numSamples description:desc];
 
-		if (desc->mBitsPerChannel == 16)
-			vDSP_vflt16((short *)inSamples, 1, _samples + _samplePosition, 1, numSamples);
-		else if (desc->mBitsPerChannel == 24)
-			vDSP_vflt24((vDSP_int24 *)inSamples, 1, _samples + _samplePosition, 1, numSamples);
-		else if (desc->mBitsPerChannel == 32)
-			vDSP_vflt32((int *)inSamples, 1, _samples + _samplePosition, 1, numSamples);
-		else
-			return;
-
-		_samplePosition += numSamples;
 		if (_samplePosition < _delegate->fftSize() * 2)
 			return;
 
-		//Convert the real data to complex data
-		// 2. Window the samples
+		// Convert the real data to complex data
+		// Window the samples
 		vDSP_vmul(_samples, 1, _window, 1, _samples, 1, _delegate->fftSize() * 2);
 
 		// copy the input to the packed complex array that the fft algo uses
@@ -416,12 +441,26 @@
 		// calculate the fft
 		vDSP_fft_zrip(_fftsetup, &_splitComplex, 1, _log2n, FFT_FORWARD);
 		
-//		float scale = 1.0 / (_delegate->fftSize() * 4);
-		const float scale = 0.0238858424 / 377926451200.0; //this brings values to around windows values
+		const float scale = 1.0 / _delegate->fftSize();
 		vDSP_vsmul(_splitComplex.realp, 1, &scale, _splitComplex.realp, 1, _delegate->fftSize());
 		vDSP_vsmul(_splitComplex.imagp, 1, &scale, _splitComplex.imagp, 1, _delegate->fftSize());
 
 		vDSP_zvabs(&_splitComplex, 1, _delegate->fft(), 1, _delegate->fftSize());
+		
+#ifndef QT_NO_DEBUG
+		const float binres = desc->mSampleRate / (_delegate->fftSize() * 2);
+		size_t maxbin = 0;
+		for (size_t i = 0; i < _delegate->fftSize(); i++) {
+			if (_delegate->fft()[i] > _delegate->fft()[maxbin])
+				maxbin = i;
+		}
+		NSLog(@"[%zu] %.2fHz = %f\n", maxbin, static_cast<float>(binres * maxbin + binres / 2), _delegate->fft()[maxbin]);
+		// https://www.youtube.com/watch?v=TbPh0pmNjo8
+		// full volume
+		// [46] 1001.29Hz = 0.289
+		// windows+wasapi = 0.289404094
+#endif // QT_NO_DEBUG
+		
 		dispatch_sync(_delegateQueue, ^{
 			_delegate->updateColors();
 		});

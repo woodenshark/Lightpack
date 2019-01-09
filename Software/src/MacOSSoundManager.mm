@@ -372,11 +372,11 @@ namespace {
 	});
 }
 
-- (void) copySamples:(const char*)buffer count:(size_t)count description:(const AudioStreamBasicDescription*)desc
+- (size_t) copySamples:(const char*)buffer count:(size_t)count description:(const AudioStreamBasicDescription*)desc
 {
 	if ((desc->mFormatFlags & kLinearPCMFormatFlagIsPacked) == 0) {
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported format flags: " << desc->mFormatFlags;
-		return;
+		return 0;
 	}
 	count = MIN(count, _delegate->fftSize() * 2 - _samplePosition);
 	
@@ -391,7 +391,7 @@ namespace {
 			vDSP_vflt32((int *)buffer, stride, _samples + _samplePosition, 1, count);
 		else {
 			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported integer BPC: " << desc->mBitsPerChannel;
-			return;
+			return 0;
 		}
 	} else if (desc->mFormatFlags & kLinearPCMFormatFlagIsFloat) {
 		if (desc->mBitsPerChannel == sizeof(*_samples) * 8) // float to float
@@ -400,14 +400,14 @@ namespace {
 			floatcpy<double>(buffer, stride, _samples + _samplePosition, count);
 		else {
 			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported float BPC: " << desc->mBitsPerChannel;
-			return;
+			return 0;
 		}
 	} else {
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "integer/float flags not set: " << desc->mFormatFlags;
-		return;
+		return 0;
 	}
-	
-	_samplePosition += count;
+
+	return count;
 }
 
 - (void) captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
@@ -415,7 +415,7 @@ namespace {
 	Q_UNUSED(output);
 	Q_UNUSED(connection);
 
-	CMItemCount numSamples = CMSampleBufferGetNumSamples(sampleBuffer);
+	size_t numSamples = (size_t)CMSampleBufferGetNumSamples(sampleBuffer);
 	if (numSamples == 0)
 		return;
 	CMBlockBufferRef audioBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
@@ -436,46 +436,52 @@ namespace {
 		return;
 	
 	@synchronized (self) {
-		[self copySamples:inSamples count:numSamples description:desc];
+		const size_t bytesPerSample = lengthAtOffset / numSamples;
+		for (size_t totalCopied = 0; totalCopied < numSamples;)
+		{
+			const size_t copiedSamples = [self copySamples:(inSamples + (bytesPerSample * totalCopied)) count:(numSamples - totalCopied) description:desc];
 
-		if (_samplePosition < _delegate->fftSize() * 2)
-			return;
+			totalCopied += copiedSamples;
+			_samplePosition += copiedSamples;
+			if (copiedSamples == 0 || (_samplePosition < _delegate->fftSize() * 2))
+				return;
 
-		// Convert the real data to complex data
-		// Window the samples
-		vDSP_vmul(_samples, 1, _window, 1, _samples, 1, _delegate->fftSize() * 2);
+			// Convert the real data to complex data
+			// Window the samples
+			vDSP_vmul(_samples, 1, _window, 1, _samples, 1, _delegate->fftSize() * 2);
 
-		// copy the input to the packed complex array that the fft algo uses
-		vDSP_ctoz((DSPComplex *)_samples, 2, &_splitComplex, 1, _delegate->fftSize());
-		
-		// calculate the fft
-		vDSP_fft_zrip(_fftsetup, &_splitComplex, 1, _log2n, FFT_FORWARD);
-		
-		const float scale = 1.0 / _delegate->fftSize();
-		vDSP_vsmul(_splitComplex.realp, 1, &scale, _splitComplex.realp, 1, _delegate->fftSize());
-		vDSP_vsmul(_splitComplex.imagp, 1, &scale, _splitComplex.imagp, 1, _delegate->fftSize());
+			// copy the input to the packed complex array that the fft algo uses
+			vDSP_ctoz((DSPComplex *)_samples, 2, &_splitComplex, 1, _delegate->fftSize());
+			
+			// calculate the fft
+			vDSP_fft_zrip(_fftsetup, &_splitComplex, 1, _log2n, FFT_FORWARD);
+			
+			const float scale = 1.0 / _delegate->fftSize();
+			vDSP_vsmul(_splitComplex.realp, 1, &scale, _splitComplex.realp, 1, _delegate->fftSize());
+			vDSP_vsmul(_splitComplex.imagp, 1, &scale, _splitComplex.imagp, 1, _delegate->fftSize());
 
-		vDSP_zvabs(&_splitComplex, 1, _delegate->fft(), 1, _delegate->fftSize());
-		
+			vDSP_zvabs(&_splitComplex, 1, _delegate->fft(), 1, _delegate->fftSize());
+			
 #ifndef QT_NO_DEBUG
-		const float binres = desc->mSampleRate / (_delegate->fftSize() * 2);
-		size_t maxbin = 0;
-		for (size_t i = 0; i < _delegate->fftSize(); i++) {
-			if (_delegate->fft()[i] > _delegate->fft()[maxbin])
-				maxbin = i;
-		}
-		NSLog(@"[%zu] %.2fHz = %f\n", maxbin, static_cast<float>(binres * maxbin + binres / 2), _delegate->fft()[maxbin]);
-		// https://www.youtube.com/watch?v=TbPh0pmNjo8
-		// full volume
-		// [46] 1001.29Hz = 0.289
-		// windows+wasapi = 0.289404094
+			const float binres = desc->mSampleRate / (_delegate->fftSize() * 2);
+			size_t maxbin = 0;
+			for (size_t i = 0; i < _delegate->fftSize(); i++) {
+				if (_delegate->fft()[i] > _delegate->fft()[maxbin])
+					maxbin = i;
+			}
+			NSLog(@"[%zu] %.2fHz = %f\n", maxbin, static_cast<float>(binres * maxbin + binres / 2), _delegate->fft()[maxbin]);
+			// https://www.youtube.com/watch?v=TbPh0pmNjo8
+			// full volume
+			// [46] 1001.29Hz = 0.289
+			// windows+wasapi = 0.289404094
 #endif // QT_NO_DEBUG
-		
-		dispatch_sync(_delegateQueue, ^{
-			_delegate->updateColors();
-		});
-		_samplePosition = 0;
-	}
+			
+			dispatch_sync(_delegateQueue, ^{
+				_delegate->updateColors();
+			});
+			_samplePosition = 0;
+		} // for totalCopied
+	} // @synchronize
 }
 
 @end

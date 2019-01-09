@@ -183,7 +183,7 @@ void SoundManager::updateColors()
 
 bool SoundManager::applyFft()
 {
-	const size_t specHeight = 1000;
+	const int specHeight = 1000;
 	size_t b0 = 0;
 	bool changed = false;
 	for (int i = 0; i < m_colors.size(); i++)

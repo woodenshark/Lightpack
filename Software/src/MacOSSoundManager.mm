@@ -374,6 +374,10 @@ namespace {
 
 - (void) copySamples:(const char*)buffer count:(size_t)count description:(const AudioStreamBasicDescription*)desc
 {
+	if ((desc->mFormatFlags & kLinearPCMFormatFlagIsPacked) == 0) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported format flags: " << desc->mFormatFlags;
+		return;
+	}
 	count = MIN(count, _delegate->fftSize() * 2 - _samplePosition);
 	
 	const uint8_t stride = (desc->mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved) || desc->mChannelsPerFrame == 1 ? 1 : 2; // get 1 channel
@@ -385,17 +389,23 @@ namespace {
 			vDSP_vflt24((vDSP_int24 *)buffer, stride, _samples + _samplePosition, 1, count);
 		else if (desc->mBitsPerChannel == 32)
 			vDSP_vflt32((int *)buffer, stride, _samples + _samplePosition, 1, count);
-		else
+		else {
+			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported integer BPC: " << desc->mBitsPerChannel;
 			return;
+		}
 	} else if (desc->mFormatFlags & kLinearPCMFormatFlagIsFloat) {
 		if (desc->mBitsPerChannel == sizeof(*_samples) * 8) // float to float
 			floatcpy<float>(buffer, stride, _samples + _samplePosition, count);
 		else if (desc->mBitsPerChannel == sizeof(double) * 8) // double to float
 			floatcpy<double>(buffer, stride, _samples + _samplePosition, count);
-		else
+		else {
+			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported float BPC: " << desc->mBitsPerChannel;
 			return;
-	} else
+		}
+	} else {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "integer/float flags not set: " << desc->mFormatFlags;
 		return;
+	}
 	
 	_samplePosition += count;
 }

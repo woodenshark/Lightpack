@@ -30,5 +30,6 @@ private:
 	virtual void populateDeviceList(QList<SoundManagerDeviceInfo>& devices, int& recommended);
 	
 	bool m_isAuthorized{false};
+	bool m_awaitingAuthorization{false};
 	MacOSNativeSoundCapture* _capture{nullptr};
 };

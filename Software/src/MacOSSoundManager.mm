@@ -499,15 +499,22 @@ bool MacOSSoundManager::init() {
 		AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
 
 		if (status == AVAuthorizationStatusNotDetermined) {
+			if (m_awaitingAuthorization) {
+				qDebug() << Q_FUNC_INFO << "Audio capture: already requested authorization";
+				return false;
+			}
+			m_awaitingAuthorization = true;
 			qWarning() << Q_FUNC_INFO << "Audio capture: authorization not determined, requesting access";
+			__block bool isEnabledBeforeAskingAuthorization = m_isEnabled;
 			[AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
 				if (granted) {
 					qDebug() << Q_FUNC_INFO << "Audio capture: access granted";
 					dispatch_sync(dispatch_get_main_queue(), ^{
+						m_awaitingAuthorization = false;
 						if (init()) {
-							requestDeviceList();
-							if (m_isEnabled)
-								start(m_isEnabled);
+							requestDeviceList(); // resets m_isEnabled
+							if (isEnabledBeforeAskingAuthorization)
+								start(isEnabledBeforeAskingAuthorization);
 						}
 					});
 				} else
@@ -562,7 +569,7 @@ void MacOSSoundManager::populateDeviceList(QList<SoundManagerDeviceInfo>& device
 void MacOSSoundManager::start(bool isEnabled)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
-	
+
 	if (m_isEnabled == isEnabled)
 		return;
 
@@ -572,6 +579,8 @@ void MacOSSoundManager::start(bool isEnabled)
 	{
 		if (!m_isInited)
 		{
+			if (m_awaitingAuthorization)
+				return;
 			if (!init()) {
 				m_isEnabled = false;
 				return;

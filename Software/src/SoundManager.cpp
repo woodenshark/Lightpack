@@ -63,8 +63,9 @@ SoundManager::~SoundManager()
 
 size_t SoundManager::fftSize() const
 {
-	// has to be a power of 2
-	return 1024;
+	const size_t size = 1024;
+	static_assert(size && !(size & (size - 1)), "FFT size has to be a power of 2");
+	return size;
 }
 
 float* SoundManager::fft() const

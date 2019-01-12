@@ -461,15 +461,13 @@ namespace {
 			vDSP_vsmul(_splitComplex.imagp, 1, &scale, _splitComplex.imagp, 1, _delegate->fftSize());
 
 			vDSP_zvabs(&_splitComplex, 1, _delegate->fft(), 1, _delegate->fftSize());
-			
+
 #ifndef QT_NO_DEBUG
 			const float binres = desc->mSampleRate / (_delegate->fftSize() * 2);
 			size_t maxbin = 0;
-			for (size_t i = 0; i < _delegate->fftSize(); i++) {
-				if (_delegate->fft()[i] > _delegate->fft()[maxbin])
-					maxbin = i;
-			}
-			NSLog(@"[%zu] %.2fHz = %f\n", maxbin, static_cast<float>(binres * maxbin + binres / 2), _delegate->fft()[maxbin]);
+			float maxmag = 0.0;
+			vDSP_maxvi(_delegate->fft(), 1, &maxmag, &maxbin, _delegate->fftSize());
+			NSLog(@"[%zu] %.2fHz = %f\n", maxbin, static_cast<float>(binres * maxbin + binres / 2), maxmag);
 			// https://www.youtube.com/watch?v=TbPh0pmNjo8
 			// full volume
 			// [46] 1001.29Hz = 0.289

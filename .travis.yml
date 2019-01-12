@@ -1,6 +1,8 @@
 language: cpp
 #language: objective-c
 
+osx_image: xcode10.1
+
 notifications:
   email: false
 

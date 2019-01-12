@@ -16,9 +16,9 @@
 namespace {
 	template <typename T>
 	inline void floatcpy(const char* src, const uint8_t stride, float* dest, const size_t len) {
-		const T* csrc = reinterpret_cast<const T*>(src);
-		for (size_t i = 0; i < len; i++)
-			dest[i] = static_cast<float>(csrc[i * stride]);
+		const T* ptr = reinterpret_cast<const T*>(src);
+		for (const T* const end = ptr + len * stride; ptr < end; ptr += stride, ++dest)
+			*dest = *ptr;
 	}
 }
 
@@ -145,14 +145,18 @@ namespace {
 	BOOL _running;
 
 	MacOSSoundManager* _delegate;
-	
+
 	// vDSP
 	FFTSetup _fftsetup;
 	DSPSplitComplex	_splitComplex;
 	float* _window;
-	float* _samples;
+	float* _leftSamples;
+	float* _rightSamples;
 	size_t _samplePosition;
 	uint8_t _log2n;
+	
+	void*  _contiguousBuffer;
+	size_t _contiguousBufferSize;
 }
 
 - (instancetype) initWithDelegate:(MacOSSoundManager*)delegate queue:(dispatch_queue_t)queue
@@ -167,12 +171,16 @@ namespace {
 		_log2n = log2(_delegate->fftSize() * 2);
 		_fftsetup = vDSP_create_fftsetup(_log2n, kFFTRadix2);
 		_window = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
-		_samples = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
+		_leftSamples = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
+		_rightSamples = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
 		_splitComplex.realp = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
 		_splitComplex.imagp = (float *)calloc(_delegate->fftSize() * 2, sizeof(float));
 		
 		vDSP_hann_window(_window, _delegate->fftSize() * 2, 0);// hamm, hann
 		_samplePosition = 0;
+		
+		_contiguousBuffer = NULL;
+		_contiguousBufferSize = 0;
 	}
 	return self;
 }
@@ -185,12 +193,17 @@ namespace {
 	dispatch_release(_sessionQueue);
 	dispatch_release(_audioCaptureQueue);
 	dispatch_release(_delegateQueue);
-	
+
 	vDSP_destroy_fftsetup(_fftsetup);
 	free(_window);
-	free(_samples);
+	free(_leftSamples);
+	free(_rightSamples);
 	free(_splitComplex.realp);
 	free(_splitComplex.imagp);
+	
+	if (_contiguousBuffer)
+		free(_contiguousBuffer);
+	
 	[super dealloc];
 }
 
@@ -372,32 +385,29 @@ namespace {
 	});
 }
 
-- (size_t) copySamples:(const char*)buffer count:(size_t)count description:(const AudioStreamBasicDescription*)desc
+- (size_t) copyBuffer:(const char* const)srcBuffer
+			   stride:(const uint8_t)stride
+				count:(const size_t)count
+		  description:(const AudioStreamBasicDescription* const)desc
+			toChannel:(float* const)destBuffer
 {
-	if ((desc->mFormatFlags & kLinearPCMFormatFlagIsPacked) == 0) {
-		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported format flags: " << desc->mFormatFlags;
-		return 0;
-	}
-	count = MIN(count, _delegate->fftSize() * 2 - _samplePosition);
-	
-	const uint8_t stride = (desc->mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved) || desc->mChannelsPerFrame == 1 ? 1 : 2; // get 1 channel
 	if (desc->mFormatFlags & kLinearPCMFormatFlagIsSignedInteger)
 	{
 		if (desc->mBitsPerChannel == 16)
-			vDSP_vflt16((short *)buffer, stride, _samples + _samplePosition, 1, count);
+			vDSP_vflt16(reinterpret_cast<const short *>(srcBuffer), stride, destBuffer, 1, count);
 		else if (desc->mBitsPerChannel == 24)
-			vDSP_vflt24((vDSP_int24 *)buffer, stride, _samples + _samplePosition, 1, count);
+			vDSP_vflt24(reinterpret_cast<const vDSP_int24 *>(srcBuffer), stride, destBuffer, 1, count);
 		else if (desc->mBitsPerChannel == 32)
-			vDSP_vflt32((int *)buffer, stride, _samples + _samplePosition, 1, count);
+			vDSP_vflt32(reinterpret_cast<const int *>(srcBuffer), stride, destBuffer, 1, count);
 		else {
 			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported integer BPC: " << desc->mBitsPerChannel;
 			return 0;
 		}
 	} else if (desc->mFormatFlags & kLinearPCMFormatFlagIsFloat) {
-		if (desc->mBitsPerChannel == sizeof(*_samples) * 8) // float to float
-			floatcpy<float>(buffer, stride, _samples + _samplePosition, count);
+		if (desc->mBitsPerChannel == sizeof(float) * 8) // float to float
+			floatcpy<float>(srcBuffer, stride, destBuffer, count);
 		else if (desc->mBitsPerChannel == sizeof(double) * 8) // double to float
-			floatcpy<double>(buffer, stride, _samples + _samplePosition, count);
+			vDSP_vdpsp(reinterpret_cast<const double *>(srcBuffer), stride, destBuffer, 1, count);
 		else {
 			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported float BPC: " << desc->mBitsPerChannel;
 			return 0;
@@ -405,6 +415,27 @@ namespace {
 	} else {
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "integer/float flags not set: " << desc->mFormatFlags;
 		return 0;
+	}
+	return count;
+}
+
+- (size_t) copySamples:(const char* const)leftBuffer rightBuffer:(const char* const)rightBuffer stride:(const size_t)stride count:(size_t)count description:(const AudioStreamBasicDescription* const)desc
+{
+	count = MIN(count, _delegate->fftSize() * 2 - _samplePosition);
+	
+	if ([self copyBuffer:leftBuffer stride:stride count:count description:desc toChannel:(_leftSamples + _samplePosition)] != count)
+		return 0;
+
+	if (rightBuffer && [self copyBuffer:rightBuffer stride:stride count:count description:desc toChannel:(_rightSamples + _samplePosition)] == count) {
+		// downmix to mono
+		// common way of doing
+		// left = (left + right) / 2
+		const float _b = 1.0f;
+		vDSP_vavlin(_rightSamples + _samplePosition, 1, &_b, _leftSamples + _samplePosition, 1, count);
+
+		// left = max(left, right)
+		// this alternative produces visually same-ish results
+//		vDSP_vmax(_rightSamples + _samplePosition, 1, _leftSamples + _samplePosition, 1, _leftSamples + _samplePosition, 1, count); // downmix to mono
 	}
 
 	return count;
@@ -415,31 +446,78 @@ namespace {
 	Q_UNUSED(output);
 	Q_UNUSED(connection);
 
-	size_t numSamples = (size_t)CMSampleBufferGetNumSamples(sampleBuffer);
-	if (numSamples == 0)
+	const size_t numSamples = (size_t)CMSampleBufferGetNumSamples(sampleBuffer);
+	if (numSamples == 0) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "no samples";
 		return;
-	CMBlockBufferRef audioBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
-	if (audioBuffer == NULL)
-		return;
-
-	size_t lengthAtOffset = 0;
-	size_t totalLength = 0;
-	char *inSamples = NULL;
-	if (CMBlockBufferGetDataPointer(audioBuffer, 0, &lengthAtOffset, &totalLength, &inSamples) != kCMBlockBufferNoErr)
-		return;
+	}
 
 	CMAudioFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sampleBuffer);
-	if (format == NULL)
+	if (format == NULL) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get audio format description";
 		return;
-	const AudioStreamBasicDescription *desc = CMAudioFormatDescriptionGetStreamBasicDescription(format);
-	if (desc == NULL || desc->mFormatID != kAudioFormatLinearPCM)
+	}
+
+	const AudioStreamBasicDescription * const desc = CMAudioFormatDescriptionGetStreamBasicDescription(format);
+	if (desc == NULL) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get ASBD";
 		return;
+	}
+
+	if (desc->mFormatID != kAudioFormatLinearPCM) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported format ID: " << desc->mFormatID;
+		return;
+	}
+
+	if ((desc->mFormatFlags & kLinearPCMFormatFlagIsPacked) == 0 && ((desc->mBitsPerChannel / 8) * desc->mChannelsPerFrame) != desc->mBytesPerFrame) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported format flags: " << desc->mFormatFlags;
+		return;
+	}
+
+	CMBlockBufferRef audioBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
+	if (audioBuffer == NULL) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get audioBuffer";
+		return;
+	}
+
+	size_t totalLength = 0;
+	if (CMBlockBufferGetDataPointer(audioBuffer, 0, NULL, &totalLength, NULL) != kCMBlockBufferNoErr || totalLength == 0) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get totalLength";
+		return;
+	}
 	
+	char *inSamplesLeft = NULL;
+	if (totalLength > _contiguousBufferSize) {
+		_contiguousBuffer = realloc(_contiguousBuffer, sizeof(*inSamplesLeft) * totalLength);
+		_contiguousBufferSize = totalLength;
+	}
+	if (_contiguousBuffer == NULL || CMBlockBufferAccessDataBytes(audioBuffer, 0, totalLength, _contiguousBuffer, &inSamplesLeft) != kCMBlockBufferNoErr || inSamplesLeft == NULL) {
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get contigous data bytes";
+		return;
+	}
+
+	const size_t bytesPerSample = desc->mBitsPerChannel / 8;
+	const char* inSamplesRight = NULL;
+	size_t stride = 1;
+	if (desc->mChannelsPerFrame > 1) {
+		if (desc->mFormatFlags & kLinearPCMFormatFlagIsNonInterleaved)
+			inSamplesRight = inSamplesLeft + (totalLength / desc->mChannelsPerFrame); // step over all left samples
+		else {
+			inSamplesRight = inSamplesLeft + bytesPerSample; // step over 1 left sample
+			stride = desc->mChannelsPerFrame;
+		}
+	}
+
 	@synchronized (self) {
-		const size_t bytesPerSample = lengthAtOffset / numSamples;
+		
 		for (size_t totalCopied = 0; totalCopied < numSamples;)
 		{
-			const size_t copiedSamples = [self copySamples:(inSamples + (bytesPerSample * totalCopied)) count:(numSamples - totalCopied) description:desc];
+			const size_t offset = bytesPerSample * totalCopied * stride;
+			const size_t copiedSamples = [self copySamples:inSamplesLeft + offset
+											   rightBuffer:(inSamplesRight ? inSamplesRight + offset : NULL)
+													stride:stride
+													 count:(numSamples - totalCopied)
+											   description:desc];
 
 			totalCopied += copiedSamples;
 			_samplePosition += copiedSamples;
@@ -448,10 +526,10 @@ namespace {
 
 			// Convert the real data to complex data
 			// Window the samples
-			vDSP_vmul(_samples, 1, _window, 1, _samples, 1, _delegate->fftSize() * 2);
+			vDSP_vmul(_leftSamples,  1, _window, 1, _leftSamples,  1, _delegate->fftSize() * 2);
 
 			// copy the input to the packed complex array that the fft algo uses
-			vDSP_ctoz((DSPComplex *)_samples, 2, &_splitComplex, 1, _delegate->fftSize());
+			vDSP_ctoz((DSPComplex *)_leftSamples, 2, &_splitComplex, 1, _delegate->fftSize());
 			
 			// calculate the fft
 			vDSP_fft_zrip(_fftsetup, &_splitComplex, 1, _log2n, FFT_FORWARD);

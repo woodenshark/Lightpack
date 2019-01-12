@@ -496,7 +496,7 @@ namespace {
 		_contiguousBufferSize = totalLength;
 	}
 	if (_contiguousBuffer == NULL || CMBlockBufferAccessDataBytes(audioBuffer, 0, totalLength, _contiguousBuffer, &inSamplesLeft) != kCMBlockBufferNoErr || inSamplesLeft == NULL) {
-		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get contigous data bytes";
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get contiguous data bytes";
 		return;
 	}
 

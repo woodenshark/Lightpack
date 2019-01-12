@@ -16,6 +16,10 @@
 namespace {
 	template <typename T>
 	inline void floatcpy(const char* src, const uint8_t stride, float* dest, const size_t len) {
+		if (stride == 1) {
+			memcpy(dest, src, len * sizeof(*dest));
+			return;
+		}
 		const T* ptr = reinterpret_cast<const T*>(src);
 		for (const T* const end = ptr + len * stride; ptr < end; ptr += stride, ++dest)
 			*dest = *ptr;

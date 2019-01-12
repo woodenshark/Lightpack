@@ -44,6 +44,7 @@
 #include <QStringBuilder>
 #include <QScrollBar>
 #include <QMessageBox>
+#include "PrismatikMath.hpp"
 
 
 using namespace SettingsScope;
@@ -870,6 +871,7 @@ void SettingsWindow::updateVirtualLedsColors(const QList<QRgb> & colors)
 
 		QPalette pal = label->palette();
 		pal.setBrush(QPalette::Window, QBrush(color));
+		pal.setColor(label->foregroundRole(), PrismatikMath::getBrightness(colors[i]) > 150 ? Qt::black : Qt::white);
 		label->setPalette(pal);
 	}
 }

@@ -31,7 +31,7 @@
 
 #define MAX_DEVICE_ID 100
 
-WindowsSoundManager::WindowsSoundManager(int hWnd, QObject *parent) : SoundManager(parent)
+WindowsSoundManager::WindowsSoundManager(int hWnd, QObject *parent) : SoundManagerBase(parent)
 {
 	m_hWnd = hWnd;
 

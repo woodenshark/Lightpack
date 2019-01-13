@@ -162,7 +162,7 @@ void MacOSGrabberBase::freeScreenImageData(GrabbedScreen& screen)
 
 GrabResult MacOSGrabberBase::grabScreens()
 {
-#ifndef SAVE_FRAME_TO_FILE
+#ifdef SAVE_FRAME_TO_FILE
 	static unsigned long _count = 0;
 	_count += m_timer->interval();
 #endif // SAVE_FRAME_TO_FILE
@@ -180,14 +180,14 @@ GrabResult MacOSGrabberBase::grabScreens()
 		} else if (result == GrabResultFrameNotReady)
 			return GrabResultFrameNotReady;
 
-#ifndef SAVE_FRAME_TO_FILE
+#ifdef SAVE_FRAME_TO_FILE
 		if (_count > 20000) // save every 20sec
 			saveGrabbedScreenToBMP(grabScreen);
 #endif // SAVE_FRAME_TO_FILE
 
 	}
 
-#ifndef SAVE_FRAME_TO_FILE
+#ifdef SAVE_FRAME_TO_FILE
 	if (_count > 20000)
 		_count = 0;
 #endif // SAVE_FRAME_TO_FILE
@@ -195,7 +195,7 @@ GrabResult MacOSGrabberBase::grabScreens()
 	return GrabResultOk;
 }
 
-#ifndef SAVE_FRAME_TO_FILE
+#ifdef SAVE_FRAME_TO_FILE
 void MacOSGrabberBase::saveGrabbedScreenToBMP(const GrabbedScreen& screen)
 {
 	CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, screen.imgData, screen.imgDataSize, NULL);

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "SoundManager.hpp"
+#include "SoundManagerBase.hpp"
 
 #include <objc/objc-runtime.h>
 #ifdef __OBJC__
@@ -16,7 +16,7 @@
 typedef struct objc_object MacOSNativeSoundCapture;
 #endif
 
-class MacOSSoundManager : public SoundManager
+class MacOSSoundManager : public SoundManagerBase
 {
 	Q_OBJECT
 

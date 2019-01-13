@@ -35,7 +35,7 @@
 #include "GrabManager.hpp"
 #include "MoodLampManager.hpp"
 #ifdef SOUNDVIZ_SUPPORT
-#include "SoundManager.hpp"
+#include "SoundManagerBase.hpp"
 #endif
 #include "ColorButton.hpp"
 #include "enums.hpp"

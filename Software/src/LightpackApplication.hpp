@@ -111,7 +111,7 @@ private:
 	GrabManager *m_grabManager;
 	MoodLampManager *m_moodlampManager;
 #ifdef SOUNDVIZ_SUPPORT
-	SoundManager *m_soundManager;
+	SoundManagerBase *m_soundManager;
 #endif
 
 	PluginsManager *m_pluginManager;

@@ -26,9 +26,9 @@
 #pragma once
 
 #include <QTime>
-#include "SoundManager.hpp"
+#include "SoundManagerBase.hpp"
 
-class WindowsSoundManager : public SoundManager
+class WindowsSoundManager : public SoundManagerBase
 {
 public:
 	WindowsSoundManager(int hWnd, QObject *parent = 0);

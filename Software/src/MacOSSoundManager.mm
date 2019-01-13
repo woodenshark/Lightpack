@@ -566,7 +566,7 @@ namespace {
 
 @end
 
-MacOSSoundManager::MacOSSoundManager(QObject *parent) : SoundManager(parent)
+MacOSSoundManager::MacOSSoundManager(QObject *parent) : SoundManagerBase(parent)
 {
 	_capture = [[MacOSNativeSoundCapture alloc] initWithDelegate:this queue:dispatch_get_main_queue()];
 }

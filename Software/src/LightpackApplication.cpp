@@ -706,7 +706,7 @@ void LightpackApplication::initGrabManager()
 	m_moodlampManager->initFromSettings();
 
 #ifdef SOUNDVIZ_SUPPORT
-	m_soundManager = SoundManager::create(m_settingsWindow->winId(), NULL);
+	m_soundManager = SoundManagerBase::create(m_settingsWindow->winId(), NULL);
 	if (m_soundManager)
 		m_soundManager->initFromSettings();
 	else

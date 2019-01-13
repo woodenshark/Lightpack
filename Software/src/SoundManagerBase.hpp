@@ -38,21 +38,21 @@ struct SoundManagerDeviceInfo {
 };
 Q_DECLARE_METATYPE(SoundManagerDeviceInfo);
 
-class SoundManager : public QObject
+class SoundManagerBase : public QObject
 {
 	Q_OBJECT
 
 public:
-	SoundManager(QObject *parent = 0);
-	virtual ~SoundManager();
-	static SoundManager* create(int hWnd = 0, QObject* parent = 0);
+	SoundManagerBase(QObject *parent = 0);
+	virtual ~SoundManagerBase();
+	static SoundManagerBase* create(int hWnd = 0, QObject* parent = 0);
 
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 
 public:
-	virtual void start(bool isMoodLampEnabled) { Q_UNUSED(isMoodLampEnabled); Q_ASSERT(("Not implemented", false)); };
+	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
 
 	// Common options
 	void setSendDataOnlyIfColorsChanged(bool state);

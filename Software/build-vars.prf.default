@@ -26,6 +26,7 @@ win32: {
 # For Qt lrelease reasons, to change the MAC SDK, you have to edit src.pro directly
 # When using variables, lrelease complains about QMAKE_MAC_SDK not being set
 # You can override QMAKE_MAC_SDK value by setting this variable.
-# macx {
+macx {
 #     QMAKE_MAC_SDK_OVERRIDE = macosx10.8
-# }
+    DEFINES += SOUNDVIZ_SUPPORT
+}

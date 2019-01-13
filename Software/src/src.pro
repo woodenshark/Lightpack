@@ -182,7 +182,6 @@ macx{
     HEADERS += \
     MacOSSession.h
 
-    DEFINES += SOUNDVIZ_SUPPORT
     contains(DEFINES,SOUNDVIZ_SUPPORT) {
         SOURCES += MacOSSoundManager.mm
         HEADERS += MacOSSoundManager.h

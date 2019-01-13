@@ -162,10 +162,10 @@ void MacOSGrabberBase::freeScreenImageData(GrabbedScreen& screen)
 
 GrabResult MacOSGrabberBase::grabScreens()
 {
-#ifndef QT_NO_DEBUG
+#ifndef SAVE_FRAME_TO_FILE
 	static unsigned long _count = 0;
 	_count += m_timer->interval();
-#endif
+#endif // SAVE_FRAME_TO_FILE
 
 	for (GrabbedScreen& grabScreen : _screensWithWidgets)
 	{
@@ -180,22 +180,22 @@ GrabResult MacOSGrabberBase::grabScreens()
 		} else if (result == GrabResultFrameNotReady)
 			return GrabResultFrameNotReady;
 
-#ifndef QT_NO_DEBUG
+#ifndef SAVE_FRAME_TO_FILE
 		if (_count > 20000) // save every 20sec
 			saveGrabbedScreenToBMP(grabScreen);
-#endif
+#endif // SAVE_FRAME_TO_FILE
 
 	}
 
-#ifndef QT_NO_DEBUG
+#ifndef SAVE_FRAME_TO_FILE
 	if (_count > 20000)
 		_count = 0;
-#endif
+#endif // SAVE_FRAME_TO_FILE
 
 	return GrabResultOk;
 }
 
-#ifndef QT_NO_DEBUG
+#ifndef SAVE_FRAME_TO_FILE
 void MacOSGrabberBase::saveGrabbedScreenToBMP(const GrabbedScreen& screen)
 {
 	CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, screen.imgData, screen.imgDataSize, NULL);
@@ -224,6 +224,6 @@ void MacOSGrabberBase::saveGrabbedScreenToBMP(const GrabbedScreen& screen)
 	CGDataProviderRelease(provider);
 	CGColorSpaceRelease(cspace);
 }
-#endif // QT_NO_DEBUG
+#endif // SAVE_FRAME_TO_FILE
 
 #endif // MAC_OS_XX_GRAB_SUPPORT

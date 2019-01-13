@@ -28,4 +28,5 @@ win32: {
 # You can override QMAKE_MAC_SDK value by setting this variable.
 # macx {
 #     QMAKE_MAC_SDK_OVERRIDE = macosx10.8
+#     DEFINES += SAVE_FRAME_TO_FILE
 # }

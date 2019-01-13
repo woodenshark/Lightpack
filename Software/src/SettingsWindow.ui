@@ -1021,7 +1021,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </layout>
             </item>
             <item>
-             <widget class="QLabel" name="label_7">
+             <widget class="QLabel" name="label_SoundvizLightpackSmoothnessNote">
               <property name="text">
                <string>Please note: The sound visualizer works best with low smoothness settings (20 and below, 10 recommended)</string>
               </property>

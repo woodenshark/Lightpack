@@ -397,11 +397,11 @@ namespace {
 {
 	if (desc->mFormatFlags & kLinearPCMFormatFlagIsSignedInteger)
 	{
-		if (desc->mBitsPerChannel == 16)
+		if (desc->mBitsPerChannel == sizeof(short) * 8)
 			vDSP_vflt16(reinterpret_cast<const short *>(srcBuffer), stride, destBuffer, 1, count);
-		else if (desc->mBitsPerChannel == 24)
+		else if (desc->mBitsPerChannel == sizeof(vDSP_int24) * 8)
 			vDSP_vflt24(reinterpret_cast<const vDSP_int24 *>(srcBuffer), stride, destBuffer, 1, count);
-		else if (desc->mBitsPerChannel == 32)
+		else if (desc->mBitsPerChannel == sizeof(int) * 8)
 			vDSP_vflt32(reinterpret_cast<const int *>(srcBuffer), stride, destBuffer, 1, count);
 		else {
 			DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "unsupported integer BPC: " << desc->mBitsPerChannel;

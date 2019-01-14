@@ -29,23 +29,18 @@
 
 #ifdef MAC_OS_CG_GRAB_SUPPORT
 
-#include "GrabberBase.hpp"
+#include "MacOSGrabberBase.hpp"
 
-class MacOSGrabber : public GrabberBase
+class MacOSCGGrabber : public MacOSGrabberBase
 {
 public:
-    MacOSGrabber(QObject *parent, GrabberContext *context);
-    virtual ~MacOSGrabber();
+	MacOSCGGrabber(QObject *parent, GrabberContext *context);
+	virtual ~MacOSCGGrabber() = default;
 
-    DECLARE_GRABBER_NAME("MacOSGrabber")
+	DECLARE_GRABBER_NAME("MacOSCGGrabber")
 
 protected slots:
-    virtual GrabResult grabScreens();
-    virtual bool reallocate(const QList< ScreenInfo > &grabScreens);
-
-    virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets);
-private:
-    void freeScreens();
+	virtual GrabResult grabDisplay(const CGDirectDisplayID display, GrabbedScreen& screen);
 };
 
 #endif // MAC_OS_CG_GRAB_SUPPORT

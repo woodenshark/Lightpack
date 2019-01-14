@@ -193,6 +193,9 @@ macx{
             # private framework
             -weak_framework CoreBrightness \
             -framework AppKit \
+            -framework AVFoundation \
+            -framework CoreMedia \
+            -framework CoreVideo \
 
     ICON = ../res/icons/Prismatik.icns
 

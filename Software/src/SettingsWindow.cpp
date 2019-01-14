@@ -265,6 +265,9 @@ void SettingsWindow::connectSignalsSlots()
 #ifdef X11_GRAB_SUPPORT
 	connect(ui->radioButton_GrabX11, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
+#ifdef MAC_OS_AV_GRAB_SUPPORT
+	connect(ui->radioButton_GrabMacAVFoundation, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+#endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
 	connect(ui->radioButton_GrabMacCoreGraphics, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
 #endif
@@ -802,6 +805,11 @@ void SettingsWindow::initGrabbersRadioButtonsVisibility()
 	ui->radioButton_GrabX11->setVisible(false);
 #else
 	ui->radioButton_GrabX11->setChecked(true);
+#endif
+#ifndef MAC_OS_AV_GRAB_SUPPORT
+	ui->radioButton_GrabMacAVFoundation->setVisible(false);
+#else
+	ui->radioButton_GrabMacAVFoundation->setChecked(true);
 #endif
 #ifndef MAC_OS_CG_GRAB_SUPPORT
 	ui->radioButton_GrabMacCoreGraphics->setVisible(false);
@@ -1797,11 +1805,19 @@ void SettingsWindow::updateUiFromSettings()
 		ui->radioButton_GrabX11->setChecked(true);
 		break;
 #endif
+#ifdef MAC_OS_AV_GRAB_SUPPORT
+	case Grab::GrabberTypeMacAVFoundation:
+		ui->radioButton_GrabMacAVFoundation->setChecked(true);
+		break;
+#endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
 	case Grab::GrabberTypeMacCoreGraphics:
 		ui->radioButton_GrabMacCoreGraphics->setChecked(true);
 		break;
 #endif
+	default:
+		qWarning() << Q_FUNC_INFO << "unsupported grabber in settings: " << Settings::getGrabberType();
+		break;
 	}
 
 #ifdef D3D10_GRAB_SUPPORT
@@ -1831,6 +1847,11 @@ Grab::GrabberType SettingsWindow::getSelectedGrabberType()
 #ifdef DDUPL_GRAB_SUPPORT
 	if (ui->radioButton_GrabDDupl->isChecked()) {
 		return Grab::GrabberTypeDDupl;
+	}
+#endif
+#ifdef MAC_OS_AV_GRAB_SUPPORT
+	if (ui->radioButton_GrabMacAVFoundation->isChecked()) {
+		return Grab::GrabberTypeMacAVFoundation;
 	}
 #endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT

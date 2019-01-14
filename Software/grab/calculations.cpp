@@ -46,15 +46,15 @@ namespace {
 	};
 
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
-	static const unsigned int accumulateBuffer(
+	static unsigned int accumulateBuffer(
 		const unsigned char *buffer,
-		const unsigned int pitch,
+		const size_t pitch,
 		const QRect &rect,
 		ColorValue *resultColor) {
 		unsigned int r = 0, g = 0, b = 0;
 		unsigned int count = 0; // count the amount of pixels taken into account
 		for (int currentY = 0; currentY < rect.height(); currentY++) {
-			int index = pitch * (rect.y() + currentY) + rect.x()*bytesPerPixel;
+			size_t index = pitch * (rect.y() + currentY) + rect.x() * bytesPerPixel;
 			for (int currentX = 0; currentX < rect.width(); currentX += pixelsPerStep) {
 				r += PIXEL_R(0) + PIXEL_R(1) + PIXEL_R(2) + PIXEL_R(3);
 				g += PIXEL_G(0) + PIXEL_G(1) + PIXEL_G(2) + PIXEL_G(3);
@@ -73,7 +73,7 @@ namespace {
 
 namespace Grab {
 	namespace Calculations {
-		QRgb calculateAvgColor(QRgb *result, const unsigned char *buffer, BufferFormat bufferFormat, unsigned int pitch, const QRect &rect) {
+		QRgb calculateAvgColor(QRgb *result, const unsigned char *buffer, BufferFormat bufferFormat, const size_t pitch, const QRect &rect) {
 
 			Q_ASSERT_X(rect.width() % pixelsPerStep == 0, "average color calculation", "rect width should be aligned by 4 bytes");
 

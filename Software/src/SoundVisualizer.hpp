@@ -111,17 +111,17 @@ protected:
 
 #define DECLARE_VISUALIZER(_OBJ_NAME_,_LABEL_) \
 public:\
-_OBJ_NAME_##SoundVisualizer() = default;\
-~##_OBJ_NAME_##SoundVisualizer() = default;\
+_OBJ_NAME_ ## SoundVisualizer() = default;\
+~_OBJ_NAME_ ## SoundVisualizer() = default;\
 \
 static const char* const name() { return _LABEL_; };\
-static SoundVisualizerBase* create() { return new _OBJ_NAME_##SoundVisualizer(); };\
+static SoundVisualizerBase* create() { return new _OBJ_NAME_ ## SoundVisualizer(); };\
 \
 const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);
 
 class PrismatikSoundVisualizer : public SoundVisualizerBase
 {
-	DECLARE_VISUALIZER(Prismatik, "Prismatik (default)");
+	DECLARE_VISUALIZER(Prismatik,"Prismatik (default)");
 	void clear(const int numberOfLeds);
 private:
 	QList<int> m_peaks;
@@ -130,7 +130,7 @@ private:
 
 class TwinPeaksSoundVisualizer : public SoundVisualizerBase
 {
-	DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks");
+	DECLARE_VISUALIZER(TwinPeaks,"Twin Peaks");
 private:
 	float m_previousPeak{ 0.0f };
 };

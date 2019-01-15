@@ -962,12 +962,12 @@ void SettingsWindow::updateAvailableSoundVizVisualizers(const QList<SoundManager
 {
 	ui->comboBox_SoundVizVisualizer->blockSignals(true);
 	ui->comboBox_SoundVizVisualizer->clear();
-	int selectedDevice = Settings::getSoundVisualizerVisualizer();
-	if (selectedDevice == -1) selectedDevice = recommended;
+	int selectedVisualizer = Settings::getSoundVisualizerVisualizer();
+	if (selectedVisualizer == -1) selectedVisualizer = recommended;
 	int selectIndex = -1;
 	for (int i = 0; i < visualizers.size(); i++) {
 		ui->comboBox_SoundVizVisualizer->addItem(visualizers[i].name, visualizers[i].id);
-		if (visualizers[i].id == selectedDevice) {
+		if (visualizers[i].id == selectedVisualizer) {
 			selectIndex = i;
 		}
 	}

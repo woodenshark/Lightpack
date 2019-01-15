@@ -113,7 +113,7 @@ public slots:
 
 #ifdef SOUNDVIZ_SUPPORT
 	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
-	void updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int default);
+	void updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int recommended);
 #endif
 
 	void updatePlugin(QList<Plugin*> plugins);

@@ -49,7 +49,7 @@ public:
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
-	void visualizerList(const QList<SoundManagerVisualizerInfo>& visualizers, int default);
+	void visualizerList(const QList<SoundManagerVisualizerInfo>& visualizers, int recommended);
 
 public:
 	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
@@ -92,5 +92,5 @@ protected:
 	
 	float*	m_fft{nullptr};
 
-	QList<VisualizerFactory> m_visulizerList;
+	QList<VisualizerFactory> m_visualizerList;
 };

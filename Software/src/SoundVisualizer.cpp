@@ -26,6 +26,7 @@
 #include <QTime>
 #include "Settings.hpp"
 #include "SoundVisualizer.hpp"
+#include <cmath>
 
 using namespace SettingsScope;
 

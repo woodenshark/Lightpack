@@ -328,8 +328,8 @@ HEADERS += \
     LightpackCommandLineParser.hpp
 
 contains(DEFINES,SOUNDVIZ_SUPPORT) {
-    SOURCES += SoundManagerBase.cpp
-    HEADERS += SoundManagerBase.hpp
+    SOURCES += SoundManagerBase.cpp SoundVisualizer.cpp
+    HEADERS += SoundManagerBase.hpp SoundVisualizer.hpp
 }
 
 win32 {

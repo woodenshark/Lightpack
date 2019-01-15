@@ -889,6 +889,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </layout>
             </item>
             <item>
+             <widget class="QComboBox" name="comboBox_SoundVizVisualizer"/>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
                <widget class="QRadioButton" name="radioButton_SoundVizConstantMode">

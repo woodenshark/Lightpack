@@ -27,8 +27,7 @@
 
 #include <QObject>
 #include <QColor>
-#include "LiquidColorGenerator.hpp"
-
+#include "SoundVisualizer.hpp"
 
 struct SoundManagerDeviceInfo {
 	SoundManagerDeviceInfo(){ this->name = ""; this->id = -1; }
@@ -50,6 +49,7 @@ public:
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
+	void visualizerList(const QList<SoundManagerVisualizerInfo>& visualizers, int default);
 
 public:
 	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
@@ -65,11 +65,13 @@ public slots:
 	void settingsProfileChanged(const QString &profileName);
 	void setNumberOfLeds(int value);
 	void setDevice(int value);
+	void setVisualizer(int value);
 	void setMinColor(QColor color);
 	void setMaxColor(QColor color);
 	void setLiquidMode(bool isEnabled);
 	void setLiquidModeSpeed(int value);
 	void requestDeviceList();
+	void requestVisualizerList();
 	void updateColors();
 
 protected:
@@ -77,22 +79,18 @@ protected:
 	void initColors(int numberOfLeds);
 	virtual void populateDeviceList(QList<SoundManagerDeviceInfo>& devices, int& recommended) = 0;
 	virtual void updateFft() {};
-	bool applyFft();
 
 protected:
-	LiquidColorGenerator m_generator;
+	SoundVisualizerBase* m_visualizer{nullptr};
 
 	QList<QRgb> m_colors;
-	QList<int> m_peaks;
-	int 	m_frames{0};
 
 	bool	m_isEnabled{false};
 	bool	m_isInited{false};
-	bool	m_isLiquidMode{false};
-	QColor 	m_minColor;
-	QColor 	m_maxColor;
 	int		m_device{-1};
 	bool	m_isSendDataOnlyIfColorsChanged{false};
 	
 	float*	m_fft{nullptr};
+
+	QList<VisualizerFactory> m_visulizerList;
 };

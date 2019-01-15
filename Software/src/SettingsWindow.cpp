@@ -250,6 +250,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
 #ifdef SOUNDVIZ_SUPPORT
 	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
+	connect(ui->comboBox_SoundVizVisualizer, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizVisualizer_currentIndexChanged(int)));
 	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
 	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
@@ -493,6 +494,7 @@ void SettingsWindow::onPostInit() {
 	this->requestFirmwareVersion();
 #ifdef SOUNDVIZ_SUPPORT
 	this->requestSoundVizDevices();
+	this->requestSoundVizVisualizers();
 #endif
 
 	if (m_trayIcon) {
@@ -955,6 +957,23 @@ void SettingsWindow::updateAvailableSoundVizDevices(const QList<SoundManagerDevi
 	ui->comboBox_SoundVizDevice->setCurrentIndex(selectIndex);
 	ui->comboBox_SoundVizDevice->blockSignals(false);
 }
+
+void SettingsWindow::updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int recommended)
+{
+	ui->comboBox_SoundVizVisualizer->blockSignals(true);
+	ui->comboBox_SoundVizVisualizer->clear();
+	int selectedDevice = Settings::getSoundVisualizerVisualizer();
+	if (selectedDevice == -1) selectedDevice = recommended;
+	int selectIndex = -1;
+	for (int i = 0; i < visualizers.size(); i++) {
+		ui->comboBox_SoundVizVisualizer->addItem(visualizers[i].name, visualizers[i].id);
+		if (visualizers[i].id == selectedDevice) {
+			selectIndex = i;
+		}
+	}
+	ui->comboBox_SoundVizVisualizer->setCurrentIndex(selectIndex);
+	ui->comboBox_SoundVizVisualizer->blockSignals(false);
+}
 #endif
 
 // ----------------------------------------------------------------------------
@@ -1363,6 +1382,14 @@ void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
 	if (!updatingFromSettings) {
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizDevice->currentData().toInt();
 		Settings::setSoundVisualizerDevice(ui->comboBox_SoundVizDevice->currentData().toInt());
+	}
+}
+
+void SettingsWindow::onSoundVizVisualizer_currentIndexChanged(int index)
+{
+	if (!updatingFromSettings) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_SoundVizVisualizer->currentData().toInt();
+		Settings::setSoundVisualizerVisualizer(ui->comboBox_SoundVizVisualizer->currentData().toInt());
 	}
 }
 
@@ -1778,6 +1805,16 @@ void SettingsWindow::updateUiFromSettings()
 			break;
 		}
 	}
+
+	for (int i = 0; i < ui->comboBox_SoundVizVisualizer->count(); i++) {
+		if (ui->comboBox_SoundVizVisualizer->itemData(i).toInt() == Settings::getSoundVisualizerVisualizer()) {
+			ui->comboBox_SoundVizVisualizer->setCurrentIndex(i);
+			break;
+		}
+	}
+
+	// TODO visu
+
 	ui->pushButton_SelectColorSoundVizMin->setColor					(Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor					(Settings::getSoundVisualizerMaxColor());
 	ui->radioButton_SoundVizConstantMode->setChecked					(!Settings::isSoundVisualizerLiquidMode());

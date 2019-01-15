@@ -76,6 +76,7 @@ signals:
 	void requestFirmwareVersion();
 #ifdef SOUNDVIZ_SUPPORT
 	void requestSoundVizDevices();
+	void requestSoundVizVisualizers();
 #endif
 	void recreateLedDevice();
 	void resultBacklightStatus(Backlight::Status);
@@ -112,6 +113,7 @@ public slots:
 
 #ifdef SOUNDVIZ_SUPPORT
 	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
+	void updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int default);
 #endif
 
 	void updatePlugin(QList<Plugin*> plugins);
@@ -135,6 +137,7 @@ private slots:
 	void onMoodLampLiquidMode_Toggled(bool isLiquidMode);
 #ifdef SOUNDVIZ_SUPPORT
 	void onSoundVizDevice_currentIndexChanged(int index);
+	void onSoundVizVisualizer_currentIndexChanged(int index);
 	void onSoundVizMinColor_changed(QColor color);
 	void onSoundVizMaxColor_changed(QColor color);
 	void onSoundVizLiquidMode_Toggled(bool isLiquidMode);

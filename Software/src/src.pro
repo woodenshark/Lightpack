@@ -203,6 +203,7 @@ macx{
             -framework Accelerate \
             -framework CoreMedia \
             -framework AVFoundation \
+            -framework CoreVideo \
 
     ICON = ../res/icons/Prismatik.icns
 

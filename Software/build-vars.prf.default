@@ -29,4 +29,5 @@ win32: {
 macx {
 #     QMAKE_MAC_SDK_OVERRIDE = macosx10.8
     DEFINES += SOUNDVIZ_SUPPORT
+#    DEFINES += SAVE_FRAME_TO_FILE
 }

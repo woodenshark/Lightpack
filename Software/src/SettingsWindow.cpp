@@ -123,7 +123,11 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	updateStatusBar();
 
 #ifdef SOUNDVIZ_SUPPORT
+
+#ifdef BASS_SOUND_SUPPORT
 	ui->label_licenseAndCredits->setText(ui->label_licenseAndCredits->text() + tr(" The sound visualizer uses the <a href=\"http://un4seen.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">BASS</span></a> library."));
+#endif // BASS_SOUND_SUPPORT
+
 	if (Settings::getConnectedDevice() != SupportedDevices::DeviceType::DeviceTypeLightpack)
 		ui->label_SoundvizLightpackSmoothnessNote->hide();
 #else

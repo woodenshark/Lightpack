@@ -499,6 +499,32 @@ namespace {
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "could not get contiguous data bytes";
 		return;
 	}
+	
+	/**
+	// This does not want to work, even from LPCM (stereo) to LPCM (mono)
+	// Unless input format == output format, AudioConverterConvertBuffer ALWAYS returns -50
+	// Tested with 10.13 and 10.14 SDKs
+
+	AVAudioFormat* monoFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32 sampleRate:44100 channels:1 interleaved:NO];
+	AudioConverterRef converter = NULL;
+
+	// Using newly created AVAudioFormat.streamDescription or copying input stream description with 1 channel yields same results
+	AudioConverterNew(desc, monoFormat.streamDescription, &converter);
+	UInt32 ioMonoSize = totalLength; // this assumes 32bit to 32bit (or less) conversion, but even very large buffers don't help
+	void *monoSamples = malloc(sizeof(*inSamplesLeft) * ioMonoSize);
+	OSStatus convertStatus = AudioConverterConvertBuffer(converter, (UInt32)totalLength, (const void *)inSamplesLeft, &ioMonoSize, monoSamples);
+	// convertStatus is ALWAYS "-50"
+	// Documentation states:
+	// 		"This function is for the special case of converting from one linear PCM format to another."
+	// which is what we want and (trying to) do
+	// 		"This function cannot perform sample rate conversions and cannot be used for conversion to or from most compressed formats."
+	// which is what we DO NOT do
+	// so in theory this should be enough to do LPCM stereo to mono
+
+	AudioConverterDispose(converter);
+	free(monoSamples);
+	[monoFormat release];
+	//*/
 
 	const size_t bytesPerSample = desc->mBitsPerChannel / 8;
 	const char* inSamplesRight = NULL;

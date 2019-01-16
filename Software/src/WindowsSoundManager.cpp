@@ -154,6 +154,8 @@ void WindowsSoundManager::start(bool isEnabled)
 		BASS_WASAPI_Free();
 	}
 
+	if (m_visualizer == nullptr)
+		return;
 	if (m_isEnabled)
 		m_visualizer->start();
 	else

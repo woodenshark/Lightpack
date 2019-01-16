@@ -216,7 +216,7 @@ void SoundManagerBase::setVisualizer(int value)
 		m_visualizer->setLiquidMode(Settings::isSoundVisualizerLiquidMode());
 		m_visualizer->setSpeed(Settings::getSoundVisualizerLiquidSpeed());
 		m_visualizer->clear(m_colors.size());
-		if (running)
+		if (running || m_isEnabled)
 			m_visualizer->start();
 	}
 }

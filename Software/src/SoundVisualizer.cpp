@@ -108,10 +108,10 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 	if (m_previousPeak < currentPeak)
 		m_previousPeak = currentPeak;
 
-	const size_t thresholdLed = middleLed * (currentPeak / m_previousPeak);
+	const size_t thresholdLed = m_previousPeak != 0.0f ? middleLed * (currentPeak / m_previousPeak) : 0;
 	for (size_t i = 0; i < middleLed; ++i) {
 		QRgb color = 0;
-		if (i <= thresholdLed) {
+		if (i < thresholdLed) {
 			QColor from = m_isLiquidMode ? m_generator.current() : m_minColor;
 			QColor to = m_isLiquidMode ? from : m_maxColor;
 			if (m_isLiquidMode) {

@@ -99,6 +99,13 @@ public:
 	virtual void clear(const int /*numberOfLeds*/) {};
 
 	virtual const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors) = 0;
+	void interpolateColor(QRgb& outColor, const QColor& from, const QColor& to, const double value, const double maxValue) {
+		QColor rgb;
+		rgb.setRed(from.red() + (to.red() - from.red()) * (value / maxValue));
+		rgb.setGreen(from.green() + (to.green() - from.green()) * (value / maxValue));
+		rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (value / maxValue));
+		outColor = rgb.rgb();
+	}
 
 protected:
 	QColor 	m_minColor;

@@ -71,12 +71,7 @@ const bool PrismatikSoundVisualizer::visualize(const float* const fftData, const
 		if (Settings::isLedEnabled(i)) {
 			QColor from = m_isLiquidMode ? QColor(0, 0, 0) : m_minColor;
 			QColor to = m_isLiquidMode ? m_generator.current() : m_maxColor;
-			QColor rgb;
-			rgb.setRed(from.red() + (to.red() - from.red()) * (val / (double)SpecHeight));
-			rgb.setGreen(from.green() + (to.green() - from.green()) * (val / (double)SpecHeight));
-			rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (val / (double)SpecHeight));
-
-			color = rgb.rgb();
+			interpolateColor(color, from, to, val, SpecHeight);
 		}
 
 		changed = changed || (colors[i] != color);
@@ -118,13 +113,7 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 				from.setHsl(from.hue(), from.saturation(), 120);
 				to.setHsl(to.hue() + 180, to.saturation(), 120);
 			}
-
-			QColor rgb;
-			rgb.setRed(from.red() + (to.red() - from.red()) * (i / (double)middleLed));
-			rgb.setGreen(from.green() + (to.green() - from.green()) * (i / (double)middleLed));
-			rgb.setBlue(from.blue() + (to.blue() - from.blue()) * (i / (double)middleLed));
-
-			color = rgb.rgb();
+			interpolateColor(color, from, to, i, middleLed);
 		}
 			
 		// peak A

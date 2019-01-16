@@ -122,7 +122,7 @@ public:
 	static const char * CmdGetBacklight;
 	static const char * CmdResultBacklight_Ambilight;
 	static const char * CmdResultBacklight_Moodlamp;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	static const char * CmdResultBacklight_SoundViz;
 #endif
 
@@ -135,7 +135,7 @@ public:
 	static const char * CmdGetSmooth;
 	static const char * CmdResultSmooth;
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	static const char * CmdGetSoundVizColors;
 	static const char * CmdResultSoundVizColors;
 
@@ -171,7 +171,7 @@ public:
 	static const char * CmdSetSmooth;
 	static const char * CmdSetProfile;
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	static const char * CmdSetSoundVizColors;
 	static const char * CmdSetSoundVizLiquid;
 #endif
@@ -191,7 +191,7 @@ public:
 	static const char * CmdSetBacklight;
 	static const char * CmdSetBacklight_Ambilight;
 	static const char * CmdSetBacklight_Moodlamp;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	static const char * CmdSetBacklight_SoundViz;
 #endif
 

@@ -856,7 +856,37 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_SoundVizDevice"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QComboBox" name="comboBox_SoundVizDevice"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_SoundVizDeviceHelp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="whatsThis">
+                 <string>By default, on macOS this feature is limited to input devices (mic, line-in...), a third party software (such as Soundflower etc) is needed to redirect desktop sound into a virtual input that can be used here. The device has to support Linear PCM, 44100Hz (or 32000, 48000) sample rate and 16 (or 24, 32) bits per channel.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin:0;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="../res/LightpackResources.qrc">
+                  <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -991,7 +1021,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </layout>
             </item>
             <item>
-             <widget class="QLabel" name="label_7">
+             <widget class="QLabel" name="label_SoundvizLightpackSmoothnessNote">
               <property name="text">
                <string>Please note: The sound visualizer works best with low smoothness settings (20 and below, 10 recommended)</string>
               </property>
@@ -3038,7 +3068,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>comboBox_LightpackModes</tabstop>
   <tabstop>spinBox_GrabSlowdown</tabstop>
   <tabstop>checkBox_GrabIsAvgColors</tabstop>
-  <tabstop>checkBox_GrabApplyGammaRamp</tabstop>
   <tabstop>checkBox_GrabApplyColorTemperature</tabstop>
   <tabstop>pushButton_grabApplyColorTemperatureHelp</tabstop>
   <tabstop>horizontalSlider_GrabColorTemperature</tabstop>
@@ -3056,7 +3085,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>pushButton_SelectColorMoodLamp</tabstop>
   <tabstop>radioButton_LiquidColorMoodLampMode</tabstop>
   <tabstop>horizontalSlider_MoodLampSpeed</tabstop>
-  <tabstop>comboBox_SoundVizDevice</tabstop>
   <tabstop>radioButton_SoundVizConstantMode</tabstop>
   <tabstop>pushButton_SelectColorSoundVizMin</tabstop>
   <tabstop>pushButton_SelectColorSoundVizMax</tabstop>

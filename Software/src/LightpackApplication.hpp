@@ -110,8 +110,8 @@ private:
 	QThread *m_apiServerThread;
 	GrabManager *m_grabManager;
 	MoodLampManager *m_moodlampManager;
-#ifdef BASS_SOUND_SUPPORT
-	SoundManager *m_soundManager;
+#ifdef SOUNDVIZ_SUPPORT
+	SoundManagerBase *m_soundManager;
 #endif
 
 	PluginsManager *m_pluginManager;

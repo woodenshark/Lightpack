@@ -151,6 +151,8 @@ win32 {
 				copy /y \"$${BASS_DIR}\\bass.dll\" .\ $$escape_expand(\r\n)\
 				copy /y \"$${BASSWASAPI_DIR}\\basswasapi.dll\" .\
 		}
+
+		DEFINES += SOUNDVIZ_SUPPORT
 	}
 
 	contains(DEFINES,NIGHTLIGHT_SUPPORT) {
@@ -180,6 +182,11 @@ macx{
     HEADERS += \
     MacOSSession.h
 
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += MacOSSoundManager.mm
+        HEADERS += MacOSSoundManager.h
+    }
+
     LIBS += \
             -framework Cocoa \
             -framework Carbon \
@@ -193,8 +200,9 @@ macx{
             # private framework
             -weak_framework CoreBrightness \
             -framework AppKit \
-            -framework AVFoundation \
+            -framework Accelerate \
             -framework CoreMedia \
+            -framework AVFoundation \
             -framework CoreVideo \
 
     ICON = ../res/icons/Prismatik.icns
@@ -319,9 +327,9 @@ HEADERS += \
     UpdatesProcessor.hpp \
     LightpackCommandLineParser.hpp
 
-contains(DEFINES,BASS_SOUND_SUPPORT) {
-    SOURCES += SoundManager.cpp
-    HEADERS += SoundManager.hpp
+contains(DEFINES,SOUNDVIZ_SUPPORT) {
+    SOURCES += SoundManagerBase.cpp
+    HEADERS += SoundManagerBase.hpp
 }
 
 win32 {
@@ -330,6 +338,11 @@ win32 {
 
     HEADERS += LedDeviceAlienFx.hpp \
     WindowsSession.hpp
+
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += WindowsSoundManager.cpp
+        HEADERS += WindowsSoundManager.hpp
+    }
 }
 
 FORMS += SettingsWindow.ui \

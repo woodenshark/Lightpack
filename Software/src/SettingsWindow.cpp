@@ -59,7 +59,7 @@ const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.co
 // Indexes of supported modes listed in ui->comboBox_Modes and ui->stackedWidget_Modes
 const int SettingsWindow::GrabModeIndex = 0;
 const int SettingsWindow::MoodLampModeIndex = 1;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 const int SettingsWindow::SoundVisualizeModeIndex = 2;
 #endif
 
@@ -122,8 +122,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 	updateStatusBar();
 
+#ifdef SOUNDVIZ_SUPPORT
+
 #ifdef BASS_SOUND_SUPPORT
 	ui->label_licenseAndCredits->setText(ui->label_licenseAndCredits->text() + tr(" The sound visualizer uses the <a href=\"http://un4seen.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">BASS</span></a> library."));
+#endif // BASS_SOUND_SUPPORT
+
+	if (Settings::getConnectedDevice() != SupportedDevices::DeviceType::DeviceTypeLightpack)
+		ui->label_SoundvizLightpackSmoothnessNote->hide();
 #else
 	ui->comboBox_LightpackModes->removeItem(2);
 #endif
@@ -242,13 +248,19 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->pushButton_DeleteProfile, SIGNAL(clicked()), this, SLOT(profileDeleteCurrent()));
 
 	connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
 	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
 	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
 	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
 	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
-#endif
+#ifdef Q_OS_MACOS
+	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(on_pushButton_SoundVizDeviceHelp_clicked()));
+#else
+	ui->pushButton_SoundVizDeviceHelp->hide();
+#endif // Q_OS_MACOS
+	
+#endif// SOUNDVIZ_SUPPORT
 	connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
@@ -479,7 +491,7 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
 	updateUiFromSettings();
 	this->requestFirmwareVersion();
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	this->requestSoundVizDevices();
 #endif
 
@@ -926,7 +938,7 @@ void SettingsWindow::processMessage(const QString &message)
 	}
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 void SettingsWindow::updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended)
 {
 	ui->comboBox_SoundVizDevice->blockSignals(true);
@@ -1274,7 +1286,7 @@ void SettingsWindow::onLightpackModes_currentIndexChanged(int index)
 		case MoodLampModeIndex:
 			Settings::setLightpackMode(MoodLampMode);
 			break;
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 		case SoundVisualizeModeIndex:
 			Settings::setLightpackMode(SoundVisualizeMode);
 			break;
@@ -1303,7 +1315,7 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
 		emit showLedWidgets(false);
 		break;
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	case SoundVisualizeModeIndex:
 		ui->comboBox_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
 		ui->stackedWidget_LightpackModes->setCurrentIndex(SoundVisualizeModeIndex);
@@ -1345,7 +1357,7 @@ void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
 	}
 }
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 void SettingsWindow::onSoundVizDevice_currentIndexChanged(int index)
 {
 	if (!updatingFromSettings) {
@@ -1759,7 +1771,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->pushButton_SelectColorMoodLamp->setColor						(Settings::getMoodLampColor());
 	ui->horizontalSlider_MoodLampSpeed->setValue						(Settings::getMoodLampSpeed());
 
-#ifdef BASS_SOUND_SUPPORT
+#ifdef SOUNDVIZ_SUPPORT
 	for (int i = 0; i < ui->comboBox_SoundVizDevice->count(); i++) {
 		if (ui->comboBox_SoundVizDevice->itemData(i).toInt() == Settings::getSoundVisualizerDevice()) {
 			ui->comboBox_SoundVizDevice->setCurrentIndex(i);
@@ -1931,6 +1943,13 @@ void SettingsWindow::showHelpOf(QObject *object)
 {
 	QCoreApplication::postEvent(object, new QHelpEvent(QEvent::WhatsThis, QPoint(0,0), QCursor::pos()));
 }
+
+#if defined(SOUNDVIZ_SUPPORT) && defined(Q_OS_MACOS)
+void SettingsWindow::on_pushButton_SoundVizDeviceHelp_clicked()
+{
+	showHelpOf(ui->pushButton_SoundVizDeviceHelp);
+}
+#endif
 
 void SettingsWindow::on_pushButton_LightpackSmoothnessHelp_clicked()
 {

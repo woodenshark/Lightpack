@@ -28,7 +28,12 @@
 #include "SoundVisualizer.hpp"
 #include <cmath>
 
-#define DECLARE_VISUALIZER(_OBJ_NAME_,_LABEL_,_ID_,_BODY_) \
+/*
+	_OBJ_NAME_	: class name prefix
+	_LABEL_		: name string to be displayed
+	_BODY_		: class declaration body
+*/
+#define DECLARE_VISUALIZER(_OBJ_NAME_,_LABEL_,_BODY_) \
 class _OBJ_NAME_ ## SoundVisualizer : public SoundVisualizerBase \
 {\
 public:\
@@ -44,7 +49,7 @@ _BODY_\
 struct _OBJ_NAME_ ## Register {\
 _OBJ_NAME_ ## Register(){\
 	factoryList.append(_OBJ_NAME_ ## SoundVisualizer::create);\
-	infoList.append(SoundManagerVisualizerInfo(_OBJ_NAME_ ## SoundVisualizer::name(), _ID_));\
+	infoList.append(SoundManagerVisualizerInfo(_OBJ_NAME_ ## SoundVisualizer::name(), (vizID++)));\
 }\
 };\
 _OBJ_NAME_ ## Register _OBJ_NAME_ ## Reg;
@@ -54,6 +59,7 @@ using namespace SettingsScope;
 namespace {
 	static QList<VisualizerFactory> factoryList;
 	static QList<SoundManagerVisualizerInfo> infoList;
+	static int vizID = 0;
 }
 
 void SoundVisualizerBase::populateFactoryList(QList<VisualizerFactory>& list)
@@ -66,11 +72,11 @@ void SoundVisualizerBase::populateNameList(QList<SoundManagerVisualizerInfo>& li
 	list = infoList;
 
 	if (infoList.size() > 0)
-		recommended = 0;
+		recommended = infoList[0].id;
 }
 
 #pragma region Prismatik
-DECLARE_VISUALIZER(Prismatik, "Prismatik (default)", 0,
+DECLARE_VISUALIZER(Prismatik, "Prismatik (default)",
 public:
 	void clear(const int numberOfLeds);
 private:
@@ -124,7 +130,7 @@ void PrismatikSoundVisualizer::clear(const int numberOfLeds) {
 
 
 #pragma region TwinPeaks
-DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks", 1,
+DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks",
 public:
 private:
 	float m_previousPeak{ 0.0f };

@@ -1,5 +1,5 @@
 /*
- * MoodLampManager.hpp
+ * SoundManagerBase.hpp
  *
  *	Created on: 11.12.2011
  *		Project: Lightpack

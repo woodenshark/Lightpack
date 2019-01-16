@@ -51,8 +51,8 @@ SoundManagerBase* SoundManagerBase::create(int hWnd, QObject* parent)
 SoundManagerBase::SoundManagerBase(QObject *parent) : QObject(parent)
 {
 	SoundVisualizerBase::populateFactoryList(m_visualizerList);
-	initFromSettings();
 	m_fft = (float *)calloc(fftSize(), sizeof(*m_fft));
+	initFromSettings();
 }
 
 SoundManagerBase::~SoundManagerBase()

@@ -28,23 +28,56 @@
 #include "SoundVisualizer.hpp"
 #include <cmath>
 
+#define DECLARE_VISUALIZER(_OBJ_NAME_,_LABEL_,_ID_,_BODY_) \
+class _OBJ_NAME_ ## SoundVisualizer : public SoundVisualizerBase \
+{\
+public:\
+_OBJ_NAME_ ## SoundVisualizer() = default;\
+~_OBJ_NAME_ ## SoundVisualizer() = default;\
+\
+static const char* const name() { return _LABEL_; };\
+static SoundVisualizerBase* create() { return new _OBJ_NAME_ ## SoundVisualizer(); };\
+\
+const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);\
+_BODY_\
+};\
+struct _OBJ_NAME_ ## Register {\
+_OBJ_NAME_ ## Register(){\
+	factoryList.append(_OBJ_NAME_ ## SoundVisualizer::create);\
+	infoList.append(SoundManagerVisualizerInfo(_OBJ_NAME_ ## SoundVisualizer::name(), _ID_));\
+}\
+};\
+_OBJ_NAME_ ## Register _OBJ_NAME_ ## Reg;
+
 using namespace SettingsScope;
+
+namespace {
+	static QList<VisualizerFactory> factoryList;
+	static QList<SoundManagerVisualizerInfo> infoList;
+}
 
 void SoundVisualizerBase::populateFactoryList(QList<VisualizerFactory>& list)
 {
-	list.append(PrismatikSoundVisualizer::create);
-	list.append(TwinPeaksSoundVisualizer::create);
+	list = factoryList;
 }
 
 void SoundVisualizerBase::populateNameList(QList<SoundManagerVisualizerInfo>& list, int& recommended)
 {
-	list.append(SoundManagerVisualizerInfo(PrismatikSoundVisualizer::name(), 0));
-	list.append(SoundManagerVisualizerInfo(TwinPeaksSoundVisualizer::name(), 1));
+	list = infoList;
 
-	recommended = 0;
+	if (infoList.size() > 0)
+		recommended = 0;
 }
 
 #pragma region Prismatik
+DECLARE_VISUALIZER(Prismatik, "Prismatik (default)", 0,
+public:
+	void clear(const int numberOfLeds);
+private:
+	QList<int> m_peaks;
+	const int SpecHeight = 1000;
+);
+
 const bool PrismatikSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	size_t b0 = 0;
@@ -91,6 +124,12 @@ void PrismatikSoundVisualizer::clear(const int numberOfLeds) {
 
 
 #pragma region TwinPeaks
+DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks", 1,
+public:
+private:
+	float m_previousPeak{ 0.0f };
+);
+
 const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	bool changed = false;

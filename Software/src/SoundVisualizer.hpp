@@ -115,29 +115,3 @@ protected:
 	bool	m_isRunning{ false };
 	size_t  m_frames{ 0 };
 };
-
-#define DECLARE_VISUALIZER(_OBJ_NAME_,_LABEL_) \
-public:\
-_OBJ_NAME_ ## SoundVisualizer() = default;\
-~_OBJ_NAME_ ## SoundVisualizer() = default;\
-\
-static const char* const name() { return _LABEL_; };\
-static SoundVisualizerBase* create() { return new _OBJ_NAME_ ## SoundVisualizer(); };\
-\
-const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);
-
-class PrismatikSoundVisualizer : public SoundVisualizerBase
-{
-	DECLARE_VISUALIZER(Prismatik,"Prismatik (default)");
-	void clear(const int numberOfLeds);
-private:
-	QList<int> m_peaks;
-	const int SpecHeight = 1000;
-};
-
-class TwinPeaksSoundVisualizer : public SoundVisualizerBase
-{
-	DECLARE_VISUALIZER(TwinPeaks,"Twin Peaks");
-private:
-	float m_previousPeak{ 0.0f };
-};

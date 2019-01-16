@@ -79,8 +79,8 @@ const bool PrismatikSoundVisualizer::visualize(const float* const fftData, const
 			color = rgb.rgb();
 		}
 
-		changed |= (colors[i] != color);
-		colors[i] = Settings::isLedEnabled(i) ? color : 0;
+		changed = changed || (colors[i] != color);
+		colors[i] = color;
 	}
 	m_frames++;
 	return changed;
@@ -128,12 +128,14 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 		}
 			
 		// peak A
-		changed |= (colors[i] != color);
-		colors[i] = Settings::isLedEnabled(i) ? color : 0;
+		QRgb colorA = Settings::isLedEnabled(i) ? color : 0;
+		changed = changed || (colors[i] != colorA);
+		colors[i] = colorA;
 
 		// peak B
-		changed |= (colors[colors.size() - i - 1] != color);
-		colors[colors.size() - i - 1] = Settings::isLedEnabled(colors.size() - i - 1) ? color : 0;
+		QRgb colorB = Settings::isLedEnabled(colors.size() - i - 1) ? color : 0;
+		changed = changed || (colors[colors.size() - i - 1] != colorB);
+		colors[colors.size() - i - 1] = colorB;
 	}
 	if (currentPeak == 0.0f)
 		m_previousPeak = currentPeak;

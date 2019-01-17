@@ -1813,8 +1813,6 @@ void SettingsWindow::updateUiFromSettings()
 		}
 	}
 
-	// TODO visu
-
 	ui->pushButton_SelectColorSoundVizMin->setColor					(Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor					(Settings::getSoundVisualizerMaxColor());
 	ui->radioButton_SoundVizConstantMode->setChecked					(!Settings::isSoundVisualizerLiquidMode());

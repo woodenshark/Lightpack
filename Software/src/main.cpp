@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 
 	if (lightpackApp.isRunning())
 	{
-		lightpackApp.sendMessage("Application already running");
+		lightpackApp.sendMessage("alreadyRunning");
 
 		qWarning() << "Application already running";
 		exit(0);

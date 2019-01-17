@@ -932,9 +932,11 @@ void SettingsWindow::processMessage(const QString &message)
 	} else if (message == "quitForWizard") {
 		qWarning() << "Wizard was started, quitting!";
 		LightpackApplication::quit();
-	} else if (m_trayIcon != NULL) {
+	} else if (m_trayIcon != NULL) { // "alreadyRunning"
 		qWarning(qPrintable(message));
 		m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
+		this->show();
+		this->activateWindow();
 	}
 }
 

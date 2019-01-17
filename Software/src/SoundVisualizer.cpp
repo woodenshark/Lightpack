@@ -134,6 +134,9 @@ DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks",
 public:
 private:
 	float m_previousPeak{ 0.0f };
+	size_t m_prevThresholdLed{ 0 };
+	double m_speedCoef = 1.0;
+	const uint8_t FadeOutSpeed = 12;
 );
 
 const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
@@ -141,38 +144,64 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 	bool changed = false;
 	const size_t middleLed = std::floor(colors.size() / 2);
 
+	// most sensitive Hz range for humans
+	// this assumes 44100Hz sample rate
+	const size_t optimalHzMin = 1950 / (44100 / 2 / fftSize); // 2kHz
+	const size_t optimalHzMax = 5050 / (44100 / 2 / fftSize); // 5kHz
+
 	float currentPeak = 0.0f;
-	for (size_t i = 0; i < fftSize; ++i)
-		currentPeak += fftData[i];
+	for (size_t i = 0; i < fftSize; ++i) {
+		float mag = fftData[i];
+		if (i > optimalHzMin && i < optimalHzMax)// amplify sensitive range
+			mag *= 6.0f;
+		currentPeak += mag;
+	}
 
 	if (m_previousPeak < currentPeak)
 		m_previousPeak = currentPeak;
+	else
+		m_previousPeak = std::max(0.0f, m_previousPeak - (fftSize * 0.000005f)); // lower the stale peak so it doesn't persist forever
 
 	const size_t thresholdLed = m_previousPeak != 0.0f ? middleLed * (currentPeak / m_previousPeak) : 0;
-	for (size_t i = 0; i < middleLed; ++i) {
+
+	// if leds move a lot with x% amplitude, increase fade speed
+	if (std::abs((int)(thresholdLed - m_prevThresholdLed)) > middleLed * 0.2)
+		m_speedCoef = std::min(10.0, m_speedCoef + 2.0);
+	else // reset on slow down
+		m_speedCoef = 1.0;// std::max(1.0, speedCoef - 2.0);
+
+	for (size_t idxA = 0; idxA < middleLed; ++idxA) {
+		const size_t idxB = colors.size() - 1 - idxA;
 		QRgb color = 0;
-		if (i < thresholdLed) {
+		if (idxA < thresholdLed) {
 			QColor from = m_isLiquidMode ? m_generator.current() : m_minColor;
 			QColor to = m_isLiquidMode ? from : m_maxColor;
 			if (m_isLiquidMode) {
 				from.setHsl(from.hue(), from.saturation(), 120);
 				to.setHsl(to.hue() + 180, to.saturation(), 120);
 			}
-			interpolateColor(color, from, to, i, middleLed);
+			interpolateColor(color, from, to, idxA, middleLed);
+		}
+		else if (FadeOutSpeed > 0 && (colors[idxA] > 0 || colors[idxB] > 0)) { // fade out old peaks
+			QColor oldColor(std::max(colors[idxA], colors[idxB])); // both colors are either the same or one is 0, so max() is good enough here
+			oldColor.setHsl(oldColor.hue(), oldColor.saturation(), oldColor.lightness() - FadeOutSpeed * ((thresholdLed > 0 ? thresholdLed : 1) / (double)idxA) * m_speedCoef);
+			color = oldColor.rgb();
 		}
 			
 		// peak A
-		QRgb colorA = Settings::isLedEnabled(i) ? color : 0;
-		changed = changed || (colors[i] != colorA);
-		colors[i] = colorA;
+		QRgb colorA = Settings::isLedEnabled(idxA) ? color : 0;
+		changed = changed || (colors[idxA] != colorA);
+		colors[idxA] = colorA;
 
 		// peak B
-		QRgb colorB = Settings::isLedEnabled(colors.size() - i - 1) ? color : 0;
-		changed = changed || (colors[colors.size() - i - 1] != colorB);
-		colors[colors.size() - i - 1] = colorB;
+		QRgb colorB = Settings::isLedEnabled(idxB) ? color : 0;
+		changed = changed || (colors[idxB] != colorB);
+		colors[idxB] = colorB;
 	}
-	if (currentPeak == 0.0f)
+	if (currentPeak == 0.0f) // reset peak on silence
 		m_previousPeak = currentPeak;
+
+	m_prevThresholdLed = thresholdLed;
 	return changed;
 }
 #pragma endregion TwinPeaks

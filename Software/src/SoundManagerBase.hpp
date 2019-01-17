@@ -91,6 +91,4 @@ protected:
 	bool	m_isSendDataOnlyIfColorsChanged{false};
 	
 	float*	m_fft{nullptr};
-
-	QList<VisualizerFactory> m_visualizerList;
 };

@@ -48,8 +48,8 @@ _BODY_\
 };\
 struct _OBJ_NAME_ ## Register {\
 _OBJ_NAME_ ## Register(){\
-	factoryList.append(_OBJ_NAME_ ## SoundVisualizer::create);\
-	infoList.append(SoundManagerVisualizerInfo(_OBJ_NAME_ ## SoundVisualizer::name(), (vizID++)));\
+	visualizerMap.insert(vizID, SoundManagerVisualizerInfo(_OBJ_NAME_ ## SoundVisualizer::name(), _OBJ_NAME_ ## SoundVisualizer::create, vizID));\
+	++vizID;\
 }\
 };\
 _OBJ_NAME_ ## Register _OBJ_NAME_ ## Reg;
@@ -57,22 +57,25 @@ _OBJ_NAME_ ## Register _OBJ_NAME_ ## Reg;
 using namespace SettingsScope;
 
 namespace {
-	static QList<VisualizerFactory> factoryList;
-	static QList<SoundManagerVisualizerInfo> infoList;
+	static QMap<int, SoundManagerVisualizerInfo> visualizerMap;
 	static int vizID = 0;
 }
 
-void SoundVisualizerBase::populateFactoryList(QList<VisualizerFactory>& list)
+SoundVisualizerBase* SoundVisualizerBase::createWithID(const int id)
 {
-	list = factoryList;
+	QMap<int, SoundManagerVisualizerInfo>::const_iterator i = visualizerMap.find(id);
+	if (i != visualizerMap.end())
+		return i.value().factory();
+	qWarning() << Q_FUNC_INFO << "failed to find visualizer ID: " << id;
+	return nullptr;
 }
 
 void SoundVisualizerBase::populateNameList(QList<SoundManagerVisualizerInfo>& list, int& recommended)
 {
-	list = infoList;
+	list = visualizerMap.values();
 
-	if (infoList.size() > 0)
-		recommended = infoList[0].id;
+	if (list.size() > 0)
+		recommended = list[0].id;
 }
 
 #pragma region Prismatik

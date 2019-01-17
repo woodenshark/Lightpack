@@ -50,7 +50,6 @@ SoundManagerBase* SoundManagerBase::create(int hWnd, QObject* parent)
 
 SoundManagerBase::SoundManagerBase(QObject *parent) : QObject(parent)
 {
-	SoundVisualizerBase::populateFactoryList(m_visualizerList);
 	m_fft = (float *)calloc(fftSize(), sizeof(*m_fft));
 	initFromSettings();
 }
@@ -200,16 +199,13 @@ void SoundManagerBase::initColors(int numberOfLeds)
 
 void SoundManagerBase::setVisualizer(int value)
 {
-	if (value >= m_visualizerList.size() || value < 0)
-		return;
-
 	bool running = false;
 	if (m_visualizer) {
 		running = m_visualizer->isRunning();
 		delete m_visualizer;
 		m_visualizer = nullptr;
 	}
-	m_visualizer = m_visualizerList[value]();
+	m_visualizer = SoundVisualizerBase::createWithID(value);
 	if (m_visualizer) {
 		m_visualizer->setMinColor(Settings::getSoundVisualizerMinColor());
 		m_visualizer->setMaxColor(Settings::getSoundVisualizerMaxColor());

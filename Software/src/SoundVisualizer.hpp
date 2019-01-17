@@ -28,25 +28,26 @@
 #include <QColor>
 #include "LiquidColorGenerator.hpp"
 
-struct SoundManagerVisualizerInfo {
-	SoundManagerVisualizerInfo() { this->name = ""; this->id = -1; }
-	SoundManagerVisualizerInfo(QString name, int id) { this->name = name; this->id = id; }
-	QString name;
-	int id;
-};
-Q_DECLARE_METATYPE(SoundManagerVisualizerInfo);
-
 class SoundVisualizerBase;
 
 typedef SoundVisualizerBase* (*VisualizerFactory)();
+
+struct SoundManagerVisualizerInfo {
+	SoundManagerVisualizerInfo() { this->name = ""; this->id = -1; this->factory = nullptr; }
+	SoundManagerVisualizerInfo(QString name, VisualizerFactory factory, int id) { this->name = name; this->id = id; this->factory = factory; }
+	QString name;
+	VisualizerFactory factory;
+	int id;
+};
+Q_DECLARE_METATYPE(SoundManagerVisualizerInfo);
 
 class SoundVisualizerBase
 {
 public:
 	static const char* const name() { return "NO_NAME"; };
 	static SoundVisualizerBase* create() { Q_ASSERT_X(false, "SoundVisualizerBase::create()", "not implemented"); return nullptr; };
-	static void populateFactoryList(QList<VisualizerFactory>&);
 	static void populateNameList(QList<SoundManagerVisualizerInfo>&, int& recommended);
+	static SoundVisualizerBase* createWithID(const int id);
 
 	SoundVisualizerBase() = default;
 	virtual ~SoundVisualizerBase() {

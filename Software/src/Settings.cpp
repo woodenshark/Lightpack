@@ -1744,6 +1744,7 @@ void Settings::initCurrentProfile(bool isResetDefault)
 #ifdef SOUNDVIZ_SUPPORT
 	// [SoundVisualizer]
 	setNewOption(Profile::Key::SoundVisualizer::Device,				Profile::SoundVisualizer::DeviceDefault, isResetDefault);
+	setNewOption(Profile::Key::SoundVisualizer::Visualizer,			Profile::SoundVisualizer::VisualizerDefault, isResetDefault);
 	setNewOption(Profile::Key::SoundVisualizer::MinColor,			Profile::SoundVisualizer::MinColorDefault, isResetDefault);
 	setNewOption(Profile::Key::SoundVisualizer::MaxColor,			Profile::SoundVisualizer::MaxColorDefault, isResetDefault);
 	setNewOption(Profile::Key::SoundVisualizer::IsLiquidMode,		Profile::SoundVisualizer::IsLiquidModeDefault, isResetDefault);

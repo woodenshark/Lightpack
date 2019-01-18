@@ -179,6 +179,7 @@ static const bool IsLiquidModeDefault = true;
 namespace SoundVisualizer
 {
 static const int DeviceDefault = -1;
+static const int VisualizerDefault = 0;
 static const QString MinColorDefault = "#301000";
 static const QString MaxColorDefault = "#0000FF";
 static const bool IsLiquidModeDefault = true;

@@ -65,6 +65,7 @@ Source: "content/prismatik-hooks32.dll"; DestDir: "{app}"; MinVersion: 6.1.7600;
 Source: "content/prismatik-unhook32.dll"; DestDir: "{app}"; MinVersion: 6.1.7600; Flags: 32bit ignoreversion
 Source: "content/UpdateElevate.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/platforms/*"; DestDir: "{app}\platforms"; Flags: ignoreversion
+Source: "content/styles/*"; DestDir: "{app}\styles"; Flags: ignoreversion
 Source: "content/Plugins/*"; DestDir: "{#UserSettingsDirName}\Plugins"; Flags: onlyifdoesntexist createallsubdirs recursesubdirs
 Source: "content/ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "content/libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion

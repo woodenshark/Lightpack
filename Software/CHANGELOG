@@ -13,6 +13,20 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.18
+---------------
+January 18, 2019
+
+* MacOS AV Grabber (#210)
+* Sound Visualizer for MacOS
+* Windows 10 Night Light and MacOS support (#177)
+* Improved DDupl grabbing performance
+* SessionChangeDetector for MacOS (#82)
+* Detect display sleep on Windows (#147)
+* Twin Peaks sound visualizer
+* Grab timing fix (#120)
+* Re-launching opens Settings Window (#142)
+
 Version 5.11.2.17
 ---------------
 April 26, 2018

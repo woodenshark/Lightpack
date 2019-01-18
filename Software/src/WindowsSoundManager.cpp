@@ -147,7 +147,6 @@ void WindowsSoundManager::start(bool isEnabled)
 		// setup update timer (40hz)
 		//m_timer = timeSetEvent(25, 25, (LPTIMECALLBACK)&UpdateSpectrum, 0, TIME_PERIODIC);
 		m_timer.start(25);
-		m_frames = 0;
 	}
 	else
 	{
@@ -155,10 +154,12 @@ void WindowsSoundManager::start(bool isEnabled)
 		BASS_WASAPI_Free();
 	}
 
-	if (m_isEnabled && m_isLiquidMode)
-		m_generator.start();
+	if (m_visualizer == nullptr)
+		return;
+	if (m_isEnabled)
+		m_visualizer->start();
 	else
-		m_generator.stop();
+		m_visualizer->stop();
 }
 
 void WindowsSoundManager::updateFft()

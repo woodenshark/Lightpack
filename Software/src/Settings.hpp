@@ -200,6 +200,8 @@ public:
 #ifdef SOUNDVIZ_SUPPORT
 	static int getSoundVisualizerDevice();
 	static void setSoundVisualizerDevice(int value);
+	static int getSoundVisualizerVisualizer();
+	static void setSoundVisualizerVisualizer(int value);
 	static QColor getSoundVisualizerMinColor();
 	static void setSoundVisualizerMinColor(QColor color);
 	static QColor getSoundVisualizerMaxColor();
@@ -321,6 +323,7 @@ signals:
 	void moodLampSpeedChanged(int value);
 #ifdef SOUNDVIZ_SUPPORT
 	void soundVisualizerDeviceChanged(int value);
+	void soundVisualizerVisualizerChanged(int value);
 	void soundVisualizerMinColorChanged(const QColor color);
 	void soundVisualizerMaxColorChanged(const QColor color);
 	void soundVisualizerLiquidModeChanged(bool isLiquidMode);

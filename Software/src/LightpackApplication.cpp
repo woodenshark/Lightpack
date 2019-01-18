@@ -735,6 +735,7 @@ void LightpackApplication::initGrabManager()
 	if (m_soundManager)
 	{
 		connect(settings(), SIGNAL(soundVisualizerDeviceChanged(int)),				m_soundManager,		SLOT(setDevice(int)));
+		connect(settings(), SIGNAL(soundVisualizerVisualizerChanged(int)),			m_soundManager,		SLOT(setVisualizer(int)));
 		connect(settings(), SIGNAL(soundVisualizerMaxColorChanged(QColor)),			m_soundManager,		SLOT(setMaxColor(QColor)));
 		connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),			m_soundManager,		SLOT(setMinColor(QColor)));
 		connect(settings(), SIGNAL(soundVisualizerLiquidSpeedChanged(int)),			m_soundManager,		SLOT(setLiquidModeSpeed(int)));
@@ -767,6 +768,9 @@ void LightpackApplication::initGrabManager()
 		if (m_soundManager) {
 			connect(m_settingsWindow, SIGNAL(requestSoundVizDevices()), m_soundManager, SLOT(requestDeviceList()));
 			connect(m_soundManager, SIGNAL(deviceList(const QList<SoundManagerDeviceInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> &, int)));
+
+			connect(m_settingsWindow, SIGNAL(requestSoundVizVisualizers()), m_soundManager, SLOT(requestVisualizerList()));
+			connect(m_soundManager, SIGNAL(visualizerList(const QList<SoundManagerVisualizerInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> &, int)));
 		}
 #endif
 	}

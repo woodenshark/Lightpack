@@ -725,7 +725,6 @@ void MacOSSoundManager::start(bool isEnabled)
 			}
 		}
 
-		m_frames = 0;
 		if (device)
 		{
 			if (![_capture setCaptureDevice:device])
@@ -741,8 +740,10 @@ void MacOSSoundManager::start(bool isEnabled)
 		[_capture stop];
 	}
 
-	if (m_isEnabled && m_isLiquidMode)
-		m_generator.start();
+	if (m_visualizer == nullptr)
+		return;
+	if (m_isEnabled)
+		m_visualizer->start();
 	else
-		m_generator.stop();
+		m_visualizer->stop();
 }

@@ -172,6 +172,7 @@ static const QString Speed = "MoodLamp/Speed";
 namespace SoundVisualizer
 {
 static const QString Device = "SoundVisualizer/Device";
+static const QString Visualizer = "SoundVisualizer/Visualizer";
 static const QString MinColor = "SoundVisualizer/MinColor";
 static const QString MaxColor = "SoundVisualizer/MaxColor";
 static const QString IsLiquidMode = "SoundVisualizer/LiquidMode";
@@ -1397,6 +1398,18 @@ void Settings::setSoundVisualizerDevice(int value)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 	setValue(Profile::Key::SoundVisualizer::Device, value);
 	m_this->soundVisualizerDeviceChanged(value);
+}
+
+int Settings::getSoundVisualizerVisualizer()
+{
+	return value(Profile::Key::SoundVisualizer::Visualizer).toInt();
+}
+
+void Settings::setSoundVisualizerVisualizer(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
+	setValue(Profile::Key::SoundVisualizer::Visualizer, value);
+	m_this->soundVisualizerVisualizerChanged(value);
 }
 
 QColor Settings::getSoundVisualizerMinColor()

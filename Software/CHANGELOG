@@ -13,6 +13,13 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.19
+---------------
+January 19, 2019
+
+* Fix a crash when using DDupl grabber (#240)
+* Do not retry autoupdates
+
 Version 5.11.2.18
 ---------------
 January 18, 2019

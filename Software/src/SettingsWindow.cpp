@@ -503,11 +503,14 @@ void SettingsWindow::onPostInit() {
 			if (Settings::getAutoUpdatingVersion() != VERSION_STR) {
 				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
 			} else {
-				m_trayIcon->showMessage(
-					tr("Prismatik update failed"), 
-					tr("There was a problem installing the update. You are still on version %1.").arg(VERSION_STR),
-					QSystemTrayIcon::Critical);
+				QMessageBox::critical(
+					this,
+					tr("Prismatik automatic update failed"),
+					tr("There was a problem when trying to automatically update Prismatik to the latest version.\n")
+					+ tr("You are still on version %1.\n").arg(VERSION_STR)
+					+ tr("Installing updates automatically was disabled."));
 				updateJustFailed = true;
+				ui->checkBox_installUpdates->setChecked(false);
 			}
 			Settings::setAutoUpdatingVersion("");
 		}

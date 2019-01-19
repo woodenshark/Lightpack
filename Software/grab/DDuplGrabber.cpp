@@ -40,6 +40,8 @@ _COM_SMARTPTR_TYPEDEF(IDXGISurface1, __uuidof(IDXGISurface1));
 _COM_SMARTPTR_TYPEDEF(ID3D11Device, __uuidof(ID3D11Device));
 _COM_SMARTPTR_TYPEDEF(ID3D11DeviceContext, __uuidof(ID3D11DeviceContext));
 _COM_SMARTPTR_TYPEDEF(ID3D11Texture2D, __uuidof(ID3D11Texture2D));
+_COM_SMARTPTR_TYPEDEF(ID3D11ShaderResourceView, __uuidof(ID3D11ShaderResourceView));
+
 
 typedef HRESULT(WINAPI *CreateDXGIFactory1Func)(REFIID riid, _Out_ void **ppFactory);
 typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
@@ -76,12 +78,6 @@ struct DDuplScreenData
 	DDuplScreenData(IDXGIOutputPtr _output, IDXGIOutputDuplicationPtr _duplication, ID3D11DevicePtr _device, ID3D11DeviceContextPtr _context)
 		: output(_output), duplication(_duplication), device(_device), context(_context)
 	{}
-
-	~DDuplScreenData()
-	{
-		if (textureCopy)
-			textureCopy->Release();
-	}
 
 	IDXGIOutputPtr output{nullptr};
 	IDXGIOutputDuplicationPtr duplication{nullptr};
@@ -525,7 +521,6 @@ GrabResult DDuplGrabber::returnBlackBuffer()
 		if (screenData->textureCopy) {
 			// if we have a texture, imgData points to surfaceMap.pBits
 			// so here we only need to free the texture and null everything
-			screenData->textureCopy->Release();
 			screenData->textureCopy = nullptr;
 			screen.imgData = NULL;
 			screen.imgDataSize = 0;
@@ -657,11 +652,10 @@ GrabResult DDuplGrabber::grabScreens()
 
 			// reset texture and data before getting new one
 			if (screenData->textureCopy) {
-				screenData->textureCopy->Release();
 				screenData->textureCopy = nullptr;
-			}
-			else if (screen.imgData)
+			} else if (screen.imgData) {
 				free((void*)screen.imgData);
+			}
 
 			screen.imgData = NULL;
 			screen.imgDataSize = 0;
@@ -695,7 +689,7 @@ GrabResult DDuplGrabber::grabScreens()
 					qCritical(Q_FUNC_INFO " Failed to CreateTexture2D: 0x%X", hr);
 					return GrabResultError;
 				}
-				ID3D11ShaderResourceView* scaledTextureView;
+				ID3D11ShaderResourceViewPtr scaledTextureView;
 				hr = screenData->device->CreateShaderResourceView(scaledTexture, NULL, &scaledTextureView);
 				if (FAILED(hr))
 				{
@@ -707,9 +701,6 @@ GrabResult DDuplGrabber::grabScreens()
 				screenData->context->GenerateMips(scaledTextureView);
 
 				screenData->context->CopySubresourceRegion(screenData->textureCopy, 0, 0, 0, 0, scaledTexture, DownscaleMipLevel, NULL);
-
-				scaledTextureView->Release();
-				scaledTexture->Release();
 			}
 			else
 				screenData->context->CopyResource(screenData->textureCopy, texture);

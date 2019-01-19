@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include <QRandomGenerator>
 
 class LiquidColorGenerator : public QObject
 {
@@ -72,4 +73,6 @@ private:
 	static const int ColorsMoodLampCount = 14;
 	static const QColor AvailableColors[ColorsMoodLampCount];
 	QList<QColor> m_unselectedColors;
+
+	QRandomGenerator m_rnd;
 };

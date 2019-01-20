@@ -78,6 +78,7 @@ signals:
 	void requestSoundVizDevices();
 	void requestSoundVizVisualizers();
 #endif
+	void requestMoodLampLamps();
 	void recreateLedDevice();
 	void resultBacklightStatus(Backlight::Status);
 	void backlightStatusChanged(Backlight::Status);
@@ -111,6 +112,7 @@ public slots:
 	void onPingDeviceEverySecond_Toggled(bool state);
 	void processMessage(const QString &message);
 
+	void updateAvailableMoodLampLamps(const QList<MoodLampLampInfo> & lamps, int recommended);
 #ifdef SOUNDVIZ_SUPPORT
 	void updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 	void updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int recommended);
@@ -134,6 +136,7 @@ private slots:
 	void onLightpackModeChanged(Lightpack::Mode);
 	void onMoodLampColor_changed(QColor color);
 	void onMoodLampSpeed_valueChanged(int value);
+	void onMoodLampLamp_currentIndexChanged(int index);
 	void onMoodLampLiquidMode_Toggled(bool isLiquidMode);
 #ifdef SOUNDVIZ_SUPPORT
 	void onSoundVizDevice_currentIndexChanged(int index);

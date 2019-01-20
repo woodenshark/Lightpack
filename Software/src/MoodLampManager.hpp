@@ -29,15 +29,18 @@
 #include <QColor>
 #include <QTimer>
 #include "LiquidColorGenerator.hpp"
+#include "MoodLamp.hpp"
 
 class MoodLampManager : public QObject
 {
 	Q_OBJECT
 public:
 	explicit MoodLampManager(QObject *parent = 0);
+	~MoodLampManager();
 
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
+	void lampList(const QList<MoodLampLampInfo> &, int);
 
 public:
 	void start(bool isMoodLampEnabled);
@@ -53,22 +56,25 @@ public slots:
 	void settingsProfileChanged(const QString &profileName);
 	void setNumberOfLeds(int value);
 	void setCurrentColor(QColor color);
+	void setCurrentLamp(const int id);
+	void requestLampList();
 
 private slots:
-	void updateColors();
+	void updateColors(const bool forceUpdate = false);
 
 private:
 	void initColors(int numberOfLeds);
-	void fillColors(QRgb rgb);
 
 private:
+	MoodLampBase* m_lamp{ nullptr };
+
 	LiquidColorGenerator m_generator;
 	QList<QRgb> m_colors;
 
 	bool	m_isMoodLampEnabled;
-	QColor m_currentColor;
+	QColor  m_currentColor;
 	bool	m_isLiquidMode;
 	bool	m_isSendDataOnlyIfColorsChanged;
 
-	QRgb m_rgbSaved;
+	QTimer m_timer;
 };

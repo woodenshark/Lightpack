@@ -167,6 +167,7 @@ namespace MoodLamp
 static const QString IsLiquidMode = "MoodLamp/LiquidMode";
 static const QString Color = "MoodLamp/Color";
 static const QString Speed = "MoodLamp/Speed";
+static const QString Lamp = "MoodLamp/Lamp";
 }
 // [SoundVisualizer]
 namespace SoundVisualizer
@@ -1387,6 +1388,19 @@ void Settings::setMoodLampSpeed(int value)
 	m_this->moodLampSpeedChanged(value);
 }
 
+int Settings::getMoodLampLamp()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	return value(Profile::Key::MoodLamp::Lamp).toInt();
+}
+
+void Settings::setMoodLampLamp(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::MoodLamp::Lamp, value);
+	m_this->moodLampLampChanged(value);
+}
+
 #ifdef SOUNDVIZ_SUPPORT
 int Settings::getSoundVisualizerDevice()
 {
@@ -1741,6 +1755,7 @@ void Settings::initCurrentProfile(bool isResetDefault)
 	setNewOption(Profile::Key::MoodLamp::IsLiquidMode,				Profile::MoodLamp::IsLiquidModeDefault, isResetDefault);
 	setNewOption(Profile::Key::MoodLamp::Color,						Profile::MoodLamp::ColorDefault, isResetDefault);
 	setNewOption(Profile::Key::MoodLamp::Speed,						Profile::MoodLamp::SpeedDefault, isResetDefault);
+	setNewOption(Profile::Key::MoodLamp::Lamp,						Profile::MoodLamp::LampDefault, isResetDefault);
 #ifdef SOUNDVIZ_SUPPORT
 	// [SoundVisualizer]
 	setNewOption(Profile::Key::SoundVisualizer::Device,				Profile::SoundVisualizer::DeviceDefault, isResetDefault);

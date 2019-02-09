@@ -215,6 +215,7 @@ void SettingsWindow::connectSignalsSlots()
 
 	connect(ui->radioButton_LiquidColorMoodLampMode, SIGNAL(toggled(bool)), this, SLOT(onMoodLampLiquidMode_Toggled(bool)));
 	connect(ui->horizontalSlider_MoodLampSpeed, SIGNAL(valueChanged(int)), this, SLOT(onMoodLampSpeed_valueChanged(int)));
+	connect(ui->comboBox_MoodLampLamp, SIGNAL(currentIndexChanged(int)), this, SLOT(onMoodLampLamp_currentIndexChanged(int)));
 
 	// Main options
 	connect(ui->comboBox_LightpackModes, SIGNAL(currentIndexChanged(int)), this, SLOT(onLightpackModes_currentIndexChanged(int)));
@@ -492,6 +493,7 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 void SettingsWindow::onPostInit() {
 	updateUiFromSettings();
 	this->requestFirmwareVersion();
+	this->requestMoodLampLamps();
 #ifdef SOUNDVIZ_SUPPORT
 	this->requestSoundVizDevices();
 	this->requestSoundVizVisualizers();
@@ -981,6 +983,23 @@ void SettingsWindow::updateAvailableSoundVizVisualizers(const QList<SoundManager
 }
 #endif
 
+void SettingsWindow::updateAvailableMoodLampLamps(const QList<MoodLampLampInfo> & lamps, int recommended)
+{
+	ui->comboBox_MoodLampLamp->blockSignals(true);
+	ui->comboBox_MoodLampLamp->clear();
+	int selectedLamp = Settings::getMoodLampLamp();
+	if (selectedLamp == -1) selectedLamp = recommended;
+	int selectIndex = -1;
+	for (int i = 0; i < lamps.size(); i++) {
+		ui->comboBox_MoodLampLamp->addItem(lamps[i].name, lamps[i].id);
+		if (lamps[i].id == selectedLamp) {
+			selectIndex = i;
+		}
+	}
+	ui->comboBox_MoodLampLamp->setCurrentIndex(selectIndex);
+	ui->comboBox_MoodLampLamp->blockSignals(false);
+}
+
 // ----------------------------------------------------------------------------
 // Show / Hide settings and about windows
 // ----------------------------------------------------------------------------
@@ -1364,6 +1383,14 @@ void SettingsWindow::onMoodLampSpeed_valueChanged(int value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 	Settings::setMoodLampSpeed(value);
+}
+
+void SettingsWindow::onMoodLampLamp_currentIndexChanged(int index)
+{
+	if (!updatingFromSettings) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << index << ui->comboBox_MoodLampLamp->currentData().toInt();
+		Settings::setMoodLampLamp(ui->comboBox_MoodLampLamp->currentData().toInt());
+	}
 }
 
 void SettingsWindow::onMoodLampLiquidMode_Toggled(bool checked)
@@ -1802,6 +1829,12 @@ void SettingsWindow::updateUiFromSettings()
 	ui->radioButton_LiquidColorMoodLampMode->setChecked				(Settings::isMoodLampLiquidMode());
 	ui->pushButton_SelectColorMoodLamp->setColor						(Settings::getMoodLampColor());
 	ui->horizontalSlider_MoodLampSpeed->setValue						(Settings::getMoodLampSpeed());
+	for (int i = 0; i < ui->comboBox_MoodLampLamp->count(); i++) {
+		if (ui->comboBox_MoodLampLamp->itemData(i).toInt() == Settings::getMoodLampLamp()) {
+			ui->comboBox_MoodLampLamp->setCurrentIndex(i);
+			break;
+		}
+	}
 
 #ifdef SOUNDVIZ_SUPPORT
 	for (int i = 0; i < ui->comboBox_SoundVizDevice->count(); i++) {

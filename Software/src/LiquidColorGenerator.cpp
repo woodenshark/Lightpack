@@ -25,7 +25,6 @@
 
 
 #include "LiquidColorGenerator.hpp"
-#include "PrismatikMath.hpp"
 #include "Settings.hpp"
 #include <QTime>
 
@@ -40,7 +39,7 @@ const QColor LiquidColorGenerator::AvailableColors[LiquidColorGenerator::ColorsM
 
 LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 {
-	qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+	m_rnd.seed(QTime(0,0,0).secsTo(QTime::currentTime()));
 
 	m_isEnabled = false;
 	m_timer.setTimerType(Qt::PreciseTimer);
@@ -116,7 +115,7 @@ void LiquidColorGenerator::updateColor()
 
 int LiquidColorGenerator::generateDelay()
 {
-	return 1000 / (m_speed + PrismatikMath::rand(25) + 1);
+	return 1000 / (m_speed + m_rnd.bounded(25) + 1);
 }
 
 QColor LiquidColorGenerator::generateColor()
@@ -127,7 +126,7 @@ QColor LiquidColorGenerator::generateColor()
 			m_unselectedColors << AvailableColors[i];
 	}
 
-	int randIndex = PrismatikMath::rand(m_unselectedColors.size());
+	int randIndex = m_rnd.bounded(m_unselectedColors.size());
 
 	return m_unselectedColors.takeAt(randIndex);
 }

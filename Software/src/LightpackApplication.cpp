@@ -730,6 +730,7 @@ void LightpackApplication::initGrabManager()
 	connect(settings(), SIGNAL(moodLampColorChanged(QColor)),					m_moodlampManager,	SLOT(setCurrentColor(QColor)));
 	connect(settings(), SIGNAL(moodLampSpeedChanged(int)),						m_moodlampManager,	SLOT(setLiquidModeSpeed(int)));
 	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),				m_moodlampManager,	SLOT(setLiquidMode(bool)));
+	connect(settings(), SIGNAL(moodLampLampChanged(int)),						m_moodlampManager,	SLOT(setCurrentLamp(int)));
 
 #ifdef SOUNDVIZ_SUPPORT
 	if (m_soundManager)
@@ -773,6 +774,9 @@ void LightpackApplication::initGrabManager()
 			connect(m_soundManager, SIGNAL(visualizerList(const QList<SoundManagerVisualizerInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> &, int)));
 		}
 #endif
+
+		connect(m_settingsWindow, SIGNAL(requestMoodLampLamps()), m_moodlampManager, SLOT(requestLampList()));
+		connect(m_moodlampManager, SIGNAL(lampList(const QList<MoodLampLampInfo> &, int)), m_settingsWindow, SLOT(updateAvailableMoodLampLamps(const QList<MoodLampLampInfo> &, int)));
 	}
 
 	connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
@@ -826,6 +830,7 @@ void LightpackApplication::settingsChanged()
 	m_moodlampManager->setCurrentColor(Settings::getMoodLampColor());
 	m_moodlampManager->setLiquidModeSpeed(Settings::getMoodLampSpeed());
 	m_moodlampManager->setLiquidMode(Settings::isMoodLampLiquidMode());
+	m_moodlampManager->setCurrentLamp(Settings::getMoodLampLamp());
 
 	bool isBacklightEnabled = Settings::isBacklightEnabled();
 	bool isCanStart = (isBacklightEnabled && m_deviceLockStatus == DeviceLocked::Unlocked);

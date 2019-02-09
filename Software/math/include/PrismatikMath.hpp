@@ -62,11 +62,6 @@ namespace PrismatikMath
 			return -1;
 	}
 
-	inline int rand(int val)
-	{
-		return qrand() % val;
-	}
-
 	inline double round(double number)
 	{
 #if defined HAVE_PLATFORM_ROUND_FUNC

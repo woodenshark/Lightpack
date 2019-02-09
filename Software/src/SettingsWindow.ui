@@ -720,6 +720,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              <number>0</number>
             </property>
             <item>
+             <widget class="QComboBox" name="comboBox_MoodLampLamp"/>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
                <widget class="QRadioButton" name="radioButton_ConstantColorMoodLampMode">

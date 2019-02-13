@@ -55,11 +55,11 @@ public:
 	}
 
 	int bounded(int highest) {
-		return qrand % highest;
+		return qrand() % highest;
 	}
 
 	int bounded(int lowest, int highest) {
-		return lowest + (qrand % (highest - lowest + 1));
+		return lowest + (qrand() % (highest - lowest + 1));
 	}
 #endif
 

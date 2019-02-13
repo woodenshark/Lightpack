@@ -135,7 +135,11 @@ QColor LiquidColorGenerator::generateColor()
 			m_unselectedColors << AvailableColors[i];
 	}
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	int randIndex = m_rnd.bounded(m_unselectedColors.size());
+#else
+	int randIndex = qrand() % m_unselectedColors.size();
+#endif
 
 	return m_unselectedColors.takeAt(randIndex);
 }

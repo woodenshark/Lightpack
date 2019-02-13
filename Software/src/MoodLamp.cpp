@@ -51,7 +51,7 @@ public:
 #else
 public:
 	void seed(quint32 seed) {
-		sqrand(seed);
+		qsrand(seed);
 	}
 
 	int bounded(int highest) {

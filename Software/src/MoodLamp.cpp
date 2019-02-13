@@ -24,11 +24,46 @@
  */
 
 #include <QTime>
-#include <QRandomGenerator>
 #include <cmath>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#include <QRandomGenerator>
+#endif
 #include "MoodLamp.hpp"
 #include "Settings.hpp"
 
+// Needed to get around the fact that the lamps are macros
+class QRandomGeneratorShim {
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+	QRandomGenerator m_rnd;
+public:
+	void seed(quint32 seed) {
+		m_rnd.seed(seed);
+	}
+
+	int bounded(int highest) {
+		return m_rnd.bounded(highest);
+	}
+
+	int bounded(int lowest, int highest) {
+		return m_rnd.bounded(lowest, highest);
+	}
+#else
+public:
+	void seed(quint32 seed) {
+		sqrand(seed);
+	}
+
+	int bounded(int highest) {
+		return qrand % highest;
+	}
+
+	int bounded(int lowest, int highest) {
+		return lowest + (qrand % (highest - lowest + 1));
+	}
+#endif
+
+};
  /*
 	 _OBJ_NAME_	: class name prefix
 	 _LABEL_	: name string to be displayed
@@ -159,7 +194,7 @@ public:
 		return true;
 	};
 private:
-	QRandomGenerator m_rnd;
+	QRandomGeneratorShim m_rnd;
 	QList<quint8> m_lightness;
 	int m_center{ 0 };
 

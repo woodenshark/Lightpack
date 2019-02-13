@@ -39,7 +39,12 @@ const QColor LiquidColorGenerator::AvailableColors[LiquidColorGenerator::ColorsM
 
 LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 {
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	m_rnd.seed(QTime(0,0,0).secsTo(QTime::currentTime()));
+#else
+	qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+#endif
 
 	m_isEnabled = false;
 	m_timer.setTimerType(Qt::PreciseTimer);
@@ -115,7 +120,11 @@ void LiquidColorGenerator::updateColor()
 
 int LiquidColorGenerator::generateDelay()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	return 1000 / (m_speed + m_rnd.bounded(25) + 1);
+#else
+	return 1000 / (m_speed + (qrand() % 25) + 1);
+#endif
 }
 
 QColor LiquidColorGenerator::generateColor()

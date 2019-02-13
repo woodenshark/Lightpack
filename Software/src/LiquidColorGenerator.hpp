@@ -28,7 +28,9 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #include <QRandomGenerator>
+#endif
 
 class LiquidColorGenerator : public QObject
 {
@@ -74,5 +76,7 @@ private:
 	static const QColor AvailableColors[ColorsMoodLampCount];
 	QList<QColor> m_unselectedColors;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	QRandomGenerator m_rnd;
+#endif
 };

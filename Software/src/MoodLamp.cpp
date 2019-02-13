@@ -163,9 +163,9 @@ private:
 	QList<quint8> m_lightness;
 	int m_center{ 0 };
 
-	static const size_t Cooling = 8;
-	static const int SparkMax = 160;
-	static const int SparkMin = 100;
+	const size_t Cooling = 8;
+	const int SparkMax = 160;
+	const int SparkMin = 100;
 );
 
 DECLARE_LAMP(RGBLife, "RGB is Life",

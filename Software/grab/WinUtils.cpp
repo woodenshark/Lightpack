@@ -49,11 +49,12 @@ const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
 #endif
 static LPCWSTR pwstrExcludeProcesses[] = {
 	// Windows
-	L"dwm.exe", L"ShellExperienceHost.exe", L"ApplicationFrameHost.exe", L"LockAppHost.exe", L"explorer.exe", L"SearchUI.exe"
+	L"dwm.exe", L"ShellExperienceHost.exe", L"ApplicationFrameHost.exe", L"LockAppHost.exe", L"explorer.exe", L"SearchUI.exe",
+	L"svchost.exe", L"lsass.exe", L"fontdrvhost.exe", L"winlogon.exe",
 	// Graphics Drivers
 	L"igfxEM.exe", L"igfxTray.exe", L"nvxdsync.exe", L"nvvsvc.exe",
 	// Browsers
-	L"chrome.exe", L"firefox.exe", L"iexplore.exe",
+	L"chrome.exe", L"firefox.exe", L"iexplore.exe", L"MicrosoftEdgeCP.exe",
 	// Apps
 	L"skype.exe", L"SkypeHost.exe", L"qtcreator.exe", L"devenv.exe", L"thunderbird.exe", L"Steam.exe"
 };

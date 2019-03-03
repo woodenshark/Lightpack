@@ -50,7 +50,7 @@ const WCHAR lightpackOffsetFinderName[] = L"offsetfinder.exe";
 static LPCWSTR pwstrExcludeProcesses[] = {
 	// Windows
 	L"dwm.exe", L"ShellExperienceHost.exe", L"ApplicationFrameHost.exe", L"LockAppHost.exe", L"explorer.exe", L"SearchUI.exe",
-	L"svchost.exe", L"lsass.exe", L"fontdrvhost.exe", L"winlogon.exe",
+	L"svchost.exe", L"lsass.exe", L"fontdrvhost.exe", L"winlogon.exe", L"dllhost.exe",
 	// Graphics Drivers
 	L"igfxEM.exe", L"igfxTray.exe", L"nvxdsync.exe", L"nvvsvc.exe",
 	// Browsers
@@ -256,6 +256,8 @@ QList<DWORD> * getProcessesIDs(QList<DWORD> * processes, LPCWSTR withModule[], U
 
 				}
 
+			} else {
+				DEBUG_HIGH_LEVEL << Q_FUNC_INFO << debug_buf_process << "module enum failed:" << GetLastError();
 			}
 		nextProcess:
 			// Release the handle to the process.

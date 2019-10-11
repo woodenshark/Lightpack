@@ -1,5 +1,8 @@
 Lightpack project with Prismatik flavour
 ---------
+[![AUR package](https://img.shields.io/aur/version/prismatik-psieg)](https://aur.archlinux.org/packages/prismatik-psieg/)
+[![AUR git package](https://img.shields.io/aur/version/prismatik-psieg-git?label=aur-git)](https://aur.archlinux.org/packages/prismatik-psieg-git/)
+
 *Modified version which includes various improvements for Windows, esp. a Desktop Duplication API Grabber*
 
 **Table of Contents:** <br />

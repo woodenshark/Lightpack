@@ -56,8 +56,6 @@ void GlobalColorCoefPage::initializePage()
 
 	_screenId = field("screenId").toInt();
 
-	QRect s = QApplication::desktop()->screenGeometry(_screenId);
-
 	int screenCount = QApplication::desktop()->screenCount();
 	for (int i = 0; i < screenCount; i++) {
 		QRect geom = QApplication::desktop()->screenGeometry(i);

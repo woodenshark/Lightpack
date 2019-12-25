@@ -178,6 +178,11 @@ unix:!macx{
     LIBS +=-lXext -lX11
 
     QMAKE_CXXFLAGS += -std=c++11
+    contains(DEFINES,PULSEAUDIO_SUPPORT) {
+        LIBS += -lpulse -lfftw3
+        SOURCES += PulseAudioSoundManager.cpp
+        HEADERS += PulseAudioSoundManager.hpp
+    }
 }
 
 macx{

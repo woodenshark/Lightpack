@@ -106,6 +106,9 @@ PulseAudioSoundManager::PulseAudioSoundManager(QObject *parent) : SoundManagerBa
 {
 	m_timer.setTimerType(Qt::PreciseTimer);
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+
+	m_pa_alive_timer.setTimerType(Qt::PreciseTimer);
+	connect(&m_pa_alive_timer, &QTimer::timeout, this, &PulseAudioSoundManager::checkPulse);
 }
 
 PulseAudioSoundManager::~PulseAudioSoundManager()
@@ -187,6 +190,7 @@ bool PulseAudioSoundManager::init() {
 	return true;
 
 unlock_and_fail:
+	m_pa_ready = 2;
 	pa_threaded_mainloop_unlock(m_main_loop);
 
 	Uninit();
@@ -343,10 +347,12 @@ void PulseAudioSoundManager::start(bool isEnabled)
 
 		// setup update timer (40hz)
 		m_timer.start(25);
+		m_pa_alive_timer.start(1000);
 	}
 	else
 	{
 		m_timer.stop();
+		m_pa_alive_timer.stop();
 		if (m_stream) {
 			ret = pa_stream_disconnect(m_stream);
 			pa_stream_unref(m_stream);
@@ -375,6 +381,26 @@ unlock_and_fail:
 
 void PulseAudioSoundManager::updateFft()
 {
+}
+
+void PulseAudioSoundManager::checkPulse()
+{
+	// pulseaudio disconnected, retry
+	if (m_pa_ready > 1) {
+		if (m_context) {
+			int ret = pa_context_connect(m_context, m_server, PA_CONTEXT_NOFLAGS, NULL);
+			if (ret != PA_OK) { // Most likely got PA_ERR_BADSTATE so restart the whole thing
+				qInfo() << "Pulseaudio reconnect failed:" << ret << pa_strerror(ret);
+				Uninit();
+			}
+		}
+
+		if (!m_isInited) {
+			m_pa_ready = 0;
+			start(!m_isEnabled);
+			start(!m_isEnabled);
+		}
+	}
 }
 
 void PulseAudioSoundManager::init_buffers()

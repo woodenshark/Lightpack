@@ -60,6 +60,7 @@ protected:
 	virtual bool init();
 	virtual void populateDeviceList(QList<SoundManagerDeviceInfo>& devices, int& recommended);
 	virtual void updateFft();
+	void checkPulse();
 
 private:
 	void Uninit();
@@ -79,6 +80,7 @@ private:
 	}
 
 	QTimer m_timer;
+	QTimer m_pa_alive_timer;
 	std::mutex m_mutex;
 	int m_cont = 0;
 

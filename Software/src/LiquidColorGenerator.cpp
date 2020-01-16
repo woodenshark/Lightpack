@@ -136,9 +136,9 @@ QColor LiquidColorGenerator::generateColor()
 	}
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-	int randIndex = m_rnd.bounded(m_unselectedColors.size());
+	int randIndex = m_rnd.bounded(std::max(1, m_unselectedColors.size()));
 #else
-	int randIndex = qrand() % m_unselectedColors.size();
+	int randIndex = qrand() % std::max(1, m_unselectedColors.size());
 #endif
 
 	return m_unselectedColors.takeAt(randIndex);

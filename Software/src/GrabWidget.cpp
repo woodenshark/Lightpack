@@ -518,7 +518,7 @@ void GrabWidget::paintEvent(QPaintEvent *)
 	QPainter painter(this);
 	painter.setPen(QColor(0x77, 0x77, 0x77));
 	if ((m_features & DimUntilInteractedWith) && isAreaEnabled()) {
-		painter.setBrush(QBrush(cmd == NOP ? QColor(m_backgroundColor.dark(150)) : QColor(m_backgroundColor)));
+		painter.setBrush(QBrush(cmd == NOP ? QColor(m_backgroundColor.darker(150)) : QColor(m_backgroundColor)));
 	}
 	painter.drawRect(0, 0, width() - 1, height() - 1);
 

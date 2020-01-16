@@ -514,7 +514,7 @@ void ApiServer::clientProcessCommands()
 		{
 			API_DEBUG_OUT << CmdGetCountMonitor;
 
-			int count = QApplication::desktop()->screenCount();
+			int count = QGuiApplication::screens().count();
 
 			result = QString("%1%2\r\n").arg(CmdResultCountMonitor).arg(count);
 		}
@@ -532,13 +532,13 @@ void ApiServer::clientProcessCommands()
 				{
 					API_DEBUG_OUT << CmdGetSizeMonitor << "OK:" << monitor;
 
-					int count = QApplication::desktop()->screenCount();
+					QScreen* screen = QGuiApplication::screens().value(monitor, nullptr);
 
-					if (count>monitor)
+					if (screen)
 					{
-						QRect screen = QApplication::desktop()->screenGeometry(monitor);
+						QRect geom = screen->geometry();
 
-						result = QString("%1%2,%3,%4,%5\r\n").arg(CmdResultSizeMonitor).arg(screen.x()).arg(screen.y()).arg(screen.width()).arg(screen.height());
+						result = QString("%1%2,%3,%4,%5\r\n").arg(CmdResultSizeMonitor).arg(geom.x()).arg(geom.y()).arg(geom.width()).arg(geom.height());
 					}
 					else
 					{

@@ -79,7 +79,7 @@ int LightpackDiscoveryPage::nextId() const {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
 	if (_ui->rbLightpackSelected->isChecked())
-		if (QApplication::desktop()->screenCount() > 1){
+		if (QGuiApplication::screens().count() > 1){
 			return Page_MonitorConfiguration;
 		} else {
 			return Page_ChooseProfile;

@@ -34,6 +34,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QUuid>
+#include <QScreen>
 #include "debug.h"
 
 #define MAIN_CONFIG_FILE_VERSION	"4.0"
@@ -524,7 +525,7 @@ QPoint Settings::getDefaultPosition(int ledIndex)
 		return QPoint(x, 0);
 	}
 
-	QRect screen = QApplication::desktop()->screenGeometry();
+	QRect screen = QGuiApplication::primaryScreen()->geometry();
 
 	int ledsCountDiv2 = MaximumNumberOfLeds::Default / 2;
 

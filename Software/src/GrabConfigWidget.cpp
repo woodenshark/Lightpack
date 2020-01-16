@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QBitmap>
 #include <QDesktopWidget>
+#include <QScreen>
 #include "debug.h"
 
 const unsigned GrabConfigWidget::MarginArrow = 20;
@@ -59,7 +60,7 @@ GrabConfigWidget::~GrabConfigWidget()
 
 void GrabConfigWidget::showConfigFor(QRect widgetGeometry, int buttonCenter)
 {
-	QRect screen = QApplication::desktop()->screenGeometry(widgetGeometry.center());
+	QRect screen = QGuiApplication::screenAt(widgetGeometry.center())->geometry();
 
 	move(widgetGeometry.right(), widgetGeometry.y() - height() / 2 + buttonCenter);
 

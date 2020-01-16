@@ -389,12 +389,8 @@ void SettingsWindow::onExpertModeEnabled_Toggled(bool isEnabled)
 }
 
 void SettingsWindow::updateExpertModeWidgetsVisibility()
-{	
-	if(Settings::isExpertModeEnabled()) {
-		ui->listWidget->setItemHidden(ui->listWidget->item(4),false);
-	} else {
-		ui->listWidget->setItemHidden(ui->listWidget->item(4),true);
-	}
+{
+	ui->listWidget->item(4)->setHidden(!Settings::isExpertModeEnabled());
 
 	updateDeviceTabWidgetsVisibility();
 }
@@ -2081,7 +2077,7 @@ void SettingsWindow::updatePlugin(QList<Plugin*> plugins)
 
 	_plugins = plugins;
 	// sort priority
-	qSort(_plugins.begin() , _plugins.end(), SettingsWindow::toPriority );
+	std::sort(_plugins.begin(), _plugins.end(), SettingsWindow::toPriority);
 	ui->list_Plugins->clear();
 	foreach(Plugin* plugin, _plugins){
 		int index = _plugins.indexOf(plugin);

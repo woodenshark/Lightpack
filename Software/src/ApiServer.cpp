@@ -696,9 +696,9 @@ void ApiServer::clientProcessCommands()
 					// Also in cycle we process requests from over clients, if this request is setcolor when
 					// it will be ignored because of m_isTaskSetColorDone == false
 
-					m_time.restart();
+					m_timer.restart();
 
-					while (m_isTaskSetColorDone == false && m_time.elapsed() < SignalWaitTimeoutMs)
+					while (m_isTaskSetColorDone == false && m_timer.hasExpired(SignalWaitTimeoutMs) == false)
 					{
 						QApplication::processEvents(QEventLoop::WaitForMoreEvents, SignalWaitTimeoutMs);
 					}

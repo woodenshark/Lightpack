@@ -583,8 +583,8 @@ int LightpackPluginInterface::GetStatus()
 
 		// Wait signal from SettingsWindow with status of backlight
 		// or if timeout -- result will be unknown
-		m_time.restart();
-		while (m_isRequestBacklightStatusDone == false && m_time.elapsed() < SignalWaitTimeoutMs)
+		m_timer.restart();
+		while (m_isRequestBacklightStatusDone == false && m_timer.hasExpired(SignalWaitTimeoutMs) == false)
 		{
 			QApplication::processEvents(QEventLoop::WaitForMoreEvents, SignalWaitTimeoutMs);
 		}

@@ -167,6 +167,30 @@ void GrabberBase::grab()
 			// Convert coordinates from "Main" desktop coord-system to capture-monitor coord-system
 			QRect preparedRect = clippedRect.translated(-monitorRect.x(), -monitorRect.y());
 
+			// grabbed screen is rotated => rotate the widget
+			if (grabbedScreen->rotation != 0)
+				if (grabbedScreen->rotation % 4 == 1) // rotated 90
+					preparedRect.setCoords(
+						monitorRect.height() - preparedRect.bottom(),
+						preparedRect.left(),
+						monitorRect.height() - preparedRect.top(),
+						preparedRect.right()
+					);
+				else if (grabbedScreen->rotation % 4 == 2) // rotated 180
+					preparedRect.setCoords(
+						monitorRect.width() - preparedRect.right(),
+						monitorRect.height() - preparedRect.bottom(),
+						monitorRect.width() - preparedRect.left(),
+						monitorRect.height() - preparedRect.top()
+					);
+				else if (grabbedScreen->rotation % 4 == 3) // rotated 270
+					preparedRect.setCoords(
+						preparedRect.top(),
+						monitorRect.width() - preparedRect.right(),
+						preparedRect.bottom(),
+						monitorRect.width() - preparedRect.left()
+					);
+
 			// grabbed screen was scaled => scale the widget
 			if (grabbedScreen->scale != 1.0)
 				preparedRect.setCoords(

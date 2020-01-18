@@ -62,6 +62,7 @@ struct GrabbedScreen {
 	void * associatedData = nullptr;
 
 	double scale = 1.0; // if grabber has ability to scale frames
+	unsigned char rotation = 0; // if grabbed image is rotated vs desktop image, multiples of 90 degrees (clockwise)
 	size_t bytesPerRow = 0; // some grabbing methods won't return values equal to (width * bytesPerPixel) because of alignment / padding
 };
 

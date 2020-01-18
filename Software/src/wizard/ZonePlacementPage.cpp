@@ -43,7 +43,7 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 {
 	_ui->setupUi(this);
 
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 
 	_x0 = screen.left() + 150;
 	_y0 = screen.top() + 150;
@@ -131,7 +131,6 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 		ScreenArea *sf = distributor->next();
 		qDebug() << sf->hScanStart() << sf->vScanStart();
 
-		QRect s = QGuiApplication::screens().value(_screenId)->geometry();
 		QRect r(sf->hScanStart(),
 				sf->vScanStart(),
 				(sf->hScanEnd() - sf->hScanStart()),
@@ -165,7 +164,7 @@ void ZonePlacementPage::removeLastGrabArea()
 
 void ZonePlacementPage::on_pbAndromeda_clicked()
 {
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	double a = (double)screen.width() / screen.height();
 	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + 2 * a));
 
@@ -189,7 +188,7 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 
 void ZonePlacementPage::on_pbCassiopeia_clicked()
 {
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	double a = (double)screen.width() / screen.height();
 	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + a));
 
@@ -208,7 +207,7 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 
 void ZonePlacementPage::on_pbPegasus_clicked()
 {
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
 		0,
@@ -225,7 +224,7 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 
 void ZonePlacementPage::on_pbCustom_clicked()
 {
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
 		_ui->sbTopLeds->value(), 
@@ -247,7 +246,7 @@ void ZonePlacementPage::on_numberOfLeds_valueChanged(int numOfLed)
 	while (numOfLed < _grabAreas.size()) {
 		removeLastGrabArea();
 	}
-	QRect screen = QGuiApplication::screens().value(_screenId)->geometry();
+	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 
 	const int dx = 10;
 	const int dy = 10;

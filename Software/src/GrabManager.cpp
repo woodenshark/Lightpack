@@ -522,7 +522,7 @@ void GrabManager::scaleLedWidgets(int screenIndexResized)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screenIndexResized:" << screenIndexResized;
 
-	QRect screenGeometry = QGuiApplication::screens().value(screenIndexResized)->geometry();
+	QRect screenGeometry = QGuiApplication::screens().value(screenIndexResized, QGuiApplication::primaryScreen())->geometry();
 	QRect lastScreenGeometry = m_lastScreenGeometry[screenIndexResized];
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screen " << screenIndexResized << " is resized to " << screenGeometry;

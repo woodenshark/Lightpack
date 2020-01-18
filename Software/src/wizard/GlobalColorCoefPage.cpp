@@ -56,9 +56,10 @@ void GlobalColorCoefPage::initializePage()
 
 	_screenId = field("screenId").toInt();
 
-	int screenCount = QApplication::desktop()->screenCount();
-	for (int i = 0; i < screenCount; i++) {
-		QRect geom = QApplication::desktop()->screenGeometry(i);
+	QList<QScreen*> screenList = QGuiApplication::screens();
+	int i = 0;
+	foreach(QScreen* screen, screenList) {
+		QRect geom = screen->geometry();
 		MonitorIdForm *monitorIdForm = new MonitorIdForm();
 
 		monitorIdForm->setWindowFlags(Qt::FramelessWindowHint);
@@ -72,6 +73,7 @@ void GlobalColorCoefPage::initializePage()
 		monitorIdForm->show();
 
 		_monitorForms.append(monitorIdForm);
+		i++;
 	}
 	this->activateWindow();
 

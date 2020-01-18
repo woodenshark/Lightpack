@@ -157,14 +157,14 @@ public:
 		for (int i = 0; i < middleLed + m_center; ++i) {
 			const int minLightnessReduction = Cooling * std::pow((double)i / (middleLed + m_center), 3);
 			const int maxLightnessReduction = minLightnessReduction * 2;
-			const int lightnessReduction = minLightnessReduction + m_rnd.bounded(maxLightnessReduction - minLightnessReduction) + Cooling / 3;
+			const int lightnessReduction = minLightnessReduction + m_rnd.bounded(std::max(1, maxLightnessReduction - minLightnessReduction)) + Cooling / 3;
 			m_lightness[i] = std::max(0, m_lightness[i] - lightnessReduction);
 		}
 
 		for (int i = colors.size() - 1; i >= middleLed + m_center; --i) {
 			const int minLightnessReduction = Cooling * std::pow((double)(colors.size() - 1 - i) / (middleLed - m_center), 3);
 			const int maxLightnessReduction = minLightnessReduction * 2;
-			const int lightnessReduction = minLightnessReduction + m_rnd.bounded(maxLightnessReduction - minLightnessReduction) + Cooling / 3;
+			const int lightnessReduction = minLightnessReduction + m_rnd.bounded(std::max(1, maxLightnessReduction - minLightnessReduction)) + Cooling / 3;
 			m_lightness[i] = std::max(0, m_lightness[i] - lightnessReduction);
 		}
 
@@ -177,11 +177,11 @@ public:
 
 
 		if (m_rnd.bounded(2) == 0) {
-			int y = m_rnd.bounded(sparkCount);
+			int y = m_rnd.bounded(std::max(1, sparkCount));
 			m_lightness[y] = std::max(SparkMax, (int)m_lightness[y] + (SparkMin + m_rnd.bounded(SparkMax - SparkMin)));
 		}
 		if (m_rnd.bounded(2) == 0) {
-			int z = colors.size() - 1 - m_rnd.bounded(sparkCount);
+			int z = colors.size() - 1 - m_rnd.bounded(std::max(1, sparkCount));
 			m_lightness[z] = std::max(SparkMax, (int)m_lightness[z] + (SparkMin + m_rnd.bounded(SparkMax - SparkMin)));
 		}
 

@@ -11,7 +11,7 @@
 #ifdef MAC_OS_AV_GRAB_SUPPORT
 
 #include "MacOSGrabberBase.hpp"
-
+#include <QMap>
 // http://philjordan.eu/article/mixing-objective-c-c++-and-objective-c++
 #include <objc/objc-runtime.h>
 #ifdef __OBJC__

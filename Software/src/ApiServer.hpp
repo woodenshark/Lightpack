@@ -238,7 +238,7 @@ private:
 	bool m_listenOnlyOnLoInterface;
 	QString m_apiAuthKey;
 	bool m_isAuthEnabled;
-	QTime m_time;
+	QElapsedTimer m_timer;
 
 	QMap <QTcpSocket*, ClientInfo> m_clients;
 

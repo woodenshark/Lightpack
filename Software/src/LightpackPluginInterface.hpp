@@ -124,7 +124,7 @@ private:
 	bool lockAlive;
 
 	static const int SignalWaitTimeoutMs;
-	QTime m_time;
+	QElapsedTimer m_timer;
 	bool m_isRequestBacklightStatusDone;
 	Backlight::Status m_backlightStatusResult;
 

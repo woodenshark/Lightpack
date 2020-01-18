@@ -69,7 +69,7 @@ bool SelectDevicePage::validatePage()
 int SelectDevicePage::nextId() const
 {
 	if (ui->rbVirtual->isChecked())
-		if (QApplication::desktop()->screenCount() == 1) {
+		if (QGuiApplication::screens().count() == 1) {
 			return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
 		} else {
 			return Page_MonitorConfiguration;

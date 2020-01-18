@@ -60,8 +60,11 @@ GrabConfigWidget::~GrabConfigWidget()
 
 void GrabConfigWidget::showConfigFor(QRect widgetGeometry, int buttonCenter)
 {
+	#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	QRect screen = QGuiApplication::screenAt(widgetGeometry.center())->geometry();
-
+	#else
+	QRect screen = QApplication::desktop()->screenGeometry(widgetGeometry.center());
+	#endif
 	move(widgetGeometry.right(), widgetGeometry.y() - height() / 2 + buttonCenter);
 
 	QRect r = geometry();

@@ -30,5 +30,5 @@ script:
   - otool -L /Volumes/bin:Prismatik/Prismatik.app/Contents/MacOS/Prismatik
   - otool -L /Volumes/bin:Prismatik/Prismatik.app/Contents/Frameworks/QtWidgets.framework/Versions/5/QtWidgets
   - hdiutil detach /dev/disk1s1
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then curl -T bin/Prismatik.dmg "https://psieg.de/lightpack/osx_builds/Prismatik_${VERSION}_${TRAVIS_BUILD_NUMBER}.dmg" -u "${PSIEG_UPLOAD_USER}:${PSIEG_UPLOAD_PASSWORD}"; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then curl -T bin/Prismatik.dmg "https://psieg.de/lightpack/osx_builds/Prismatik_${VERSION}_${TRAVIS_BUILD_NUMBER}.dmg" -u "${PSIEG_UPLOAD_USER}:${PSIEG_UPLOAD_PASSWORD}"; fi'
   - set +e

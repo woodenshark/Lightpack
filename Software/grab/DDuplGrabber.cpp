@@ -465,6 +465,19 @@ bool DDuplGrabber::_reallocate(const QList< ScreenInfo > &grabScreens, bool noRe
 					grabScreen.imgFormat = BufferFormatArgb;
 					grabScreen.screenInfo = screenInfo;
 					grabScreen.scale = 1.0;
+					switch (outputDesc.Rotation) {
+					case DXGI_MODE_ROTATION_ROTATE90:
+						grabScreen.rotation = 3; // If the screen is rotated 90, in the screen coordinates the image is rotated 270
+						break;
+					case DXGI_MODE_ROTATION_ROTATE180:
+						grabScreen.rotation = 2;
+						break;
+					case DXGI_MODE_ROTATION_ROTATE270:
+						grabScreen.rotation = 1; // If the screen is rotated 270, in the screen coordinates the image is rotated 90
+						break;
+					default:
+						grabScreen.rotation = 0;
+					}
 					grabScreen.bytesPerRow = 0;
 					grabScreen.associatedData = new DDuplScreenData(output, duplication, device, context);
 
@@ -626,7 +639,9 @@ GrabResult DDuplGrabber::grabScreens()
 			D3D11_TEXTURE2D_DESC desc;
 			texture->GetDesc(&desc);
 
-			if (desc.Width != screen.screenInfo.rect.width() || desc.Height != screen.screenInfo.rect.height())
+			// Expect matching or flipped rotation
+			if (screen.rotation % 2 == 0 && (desc.Width != screen.screenInfo.rect.width() || desc.Height != screen.screenInfo.rect.height())
+				|| screen.rotation % 2 == 1 && (desc.Height != screen.screenInfo.rect.width() || desc.Width != screen.screenInfo.rect.height()))
 			{
 				qCritical(Q_FUNC_INFO " Dimension mismatch: screen %d x %d, texture %d x %d",
 					screen.screenInfo.rect.width(),

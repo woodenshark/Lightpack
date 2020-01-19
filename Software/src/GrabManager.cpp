@@ -151,11 +151,15 @@ void GrabManager::start(bool isGrabEnabled)
 	clearColorsNew();
 
 	m_isGrabbingStarted = isGrabEnabled;
+	if (!isGrabEnabled && m_isGrabbingSuspendedDueToDeviceError) {
+		m_isGrabbingSuspendedDueToDeviceError = false; // Don't restart after device recovery if the user stopped
+	}
 
 	if (m_grabber != NULL) {
 		if (isGrabEnabled) {
 			m_timerUpdateFPS->start();
 			m_grabber->startGrabbing();
+			m_isGrabbingSuspendedDueToDeviceError = false;
 		} else {
 			clearColorsCurrent();
 			m_timerUpdateFPS->stop();
@@ -163,6 +167,26 @@ void GrabManager::start(bool isGrabEnabled)
 			m_grabber->stopGrabbing();
 			emit ambilightTimeOfUpdatingColors(0);
 		}
+	}
+}
+
+void GrabManager::ledDeviceCallSuccess(bool isSuccess) {
+	if (!isSuccess) {
+		if (!m_isGrabbingSuspendedDueToDeviceError) {
+			if (m_isGrabbingStarted) {
+				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "stopping grabbing while device is not available";
+				start(false);
+				m_isGrabbingSuspendedDueToDeviceError = true; // Stop clears the bit (for user stop), so re-set it here
+			}
+		}
+	}
+}
+
+void GrabManager::ledDeviceOpenSuccess(bool isSuccess) {
+	if (isSuccess && m_isGrabbingSuspendedDueToDeviceError) {
+		m_isGrabbingSuspendedDueToDeviceError = false;
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "device available again, resuming grabbing";
+		start(true);
 	}
 }
 

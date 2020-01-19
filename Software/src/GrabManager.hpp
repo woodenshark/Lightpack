@@ -73,6 +73,8 @@ public slots:
 	void onDx9GrabberEnabledChanged(bool state);
 #endif
 	void start(bool isGrabEnabled);
+	void ledDeviceCallSuccess(bool isSuccess);
+	void ledDeviceOpenSuccess(bool isSuccess);
 	void settingsProfileChanged(const QString &profileName);
 	void setVisibleLedWidgets(bool state);
 	void setColoredLedWidgets(bool state);
@@ -131,6 +133,7 @@ private:
 	bool m_isSendDataOnlyIfColorsChanged;
 	bool m_avgColorsOnAllLeds;
 	bool m_isGrabbingStarted;
+	bool m_isGrabbingSuspendedDueToDeviceError;
 	int m_overBrighten;
 	bool m_isApplyBlueLightReduction;
 	bool m_isApplyColorTemperature;

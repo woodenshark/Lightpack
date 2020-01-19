@@ -74,6 +74,7 @@ public slots:
 	virtual void setColorSequence(QString value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
+	virtual void updateWBAdjustments(); // Reads from settings
 	virtual void updateWBAdjustments(const QList<WBAdjustment> &coefs, bool updateColors = true);
 	virtual void requestFirmwareVersion() = 0;
 	virtual void updateDeviceSettings();

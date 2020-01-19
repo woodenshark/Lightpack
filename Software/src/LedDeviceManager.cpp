@@ -494,7 +494,7 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
 	connect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int)),			m_ledDevice, SLOT(setLuminosityThreshold(int)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool)),	Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),			m_ledDevice, SLOT(requestFirmwareVersion()),					Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(ledDeviceUpdateWBAdjustments()),				Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()),						Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()),						Qt::QueuedConnection);
 }
 

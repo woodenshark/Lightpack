@@ -647,14 +647,11 @@ void LightpackApplication::startLedDeviceManager()
 	connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceGammaChanged(double)),				m_ledDeviceManager, SLOT(setGamma(double)),						Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceBrightnessChanged(int)),			m_ledDeviceManager, SLOT(setBrightness(int)),					Qt::QueuedConnection);
-//	connect(settings(), SIGNAL(deviceColorSequenceChanged(QString)),	m_ledDeviceManager, SLOT(setColorSequence(QString)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(luminosityThresholdChanged(int)),		m_ledDeviceManager, SLOT(setLuminosityThreshold(int)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(minimumLuminosityEnabledChanged(bool)),	m_ledDeviceManager, SLOT(setMinimumLuminosityEnabled(bool)),	Qt::QueuedConnection);
 	connect(settings(), SIGNAL(ledCoefBlueChanged(int,double)),			m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
 	connect(settings(), SIGNAL(ledCoefRedChanged(int,double)),			m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
 	connect(settings(), SIGNAL(ledCoefGreenChanged(int,double)),		m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
-
-//	connect(settingsObj, SIGNAL(settingsProfileChanged()),		m_ledDeviceManager, SLOT(updateDeviceSettings()), Qt::QueuedConnection);
 
 
 	if (!m_noGui)

@@ -53,6 +53,10 @@ void AbstractLedDevice::setMinimumLuminosityThresholdEnabled(bool value, bool up
 		setColors(m_colorsSaved);
 }
 
+void AbstractLedDevice::updateWBAdjustments() {
+	updateWBAdjustments(SettingsScope::Settings::getLedCoefs());
+}
+
 void AbstractLedDevice::updateWBAdjustments(const QList<WBAdjustment> &coefs, bool updateColors) {
 	m_wbAdjustments.clear();
 	m_wbAdjustments.append(coefs);

@@ -13,6 +13,14 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.20
+---------------
+January 20, 2020
+
+* Add new moodlights modes
+* Stop grabbing when device is disconnected (#248)
+* DDupl: handle portrait mode (#253)
+
 Version 5.11.2.19
 ---------------
 January 19, 2019

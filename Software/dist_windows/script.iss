@@ -111,8 +111,8 @@ russian.CreateStartupIcon=Добавить в папку запуска
 english.CreateStartupIcon=Add to startup folder
 
 ; Admin task name
-russian.CreateAdminStartupTask =Автоматический запуск с правами администратора
-english.CreateAdminStartupTask =Automatically launch with admin rights
+russian.CreateAdminStartupTask =Автоматический запуск с правами администратора (Не рекомендуется)
+english.CreateAdminStartupTask =Automatically launch with admin rights (not recommended)
 
 ; Uninstall name
 russian.RemoveOnly =(удалить только)

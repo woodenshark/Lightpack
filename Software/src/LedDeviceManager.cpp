@@ -36,6 +36,7 @@
 #include "LedDeviceAdalight.hpp"
 #include "LedDeviceArdulight.hpp"
 #include "LedDeviceVirtual.hpp"
+#include "LedDeviceUdp.hpp"
 #include "Settings.hpp"
 
 using namespace SettingsScope;
@@ -449,6 +450,10 @@ AbstractLedDevice * LedDeviceManager::createLedDevice(SupportedDevices::DeviceTy
 	case SupportedDevices::DeviceTypeArdulight:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::ArdulightDevice";
 		return (AbstractLedDevice *)new LedDeviceArdulight(Settings::getArdulightSerialPortName(), Settings::getArdulightSerialPortBaudRate());
+
+	case SupportedDevices::DeviceTypeUdp:
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::UdpDevice";
+		return (AbstractLedDevice*)new LedDeviceUdp();
 
 	case SupportedDevices::DeviceTypeVirtual:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::VirtualDevice";

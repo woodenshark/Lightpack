@@ -456,6 +456,9 @@ void ApiServer::clientProcessCommands()
 			case SupportedDevices::DeviceTypeAlienFx:
 				max = MaximumNumberOfLeds::AlienFx;
 				break;
+			case SupportedDevices::DeviceTypeUdp:
+				max = MaximumNumberOfLeds::Udp;
+				break;
 			default:
 				max = MaximumNumberOfLeds::Default;
 			}

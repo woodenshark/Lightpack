@@ -129,6 +129,10 @@ namespace Virtual
 {
 static const int NumberOfLedsDefault = 10;
 }
+namespace Udp
+{
+static const int NumberOfLedsDefault = 10;
+}
 }
 
 // ProfileName.ini

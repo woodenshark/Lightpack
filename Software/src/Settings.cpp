@@ -120,6 +120,10 @@ namespace Virtual
 {
 static const QString NumberOfLeds = "Virtual/NumberOfLeds";
 }
+namespace Udp
+{
+static const QString NumberOfLeds = "Udp/NumberOfLeds";
+}
 } /*Key*/
 
 namespace Value
@@ -133,6 +137,7 @@ static const QString AlienFxDevice = "AlienFx";
 static const QString AdalightDevice = "Adalight";
 static const QString ArdulightDevice = "Ardulight";
 static const QString VirtualDevice = "Virtual";
+static const QString UdpDevice = "Udp";
 }
 
 } /*Value*/
@@ -303,6 +308,7 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,		Main::AlienFx::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,	Main::Lightpack::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Virtual::NumberOfLeds,		Main::Virtual::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Udp::NumberOfLeds,          Main::Udp::NumberOfLedsDefault);
 
 	setNewOptionMain(Main::Key::CheckForUpdates,			Main::CheckForUpdates);
 	setNewOptionMain(Main::Key::InstallUpdates,				Main::InstallUpdates);
@@ -905,6 +911,10 @@ void Settings::setNumberOfLeds(SupportedDevices::DeviceType device, int numberOf
 
 			case DeviceTypeVirtual:
 			m_this->virtualNumberOfLedsChanged(numberOfLeds);
+			break;
+
+			case DeviceTypeUdp:
+			m_this->udpNumberOfLedsChanged(numberOfLeds);
 			break;
 		default:
 			qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "numberOfLeds ==" << numberOfLeds;
@@ -1900,11 +1910,13 @@ void Settings::initDevicesMap()
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeArdulight] = Main::Value::ConnectedDevice::ArdulightDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeLightpack] = Main::Value::ConnectedDevice::LightpackDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeVirtual]	= Main::Value::ConnectedDevice::VirtualDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeUdp] = Main::Value::ConnectedDevice::UdpDevice;
 
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAdalight]	= Main::Key::Adalight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeVirtual]	= Main::Key::Virtual::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeUdp] = Main::Key::Udp::NumberOfLeds;
 
 #ifdef ALIEN_FX_SUPPORTED
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAlienFx]	= Main::Value::ConnectedDevice::AlienFxDevice;

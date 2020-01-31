@@ -296,6 +296,7 @@ signals:
 	void adalightNumberOfLedsChanged(int numberOfLeds);
 	void ardulightNumberOfLedsChanged(int numberOfLeds);
 	void virtualNumberOfLedsChanged(int numberOfLeds);
+	void udpNumberOfLedsChanged(int numberOfLeds);
 	void grabSlowdownChanged(int value);
 	void backlightEnabledChanged(bool isEnabled);
 	void grabAvgColorsEnabledChanged(bool isEnabled);

@@ -28,6 +28,7 @@
 #include "ui_SelectDevicePage.h"
 #include "Wizard.hpp"
 #include "LedDeviceVirtual.hpp"
+#include "LedDeviceUdp.hpp"
 #include "QDesktopWidget"
 
 SelectDevicePage::SelectDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
@@ -48,7 +49,7 @@ void SelectDevicePage::initializePage()
 	registerField("isAdalight", ui->rbAdalight);
 	registerField("isArdulight", ui->rbArdulight);
 	registerField("isVirtual", ui->rbVirtual);
-
+    registerField("isUdp", ui->rbUdp);
 }
 
 void SelectDevicePage::cleanupPage()
@@ -56,6 +57,7 @@ void SelectDevicePage::cleanupPage()
 	setField("isAdalight", false);
 	setField("isArdulight", false);
 	setField("isVirtual", false);
+    setField("isUdp", false);
 }
 
 bool SelectDevicePage::validatePage()
@@ -63,12 +65,15 @@ bool SelectDevicePage::validatePage()
 	if (field("isVirtual").toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceVirtual());
 	}
+    else if (field("isUdp").toBool()) {
+        _transSettings->ledDevice.reset(new LedDeviceUdp());
+    }
 	return true;
 }
 
 int SelectDevicePage::nextId() const
 {
-	if (ui->rbVirtual->isChecked())
+	if (ui->rbVirtual->isChecked() || ui->rbUdp->isChecked())
 		if (QGuiApplication::screens().count() == 1) {
 			return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
 		} else {

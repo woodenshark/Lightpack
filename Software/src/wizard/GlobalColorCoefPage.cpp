@@ -95,7 +95,6 @@ bool GlobalColorCoefPage::validatePage()
 	SupportedDevices::DeviceType devType;
 	if (deviceName.compare("lightpack", Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeLightpack;
-
 	}
 	else if (deviceName.compare("adalight", Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeAdalight;
@@ -110,6 +109,9 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setArdulightSerialPortBaudRate(field("baudRate").toString());
 		Settings::setColorSequence(devType, field("colorFormat").toString());
 
+	}
+	else if (deviceName.compare("udp", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeUdp;
 	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;

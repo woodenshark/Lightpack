@@ -17,18 +17,19 @@
    <string>Select connected device</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="2">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="3" column="1">
+    <widget class="QRadioButton" name="rbVirtual">
+     <property name="text">
+      <string>Virtual LED device</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QRadioButton" name="rbArdulight">
+     <property name="text">
+      <string>Ardulight</string>
      </property>
-    </spacer>
+    </widget>
    </item>
    <item row="0" column="1">
     <spacer name="verticalSpacer">
@@ -53,7 +54,20 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="1" column="2">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -79,17 +93,10 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QRadioButton" name="rbArdulight">
+   <item row="4" column="1">
+    <widget class="QRadioButton" name="rbUdp">
      <property name="text">
-      <string>Ardulight</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QRadioButton" name="rbVirtual">
-     <property name="text">
-      <string>Virtual LED device</string>
+      <string>UDP</string>
      </property>
     </widget>
    </item>

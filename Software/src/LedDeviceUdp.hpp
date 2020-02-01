@@ -38,7 +38,7 @@ public:
     virtual ~LedDeviceUdp();
 
 public slots:
-	const QString name() const { return "virtual"; }
+	const QString name() const { return "udp"; }
 	void open();
     void close();
 	void setColors(const QList<QRgb> & colors);

@@ -32,9 +32,9 @@
 #include "enums.hpp"
 
 #ifdef ALIEN_FX_SUPPORTED
-#	define SUPPORTED_DEVICES			"Lightpack,AlienFx,Adalight,Ardulight,Virtual"
+#	define SUPPORTED_DEVICES			"Lightpack,AlienFx,Adalight,Ardulight,Virtual,Udp"
 #else
-#	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual"
+#	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual,Udp"
 #endif
 
 #define _GRABMODE_ENUM(_name_)		::Grab::GrabberType##_name_

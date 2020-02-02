@@ -100,8 +100,8 @@ private:
 	size_t m_pa_samples_read, m_buffer_samples;
 
 	/* FFT */
-	fftw_complex *m_output = nullptr; //special buffer with proper SIMD alignments
-	std::vector<double> m_input;
-	fftw_plan m_plan = nullptr;
+	fftwf_complex *m_output = nullptr; //special buffer with proper SIMD alignments
+	std::vector<float> m_input;
+	fftwf_plan m_plan = nullptr;
 	std::vector<float> m_weights;
 };

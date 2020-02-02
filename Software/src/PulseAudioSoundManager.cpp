@@ -138,12 +138,12 @@ void PulseAudioSoundManager::Uninit()
 	}
 
 	if (m_plan) {
-		fftw_destroy_plan(m_plan);
+		fftwf_destroy_plan(m_plan);
 		m_plan = nullptr;
 	}
 
 	if (m_output) {
-		fftw_free(m_output);
+		fftwf_free(m_output);
 		m_output = nullptr;
 	}
 
@@ -407,12 +407,12 @@ void PulseAudioSoundManager::init_buffers()
 {
 	// just in case, free old stuff
 	if (m_plan) {
-		fftw_destroy_plan(m_plan);
+		fftwf_destroy_plan(m_plan);
 		m_plan = nullptr;
 	}
 
 	if (m_output) {
-		fftw_free(m_output);
+		fftwf_free(m_output);
 		m_output = nullptr;
 	}
 
@@ -421,9 +421,9 @@ void PulseAudioSoundManager::init_buffers()
 	m_pa_buf.resize(m_buffer_samples * m_ss.channels);
 
 	/* FFTW buffer */
-	m_output = (fftw_complex*) fftw_alloc_complex(fftSize() + 1);
+	m_output = (fftwf_complex*) fftwf_alloc_complex(fftSize() + 1);
 	m_input.resize(m_buffer_samples);
-	m_plan = fftw_plan_dft_r2c_1d(m_input.size(), m_input.data(), reinterpret_cast<fftw_complex*>(m_output), 0);
+	m_plan = fftwf_plan_dft_r2c_1d(m_input.size(), m_input.data(), m_output, 0);
 
 	m_weights.resize(fftSize() + 1);
 	weights_init(m_weights.data(), m_weights.size(), WINDOW_HANNING); // TODO: BASS does hanning?
@@ -432,13 +432,13 @@ void PulseAudioSoundManager::init_buffers()
 void PulseAudioSoundManager::process_fft()
 {
 	for (size_t i = 0; i < m_pa_buf.size(); i += m_ss.channels /* Mono anyway but... */) {
-		m_input[i] = static_cast<double> (m_pa_buf[i]);
+		m_input[i] = m_pa_buf[i];
 	}
 
-	fftw_execute(m_plan);
+	fftwf_execute(m_plan);
 
 	for (size_t i = 0; i < fftSize(); i++ ) {
-		m_fft[i] = static_cast<float>(sqrt( pow(m_output[i][0], 2) + pow(m_output[i][1], 2) ) * m_weights[i]);
+		m_fft[i] = sqrtf( pow(m_output[i][0], 2) + pow(m_output[i][1], 2) ) * m_weights[i];
 	}
 }
 

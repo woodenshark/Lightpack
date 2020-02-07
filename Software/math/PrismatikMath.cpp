@@ -333,4 +333,9 @@ namespace PrismatikMath
 	quint8 getBrightness(const QRgb rgb) {
 		return static_cast<quint8>(qRed(rgb) * 0.299 + qGreen(rgb) * 0.587 + qBlue(rgb) * 0.114);
 	}
+
+	double theoreticalMaxFrameRate(const double ledCount, const double baudRate) {
+		// math credit https://www.partsnotincluded.com/calculating-adalight-framerate-limits/
+		return pow((10.0 * (3.0 * ledCount + 6.0)) / baudRate + 0.00003 * ledCount, -1.0);
+	}
 }

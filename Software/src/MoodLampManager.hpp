@@ -41,6 +41,7 @@ public:
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void lampList(const QList<MoodLampLampInfo> &, int);
+	void moodlampFrametime(const double frameMs);
 
 public:
 	void start(bool isMoodLampEnabled);

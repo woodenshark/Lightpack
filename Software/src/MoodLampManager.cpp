@@ -167,8 +167,10 @@ void MoodLampManager::updateColors(const bool forceUpdate)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << newColor.rgb();
 
 	bool changed = (m_lamp ? m_lamp->shine(newColor, m_colors) : false);
-	if (changed || !m_isSendDataOnlyIfColorsChanged || forceUpdate)
+	if (changed || !m_isSendDataOnlyIfColorsChanged || forceUpdate) {
 		emit updateLedsColors(m_colors);
+		emit moodlampFrametime(m_lamp->interval());
+	}
 }
 
 void MoodLampManager::initColors(int numberOfLeds)

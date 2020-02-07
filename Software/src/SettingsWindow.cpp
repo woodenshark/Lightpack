@@ -1136,8 +1136,6 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 	if (updateResultMs != 0)
 		hz = 1000.0 / updateResultMs; /* ms to hz */
 	
-	const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
-	
 	const SupportedDevices::DeviceType device = Settings::getConnectedDevice();
 	QString baudRateWarning;
 	if (device == SupportedDevices::DeviceTypeArdulight || device == SupportedDevices::DeviceTypeAdalight) {
@@ -1162,7 +1160,11 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 		this->labelFPS->setPalette(palette);
 	}
 	
-	QString fpsText = QString::number(hz, 'f', 0) + " / " + QString::number(maxHz, 'f', 0);
+	QString fpsText = QString::number(hz, 'f', 0);
+	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
+		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
+		fpsText += " / " + QString::number(maxHz, 'f', 0);
+	}
 
 	ui->label_GrabFrequency_value->setText(fpsText);
 

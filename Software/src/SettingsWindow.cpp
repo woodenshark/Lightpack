@@ -1136,13 +1136,37 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 	if (updateResultMs != 0)
 		hz = 1000.0 / updateResultMs; /* ms to hz */
 	
-	double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
+	const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
+	
+	const SupportedDevices::DeviceType device = Settings::getConnectedDevice();
+	QString baudRateWarning;
+	if (device == SupportedDevices::DeviceTypeArdulight || device == SupportedDevices::DeviceTypeAdalight) {
+		const double ledCount = static_cast<double>(Settings::getNumberOfLeds(device));
+		const double baudRate = static_cast<double>(device == SupportedDevices::DeviceTypeAdalight ? Settings::getAdalightSerialPortBaudRate() : Settings::getArdulightSerialPortBaudRate());
 
+		const double theoreticalMaxHz = PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate);
+
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "Therotical Max Hz for led count and baud rate:" << theoreticalMaxHz << ledCount << baudRate;
+
+		const QPalette& defaultPalette = ui->label_GrabFrequency_txt_fps->palette();
+
+		QPalette palette = ui->label_GrabFrequency_value->palette();
+
+		if (theoreticalMaxHz <= hz) {
+			palette.setColor(QPalette::WindowText, QColorConstants::Red);
+			baudRateWarning = tr(" LOW BAUDRATE!");
+		} else
+			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
+
+		ui->label_GrabFrequency_value->setPalette(palette);
+		this->labelFPS->setPalette(palette);
+	}
+	
 	QString fpsText = QString::number(hz, 'f', 0) + " / " + QString::number(maxHz, 'f', 0);
 
 	ui->label_GrabFrequency_value->setText(fpsText);
 
-	this->labelFPS->setText(tr("FPS: ") + fpsText);
+	this->labelFPS->setText(tr("FPS: ") + fpsText + baudRateWarning);
 }
 
 // ----------------------------------------------------------------------------

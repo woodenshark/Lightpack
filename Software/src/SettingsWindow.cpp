@@ -1151,7 +1151,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 		QPalette palette = ui->label_GrabFrequency_value->palette();
 
 		if (theoreticalMaxHz <= hz) {
-			palette.setColor(QPalette::WindowText, QColorConstants::Red);
+			palette.setColor(QPalette::WindowText, Qt::red);
 			baudRateWarning = tr(" LOW BAUDRATE!");
 		} else
 			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));

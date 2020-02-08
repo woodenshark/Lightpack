@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include <QElapsedTimer>
 #include "LiquidColorGenerator.hpp"
 #include "MoodLamp.hpp"
 
@@ -78,4 +79,5 @@ private:
 	bool	m_isSendDataOnlyIfColorsChanged;
 
 	QTimer m_timer;
+	QElapsedTimer m_elapsedTimer;
 };

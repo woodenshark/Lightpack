@@ -82,11 +82,13 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 	m_grabber = queryGrabber(Settings::getGrabberType());
 
 	m_timerUpdateFPS = new QTimer(this);
+	m_timerUpdateFPS->setTimerType(Qt::PreciseTimer);
 	connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
 	m_timerUpdateFPS->setSingleShot(false);
 	m_timerUpdateFPS->setInterval(FPS_UPDATE_INTERVAL);
 
 	m_timerFakeGrab = new QTimer(this);
+	m_timerFakeGrab->setTimerType(Qt::PreciseTimer);
 	connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
 	m_timerFakeGrab->setSingleShot(false);
 	m_timerFakeGrab->setInterval(FAKE_GRAB_INTERVAL);

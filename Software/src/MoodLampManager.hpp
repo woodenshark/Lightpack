@@ -80,4 +80,5 @@ private:
 
 	QTimer m_timer;
 	QElapsedTimer m_elapsedTimer;
+	size_t m_frames{ 1 };
 };

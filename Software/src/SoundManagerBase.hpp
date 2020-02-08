@@ -95,4 +95,5 @@ protected:
 	float*	m_fft{nullptr};
 	
 	QElapsedTimer m_elapsedTimer;
+	size_t m_frames{ 1 };
 };

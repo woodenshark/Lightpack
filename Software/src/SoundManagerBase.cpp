@@ -183,7 +183,11 @@ void SoundManagerBase::updateColors()
 	bool colorsChanged = (m_visualizer ? m_visualizer->visualize(m_fft, fftSize(), m_colors) : false);
 	if (colorsChanged || !m_isSendDataOnlyIfColorsChanged) {
 		emit updateLedsColors(m_colors);
-		emit visualizerFrametime(m_elapsedTimer.restart());
+		if (m_elapsedTimer.hasExpired(1000)) { // 1s
+			emit visualizerFrametime(m_elapsedTimer.restart() / m_frames);
+			m_frames = 0;
+		}
+		m_frames++;
 	}
 }
 

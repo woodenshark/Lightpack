@@ -169,7 +169,14 @@ void MoodLampManager::updateColors(const bool forceUpdate)
 	bool changed = (m_lamp ? m_lamp->shine(newColor, m_colors) : false);
 	if (changed || !m_isSendDataOnlyIfColorsChanged || forceUpdate) {
 		emit updateLedsColors(m_colors);
-		emit moodlampFrametime(m_elapsedTimer.restart());
+		if (forceUpdate) {
+			emit moodlampFrametime(1000);
+			m_elapsedTimer.restart();
+		} else if (m_elapsedTimer.hasExpired(1000)) { // 1s
+			emit moodlampFrametime(m_elapsedTimer.restart() / m_frames);
+			m_frames = 0;
+		}
+		m_frames++;
 	}
 }
 

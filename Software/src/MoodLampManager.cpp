@@ -83,6 +83,7 @@ void MoodLampManager::setLiquidMode(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 	m_isLiquidMode = state;
+	emit moodlampFrametime(1000); // reset FPS to 1
 	if (m_isLiquidMode && m_isMoodLampEnabled)
 		m_generator.start();
 	else {
@@ -102,6 +103,7 @@ void MoodLampManager::setSendDataOnlyIfColorsChanged(bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 	m_isSendDataOnlyIfColorsChanged = state;
+	emit moodlampFrametime(1000); // reset FPS to 1
 }
 
 void MoodLampManager::setNumberOfLeds(int numberOfLeds)
@@ -144,7 +146,7 @@ void MoodLampManager::setCurrentLamp(const int id)
 	}
 
 	m_lamp = MoodLampBase::createWithID(id);
-
+	emit moodlampFrametime(1000); // reset FPS to 1
 	if (m_isMoodLampEnabled && m_lamp)
 		m_timer.start(m_lamp->interval());
 }

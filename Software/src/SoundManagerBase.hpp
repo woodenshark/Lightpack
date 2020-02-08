@@ -27,6 +27,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QElapsedTimer>
 #include "SoundVisualizer.hpp"
 
 struct SoundManagerDeviceInfo {
@@ -50,6 +51,7 @@ signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void deviceList(const QList<SoundManagerDeviceInfo> & devices, int recommended);
 	void visualizerList(const QList<SoundManagerVisualizerInfo>& visualizers, int recommended);
+	void visualizerFrametime(const double);
 
 public:
 	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
@@ -91,4 +93,6 @@ protected:
 	bool	m_isSendDataOnlyIfColorsChanged{false};
 	
 	float*	m_fft{nullptr};
+	
+	QElapsedTimer m_elapsedTimer;
 };

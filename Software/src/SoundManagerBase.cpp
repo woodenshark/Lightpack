@@ -181,8 +181,10 @@ void SoundManagerBase::updateColors()
 
 	updateFft();
 	bool colorsChanged = (m_visualizer ? m_visualizer->visualize(m_fft, fftSize(), m_colors) : false);
-	if (colorsChanged || !m_isSendDataOnlyIfColorsChanged)
+	if (colorsChanged || !m_isSendDataOnlyIfColorsChanged) {
 		emit updateLedsColors(m_colors);
+		emit visualizerFrametime(m_elapsedTimer.restart());
+	}
 }
 
 void SoundManagerBase::initColors(int numberOfLeds)

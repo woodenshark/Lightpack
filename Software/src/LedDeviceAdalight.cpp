@@ -201,7 +201,7 @@ void LedDeviceAdalight::open()
 
 	m_AdalightDevice->setPortName(m_portName);// Settings::getAdalightSerialPortName());
 
-	m_AdalightDevice->open(QIODevice::WriteOnly | QIODevice::Unbuffered);
+	m_AdalightDevice->open(QIODevice::WriteOnly);
 	bool ok = m_AdalightDevice->isOpen();
 
 	// Ubuntu 10.04: on every second attempt to open the device leads to failure

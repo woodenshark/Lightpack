@@ -1,5 +1,5 @@
 /*
- * LightpackVirtual.cpp
+ * LedDeviceUdp.cpp
  *
  *	Created on: 06.09.2011
  *		Author: Mike Shatohin (brunql), Timur Sattarov

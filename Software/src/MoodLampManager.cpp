@@ -174,6 +174,7 @@ void MoodLampManager::updateColors(const bool forceUpdate)
 		if (forceUpdate) {
 			emit moodlampFrametime(1000);
 			m_elapsedTimer.restart();
+			m_frames = 0;
 		} else if (m_elapsedTimer.hasExpired(1000)) { // 1s
 			emit moodlampFrametime(m_elapsedTimer.restart() / m_frames);
 			m_frames = 0;

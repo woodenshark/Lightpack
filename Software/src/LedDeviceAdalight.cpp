@@ -201,12 +201,13 @@ void LedDeviceAdalight::open()
 
 	m_AdalightDevice->setPortName(m_portName);// Settings::getAdalightSerialPortName());
 
-	m_AdalightDevice->open(QIODevice::WriteOnly | QIODevice::Unbuffered);
+	m_AdalightDevice->open(QIODevice::WriteOnly);
 	bool ok = m_AdalightDevice->isOpen();
 
 	// Ubuntu 10.04: on every second attempt to open the device leads to failure
 	if (ok == false)
 	{
+		qWarning() << Q_FUNC_INFO << "Serial device" << m_AdalightDevice->portName() << "open fail, will retry. Error" << (int)m_AdalightDevice->error() << m_AdalightDevice->errorString();
 		// Try one more time
 		m_AdalightDevice->open(QIODevice::WriteOnly);
 		ok = m_AdalightDevice->isOpen();
@@ -215,7 +216,6 @@ void LedDeviceAdalight::open()
 	if (ok)
 	{
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Serial device" << m_AdalightDevice->portName() << "open";
-
 		ok = m_AdalightDevice->setBaudRate(m_baudRate);//Settings::getAdalightSerialPortBaudRate());
 		if (ok)
 		{
@@ -226,16 +226,16 @@ void LedDeviceAdalight::open()
 				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Data bits	:" << m_AdalightDevice->dataBits();
 				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Parity		:" << m_AdalightDevice->parity();
 				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Stop bits	:" << m_AdalightDevice->stopBits();
-				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Flow		:" << m_AdalightDevice->flowControl();
+				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Flow			:" << m_AdalightDevice->flowControl();
 			} else {
-				qWarning() << Q_FUNC_INFO << "Set data bits 8 fail";
+				qWarning() << Q_FUNC_INFO << "Set data bits 8 fail. Error" << (int)m_AdalightDevice->error() << m_AdalightDevice->errorString();
 			}
 		} else {
-			qWarning() << Q_FUNC_INFO << "Set baud rate" << m_baudRate << "fail";
+			qWarning() << Q_FUNC_INFO << "Set baud rate" << m_baudRate << "fail. Error" << (int)m_AdalightDevice->error() << m_AdalightDevice->errorString();
 		}
 
 	} else {
-		qWarning() << Q_FUNC_INFO << "Serial device" << m_AdalightDevice->portName() << "open fail. " << m_AdalightDevice->errorString();
+		qWarning() << Q_FUNC_INFO << "Serial device" << m_AdalightDevice->portName() << "open fail. Error" << (int)m_AdalightDevice->error() << m_AdalightDevice->errorString();
 		DEBUG_OUT << Q_FUNC_INFO << "Available ports:";
 		QList<QSerialPortInfo> availPorts = QSerialPortInfo::availablePorts();
 		for(int i=0; i < availPorts.size(); i++) {

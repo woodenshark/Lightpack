@@ -527,7 +527,7 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 	disconnect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int)),			m_ledDevice, SLOT(setLuminosityThreshold(int)));
 	disconnect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool)));
 	disconnect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),				m_ledDevice, SLOT(requestFirmwareVersion()));
-	disconnect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(ledDeviceUpdateWBAdjustments()));
+	disconnect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()));
 	disconnect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()));
 }
 

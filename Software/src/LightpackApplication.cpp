@@ -728,6 +728,7 @@ void LightpackApplication::initGrabManager()
 	connect(settings(), SIGNAL(moodLampSpeedChanged(int)),						m_moodlampManager,	SLOT(setLiquidModeSpeed(int)));
 	connect(settings(), SIGNAL(moodLampLiquidModeChanged(bool)),				m_moodlampManager,	SLOT(setLiquidMode(bool)));
 	connect(settings(), SIGNAL(moodLampLampChanged(int)),						m_moodlampManager,	SLOT(setCurrentLamp(int)));
+	connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)),		m_moodlampManager,	SLOT(setSendDataOnlyIfColorsChanged(bool)));
 
 #ifdef SOUNDVIZ_SUPPORT
 	if (m_soundManager)
@@ -738,6 +739,7 @@ void LightpackApplication::initGrabManager()
 		connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)),			m_soundManager,		SLOT(setMinColor(QColor)));
 		connect(settings(), SIGNAL(soundVisualizerLiquidSpeedChanged(int)),			m_soundManager,		SLOT(setLiquidModeSpeed(int)));
 		connect(settings(), SIGNAL(soundVisualizerLiquidModeChanged(bool)),			m_soundManager,		SLOT(setLiquidMode(bool)));
+		connect(settings(), SIGNAL(sendDataOnlyIfColorsChangesChanged(bool)),		m_soundManager,		SLOT(setSendDataOnlyIfColorsChanged(bool)));
 
 		connect(m_pluginInterface, SIGNAL(updateSoundVizMinColor(QColor)),			m_soundManager,		SLOT(setMinColor(QColor)),								Qt::QueuedConnection);
 		connect(m_pluginInterface, SIGNAL(updateSoundVizMaxColor(QColor)),			m_soundManager,		SLOT(setMaxColor(QColor)),								Qt::QueuedConnection);

@@ -48,7 +48,6 @@ public:
 	void start(bool isMoodLampEnabled);
 
 	// Common options
-	void setSendDataOnlyIfColorsChanged(bool state);
 	void reset();
 
 public slots:
@@ -60,6 +59,7 @@ public slots:
 	void setCurrentColor(QColor color);
 	void setCurrentLamp(const int id);
 	void requestLampList();
+	void setSendDataOnlyIfColorsChanged(bool state);
 
 private slots:
 	void updateColors(const bool forceUpdate = false);

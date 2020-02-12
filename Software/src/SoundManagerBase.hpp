@@ -57,7 +57,6 @@ public:
 	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
 
 	// Common options
-	void setSendDataOnlyIfColorsChanged(bool state);
 	void reset();
 	virtual size_t fftSize() const;
 	float* fft() const;
@@ -75,6 +74,7 @@ public slots:
 	void requestDeviceList();
 	void requestVisualizerList();
 	void updateColors();
+	void setSendDataOnlyIfColorsChanged(bool state);
 
 protected:
 	virtual bool init() = 0;

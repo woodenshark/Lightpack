@@ -1,5 +1,5 @@
 /*
- * LedDeviceUdp.hpp
+ * LedDeviceDrgb.hpp
  *
  *	Created on: 17.04.2011
  *		Author: Timur Sattarov && Mike Shatohin
@@ -30,15 +30,15 @@
 #include "colorspace_types.h"
 #include <QUdpSocket>
 
-class LedDeviceUdp : public AbstractLedDevice
+class LedDeviceDrgb : public AbstractLedDevice
 {
 	Q_OBJECT
 public:
-    LedDeviceUdp(QObject * parent = 0);
-    virtual ~LedDeviceUdp();
+    LedDeviceDrgb(const QString& address, const QString& port, QObject * parent = 0);
+    virtual ~LedDeviceDrgb();
 
 public slots:
-	const QString name() const { return "udp"; }
+	const QString name() const { return "drgb"; }
 	void open();
     void close();
 	void setColors(const QList<QRgb> & colors);
@@ -54,13 +54,15 @@ public slots:
 	int defaultLedsCount() { return 10; }
 
 private:
-    QUdpSocket* m_MoteDevice;
+    QUdpSocket* m_Socket;
 
     QByteArray m_writeBufferHeader;
     QByteArray m_writeBuffer;
 
-    const int port = 7755;
+    QString m_address;
+    int m_port;
+
     bool writeBuffer(const QByteArray& buff);
 	void resizeColorsBuffer(int buffSize);
-    void reinitBufferHeader(int ledsCount);
+    void reinitBufferHeader();
 };

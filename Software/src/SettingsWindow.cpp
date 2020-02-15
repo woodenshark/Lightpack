@@ -418,13 +418,6 @@ void SettingsWindow::updateDeviceTabWidgetsVisibility()
 		initVirtualLeds(Settings::getNumberOfLeds(SupportedDevices::DeviceTypeVirtual));
 		break;
 
-	case SupportedDevices::DeviceTypeUdp:
-		ui->tabDevices->show();
-		ui->tabDevices->setCurrentWidget(ui->tabDeviceVirtual);
-		// Sync Virtual Leds count with NumberOfLeds field
-		initVirtualLeds(Settings::getNumberOfLeds(SupportedDevices::DeviceTypeUdp));
-		break;
-
 	case SupportedDevices::DeviceTypeLightpack:
 		ui->tabDevices->show();
 		ui->tabDevices->setCurrentWidget(ui->tabDeviceLightpack);

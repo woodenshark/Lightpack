@@ -87,7 +87,7 @@ enum DeviceType {
 	DeviceTypeAdalight,
 	DeviceTypeVirtual,
 	DeviceTypeArdulight,
-	DeviceTypeUdp,
+	DeviceTypeDrgb,
 
 	DeviceTypesCount,
 	DefaultDeviceType = DeviceTypeLightpack
@@ -104,7 +104,7 @@ enum Devices
 	Ardulight	= 255,
 	AlienFx		= 1,
 	Virtual		= 511,
-	Udp         = 511,
+	Drgb        = 490,
 
 	Lightpack4	= 8,
 	Lightpack5	= 10,

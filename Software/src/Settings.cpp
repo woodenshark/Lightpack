@@ -120,9 +120,11 @@ namespace Virtual
 {
 static const QString NumberOfLeds = "Virtual/NumberOfLeds";
 }
-namespace Udp
+namespace Drgb
 {
-static const QString NumberOfLeds = "Udp/NumberOfLeds";
+static const QString NumberOfLeds = "Drgb/NumberOfLeds";
+static const QString Address = "Drgb/Address";
+static const QString Port = "Drgb/Port";
 }
 } /*Key*/
 
@@ -137,7 +139,7 @@ static const QString AlienFxDevice = "AlienFx";
 static const QString AdalightDevice = "Adalight";
 static const QString ArdulightDevice = "Ardulight";
 static const QString VirtualDevice = "Virtual";
-static const QString UdpDevice = "Udp";
+static const QString DrgbDevice = "DRGB";
 }
 
 } /*Value*/
@@ -308,7 +310,10 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,		Main::AlienFx::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,	Main::Lightpack::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Virtual::NumberOfLeds,		Main::Virtual::NumberOfLedsDefault);
-	setNewOptionMain(Main::Key::Udp::NumberOfLeds,          Main::Udp::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Drgb::NumberOfLeds,         Main::Drgb::NumberOfLedsDefault);
+
+	setNewOptionMain(Main::Key::Drgb::Address,              Main::Drgb::AddressDefault);
+	setNewOptionMain(Main::Key::Drgb::Port,                 Main::Drgb::PortDefault);
 
 	setNewOptionMain(Main::Key::CheckForUpdates,			Main::CheckForUpdates);
 	setNewOptionMain(Main::Key::InstallUpdates,				Main::InstallUpdates);
@@ -841,6 +846,29 @@ void Settings::setArdulightSerialPortBaudRate(const QString & baud)
 	m_this->ardulightSerialPortBaudRateChanged(baud);
 }
 
+QString Settings::getDrgbAddress()
+{
+	return valueMain(Main::Key::Drgb::Address).toString();
+}
+
+void Settings::setDrgbAddress(const QString& address)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Address, address);
+	m_this->drgbAddressChanged(address);
+}
+
+QString Settings::getDrgbPort()
+{
+	return valueMain(Main::Key::Drgb::Port).toString();
+}
+
+void Settings::setDrgbPort(const QString& port)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Port, port);
+	m_this->drgbPortChanged(port);
+}
 
 QStringList Settings::getSupportedSerialPortBaudRates()
 {
@@ -913,8 +941,8 @@ void Settings::setNumberOfLeds(SupportedDevices::DeviceType device, int numberOf
 			m_this->virtualNumberOfLedsChanged(numberOfLeds);
 			break;
 
-			case DeviceTypeUdp:
-			m_this->udpNumberOfLedsChanged(numberOfLeds);
+			case DeviceTypeDrgb:
+			m_this->drgbNumberOfLedsChanged(numberOfLeds);
 			break;
 		default:
 			qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "numberOfLeds ==" << numberOfLeds;
@@ -1910,13 +1938,13 @@ void Settings::initDevicesMap()
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeArdulight] = Main::Value::ConnectedDevice::ArdulightDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeLightpack] = Main::Value::ConnectedDevice::LightpackDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeVirtual]	= Main::Value::ConnectedDevice::VirtualDevice;
-	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeUdp] = Main::Value::ConnectedDevice::UdpDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeDrgb] = Main::Value::ConnectedDevice::DrgbDevice;
 
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAdalight]	= Main::Key::Adalight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeVirtual]	= Main::Key::Virtual::NumberOfLeds;
-	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeUdp] = Main::Key::Udp::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeDrgb] = Main::Key::Drgb::NumberOfLeds;
 
 #ifdef ALIEN_FX_SUPPORTED
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAlienFx]	= Main::Value::ConnectedDevice::AlienFxDevice;

@@ -94,9 +94,9 @@
     </spacer>
    </item>
    <item row="4" column="1">
-    <widget class="QRadioButton" name="rbUdp">
+    <widget class="QRadioButton" name="rbDrgb">
      <property name="text">
-      <string>UDP</string>
+      <string>DRGB</string>
      </property>
     </widget>
    </item>

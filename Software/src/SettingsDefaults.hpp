@@ -32,9 +32,9 @@
 #include "enums.hpp"
 
 #ifdef ALIEN_FX_SUPPORTED
-#	define SUPPORTED_DEVICES			"Lightpack,AlienFx,Adalight,Ardulight,Virtual,Udp"
+#	define SUPPORTED_DEVICES			"Lightpack,AlienFx,Adalight,Ardulight,Virtual,DRGB"
 #else
-#	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual,Udp"
+#	define SUPPORTED_DEVICES			"Lightpack,Adalight,Ardulight,Virtual,DRGB"
 #endif
 
 #define _GRABMODE_ENUM(_name_)		::Grab::GrabberType##_name_
@@ -129,9 +129,11 @@ namespace Virtual
 {
 static const int NumberOfLedsDefault = 10;
 }
-namespace Udp
+namespace Drgb
 {
 static const int NumberOfLedsDefault = 10;
+static const QString AddressDefault = "127.0.0.1";
+static const QString PortDefault = "21324";
 }
 }
 

@@ -253,7 +253,7 @@ SOURCES += \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
     LedDeviceVirtual.cpp \
-    LedDeviceUdp.cpp \
+    LedDeviceDrgb.cpp \
     ColorButton.cpp \
     ApiServer.cpp \
     ApiServerSetColorTask.cpp \
@@ -277,6 +277,7 @@ SOURCES += \
     wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
+    wizard/ConfigureUdpDevicePage.cpp \
     wizard/SelectDevicePage.cpp \
     wizard/GlobalColorCoefPage.cpp \
     wizard/CustomDistributor.cpp \
@@ -301,7 +302,7 @@ HEADERS += \
     LedDeviceLightpack.hpp \
     LedDeviceAdalight.hpp \
     LedDeviceArdulight.hpp \
-    LedDeviceUdp.hpp \
+    LedDeviceDrgb.hpp \
     LedDeviceVirtual.hpp \
     ColorButton.hpp \
     ../common/defs.h \
@@ -329,6 +330,7 @@ HEADERS += \
     wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
     wizard/ConfigureDevicePage.hpp \
+    wizard/ConfigureUdpDevicePage.hpp \
     wizard/SelectDevicePage.hpp \
     wizard/GlobalColorCoefPage.hpp \
     types.h \
@@ -366,6 +368,7 @@ FORMS += SettingsWindow.ui \
     wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
+    wizard/ConfigureUdpDevicePage.ui \
     wizard/SelectDevicePage.ui \
     wizard/GlobalColorCoefPage.ui
 

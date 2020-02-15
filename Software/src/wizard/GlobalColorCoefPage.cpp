@@ -110,8 +110,10 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setColorSequence(devType, field("colorFormat").toString());
 
 	}
-	else if (deviceName.compare("udp", Qt::CaseInsensitive) == 0) {
-		devType = SupportedDevices::DeviceTypeUdp;
+	else if (deviceName.compare("drgb", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeDrgb;
+		Settings::setDrgbAddress(field("address").toString());
+		Settings::setDrgbPort(field("port").toString());
 	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;

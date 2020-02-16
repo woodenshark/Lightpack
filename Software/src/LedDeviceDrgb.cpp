@@ -32,33 +32,18 @@
 
 using namespace SettingsScope;
 
-LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, QObject * parent) : AbstractLedDevice(parent)
+LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-
-	m_address = address;
-	m_port = port.toInt();
-
-	m_gamma = Settings::getDeviceGamma();
-	m_brightness = Settings::getDeviceBrightness();
-
-	m_Socket = NULL;
-	m_writeBufferHeader.append((char)255);
 }
 
-LedDeviceDrgb::~LedDeviceDrgb()
-{
-	close();
+const QString LedDeviceDrgb::name() const
+{ 
+	return "drgb"; 
 }
 
-void LedDeviceDrgb::close()
+int LedDeviceDrgb::maxLedsCount()
 {
-	if (m_Socket != NULL) {
-		m_Socket->close();
-
-		delete m_Socket;
-		m_Socket = NULL;
-	}
+	return 490;
 }
 
 void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
@@ -124,80 +109,10 @@ void LedDeviceDrgb::switchOffLeds()
 	emit commandCompleted(ok);
 }
 
-void LedDeviceDrgb::setRefreshDelay(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::setColorDepth(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::setSmoothSlowdown(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::setColorSequence(QString value)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-	m_colorSequence = value;
-	setColors(m_colorsSaved);
-
-	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::setGamma(double value)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-	m_gamma = value;
-	setColors(m_colorsSaved);
-}
-
-void LedDeviceDrgb::setBrightness(int percent)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
-
-	m_brightness = percent;
-	setColors(m_colorsSaved);
-}
-
 void LedDeviceDrgb::requestFirmwareVersion()
 {
 	emit firmwareVersion("1.0 (drgb device)");
 	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::open()
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	emit openDeviceSuccess(true);
-
-	if (m_Socket != NULL)
-		m_Socket->close();
-	else
-		m_Socket = new QUdpSocket();
-}
-
-bool LedDeviceDrgb::writeBuffer(const QByteArray& buff)
-{
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Hex:" << buff.toHex();
-
-	if (m_Socket == NULL)
-		return false;
-
-	int bytesWritten = m_Socket->writeDatagram(buff, QHostAddress(m_address), m_port);
-
-	if (bytesWritten != buff.count())
-	{
-		qWarning() << Q_FUNC_INFO << "bytesWritten != buff.count():" << bytesWritten << buff.count() << " " << m_Socket->errorString();
-		return false;
-	}
-
-	return true;
 }
 
 void LedDeviceDrgb::resizeColorsBuffer(int buffSize)

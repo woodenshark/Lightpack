@@ -253,6 +253,7 @@ SOURCES += \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
     LedDeviceVirtual.cpp \
+    AbstractLedDeviceUdp.cpp \
     LedDeviceDrgb.cpp \
     ColorButton.cpp \
     ApiServer.cpp \
@@ -302,6 +303,7 @@ HEADERS += \
     LedDeviceLightpack.hpp \
     LedDeviceAdalight.hpp \
     LedDeviceArdulight.hpp \
+    AbstractLedDeviceUdp.hpp \
     LedDeviceDrgb.hpp \
     LedDeviceVirtual.hpp \
     ColorButton.hpp \

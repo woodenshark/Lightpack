@@ -1,5 +1,5 @@
 /*
- * LedDeviceDrgb.hpp
+ * AbstractLedDeviceUdp.hpp
  *
  *	Created on: 17.04.2011
  *		Author: Timur Sattarov && Mike Shatohin
@@ -26,24 +26,39 @@
 
 #pragma once
 
-#include "AbstractLedDeviceUdp.hpp"
+#include "AbstractLedDevice.hpp"
 #include "colorspace_types.h"
 #include <QUdpSocket>
 
-class LedDeviceDrgb : public AbstractLedDeviceUdp
+class AbstractLedDeviceUdp : public AbstractLedDevice
 {
 	Q_OBJECT
 public:
-    LedDeviceDrgb(const QString& address, const QString& port, QObject * parent = 0);
+    AbstractLedDeviceUdp(const QString& address, const QString& port, QObject * parent = 0);
+    virtual ~AbstractLedDeviceUdp();
 
 public slots:
-    const QString name() const;
-	void setColors(const QList<QRgb> & colors);
-	void switchOffLeds();
-    void requestFirmwareVersion();
-    int maxLedsCount();
+	void open();
+    void close();
+	void setRefreshDelay(int /*value*/);
+	void setColorDepth(int /*value*/);
+	void setSmoothSlowdown(int /*value*/);
+	void setColorSequence(QString /*value*/);
+	void setGamma(double value);
+	void setBrightness(int value);
+	int defaultLedsCount() { return 10; }
 
 protected:
-    void resizeColorsBuffer(int buffSize);
-    void reinitBufferHeader();
+    QByteArray m_writeBufferHeader;
+    QByteArray m_writeBuffer;
+
+    virtual void resizeColorsBuffer(int buffSize) = 0;
+    virtual void reinitBufferHeader() = 0;
+    bool writeBuffer(const QByteArray& buff);
+
+private:
+    QUdpSocket* m_Socket;
+
+    QString m_address;
+    int m_port;
 };

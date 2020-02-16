@@ -1,5 +1,5 @@
 /*
- * LedDeviceDrgb.cpp
+ * LedDeviceWarls.cpp
  *
  *	Created on: 06.09.2011
  *		Author: Mike Shatohin (brunql), Timur Sattarov
@@ -24,24 +24,24 @@
  *
  */
 
-#include "LedDeviceDrgb.hpp"
+#include "LedDeviceWarls.hpp"
 #include "enums.hpp"
 
-LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
+LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
 {
 }
 
-const QString LedDeviceDrgb::name() const
+const QString LedDeviceWarls::name() const
 { 
-	return "drgb"; 
+	return "warls"; 
 }
 
-int LedDeviceDrgb::maxLedsCount()
+int LedDeviceWarls::maxLedsCount()
 {
-	return 490;
+	return 255;
 }
 
-void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
+void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 {
 	if(colors.size()> 0)
 	{
@@ -63,6 +63,7 @@ void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 			color.g = color.g >> 4;
 			color.b = color.b >> 4;
 
+			m_writeBuffer.append(i);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.b);
@@ -73,7 +74,7 @@ void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 	emit commandCompleted(ok);
 }
 
-void LedDeviceDrgb::switchOffLeds()
+void LedDeviceWarls::switchOffLeds()
 {
 	int count = m_colorsSaved.count();
 	m_colorsSaved.clear();
@@ -86,7 +87,8 @@ void LedDeviceDrgb::switchOffLeds()
 	m_writeBuffer.append(m_writeBufferHeader);
 
 	for (int i = 0; i < count; i++) {
-		m_writeBuffer.append((char)0)
+		m_writeBuffer.append((char)i)
+			.append((char)0)
 			.append((char)0)
 			.append((char)0);
 	}
@@ -95,24 +97,24 @@ void LedDeviceDrgb::switchOffLeds()
 	emit commandCompleted(ok);
 }
 
-void LedDeviceDrgb::requestFirmwareVersion()
+void LedDeviceWarls::requestFirmwareVersion()
 {
-	emit firmwareVersion("1.0 (drgb device)");
+	emit firmwareVersion("1.0 (warls device)");
 	emit commandCompleted(true);
 }
 
-void LedDeviceDrgb::resizeColorsBuffer(int buffSize)
+void LedDeviceWarls::resizeColorsBuffer(int buffSize)
 {
 	if (m_colorsBuffer.count() == buffSize)
 		return;
 
 	m_colorsBuffer.clear();
 
-	if (buffSize > MaximumNumberOfLeds::Drgb)
+	if (buffSize > MaximumNumberOfLeds::Warls)
 	{
-		qCritical() << Q_FUNC_INFO << "buffSize > MaximumNumberOfLeds::Drgb" << buffSize << ">" << MaximumNumberOfLeds::Drgb;
+		qCritical() << Q_FUNC_INFO << "buffSize > MaximumNumberOfLeds::Warls" << buffSize << ">" << MaximumNumberOfLeds::Warls;
 
-		buffSize = MaximumNumberOfLeds::Drgb;
+		buffSize = MaximumNumberOfLeds::Warls;
 	}
 
 	for (int i = 0; i < buffSize; i++)
@@ -123,11 +125,11 @@ void LedDeviceDrgb::resizeColorsBuffer(int buffSize)
 	reinitBufferHeader();
 }
 
-void LedDeviceDrgb::reinitBufferHeader()
+void LedDeviceWarls::reinitBufferHeader()
 {
 	m_writeBufferHeader.clear();
 
 	// Initialize buffer header
-	m_writeBufferHeader.append((char)2);    // DRGB protocol
+	m_writeBufferHeader.append((char)1);    // WARLS protocol
 	m_writeBufferHeader.append((char)255);  // Max-timeout
 }

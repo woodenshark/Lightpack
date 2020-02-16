@@ -115,6 +115,16 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setDrgbAddress(field("address").toString());
 		Settings::setDrgbPort(field("port").toString());
 	}
+	else if (deviceName.compare("dnrgb", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeDnrgb;
+		Settings::setDnrgbAddress(field("address").toString());
+		Settings::setDnrgbPort(field("port").toString());
+	}
+	else if (deviceName.compare("warls", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeWarls;
+		Settings::setWarlsAddress(field("address").toString());
+		Settings::setWarlsPort(field("port").toString());
+	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;
 	}

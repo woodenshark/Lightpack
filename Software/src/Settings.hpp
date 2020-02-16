@@ -136,6 +136,14 @@ public:
 	static void setDrgbAddress(const QString& address);
 	static QString getDrgbPort();
 	static void setDrgbPort(const QString& port);
+	static QString getDnrgbAddress();
+	static void setDnrgbAddress(const QString& address);
+	static QString getDnrgbPort();
+	static void setDnrgbPort(const QString& port);
+	static QString getWarlsAddress();
+	static void setWarlsAddress(const QString& address);
+	static QString getWarlsPort();
+	static void setWarlsPort(const QString& port);
 	static QStringList getSupportedSerialPortBaudRates();
 	static bool isConnectedDeviceUsesSerialPort();
 	// [Adalight | Ardulight | Lightpack | ... | Virtual]
@@ -298,11 +306,17 @@ signals:
 	void ardulightSerialPortBaudRateChanged(const QString & baud);
 	void drgbAddressChanged(const QString& address);
 	void drgbPortChanged(const QString& port);
+	void dnrgbAddressChanged(const QString& address);
+	void dnrgbPortChanged(const QString& port);
+	void warlsAddressChanged(const QString& address);
+	void warlsPortChanged(const QString& port);
 	void lightpackNumberOfLedsChanged(int numberOfLeds);
 	void adalightNumberOfLedsChanged(int numberOfLeds);
 	void ardulightNumberOfLedsChanged(int numberOfLeds);
 	void virtualNumberOfLedsChanged(int numberOfLeds);
 	void drgbNumberOfLedsChanged(int numberOfLeds);
+	void dnrgbNumberOfLedsChanged(int numberOfLeds);
+	void warlsNumberOfLedsChanged(int numberOfLeds);
 	void grabSlowdownChanged(int value);
 	void backlightEnabledChanged(bool isEnabled);
 	void grabAvgColorsEnabledChanged(bool isEnabled);

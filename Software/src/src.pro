@@ -255,6 +255,8 @@ SOURCES += \
     LedDeviceVirtual.cpp \
     AbstractLedDeviceUdp.cpp \
     LedDeviceDrgb.cpp \
+    LedDeviceDnrgb.cpp \
+    LedDeviceWarls.cpp \
     ColorButton.cpp \
     ApiServer.cpp \
     ApiServerSetColorTask.cpp \
@@ -305,6 +307,8 @@ HEADERS += \
     LedDeviceArdulight.hpp \
     AbstractLedDeviceUdp.hpp \
     LedDeviceDrgb.hpp \
+    LedDeviceDnrgb.hpp \
+    LedDeviceWarls.hpp \
     LedDeviceVirtual.hpp \
     ColorButton.hpp \
     ../common/defs.h \

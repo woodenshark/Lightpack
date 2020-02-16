@@ -33,7 +33,6 @@
 #include "LedDeviceArdulight.hpp"
 #include "LedDeviceAdalight.hpp"
 #include "LedDeviceVirtual.hpp"
-#include "LedDeviceDrgb.hpp"
 #include "Wizard.hpp"
 
 using namespace SettingsScope;

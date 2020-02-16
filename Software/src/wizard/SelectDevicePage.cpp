@@ -50,6 +50,8 @@ void SelectDevicePage::initializePage()
 	registerField("isArdulight", ui->rbArdulight);
 	registerField("isVirtual", ui->rbVirtual);
     registerField("isDrgb", ui->rbDrgb);
+    registerField("isDnrgb", ui->rbDnrgb);
+    registerField("isWarls", ui->rbWarls);
 }
 
 void SelectDevicePage::cleanupPage()
@@ -58,6 +60,8 @@ void SelectDevicePage::cleanupPage()
 	setField("isArdulight", false);
 	setField("isVirtual", false);
     setField("isDrgb", false);
+    setField("isDnrgb", false);
+    setField("isWarls", false);
 }
 
 bool SelectDevicePage::validatePage()

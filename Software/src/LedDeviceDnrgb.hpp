@@ -1,5 +1,5 @@
 /*
- * LedDeviceDrgb.hpp
+ * LedDeviceDnrgb.hpp
  *
  *	Created on: 17.04.2011
  *		Author: Timur Sattarov && Mike Shatohin
@@ -28,11 +28,11 @@
 
 #include "AbstractLedDeviceUdp.hpp"
 
-class LedDeviceDrgb : public AbstractLedDeviceUdp
+class LedDeviceDnrgb : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceDrgb(const QString& address, const QString& port, QObject * parent = 0);
+    LedDeviceDnrgb(const QString& address, const QString& port, QObject * parent = 0);
 
 public slots:
     const QString name() const;
@@ -44,4 +44,7 @@ public slots:
 protected:
     void resizeColorsBuffer(int buffSize);
     void reinitBufferHeader();
+
+private:
+    const int LEDS_PER_PACKET = 489;
 };

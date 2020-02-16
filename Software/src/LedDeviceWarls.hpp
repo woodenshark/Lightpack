@@ -1,5 +1,5 @@
 /*
- * LedDeviceDrgb.hpp
+ * LedDeviceWarls.hpp
  *
  *	Created on: 17.04.2011
  *		Author: Timur Sattarov && Mike Shatohin
@@ -28,11 +28,11 @@
 
 #include "AbstractLedDeviceUdp.hpp"
 
-class LedDeviceDrgb : public AbstractLedDeviceUdp
+class LedDeviceWarls : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceDrgb(const QString& address, const QString& port, QObject * parent = 0);
+    LedDeviceWarls(const QString& address, const QString& port, QObject * parent = 0);
 
 public slots:
     const QString name() const;

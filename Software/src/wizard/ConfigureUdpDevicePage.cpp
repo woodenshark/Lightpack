@@ -30,10 +30,9 @@
 #include "ConfigureUdpDevicePage.hpp"
 #include "ui_ConfigureUdpDevicePage.h"
 #include "Settings.hpp"
-#include "LedDeviceArdulight.hpp"
-#include "LedDeviceAdalight.hpp"
-#include "LedDeviceVirtual.hpp"
 #include "LedDeviceDrgb.hpp"
+#include "LedDeviceDnrgb.hpp"
+#include "LedDeviceWarls.hpp"
 #include "Wizard.hpp"
 
 using namespace SettingsScope;
@@ -54,6 +53,14 @@ void ConfigureUdpDevicePage::initializePage()
 	if (field("isDrgb").toBool()) {
 		currentAddress = Settings::getDrgbAddress();
 		currentPort = Settings::getDrgbPort();
+	}
+	else if (field("isDnrgb").toBool()) {
+		currentAddress = Settings::getDnrgbAddress();
+		currentPort = Settings::getDnrgbPort();
+	}
+	else if (field("isWarls").toBool()) {
+		currentAddress = Settings::getWarlsAddress();
+		currentPort = Settings::getWarlsPort();
 	}
 
 	if (currentAddress != NULL && currentAddress.isEmpty() == false)
@@ -78,7 +85,14 @@ bool ConfigureUdpDevicePage::validatePage()
 
 	if (field("isDrgb").toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port));
-	} else {
+	} 
+	else if (field("isDnrgb").toBool()) {
+		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port));
+	}
+	else if (field("isWarls").toBool()) {
+		_transSettings->ledDevice.reset(new LedDeviceWarls(address, port));
+	}
+	else {
 		QMessageBox::information(NULL, "Wrong device", "Try to restart the wizard");
 		qCritical() << "couldn't create LedDevice, unexpected state, device is not selected or device is not configurable";
 		return false;

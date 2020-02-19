@@ -38,7 +38,7 @@ const QString LedDeviceDnrgb::name() const
 
 int LedDeviceDnrgb::maxLedsCount()
 {
-	return 1024; // todo: choose a reasonable max
+	return 1023;
 }
 
 void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)

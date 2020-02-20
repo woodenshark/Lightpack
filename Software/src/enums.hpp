@@ -107,7 +107,7 @@ enum Devices
 	AlienFx		= 1,
 	Virtual		= 511,
 	Drgb        = 490,
-	Dnrgb       = 1023,
+	Dnrgb       = 1500,
 	Warls       = 255,
 
 	Lightpack4	= 8,

@@ -295,6 +295,7 @@ private:
 	QLabel *labelProfile;
 	QLabel *labelDevice;
 	QLabel *labelFPS;
+	double m_maxFPS{ 0 };
 
 	QCache<QString, QPixmap> m_pixmapCache;
 

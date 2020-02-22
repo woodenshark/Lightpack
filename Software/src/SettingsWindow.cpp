@@ -1135,40 +1135,52 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 
 	if (updateResultMs != 0)
 		hz = 1000.0 / updateResultMs; /* ms to hz */
-	
+
+	QString fpsText = QString::number(hz, 'f', 0);
+	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
+		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
+		fpsText += " / " + QString::number(maxHz, 'f', 0);
+	}
+	ui->label_GrabFrequency_value->setText(fpsText);
+
 	const SupportedDevices::DeviceType device = Settings::getConnectedDevice();
-	QString baudRateWarning;
+
 	if (device == SupportedDevices::DeviceTypeArdulight || device == SupportedDevices::DeviceTypeAdalight) {
 		const double ledCount = static_cast<double>(Settings::getNumberOfLeds(device));
 		const double baudRate = static_cast<double>(device == SupportedDevices::DeviceTypeAdalight ? Settings::getAdalightSerialPortBaudRate() : Settings::getArdulightSerialPortBaudRate());
-
+		m_maxFPS = std::max(hz, m_maxFPS);
 		const double theoreticalMaxHz = PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate);
 
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "Therotical Max Hz for led count and baud rate:" << theoreticalMaxHz << ledCount << baudRate;
-
+		if (theoreticalMaxHz <= hz)
+			qWarning() << Q_FUNC_INFO << hz << "FPS went over theoretical max of" << theoreticalMaxHz;
+		
 		const QPalette& defaultPalette = ui->label_GrabFrequency_txt_fps->palette();
 
 		QPalette palette = ui->label_GrabFrequency_value->palette();
-
-		if (theoreticalMaxHz <= hz) {
+		if (theoreticalMaxHz <= m_maxFPS) {
 			palette.setColor(QPalette::WindowText, Qt::red);
-			baudRateWarning = tr(" LOW BAUDRATE!");
+#ifdef Q_OS_WIN
+			fpsText += " <b>!!!</b>";
+#else
+			fpsText += " ⚠️";
+#endif
+			QString toolTipMsg = tr(
+"<html><body><p>Your frame rate reached <b>%1 FPS</b>, your baud rate of <b>%2</b> might be too low for the amount of LEDs (%3).</p>\
+<p>You might experience lag or visual artifacts with your LEDs.</p>\
+<p>Lower your target framerate to <b>under %4 FPS</b> or increase your baud rate to <b>above %5</b>.</p></body></html>")
+			.arg(m_maxFPS, 0, 'f', 0).arg(baudRate).arg(ledCount)
+			.arg(PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate), 0, 'f', 0)
+			.arg(std::round(PrismatikMath::theoreticalMinBaudRate(ledCount, m_maxFPS) / 100.0) * 100.0, 0, 'f', 0);
+			this->labelFPS->setToolTip(toolTipMsg);
 		} else
 			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
 
 		ui->label_GrabFrequency_value->setPalette(palette);
 		this->labelFPS->setPalette(palette);
 	}
-	
-	QString fpsText = QString::number(hz, 'f', 0);
-	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
-		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
-		fpsText += " / " + QString::number(maxHz, 'f', 0);
-	}
 
-	ui->label_GrabFrequency_value->setText(fpsText);
-
-	this->labelFPS->setText(tr("FPS: ") + fpsText + baudRateWarning);
+	this->labelFPS->setText(tr("FPS: ") + fpsText);
 }
 
 // ----------------------------------------------------------------------------

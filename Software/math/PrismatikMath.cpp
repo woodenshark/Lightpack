@@ -338,4 +338,9 @@ namespace PrismatikMath
 		// math credit https://www.partsnotincluded.com/calculating-adalight-framerate-limits/
 		return pow((10.0 * (3.0 * ledCount + 6.0)) / baudRate + 0.00003 * ledCount, -1.0);
 	}
+
+	double theoreticalMinBaudRate(const double ledCount, const double frameRate) {
+		// derived from theoreticalMaxFrameRate()
+		return (30.0 * ledCount + 60) / (1.0 / frameRate - 0.00003 * ledCount);
+	}
 }

@@ -53,6 +53,7 @@ namespace PrismatikMath
 	StructRgb toRgb(const StructLab &);
 	quint8 getBrightness(const QRgb);
 	double theoreticalMaxFrameRate(const double ledCount, const double baudRate);
+	double theoreticalMinBaudRate(const double ledCount, const double frameRate);
 
 	// Convert ASCII char '5' to 5
 	inline char getDigit(const char d)

@@ -80,7 +80,7 @@ int SelectDevicePage::nextId() const
 		} else {
 			return Page_MonitorConfiguration;
 		}
-    if (ui->rbDrgb->isChecked())
+    if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
         return Page_ConfigureUdpDevice;
 	else
 		return Page_ConfigureDevice;

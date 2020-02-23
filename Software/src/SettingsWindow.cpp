@@ -1178,6 +1178,11 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 
 		ui->label_GrabFrequency_value->setPalette(palette);
 		this->labelFPS->setPalette(palette);
+		
+		// this acts as a "read" status for the tooltip
+		// the detected max can be reset, which should remove the warning when the grab interval was adjusted
+		if (this->labelFPS->underMouse())
+			m_maxFPS = hz;
 	}
 
 	this->labelFPS->setText(tr("FPS: ") + fpsText);

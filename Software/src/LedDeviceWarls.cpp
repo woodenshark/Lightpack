@@ -38,7 +38,7 @@ const QString LedDeviceWarls::name() const
 
 int LedDeviceWarls::maxLedsCount()
 {
-	return 255;
+	return MaximumNumberOfLeds::Warls;
 }
 
 void LedDeviceWarls::setColors(const QList<QRgb> & colors)
@@ -130,6 +130,6 @@ void LedDeviceWarls::reinitBufferHeader()
 	m_writeBufferHeader.clear();
 
 	// Initialize buffer header
-	m_writeBufferHeader.append((char)1);    // WARLS protocol
-	m_writeBufferHeader.append((char)255);  // Max-timeout
+	m_writeBufferHeader.append((char)UdpDevice::Warls);    // WARLS protocol
+	m_writeBufferHeader.append((char)255);                 // Max-timeout
 }

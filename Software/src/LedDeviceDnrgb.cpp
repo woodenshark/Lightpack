@@ -38,7 +38,7 @@ const QString LedDeviceDnrgb::name() const
 
 int LedDeviceDnrgb::maxLedsCount()
 {
-	return 1500;
+	return MaximumNumberOfLeds::Dnrgb;
 }
 
 void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
@@ -54,16 +54,16 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 		applyColorModifications(colors, m_colorsBuffer);
 
 		// Send multiple buffers
-		int remainingColors = colors.count();
-		int startIndex = 0;
-		int colorsToSend = 0;
+		uint16_t remainingColors = colors.count();
+		uint16_t startIndex = 0;
+		uint16_t colorsToSend = 0;
 		
 		while (remainingColors > 0)
 		{
 			m_writeBuffer.clear();
 			m_writeBuffer.append(m_writeBufferHeader);
-			m_writeBuffer.append((char)startIndex >> 8);  //High byte
-			m_writeBuffer.append((char)startIndex);       //Low byte
+			m_writeBuffer.append((char)(startIndex >> 8));  //High byte
+			m_writeBuffer.append((char)startIndex);         //Low byte
 
 			if (remainingColors > LEDS_PER_PACKET)
 			{
@@ -74,7 +74,7 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 				colorsToSend = remainingColors;
 			}
 
-			for (int i = startIndex; i < startIndex + colorsToSend; i++)
+			for (uint16_t i = startIndex; i < startIndex + colorsToSend; i++)
 			{
 				StructRgb color = m_colorsBuffer[i];
 
@@ -176,6 +176,6 @@ void LedDeviceDnrgb::reinitBufferHeader()
 	m_writeBufferHeader.clear();
 
 	// Initialize buffer header
-	m_writeBufferHeader.append((char)4);    // DNRGB protocol
-	m_writeBufferHeader.append((char)255);  // Max-timeout
+	m_writeBufferHeader.append((char)UdpDevice::Dnrgb);    // DNRGB protocol
+	m_writeBufferHeader.append((char)255);                 // Max-timeout
 }

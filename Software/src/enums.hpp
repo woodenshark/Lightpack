@@ -118,6 +118,16 @@ enum Devices
 };
 }
 
+namespace UdpDevice
+{
+enum Protocol
+{
+	Warls = 1,
+	Drgb  = 2,
+	Dnrgb = 4
+};
+}
+
 // Configure SettingsWindow Device tab for suitable device options
 namespace DeviceTab
 {

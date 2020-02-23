@@ -38,7 +38,7 @@ const QString LedDeviceDrgb::name() const
 
 int LedDeviceDrgb::maxLedsCount()
 {
-	return 490;
+	return MaximumNumberOfLeds::Drgb;
 }
 
 void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
@@ -128,6 +128,6 @@ void LedDeviceDrgb::reinitBufferHeader()
 	m_writeBufferHeader.clear();
 
 	// Initialize buffer header
-	m_writeBufferHeader.append((char)2);    // DRGB protocol
-	m_writeBufferHeader.append((char)255);  // Max-timeout
+	m_writeBufferHeader.append((char)UdpDevice::Drgb);    // DRGB protocol
+	m_writeBufferHeader.append((char)255);                // Max-timeout
 }

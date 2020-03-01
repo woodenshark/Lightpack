@@ -298,7 +298,7 @@ private:
 	QLabel *labelDevice;
 	QLabel *labelFPS;
 	double m_maxFPS{ 0 };
-	QTimer m_baudrateTriggerTimer;
+	QTimer m_baudrateWarningClearTimer;
 
 	QCache<QString, QPixmap> m_pixmapCache;
 

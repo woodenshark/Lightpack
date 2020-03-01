@@ -318,7 +318,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
 	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
 	connect(ui->checkBox_installUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_installUpdates_Toggled(bool)));
-	connect(&m_baudrateTriggerTimer, SIGNAL(timeout()), this, SLOT(clearBaudrateWarning()));
+	connect(&m_baudrateWarningClearTimer, SIGNAL(timeout()), this, SLOT(clearBaudrateWarning()));
 }
 
 // ----------------------------------------------------------------------------
@@ -1177,7 +1177,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 			.arg(PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate), 0, 'f', 0)
 			.arg(std::round(PrismatikMath::theoreticalMinBaudRate(ledCount, m_maxFPS) / 100.0) * 100.0, 0, 'f', 0);
 			this->labelFPS->setToolTip(toolTipMsg);
-			m_baudrateTriggerTimer.start(15000);
+			m_baudrateWarningClearTimer.start(15000);
 		} else
 			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
 

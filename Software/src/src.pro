@@ -178,6 +178,24 @@ unix:!macx{
     LIBS +=-lXext -lX11
 
     QMAKE_CXXFLAGS += -std=c++11
+    contains(DEFINES,PULSEAUDIO_SUPPORT) {
+        INCLUDEPATH += $${PULSEAUDIO_INC_DIR} \
+            $${FFTW3_INC_DIR}
+
+        defined(PULSEAUDIO_LIB_DIR, var) {
+            LIBS += -L$${PULSEAUDIO_LIB_DIR}
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) \"$${PULSEAUDIO_LIB_DIR}/libpulse.so.0\" $(DESTDIR) $$escape_expand(\n\t)\
+				$(INSTALL_PROGRAM) \"$${PULSEAUDIO_LIB_DIR}/libpulsecommon-13.0.so\" $(DESTDIR) $$escape_expand(\n\t)
+        }
+
+        defined(PULSEAUDIO_LIB_DIR, var) {
+            LIBS += -L$${FFTW3_LIB_DIR}
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) \"$${FFTW3_LIB_DIR}/libfftw3f.so.3\" $(DESTDIR) $$escape_expand(\n)
+        }
+
+        LIBS += -lpulse -lfftw3f
+        DEFINES += SOUNDVIZ_SUPPORT
+	}
 }
 
 macx{
@@ -351,6 +369,13 @@ win32 {
     contains(DEFINES,SOUNDVIZ_SUPPORT) {
         SOURCES += WindowsSoundManager.cpp
         HEADERS += WindowsSoundManager.hpp
+    }
+}
+
+unix:!macx {
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += PulseAudioSoundManager.cpp
+        HEADERS += PulseAudioSoundManager.hpp
     }
 }
 

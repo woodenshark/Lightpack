@@ -70,6 +70,7 @@ You will need the following packages, usually all of them are in distro's reposi
 * qttools5-dev-tools
 * if you are using Ubuntu: libappindicator-dev
 * not required, but the update checker uses SSL sockets: openssl
+* for sound visualizer: libpulse-dev, libfftw3-dev
 
 #### Build Process:
 1. Go to `<repo>/Software`

@@ -33,6 +33,8 @@
 #include "MacOSSoundManager.h"
 #elif defined(Q_OS_WIN) && defined(BASS_SOUND_SUPPORT)
 #include "WindowsSoundManager.hpp"
+#elif defined(Q_OS_LINUX) && defined(PULSEAUDIO_SUPPORT)
+#include "PulseAudioSoundManager.hpp"
 #endif
 
 using namespace SettingsScope;
@@ -44,6 +46,9 @@ SoundManagerBase* SoundManagerBase::create(int hWnd, QObject* parent)
 	return new MacOSSoundManager(parent);
 #elif defined(Q_OS_WIN) && defined(BASS_SOUND_SUPPORT)
 	return new WindowsSoundManager(hWnd, parent);
+#elif defined(Q_OS_LINUX) && defined(PULSEAUDIO_SUPPORT)
+	Q_UNUSED(hWnd);
+	return new PulseAudioSoundManager(parent);
 #endif
 	return nullptr;
 }

@@ -23,6 +23,14 @@ win32: {
     TARGET_ARCH = x86_64
 }
 
+unix:!macx {
+    DEFINES += PULSEAUDIO_SUPPORT
+#    PULSEAUDIO_INC_DIR = "../../../pulseaudio/src"
+#    PULSEAUDIO_LIB_DIR = "../../../pulseaudio/src/.libs"
+#    FFTW3_INC_DIR = "../../../fftw-3.3.8/api"
+#    FFTW3_LIB_DIR = "../../../fftw-3.3.8/.libs"
+}
+
 # For Qt lrelease reasons, to change the MAC SDK, you have to edit src.pro directly
 # When using variables, lrelease complains about QMAKE_MAC_SDK not being set
 # You can override QMAKE_MAC_SDK value by setting this variable.

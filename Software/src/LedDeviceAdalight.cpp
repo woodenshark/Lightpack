@@ -253,6 +253,11 @@ bool LedDeviceAdalight::writeBuffer(const QByteArray & buff)
 	if (m_AdalightDevice == NULL || m_AdalightDevice->isOpen() == false)
 		return false;
 
+	if (m_AdalightDevice->bytesToWrite() > buff.count()) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Serial bytesToWrite:" << m_AdalightDevice->bytesToWrite() << ", skipping current frame";
+		return true;
+	}
+
 	int bytesWritten = m_AdalightDevice->write(buff);
 
 	if (bytesWritten != buff.count())

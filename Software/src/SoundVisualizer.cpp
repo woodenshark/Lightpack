@@ -27,6 +27,7 @@
 #include "Settings.hpp"
 #include "SoundVisualizer.hpp"
 #include <cmath>
+#include "PrismatikMath.hpp"
 
 /*
 	_OBJ_NAME_	: class name prefix
@@ -187,7 +188,8 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 		}
 		else if (FadeOutSpeed > 0 && (colors[idxA] > 0 || colors[idxB] > 0)) { // fade out old peaks
 			QColor oldColor(std::max(colors[idxA], colors[idxB])); // both colors are either the same or one is 0, so max() is good enough here
-			oldColor.setHsl(oldColor.hue(), oldColor.saturation(), oldColor.lightness() - FadeOutSpeed * ((thresholdLed > 0 ? thresholdLed : 1) / (double)idxA) * m_speedCoef);
+			const int luminosity = std::min(std::max(oldColor.lightness() - FadeOutSpeed * ((thresholdLed > 0 ? thresholdLed : 1) / (double)idxA)* m_speedCoef, 255.0), 0.0);
+			oldColor.setHsl(oldColor.hue(), oldColor.saturation(), luminosity);
 			color = oldColor.rgb();
 		}
 			

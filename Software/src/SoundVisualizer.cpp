@@ -27,7 +27,6 @@
 #include "Settings.hpp"
 #include "SoundVisualizer.hpp"
 #include <cmath>
-#include "PrismatikMath.hpp"
 
 /*
 	_OBJ_NAME_	: class name prefix

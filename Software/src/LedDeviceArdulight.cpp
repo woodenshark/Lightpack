@@ -262,7 +262,6 @@ void LedDeviceArdulight::writeLastWill()
 {
 	if (m_ArdulightDevice->bytesToWrite() == 0) {
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Writing last will frame";
-		m_lastWillTimer->stop();
 		setColors(m_colorsSaved);
 	}
 }
@@ -281,6 +280,7 @@ bool LedDeviceArdulight::writeBuffer(const QByteArray & buff)
 		m_lastWillTimer->start(100);
 		return true;
 	}
+	m_lastWillTimer->stop();
 
 	int bytesWritten = m_ArdulightDevice->write(buff);
 

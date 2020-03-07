@@ -136,14 +136,20 @@ public:
 	static void setDrgbAddress(const QString& address);
 	static QString getDrgbPort();
 	static void setDrgbPort(const QString& port);
+	static int getDrgbTimeout();
+	static void setDrgbTimeout(const int timeout);
 	static QString getDnrgbAddress();
 	static void setDnrgbAddress(const QString& address);
 	static QString getDnrgbPort();
 	static void setDnrgbPort(const QString& port);
+	static int getDnrgbTimeout();
+	static void setDnrgbTimeout(const int timeout);
 	static QString getWarlsAddress();
 	static void setWarlsAddress(const QString& address);
 	static QString getWarlsPort();
 	static void setWarlsPort(const QString& port);
+	static int getWarlsTimeout();
+	static void setWarlsTimeout(const int timeout);
 	static QStringList getSupportedSerialPortBaudRates();
 	static bool isConnectedDeviceUsesSerialPort();
 	// [Adalight | Ardulight | Lightpack | ... | Virtual]
@@ -306,10 +312,13 @@ signals:
 	void ardulightSerialPortBaudRateChanged(const QString & baud);
 	void drgbAddressChanged(const QString& address);
 	void drgbPortChanged(const QString& port);
+	void drgbTimeoutChanged(const int timeout);
 	void dnrgbAddressChanged(const QString& address);
 	void dnrgbPortChanged(const QString& port);
+	void dnrgbTimeoutChanged(const int timeout);
 	void warlsAddressChanged(const QString& address);
 	void warlsPortChanged(const QString& port);
+	void warlsTimeoutChanged(const int timeout);
 	void lightpackNumberOfLedsChanged(int numberOfLeds);
 	void adalightNumberOfLedsChanged(int numberOfLeds);
 	void ardulightNumberOfLedsChanged(int numberOfLeds);

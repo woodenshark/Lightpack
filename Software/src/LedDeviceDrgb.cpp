@@ -27,7 +27,7 @@
 #include "LedDeviceDrgb.hpp"
 #include "enums.hpp"
 
-LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
+LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
@@ -129,5 +129,5 @@ void LedDeviceDrgb::reinitBufferHeader()
 
 	// Initialize buffer header
 	m_writeBufferHeader.append((char)UdpDevice::Drgb);    // DRGB protocol
-	m_writeBufferHeader.append((char)255);                // Max-timeout
+	m_writeBufferHeader.append((char)m_timeout);
 }

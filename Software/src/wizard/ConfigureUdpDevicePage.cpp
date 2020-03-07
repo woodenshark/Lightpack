@@ -49,48 +49,57 @@ void ConfigureUdpDevicePage::initializePage()
 {
 	QString currentAddress = NULL;
 	QString currentPort = NULL;
+	int currentTimeout = NULL;
 
 	if (field("isDrgb").toBool()) {
 		currentAddress = Settings::getDrgbAddress();
 		currentPort = Settings::getDrgbPort();
+		currentTimeout = Settings::getDrgbTimeout();
 	}
 	else if (field("isDnrgb").toBool()) {
 		currentAddress = Settings::getDnrgbAddress();
 		currentPort = Settings::getDnrgbPort();
+		currentTimeout = Settings::getDnrgbTimeout();
 	}
 	else if (field("isWarls").toBool()) {
 		currentAddress = Settings::getWarlsAddress();
 		currentPort = Settings::getWarlsPort();
+		currentTimeout = Settings::getWarlsTimeout();
 	}
 
 	if (currentAddress != NULL && currentAddress.isEmpty() == false)
 		ui->leAddress->setText(currentAddress);
 	if (currentPort != NULL && currentPort.isEmpty() == false)
 		ui->lePort->setText(currentPort);
+	if (currentTimeout != NULL)
+		ui->sbTimeout->setValue(currentTimeout);
 
 	registerField("address", ui->leAddress);
 	registerField("port", ui->lePort);
+	registerField("timeout", ui->sbTimeout);
 }
 
 void ConfigureUdpDevicePage::cleanupPage()
 {
 	setField("address", "");
 	setField("port", "");
+	setField("timeout", "");
 }
 
 bool ConfigureUdpDevicePage::validatePage()
 {
 	QString address = field("address").toString();
 	QString port = field("port").toString();
+	int timeout = field("timeout").toInt();
 
 	if (field("isDrgb").toBool()) {
-		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port));
+		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port, timeout));
 	} 
 	else if (field("isDnrgb").toBool()) {
-		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port));
+		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port, timeout));
 	}
 	else if (field("isWarls").toBool()) {
-		_transSettings->ledDevice.reset(new LedDeviceWarls(address, port));
+		_transSettings->ledDevice.reset(new LedDeviceWarls(address, port, timeout));
 	}
 	else {
 		QMessageBox::information(NULL, "Wrong device", "Try to restart the wizard");

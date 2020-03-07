@@ -32,7 +32,7 @@ class LedDeviceWarls : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceWarls(const QString& address, const QString& port, QObject * parent = 0);
+    LedDeviceWarls(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
 
 public slots:
     const QString name() const;

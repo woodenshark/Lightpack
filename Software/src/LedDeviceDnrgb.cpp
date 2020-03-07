@@ -27,7 +27,7 @@
 #include "LedDeviceDnrgb.hpp"
 #include "enums.hpp"
 
-LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
+LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
@@ -177,5 +177,5 @@ void LedDeviceDnrgb::reinitBufferHeader()
 
 	// Initialize buffer header
 	m_writeBufferHeader.append((char)UdpDevice::Dnrgb);    // DNRGB protocol
-	m_writeBufferHeader.append((char)255);                 // Max-timeout
+	m_writeBufferHeader.append((char)m_timeout);
 }

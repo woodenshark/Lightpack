@@ -125,18 +125,21 @@ namespace Drgb
 static const QString NumberOfLeds = "Drgb/NumberOfLeds";
 static const QString Address = "Drgb/Address";
 static const QString Port = "Drgb/Port";
+static const QString Timeout = "Drgb/Timeout";
 }
 namespace Dnrgb
 {
-	static const QString NumberOfLeds = "Dnrgb/NumberOfLeds";
-	static const QString Address = "Dnrgb/Address";
-	static const QString Port = "Dnrgb/Port";
+static const QString NumberOfLeds = "Dnrgb/NumberOfLeds";
+static const QString Address = "Dnrgb/Address";
+static const QString Port = "Dnrgb/Port";
+static const QString Timeout = "Dnrgb/Timeout";
 }
 namespace Warls
 {
-	static const QString NumberOfLeds = "Warls/NumberOfLeds";
-	static const QString Address = "Warls/Address";
-	static const QString Port = "Warls/Port";
+static const QString NumberOfLeds = "Warls/NumberOfLeds";
+static const QString Address = "Warls/Address";
+static const QString Port = "Warls/Port";
+static const QString Timeout = "Warls/Timeout";
 }
 } /*Key*/
 
@@ -330,12 +333,15 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 
 	setNewOptionMain(Main::Key::Drgb::Address,              Main::Drgb::AddressDefault);
 	setNewOptionMain(Main::Key::Drgb::Port,                 Main::Drgb::PortDefault);
+	setNewOptionMain(Main::Key::Drgb::Timeout,              Main::Drgb::TimeoutDefault);
 
 	setNewOptionMain(Main::Key::Dnrgb::Address,             Main::Dnrgb::AddressDefault);
 	setNewOptionMain(Main::Key::Dnrgb::Port,                Main::Dnrgb::PortDefault);
+	setNewOptionMain(Main::Key::Dnrgb::Timeout,             Main::Dnrgb::TimeoutDefault);
 
 	setNewOptionMain(Main::Key::Warls::Address,             Main::Warls::AddressDefault);
 	setNewOptionMain(Main::Key::Warls::Port,                Main::Warls::PortDefault);
+	setNewOptionMain(Main::Key::Warls::Timeout,             Main::Warls::TimeoutDefault);
 
 	setNewOptionMain(Main::Key::CheckForUpdates,			Main::CheckForUpdates);
 	setNewOptionMain(Main::Key::InstallUpdates,				Main::InstallUpdates);
@@ -892,6 +898,18 @@ void Settings::setDrgbPort(const QString& port)
 	m_this->drgbPortChanged(port);
 }
 
+int Settings::getDrgbTimeout()
+{
+	return valueMain(Main::Key::Drgb::Timeout).toInt();
+}
+
+void Settings::setDrgbTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Timeout, timeout);
+	m_this->drgbTimeoutChanged(timeout);
+}
+
 QString Settings::getDnrgbAddress()
 {
 	return valueMain(Main::Key::Dnrgb::Address).toString();
@@ -916,6 +934,18 @@ void Settings::setDnrgbPort(const QString& port)
 	m_this->dnrgbPortChanged(port);
 }
 
+int Settings::getDnrgbTimeout()
+{
+	return valueMain(Main::Key::Dnrgb::Timeout).toInt();
+}
+
+void Settings::setDnrgbTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Dnrgb::Timeout, timeout);
+	m_this->dnrgbTimeoutChanged(timeout);
+}
+
 QString Settings::getWarlsAddress()
 {
 	return valueMain(Main::Key::Warls::Address).toString();
@@ -938,6 +968,18 @@ void Settings::setWarlsPort(const QString& port)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	setValueMain(Main::Key::Warls::Port, port);
 	m_this->warlsPortChanged(port);
+}
+
+int Settings::getWarlsTimeout()
+{
+	return valueMain(Main::Key::Warls::Timeout).toInt();
+}
+
+void Settings::setWarlsTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Warls::Timeout, timeout);
+	m_this->warlsTimeoutChanged(timeout);
 }
 
 QStringList Settings::getSupportedSerialPortBaudRates()

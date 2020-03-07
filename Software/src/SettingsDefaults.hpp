@@ -134,18 +134,21 @@ namespace Drgb
 static const int NumberOfLedsDefault = 10;
 static const QString AddressDefault = "127.0.0.1";
 static const QString PortDefault = "21324";
+static const int TimeoutDefault = 255;
 }
 namespace Dnrgb
 {
-    static const int NumberOfLedsDefault = 10;
-    static const QString AddressDefault = "127.0.0.1";
-    static const QString PortDefault = "21324";
+static const int NumberOfLedsDefault = 10;
+static const QString AddressDefault = "127.0.0.1";
+static const QString PortDefault = "21324";
+static const int TimeoutDefault = 255;
 }
 namespace Warls
 {
-    static const int NumberOfLedsDefault = 10;
-    static const QString AddressDefault = "127.0.0.1";
-    static const QString PortDefault = "21324";
+static const int NumberOfLedsDefault = 10;
+static const QString AddressDefault = "127.0.0.1";
+static const QString PortDefault = "21324";
+static const int TimeoutDefault = 255;
 }
 }
 

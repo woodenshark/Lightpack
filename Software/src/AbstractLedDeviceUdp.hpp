@@ -34,7 +34,7 @@ class AbstractLedDeviceUdp : public AbstractLedDevice
 {
 	Q_OBJECT
 public:
-    AbstractLedDeviceUdp(const QString& address, const QString& port, QObject * parent = 0);
+    AbstractLedDeviceUdp(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
     virtual ~AbstractLedDeviceUdp();
 
 public slots:
@@ -55,6 +55,8 @@ protected:
     virtual void resizeColorsBuffer(int buffSize) = 0;
     virtual void reinitBufferHeader() = 0;
     bool writeBuffer(const QByteArray& buff);
+
+    int m_timeout;
 
 private:
     QUdpSocket* m_Socket;

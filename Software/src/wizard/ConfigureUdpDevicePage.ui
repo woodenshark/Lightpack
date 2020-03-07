@@ -21,6 +21,49 @@
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="page">
       <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="1">
+        <widget class="QLabel" name="lAddress">
+         <property name="text">
+          <string>Address</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="leAddress"/>
+       </item>
+       <item row="5" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="lTimeout">
+         <property name="text">
+          <string>Timeout</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="5" column="2">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
@@ -34,7 +77,10 @@
          </property>
         </spacer>
        </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="lePort"/>
+       </item>
+       <item row="8" column="1">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -54,44 +100,15 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="7" column="1">
+        <widget class="QSpinBox" name="sbTimeout">
+         <property name="maximum">
+          <number>255</number>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="lAddress">
-         <property name="text">
-          <string>Address</string>
+         <property name="value">
+          <number>255</number>
          </property>
         </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="leAddress"/>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="lePort"/>
        </item>
       </layout>
      </widget>

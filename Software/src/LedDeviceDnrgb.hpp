@@ -32,7 +32,7 @@ class LedDeviceDnrgb : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceDnrgb(const QString& address, const QString& port, QObject * parent = 0);
+    LedDeviceDnrgb(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
 
 public slots:
     const QString name() const;

@@ -32,12 +32,13 @@
 
 using namespace SettingsScope;
 
-AbstractLedDeviceUdp::AbstractLedDeviceUdp(const QString& address, const QString& port, QObject * parent) : AbstractLedDevice(parent)
+AbstractLedDeviceUdp::AbstractLedDeviceUdp(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDevice(parent)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
 	m_address = address;
 	m_port = port.toInt();
+	m_timeout = timeout;
 
 	m_gamma = Settings::getDeviceGamma();
 	m_brightness = Settings::getDeviceBrightness();

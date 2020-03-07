@@ -27,7 +27,7 @@
 #include "LedDeviceWarls.hpp"
 #include "enums.hpp"
 
-LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, QObject * parent) : AbstractLedDeviceUdp(address, port, parent)
+LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
@@ -73,11 +73,8 @@ void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 		m_colorsSaved = colors;
 	}
 
-	bool ok = true;
-
-	if (m_writeBuffer.size() != m_writeBufferHeader.size())
-		ok = writeBuffer(m_writeBuffer);
-		
+	// This may send the header only
+	bool ok = writeBuffer(m_writeBuffer);
 	emit commandCompleted(ok);
 }
 
@@ -140,5 +137,5 @@ void LedDeviceWarls::reinitBufferHeader()
 
 	// Initialize buffer header
 	m_writeBufferHeader.append((char)UdpDevice::Warls);    // WARLS protocol
-	m_writeBufferHeader.append((char)255);                 // Max-timeout
+	m_writeBufferHeader.append((char)m_timeout);
 }

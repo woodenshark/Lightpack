@@ -73,11 +73,12 @@ void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 		m_colorsSaved = colors;
 	}
 
+	bool ok = true;
+
 	if (m_writeBuffer.size() != m_writeBufferHeader.size())
-	{
-		bool ok = writeBuffer(m_writeBuffer);
-		emit commandCompleted(ok);
-	}
+		ok = writeBuffer(m_writeBuffer);
+		
+	emit commandCompleted(ok);
 }
 
 void LedDeviceWarls::switchOffLeds()

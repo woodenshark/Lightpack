@@ -43,32 +43,29 @@ int LedDeviceDrgb::maxLedsCount()
 
 void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 {
-	if(colors.size()> 0)
+	m_colorsSaved = colors;
+
+	resizeColorsBuffer(colors.count());
+
+	applyColorModifications(colors, m_colorsBuffer);
+
+	m_writeBuffer.clear();
+	m_writeBuffer.append(m_writeBufferHeader);
+
+	for (int i = 0; i < m_colorsBuffer.count(); i++)
 	{
-		m_colorsSaved = colors;
+		StructRgb color = m_colorsBuffer[i];
 
-		resizeColorsBuffer(colors.count());
+		// Reduce 12-bit colour information
+		color.r = color.r >> 4;
+		color.g = color.g >> 4;
+		color.b = color.b >> 4;
 
-		applyColorModifications(colors, m_colorsBuffer);
-
-		m_writeBuffer.clear();
-		m_writeBuffer.append(m_writeBufferHeader);
-
-		for (int i = 0; i < m_colorsBuffer.count(); i++)
-		{
-			StructRgb color = m_colorsBuffer[i];
-
-			// Reduce 12-bit colour information
-			color.r = color.r >> 4;
-			color.g = color.g >> 4;
-			color.b = color.b >> 4;
-
-			m_writeBuffer.append(color.r);
-			m_writeBuffer.append(color.g);
-			m_writeBuffer.append(color.b);
-		}
+		m_writeBuffer.append(color.r);
+		m_writeBuffer.append(color.g);
+		m_writeBuffer.append(color.b);
 	}
-
+	
 	bool ok = writeBuffer(m_writeBuffer);
 	emit commandCompleted(ok);
 }

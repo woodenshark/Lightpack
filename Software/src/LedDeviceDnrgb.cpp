@@ -45,53 +45,50 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 {
 	bool ok = true;
 
-	if (colors.size() > 0)
-	{
-		m_colorsSaved = colors;
+	m_colorsSaved = colors;
 
-		resizeColorsBuffer(colors.count());
+	resizeColorsBuffer(colors.count());
 
-		applyColorModifications(colors, m_colorsBuffer);
+	applyColorModifications(colors, m_colorsBuffer);
 
-		// Send multiple buffers
-		uint16_t remainingColors = colors.count();
-		uint16_t startIndex = 0;
-		uint16_t colorsToSend = 0;
+	// Send multiple buffers
+	uint16_t remainingColors = colors.count();
+	uint16_t startIndex = 0;
+	uint16_t colorsToSend = 0;
 		
-		while (remainingColors > 0)
+	while (remainingColors > 0)
+	{
+		m_writeBuffer.clear();
+		m_writeBuffer.append(m_writeBufferHeader);
+		m_writeBuffer.append((char)(startIndex >> 8));  //High byte
+		m_writeBuffer.append((char)startIndex);         //Low byte
+
+		if (remainingColors > LEDS_PER_PACKET)
 		{
-			m_writeBuffer.clear();
-			m_writeBuffer.append(m_writeBufferHeader);
-			m_writeBuffer.append((char)(startIndex >> 8));  //High byte
-			m_writeBuffer.append((char)startIndex);         //Low byte
-
-			if (remainingColors > LEDS_PER_PACKET)
-			{
-				colorsToSend = LEDS_PER_PACKET;
-			}
-			else
-			{
-				colorsToSend = remainingColors;
-			}
-
-			for (uint16_t i = startIndex; i < startIndex + colorsToSend; i++)
-			{
-				StructRgb color = m_colorsBuffer[i];
-
-				// Reduce 12-bit colour information
-				color.r = color.r >> 4;
-				color.g = color.g >> 4;
-				color.b = color.b >> 4;
-
-				m_writeBuffer.append(color.r);
-				m_writeBuffer.append(color.g);
-				m_writeBuffer.append(color.b);
-			}
-
-			startIndex += colorsToSend;
-			remainingColors -= colorsToSend;
-			ok &= writeBuffer(m_writeBuffer);
+			colorsToSend = LEDS_PER_PACKET;
 		}
+		else
+		{
+			colorsToSend = remainingColors;
+		}
+
+		for (uint16_t i = startIndex; i < startIndex + colorsToSend; i++)
+		{
+			StructRgb color = m_colorsBuffer[i];
+
+			// Reduce 12-bit colour information
+			color.r = color.r >> 4;
+			color.g = color.g >> 4;
+			color.b = color.b >> 4;
+
+			m_writeBuffer.append(color.r);
+			m_writeBuffer.append(color.g);
+			m_writeBuffer.append(color.b);
+		}
+
+		startIndex += colorsToSend;
+		remainingColors -= colorsToSend;
+		ok &= writeBuffer(m_writeBuffer);
 	}
 
 	emit commandCompleted(ok);

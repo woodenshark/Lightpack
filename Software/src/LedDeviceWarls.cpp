@@ -43,35 +43,32 @@ int LedDeviceWarls::maxLedsCount()
 
 void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 {
-	if(colors.size()> 0)
+	resizeColorsBuffer(colors.count());
+
+	applyColorModifications(colors, m_colorsBuffer);
+
+	m_writeBuffer.clear();
+	m_writeBuffer.append(m_writeBufferHeader);
+
+	for (int i = 0; i < m_colorsBuffer.count(); i++)
 	{
-		resizeColorsBuffer(colors.count());
-
-		applyColorModifications(colors, m_colorsBuffer);
-
-		m_writeBuffer.clear();
-		m_writeBuffer.append(m_writeBufferHeader);
-
-		for (int i = 0; i < m_colorsBuffer.count(); i++)
+		if (colors[i] != m_colorsSaved[i])
 		{
-			if (colors[i] != m_colorsSaved[i])
-			{
-				StructRgb color = m_colorsBuffer[i];
+			StructRgb color = m_colorsBuffer[i];
 
-				// Reduce 12-bit colour information
-				color.r = color.r >> 4;
-				color.g = color.g >> 4;
-				color.b = color.b >> 4;
+			// Reduce 12-bit colour information
+			color.r = color.r >> 4;
+			color.g = color.g >> 4;
+			color.b = color.b >> 4;
 
-				m_writeBuffer.append(i);
-				m_writeBuffer.append(color.r);
-				m_writeBuffer.append(color.g);
-				m_writeBuffer.append(color.b);
-			}
+			m_writeBuffer.append(i);
+			m_writeBuffer.append(color.r);
+			m_writeBuffer.append(color.g);
+			m_writeBuffer.append(color.b);
 		}
-
-		m_colorsSaved = colors;
 	}
+
+	m_colorsSaved = colors;
 
 	// This may send the header only
 	bool ok = writeBuffer(m_writeBuffer);

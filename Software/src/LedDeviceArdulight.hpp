@@ -51,7 +51,7 @@ public slots:
 	void updateDeviceSettings();
 	int maxLedsCount(){ return 255; }
 	virtual int defaultLedsCount() { return 25; }
-    void writeLastWill();
+	void writeLastWill();
 
 private:
 	bool writeBuffer(const QByteArray & buff);
@@ -65,5 +65,5 @@ private:
 
 	QString m_portName;
 	int m_baudRate;
-    QTimer* m_lastWillTimer{ nullptr };
+	QTimer* m_lastWillTimer{ nullptr };
 };

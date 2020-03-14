@@ -240,6 +240,8 @@ private slots:
 	void onCheckBox_checkForUpdates_Toggled(bool isEnabled);
 	void onCheckBox_installUpdates_Toggled(bool isEnabled);
 
+	void clearBaudrateWarning();
+
 private:
 	void updateExpertModeWidgetsVisibility();
 	void updateDeviceTabWidgetsVisibility();
@@ -295,6 +297,8 @@ private:
 	QLabel *labelProfile;
 	QLabel *labelDevice;
 	QLabel *labelFPS;
+	double m_maxFPS{ 0 };
+	QTimer m_baudrateWarningClearTimer;
 
 	QCache<QString, QPixmap> m_pixmapCache;
 

@@ -52,7 +52,13 @@ using namespace SettingsScope;
 // ----------------------------------------------------------------------------
 // Lightpack settings window
 // ----------------------------------------------------------------------------
-
+namespace {
+#ifdef Q_OS_WIN
+const QString BaudrateWarningSign = " <b>!!!</b>";
+#else
+const QString BaudrateWarningSign = " ⚠️";
+#endif
+}
 const QString SettingsWindow::DeviceFirmvareVersionUndef = "undef";
 const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.com/p/lightpack/downloads/list";
 
@@ -312,6 +318,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
 	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
 	connect(ui->checkBox_installUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_installUpdates_Toggled(bool)));
+	connect(&m_baudrateWarningClearTimer, SIGNAL(timeout()), this, SLOT(clearBaudrateWarning()));
 }
 
 // ----------------------------------------------------------------------------
@@ -1135,14 +1142,63 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 
 	if (updateResultMs != 0)
 		hz = 1000.0 / updateResultMs; /* ms to hz */
-	
-	double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
 
-	QString fpsText = QString::number(hz, 'f', 0) + " / " + QString::number(maxHz, 'f', 0);
-
+	QString fpsText = QString::number(hz, 'f', 0);
+	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
+		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
+		fpsText += " / " + QString::number(maxHz, 'f', 0);
+	}
 	ui->label_GrabFrequency_value->setText(fpsText);
 
+	const SupportedDevices::DeviceType device = Settings::getConnectedDevice();
+
+	if (device == SupportedDevices::DeviceTypeArdulight || device == SupportedDevices::DeviceTypeAdalight) {
+		const double ledCount = static_cast<double>(Settings::getNumberOfLeds(device));
+		const double baudRate = static_cast<double>(device == SupportedDevices::DeviceTypeAdalight ? Settings::getAdalightSerialPortBaudRate() : Settings::getArdulightSerialPortBaudRate());
+		m_maxFPS = std::max(hz, m_maxFPS);
+		const double theoreticalMaxHz = PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate);
+
+		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "Therotical Max Hz for led count and baud rate:" << theoreticalMaxHz << ledCount << baudRate;
+		if (theoreticalMaxHz <= hz)
+			qWarning() << Q_FUNC_INFO << hz << "FPS went over theoretical max of" << theoreticalMaxHz;
+		
+		const QPalette& defaultPalette = ui->label_GrabFrequency_txt_fps->palette();
+
+		QPalette palette = ui->label_GrabFrequency_value->palette();
+		if (theoreticalMaxHz <= m_maxFPS) {
+			palette.setColor(QPalette::WindowText, Qt::red);
+			fpsText += BaudrateWarningSign;
+
+			QString toolTipMsg = tr(
+"<html><body><p>Your frame rate reached <b>%1 FPS</b>, your baud rate of <b>%2</b> might be too low for the amount of LEDs (%3).</p>\
+<p>You might experience lag or visual artifacts with your LEDs.</p>\
+<p>Lower your target framerate to <b>under %4 FPS</b> or increase your baud rate to <b>above %5</b>.</p></body></html>")
+			.arg(m_maxFPS, 0, 'f', 0).arg(baudRate).arg(ledCount)
+			.arg(PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate), 0, 'f', 0)
+			.arg(std::round(PrismatikMath::theoreticalMinBaudRate(ledCount, m_maxFPS) / 100.0) * 100.0, 0, 'f', 0);
+			this->labelFPS->setToolTip(toolTipMsg);
+			m_baudrateWarningClearTimer.start(15000);
+		} else
+			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
+
+		ui->label_GrabFrequency_value->setPalette(palette);
+		this->labelFPS->setPalette(palette);
+	}
+
 	this->labelFPS->setText(tr("FPS: ") + fpsText);
+}
+
+void SettingsWindow::clearBaudrateWarning()
+{
+	const QPalette& defaultPalette = ui->label_GrabFrequency_txt_fps->palette();
+	QPalette palette = ui->label_GrabFrequency_value->palette();
+	palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
+
+	ui->label_GrabFrequency_value->setPalette(palette);
+	this->labelFPS->setPalette(palette);
+	this->labelFPS->setToolTip("");
+
+	this->labelFPS->setText(this->labelFPS->text().remove(BaudrateWarningSign));
 }
 
 // ----------------------------------------------------------------------------

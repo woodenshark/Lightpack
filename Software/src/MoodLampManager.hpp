@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include <QElapsedTimer>
 #include "LiquidColorGenerator.hpp"
 #include "MoodLamp.hpp"
 
@@ -41,12 +42,12 @@ public:
 signals:
 	void updateLedsColors(const QList<QRgb> & colors);
 	void lampList(const QList<MoodLampLampInfo> &, int);
+	void moodlampFrametime(const double frameMs);
 
 public:
 	void start(bool isMoodLampEnabled);
 
 	// Common options
-	void setSendDataOnlyIfColorsChanged(bool state);
 	void reset();
 
 public slots:
@@ -58,6 +59,7 @@ public slots:
 	void setCurrentColor(QColor color);
 	void setCurrentLamp(const int id);
 	void requestLampList();
+	void setSendDataOnlyIfColorsChanged(bool state);
 
 private slots:
 	void updateColors(const bool forceUpdate = false);
@@ -77,4 +79,6 @@ private:
 	bool	m_isSendDataOnlyIfColorsChanged;
 
 	QTimer m_timer;
+	QElapsedTimer m_elapsedTimer;
+	size_t m_frames{ 1 };
 };

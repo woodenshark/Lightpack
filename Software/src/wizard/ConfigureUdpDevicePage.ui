@@ -102,6 +102,9 @@
        </item>
        <item row="7" column="1">
         <widget class="QSpinBox" name="sbTimeout">
+         <property name="toolTip">
+          <string>Setting this to 255 means the device will keep the colors set by Prismatik. For other values, the device will return to its previous state when Prismatik is closed.</string>
+         </property>
          <property name="minimum">
           <number>1</number>
          </property>

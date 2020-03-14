@@ -58,6 +58,7 @@ LedDeviceArdulight::LedDeviceArdulight(const QString &portName, const int baudRa
 LedDeviceArdulight::~LedDeviceArdulight()
 {
 	close();
+	delete m_lastWillTimer;
 }
 
 void LedDeviceArdulight::close()

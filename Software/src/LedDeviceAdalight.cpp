@@ -55,6 +55,7 @@ LedDeviceAdalight::LedDeviceAdalight(const QString &portName, const int baudRate
 LedDeviceAdalight::~LedDeviceAdalight()
 {
 	close();
+	delete m_lastWillTimer;
 }
 
 void LedDeviceAdalight::close()

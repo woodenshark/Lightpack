@@ -51,7 +51,7 @@ public slots:
 	void updateDeviceSettings();
 	int maxLedsCount(){ return 255; }
 	virtual int defaultLedsCount() { return 25; }
-	void writeLastWill();
+	void writeLastWill(const bool force = false);
 
 private:
 	bool writeBuffer(const QByteArray & buff);

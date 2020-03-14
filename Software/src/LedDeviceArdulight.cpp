@@ -259,9 +259,9 @@ void LedDeviceArdulight::open()
 	emit openDeviceSuccess(ok);
 }
 
-void LedDeviceArdulight::writeLastWill()
+void LedDeviceArdulight::writeLastWill(const bool force)
 {
-	if (m_ArdulightDevice->bytesToWrite() == 0) {
+	if (force || m_ArdulightDevice->bytesToWrite() == 0) {
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Writing last will frame";
 		setColors(m_colorsSaved);
 	}

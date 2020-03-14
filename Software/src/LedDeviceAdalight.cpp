@@ -249,9 +249,9 @@ void LedDeviceAdalight::open()
 	emit openDeviceSuccess(ok);
 }
 
-void LedDeviceAdalight::writeLastWill()
+void LedDeviceAdalight::writeLastWill(const bool force)
 {
-	if (m_AdalightDevice->bytesToWrite() == 0) {
+	if (force || m_AdalightDevice->bytesToWrite() == 0) {
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Writing last will frame";
 		setColors(m_colorsSaved);
 	}

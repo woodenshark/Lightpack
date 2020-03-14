@@ -63,12 +63,17 @@ LedDeviceArdulight::~LedDeviceArdulight()
 
 void LedDeviceArdulight::close()
 {
-	if (m_ArdulightDevice != NULL) {
-		m_ArdulightDevice->close();
+	if (m_ArdulightDevice == NULL)
+		return;
 
-		delete m_ArdulightDevice;
-		m_ArdulightDevice = NULL;
+	if (m_lastWillTimer->isActive()) {
+		m_lastWillTimer->stop();
+		writeLastWill(true);
 	}
+	m_ArdulightDevice->close();
+
+	delete m_ArdulightDevice;
+	m_ArdulightDevice = NULL;
 }
 
 void LedDeviceArdulight::setColors(const QList<QRgb> & colors)

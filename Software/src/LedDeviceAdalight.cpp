@@ -60,12 +60,17 @@ LedDeviceAdalight::~LedDeviceAdalight()
 
 void LedDeviceAdalight::close()
 {
-	if (m_AdalightDevice != NULL) {
-		m_AdalightDevice->close();
+	if (m_AdalightDevice == NULL)
+		return;
 
-		delete m_AdalightDevice;
-		m_AdalightDevice = NULL;
+	if (m_lastWillTimer->isActive()) {
+		m_lastWillTimer->stop();
+		writeLastWill(true);
 	}
+	m_AdalightDevice->close();
+
+	delete m_AdalightDevice;
+	m_AdalightDevice = NULL;
 }
 
 void LedDeviceAdalight::setColors(const QList<QRgb> & colors)

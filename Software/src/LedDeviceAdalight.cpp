@@ -44,7 +44,9 @@ LedDeviceAdalight::LedDeviceAdalight(const QString &portName, const int baudRate
 //	m_brightness = Settings::getDeviceBrightness();
 //	m_colorSequence =Settings::getColorSequence(SupportedDevices::DeviceTypeAdalight);
 	m_AdalightDevice = NULL;
-
+	m_lastWillTimer = new QTimer(this);
+	m_lastWillTimer->setTimerType(Qt::PreciseTimer);
+	connect(m_lastWillTimer, SIGNAL(timeout()), this, SLOT(writeLastWill()));
 	// TODO: think about init m_savedColors in all ILedDevices
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
@@ -53,16 +55,22 @@ LedDeviceAdalight::LedDeviceAdalight(const QString &portName, const int baudRate
 LedDeviceAdalight::~LedDeviceAdalight()
 {
 	close();
+	delete m_lastWillTimer;
 }
 
 void LedDeviceAdalight::close()
 {
-	if (m_AdalightDevice != NULL) {
-		m_AdalightDevice->close();
+	if (m_AdalightDevice == NULL)
+		return;
 
-		delete m_AdalightDevice;
-		m_AdalightDevice = NULL;
+	if (m_lastWillTimer->isActive()) {
+		m_lastWillTimer->stop();
+		writeLastWill(true);
 	}
+	m_AdalightDevice->close();
+
+	delete m_AdalightDevice;
+	m_AdalightDevice = NULL;
 }
 
 void LedDeviceAdalight::setColors(const QList<QRgb> & colors)
@@ -246,12 +254,29 @@ void LedDeviceAdalight::open()
 	emit openDeviceSuccess(ok);
 }
 
+void LedDeviceAdalight::writeLastWill(const bool force)
+{
+	if (force || m_AdalightDevice->bytesToWrite() == 0) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Writing last will frame";
+		setColors(m_colorsSaved);
+	}
+}
+
 bool LedDeviceAdalight::writeBuffer(const QByteArray & buff)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Hex:" << buff.toHex();
 
 	if (m_AdalightDevice == NULL || m_AdalightDevice->isOpen() == false)
 		return false;
+
+	if (m_AdalightDevice->bytesToWrite() > 0) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Serial bytesToWrite:" << m_AdalightDevice->bytesToWrite() << ", skipping current frame";
+		// If no more writes will be done ("Send data only of colors changed")
+		// re-schedule last skipped frame in case it's important (for ex a black frame to turn off)
+		m_lastWillTimer->start(100);
+		return true;
+	}
+	m_lastWillTimer->stop();
 
 	int bytesWritten = m_AdalightDevice->write(buff);
 

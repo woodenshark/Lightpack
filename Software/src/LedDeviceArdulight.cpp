@@ -48,22 +48,32 @@ LedDeviceArdulight::LedDeviceArdulight(const QString &portName, const int baudRa
 //	m_colorSequence = Settings::getColorSequence(SupportedDevices::DeviceTypeArdulight);
 	m_ArdulightDevice = NULL;
 
+	m_lastWillTimer = new QTimer(this);
+	m_lastWillTimer->setTimerType(Qt::PreciseTimer);
+	connect(m_lastWillTimer, SIGNAL(timeout()), this, SLOT(writeLastWill()));
+
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
 }
 
 LedDeviceArdulight::~LedDeviceArdulight()
 {
 	close();
+	delete m_lastWillTimer;
 }
 
 void LedDeviceArdulight::close()
 {
-	if (m_ArdulightDevice != NULL) {
-		m_ArdulightDevice->close();
+	if (m_ArdulightDevice == NULL)
+		return;
 
-		delete m_ArdulightDevice;
-		m_ArdulightDevice = NULL;
+	if (m_lastWillTimer->isActive()) {
+		m_lastWillTimer->stop();
+		writeLastWill(true);
 	}
+	m_ArdulightDevice->close();
+
+	delete m_ArdulightDevice;
+	m_ArdulightDevice = NULL;
 }
 
 void LedDeviceArdulight::setColors(const QList<QRgb> & colors)
@@ -254,12 +264,29 @@ void LedDeviceArdulight::open()
 	emit openDeviceSuccess(ok);
 }
 
+void LedDeviceArdulight::writeLastWill(const bool force)
+{
+	if (force || m_ArdulightDevice->bytesToWrite() == 0) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Writing last will frame";
+		setColors(m_colorsSaved);
+	}
+}
+
 bool LedDeviceArdulight::writeBuffer(const QByteArray & buff)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Hex:" << buff.toHex();
 
 	if (m_ArdulightDevice == NULL || m_ArdulightDevice->isOpen() == false)
 		return false;
+
+	if (m_ArdulightDevice->bytesToWrite() > 0) {
+		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Serial bytesToWrite:" << m_ArdulightDevice->bytesToWrite() << ", skipping current frame";
+		// If no more writes will be done ("Send data only of colors changed")
+		// re-schedule last skipped frame in case it's important (for ex a black frame to turn off)
+		m_lastWillTimer->start(100);
+		return true;
+	}
+	m_lastWillTimer->stop();
 
 	int bytesWritten = m_ArdulightDevice->write(buff);
 

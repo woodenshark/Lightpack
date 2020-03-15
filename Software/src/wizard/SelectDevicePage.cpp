@@ -28,6 +28,7 @@
 #include "ui_SelectDevicePage.h"
 #include "Wizard.hpp"
 #include "LedDeviceVirtual.hpp"
+#include "LedDeviceDrgb.hpp"
 #include "QDesktopWidget"
 
 SelectDevicePage::SelectDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
@@ -48,7 +49,9 @@ void SelectDevicePage::initializePage()
 	registerField("isAdalight", ui->rbAdalight);
 	registerField("isArdulight", ui->rbArdulight);
 	registerField("isVirtual", ui->rbVirtual);
-
+    registerField("isDrgb", ui->rbDrgb);
+    registerField("isDnrgb", ui->rbDnrgb);
+    registerField("isWarls", ui->rbWarls);
 }
 
 void SelectDevicePage::cleanupPage()
@@ -56,6 +59,9 @@ void SelectDevicePage::cleanupPage()
 	setField("isAdalight", false);
 	setField("isArdulight", false);
 	setField("isVirtual", false);
+    setField("isDrgb", false);
+    setField("isDnrgb", false);
+    setField("isWarls", false);
 }
 
 bool SelectDevicePage::validatePage()
@@ -74,7 +80,8 @@ int SelectDevicePage::nextId() const
 		} else {
 			return Page_MonitorConfiguration;
 		}
-
+    if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
+        return Page_ConfigureUdpDevice;
 	else
 		return Page_ConfigureDevice;
 }

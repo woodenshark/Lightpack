@@ -120,6 +120,27 @@ namespace Virtual
 {
 static const QString NumberOfLeds = "Virtual/NumberOfLeds";
 }
+namespace Drgb
+{
+static const QString NumberOfLeds = "Drgb/NumberOfLeds";
+static const QString Address = "Drgb/Address";
+static const QString Port = "Drgb/Port";
+static const QString Timeout = "Drgb/Timeout";
+}
+namespace Dnrgb
+{
+static const QString NumberOfLeds = "Dnrgb/NumberOfLeds";
+static const QString Address = "Dnrgb/Address";
+static const QString Port = "Dnrgb/Port";
+static const QString Timeout = "Dnrgb/Timeout";
+}
+namespace Warls
+{
+static const QString NumberOfLeds = "Warls/NumberOfLeds";
+static const QString Address = "Warls/Address";
+static const QString Port = "Warls/Port";
+static const QString Timeout = "Warls/Timeout";
+}
 } /*Key*/
 
 namespace Value
@@ -133,6 +154,9 @@ static const QString AlienFxDevice = "AlienFx";
 static const QString AdalightDevice = "Adalight";
 static const QString ArdulightDevice = "Ardulight";
 static const QString VirtualDevice = "Virtual";
+static const QString DrgbDevice = "DRGB";
+static const QString DnrgbDevice = "DNRGB";
+static const QString WarlsDevice = "WARLS";
 }
 
 } /*Value*/
@@ -303,6 +327,21 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,		Main::AlienFx::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,	Main::Lightpack::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Virtual::NumberOfLeds,		Main::Virtual::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Drgb::NumberOfLeds,         Main::Drgb::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Dnrgb::NumberOfLeds,        Main::Dnrgb::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Warls::NumberOfLeds,        Main::Warls::NumberOfLedsDefault);
+
+	setNewOptionMain(Main::Key::Drgb::Address,              Main::Drgb::AddressDefault);
+	setNewOptionMain(Main::Key::Drgb::Port,                 Main::Drgb::PortDefault);
+	setNewOptionMain(Main::Key::Drgb::Timeout,              Main::Drgb::TimeoutDefault);
+
+	setNewOptionMain(Main::Key::Dnrgb::Address,             Main::Dnrgb::AddressDefault);
+	setNewOptionMain(Main::Key::Dnrgb::Port,                Main::Dnrgb::PortDefault);
+	setNewOptionMain(Main::Key::Dnrgb::Timeout,             Main::Dnrgb::TimeoutDefault);
+
+	setNewOptionMain(Main::Key::Warls::Address,             Main::Warls::AddressDefault);
+	setNewOptionMain(Main::Key::Warls::Port,                Main::Warls::PortDefault);
+	setNewOptionMain(Main::Key::Warls::Timeout,             Main::Warls::TimeoutDefault);
 
 	setNewOptionMain(Main::Key::CheckForUpdates,			Main::CheckForUpdates);
 	setNewOptionMain(Main::Key::InstallUpdates,				Main::InstallUpdates);
@@ -835,6 +874,113 @@ void Settings::setArdulightSerialPortBaudRate(const QString & baud)
 	m_this->ardulightSerialPortBaudRateChanged(baud);
 }
 
+QString Settings::getDrgbAddress()
+{
+	return valueMain(Main::Key::Drgb::Address).toString();
+}
+
+void Settings::setDrgbAddress(const QString& address)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Address, address);
+	m_this->drgbAddressChanged(address);
+}
+
+QString Settings::getDrgbPort()
+{
+	return valueMain(Main::Key::Drgb::Port).toString();
+}
+
+void Settings::setDrgbPort(const QString& port)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Port, port);
+	m_this->drgbPortChanged(port);
+}
+
+int Settings::getDrgbTimeout()
+{
+	return valueMain(Main::Key::Drgb::Timeout).toInt();
+}
+
+void Settings::setDrgbTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Drgb::Timeout, timeout);
+	m_this->drgbTimeoutChanged(timeout);
+}
+
+QString Settings::getDnrgbAddress()
+{
+	return valueMain(Main::Key::Dnrgb::Address).toString();
+}
+
+void Settings::setDnrgbAddress(const QString& address)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Dnrgb::Address, address);
+	m_this->dnrgbAddressChanged(address);
+}
+
+QString Settings::getDnrgbPort()
+{
+	return valueMain(Main::Key::Dnrgb::Port).toString();
+}
+
+void Settings::setDnrgbPort(const QString& port)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Dnrgb::Port, port);
+	m_this->dnrgbPortChanged(port);
+}
+
+int Settings::getDnrgbTimeout()
+{
+	return valueMain(Main::Key::Dnrgb::Timeout).toInt();
+}
+
+void Settings::setDnrgbTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Dnrgb::Timeout, timeout);
+	m_this->dnrgbTimeoutChanged(timeout);
+}
+
+QString Settings::getWarlsAddress()
+{
+	return valueMain(Main::Key::Warls::Address).toString();
+}
+
+void Settings::setWarlsAddress(const QString& address)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Warls::Address, address);
+	m_this->warlsAddressChanged(address);
+}
+
+QString Settings::getWarlsPort()
+{
+	return valueMain(Main::Key::Warls::Port).toString();
+}
+
+void Settings::setWarlsPort(const QString& port)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Warls::Port, port);
+	m_this->warlsPortChanged(port);
+}
+
+int Settings::getWarlsTimeout()
+{
+	return valueMain(Main::Key::Warls::Timeout).toInt();
+}
+
+void Settings::setWarlsTimeout(const int timeout)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValueMain(Main::Key::Warls::Timeout, timeout);
+	m_this->warlsTimeoutChanged(timeout);
+}
 
 QStringList Settings::getSupportedSerialPortBaudRates()
 {
@@ -905,6 +1051,18 @@ void Settings::setNumberOfLeds(SupportedDevices::DeviceType device, int numberOf
 
 			case DeviceTypeVirtual:
 			m_this->virtualNumberOfLedsChanged(numberOfLeds);
+			break;
+
+			case DeviceTypeDrgb:
+			m_this->drgbNumberOfLedsChanged(numberOfLeds);
+			break;
+
+			case DeviceTypeDnrgb:
+			m_this->dnrgbNumberOfLedsChanged(numberOfLeds);
+			break;
+
+			case DeviceTypeWarls:
+			m_this->warlsNumberOfLedsChanged(numberOfLeds);
 			break;
 		default:
 			qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "numberOfLeds ==" << numberOfLeds;
@@ -1900,11 +2058,17 @@ void Settings::initDevicesMap()
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeArdulight] = Main::Value::ConnectedDevice::ArdulightDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeLightpack] = Main::Value::ConnectedDevice::LightpackDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeVirtual]	= Main::Value::ConnectedDevice::VirtualDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeDrgb] = Main::Value::ConnectedDevice::DrgbDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeDnrgb] = Main::Value::ConnectedDevice::DnrgbDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeWarls] = Main::Value::ConnectedDevice::WarlsDevice;
 
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAdalight]	= Main::Key::Adalight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeVirtual]	= Main::Key::Virtual::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeDrgb] = Main::Key::Drgb::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeDnrgb] = Main::Key::Dnrgb::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeWarls] = Main::Key::Warls::NumberOfLeds;
 
 #ifdef ALIEN_FX_SUPPORTED
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAlienFx]	= Main::Value::ConnectedDevice::AlienFxDevice;

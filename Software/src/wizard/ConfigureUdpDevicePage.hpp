@@ -1,10 +1,10 @@
 /*
- * Wizard.hpp
+ * ConfigureUdpDevicePage.hpp
  *
- *	Created on: 10/22/2013
- *		Project: %PROJECT% (Use "Lightpack" for hardware/firmware, or "Prismatik" for software)
+ *	Created on: 15/02/2020
+ *		Project: Prismatik
  *
- *	Copyright (c) 2013 %NICKNAME%
+ *	Copyright (c) 2013 Tim
  *
  *	Lightpack is an open-source, USB content-driving ambient lighting
  *	hardware.
@@ -24,45 +24,32 @@
  *
  */
 
-#ifndef WIZARD_HPP
-#define WIZARD_HPP
+#ifndef CONFIGUREUDPDEVICEPAGE_HPP
+#define CONFIGUREUDPDEVICEPAGE_HPP
 
-#include <QApplication>
-#include <QWizard>
+#include <QWizardPage>
 #include "SettingsAwareTrait.hpp"
 
 namespace Ui {
-class Wizard;
+class ConfigureUdpDevicePage;
 }
 
-enum {
-	Page_LightpackDiscovery,
-	Page_ChooseDevice,
-	Page_ConfigureDevice,
-    Page_ConfigureUdpDevice,
-	Page_MonitorConfiguration,
-	Page_ChooseProfile,
-	Page_ZonePlacement,
-	Page_GlobalColorCoef
-};
-
-class Wizard : public QWizard, SettingsAwareTrait
+class ConfigureUdpDevicePage : public QWizardPage, SettingsAwareTrait
 {
 	Q_OBJECT
 
 public:
-	explicit Wizard(bool isInitFromSettings, QWidget *parent = 0);
-	~Wizard();
+	explicit ConfigureUdpDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent = 0);
+	~ConfigureUdpDevicePage();
 
-	int skipMonitorConfigurationPage() {
-		this->setField("screenId", -1);
-		return Page_ChooseProfile;
-	}
-
-public slots:
+protected:
+	void initializePage();
+	void cleanupPage();
+	bool validatePage();
+	int nextId() const;
 
 private:
-	Ui::Wizard *_ui;
+	Ui::ConfigureUdpDevicePage*ui;
 };
 
-#endif // WIZARD_HPP
+#endif // CONFIGUREUDPDEVICEPAGE_HPP

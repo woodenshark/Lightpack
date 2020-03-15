@@ -36,6 +36,9 @@
 #include "LedDeviceAdalight.hpp"
 #include "LedDeviceArdulight.hpp"
 #include "LedDeviceVirtual.hpp"
+#include "LedDeviceDrgb.hpp"
+#include "LedDeviceDnrgb.hpp"
+#include "LedDeviceWarls.hpp"
 #include "Settings.hpp"
 
 using namespace SettingsScope;
@@ -449,6 +452,18 @@ AbstractLedDevice * LedDeviceManager::createLedDevice(SupportedDevices::DeviceTy
 	case SupportedDevices::DeviceTypeArdulight:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::ArdulightDevice";
 		return (AbstractLedDevice *)new LedDeviceArdulight(Settings::getArdulightSerialPortName(), Settings::getArdulightSerialPortBaudRate());
+
+	case SupportedDevices::DeviceTypeDrgb:
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::DrgbDevice";
+		return (AbstractLedDevice*)new LedDeviceDrgb(Settings::getDrgbAddress(), Settings::getDrgbPort(), Settings::getDrgbTimeout());
+
+	case SupportedDevices::DeviceTypeDnrgb:
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::DnrgbDevice";
+		return (AbstractLedDevice*)new LedDeviceDnrgb(Settings::getDnrgbAddress(), Settings::getDnrgbPort(), Settings::getDnrgbTimeout());
+
+	case SupportedDevices::DeviceTypeWarls:
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::WarlsDevice";
+		return (AbstractLedDevice*)new LedDeviceWarls(Settings::getWarlsAddress(), Settings::getWarlsPort(), Settings::getWarlsTimeout());
 
 	case SupportedDevices::DeviceTypeVirtual:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::VirtualDevice";

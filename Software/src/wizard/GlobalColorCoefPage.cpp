@@ -95,7 +95,6 @@ bool GlobalColorCoefPage::validatePage()
 	SupportedDevices::DeviceType devType;
 	if (deviceName.compare("lightpack", Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeLightpack;
-
 	}
 	else if (deviceName.compare("adalight", Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeAdalight;
@@ -110,6 +109,24 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setArdulightSerialPortBaudRate(field("baudRate").toString());
 		Settings::setColorSequence(devType, field("colorFormat").toString());
 
+	}
+	else if (deviceName.compare("drgb", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeDrgb;
+		Settings::setDrgbAddress(field("address").toString());
+		Settings::setDrgbPort(field("port").toString());
+		Settings::setDrgbTimeout(field("timeout").toInt());
+	}
+	else if (deviceName.compare("dnrgb", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeDnrgb;
+		Settings::setDnrgbAddress(field("address").toString());
+		Settings::setDnrgbPort(field("port").toString());
+		Settings::setDnrgbTimeout(field("timeout").toInt());
+	}
+	else if (deviceName.compare("warls", Qt::CaseInsensitive) == 0) {
+		devType = SupportedDevices::DeviceTypeWarls;
+		Settings::setWarlsAddress(field("address").toString());
+		Settings::setWarlsPort(field("port").toString());
+		Settings::setWarlsTimeout(field("timeout").toInt());
 	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;

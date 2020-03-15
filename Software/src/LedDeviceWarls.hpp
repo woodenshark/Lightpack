@@ -1,8 +1,8 @@
 /*
  * LedDeviceWarls.hpp
  *
- *	Created on: 17.04.2011
- *		Author: Timur Sattarov && Mike Shatohin
+ *	Created on: 16.02.2020
+ *		Author: Tom Archer
  *		Project: Lightpack
  *
  *	Lightpack is very simple implementation of the backlight for a laptop

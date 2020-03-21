@@ -65,7 +65,7 @@ CONFIG(clang) {
 }
 
 unix:!macx{
-    CONFIG    += link_pkgconfig debug
+    CONFIG    += link_pkgconfig
     PKGCONFIG += libusb-1.0
 
     DESKTOP = $$(XDG_CURRENT_DESKTOP)

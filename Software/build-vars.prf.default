@@ -4,12 +4,12 @@
 #------------------------------------------------------------------------------
 # General
 #------------------------------------------------------------------------------
-win32: {	
+win32: {
 	# Set this to -Win32 for 32-bit
 	OPENSSL_DIR = "C:\\OpenSSL-Win64\\bin"
 	# Set this to run without openssl. The updatecheck won't work.
 	# DEFINES += NO_OPENSSL
-	
+
 	# optional: BASS library directory, for sound visualization (http://www.un4seen.com/)
 	DEFINES += BASS_SOUND_SUPPORT
 	BASS_DIR = "C:\\bass"
@@ -19,23 +19,24 @@ win32: {
 	DEFINES += NIGHTLIGHT_SUPPORT
 	NIGHTLIGHT_DIR = C:\\NightLightLibrary
 
-    # Set this to x86 to compile 32-bit
-    TARGET_ARCH = x86_64
+	# Set this to x86 to compile 32-bit
+	TARGET_ARCH = x86_64
 }
 
 unix:!macx {
-    DEFINES += PULSEAUDIO_SUPPORT
-#    PULSEAUDIO_INC_DIR = "../../../pulseaudio/src"
-#    PULSEAUDIO_LIB_DIR = "../../../pulseaudio/src/.libs"
-#    FFTW3_INC_DIR = "../../../fftw-3.3.8/api"
-#    FFTW3_LIB_DIR = "../../../fftw-3.3.8/.libs"
+	# CONFIG += debug
+	DEFINES += PULSEAUDIO_SUPPORT
+	# PULSEAUDIO_INC_DIR = "../../../pulseaudio/src"
+	# PULSEAUDIO_LIB_DIR = "../../../pulseaudio/src/.libs"
+	# FFTW3_INC_DIR = "../../../fftw-3.3.8/api"
+	# FFTW3_LIB_DIR = "../../../fftw-3.3.8/.libs"
 }
 
 # For Qt lrelease reasons, to change the MAC SDK, you have to edit src.pro directly
 # When using variables, lrelease complains about QMAKE_MAC_SDK not being set
 # You can override QMAKE_MAC_SDK value by setting this variable.
 macx {
-#     QMAKE_MAC_SDK_OVERRIDE = macosx10.8
-    DEFINES += SOUNDVIZ_SUPPORT
-#    DEFINES += SAVE_FRAME_TO_FILE
+	# QMAKE_MAC_SDK_OVERRIDE = macosx10.8
+	DEFINES += SOUNDVIZ_SUPPORT
+	# DEFINES += SAVE_FRAME_TO_FILE
 }

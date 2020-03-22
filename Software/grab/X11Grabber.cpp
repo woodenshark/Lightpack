@@ -137,6 +137,8 @@ bool X11Grabber::reallocate(const QList<ScreenInfo> &screens)
 
         GrabbedScreen grabScreen;
         grabScreen.imgData = (unsigned char *)mem;
+        grabScreen.imgDataSize = imagesize;
+        grabScreen.bytesPerRow = d->image->bytes_per_line;
         grabScreen.imgFormat = BufferFormatArgb;
         grabScreen.screenInfo = screens[i];
         grabScreen.associatedData = d;

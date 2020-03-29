@@ -15,7 +15,7 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 
 Version 5.11.2.22
 ---------------
-March 15, 2020
+March 29, 2020
 
 * Support for UDP devices (WARLS, DRGB, DNRGB)
 * Pulseaudio Sound Visualizer

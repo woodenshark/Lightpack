@@ -13,6 +13,14 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.22
+---------------
+March 15, 2020
+
+* Support for UDP devices (WARLS, DRGB, DNRGB)
+* Pulseaudio Sound Visualizer
+* Tweaks for Adalight/Adrulight devices
+
 Version 5.11.2.21
 ---------------
 January 26, 2020

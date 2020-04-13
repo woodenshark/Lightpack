@@ -141,6 +141,10 @@ void GrabberBase::grab()
 		_context->grabResult->clear();
 
 		for (int i = 0; i < _context->grabWidgets->size(); ++i) {
+			if (!_context->grabWidgets->at(i)->isAreaEnabled()) {
+				_context->grabResult->append(qRgb(0,0,0));
+				continue;
+			}
 			QRect widgetRect = _context->grabWidgets->at(i)->frameGeometry();
 			getValidRect(widgetRect);
 
@@ -214,19 +218,13 @@ void GrabberBase::grab()
 				continue;
 			}
 
-			using namespace Grab;
 			const int bytesPerPixel = 4;
-			QRgb avgColor;
-			if (_context->grabWidgets->at(i)->isAreaEnabled()) {
-				Q_ASSERT(grabbedScreen->imgData);
-				Calculations::calculateAvgColor(
-					&avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat,
-					grabbedScreen->bytesPerRow > 0 ? grabbedScreen->bytesPerRow : grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
-					preparedRect);
-				_context->grabResult->append(avgColor);
-			} else {
-				_context->grabResult->append(qRgb(0,0,0));
-			}
+			Q_ASSERT(grabbedScreen->imgData);
+			QRgb avgColor = Grab::Calculations::calculateAvgColor(
+				grabbedScreen->imgData, grabbedScreen->imgFormat,
+				grabbedScreen->bytesPerRow > 0 ? grabbedScreen->bytesPerRow : grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
+				preparedRect);
+			_context->grabResult->append(avgColor);
 		}
 
 	}

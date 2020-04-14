@@ -149,7 +149,7 @@ static bool avx2_available() {
 	uint32_t eax = 0x07;
 	uint32_t ecx = 0x00;
 #if defined(_MSC_VER)
-	__cpuidex(abcd, eax, ecx);
+	__cpuidex((int*)abcd, eax, ecx);
 #else
 	uint32_t ebx = 0;
 	uint32_t edx = 0;

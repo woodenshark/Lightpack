@@ -33,14 +33,14 @@
    <item row="2" column="1">
     <widget class="QRadioButton" name="rbArdulight">
      <property name="text">
-      <string>Ardulight</string>
+      <string>Ardulight (Serial, 255 LEDs)</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
     <widget class="QRadioButton" name="rbAdalight">
      <property name="text">
-      <string>Adalight</string>
+      <string>Adalight (Serial, 511 LEDs)</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -76,7 +76,7 @@
    <item row="4" column="1">
     <widget class="QRadioButton" name="rbDrgb">
      <property name="text">
-      <string>DRGB</string>
+      <string>DRGB (UDP, 490 LEDs)</string>
      </property>
     </widget>
    </item>
@@ -103,14 +103,14 @@
    <item row="5" column="1">
     <widget class="QRadioButton" name="rbDnrgb">
      <property name="text">
-      <string>DNRGB</string>
+      <string>DNRGB (UDP, 1500 LEDs)</string>
      </property>
     </widget>
    </item>
    <item row="6" column="1">
     <widget class="QRadioButton" name="rbWarls">
      <property name="text">
-      <string>WARLS</string>
+      <string>WARLS (UDP, 255 LEDs)</string>
      </property>
     </widget>
    </item>

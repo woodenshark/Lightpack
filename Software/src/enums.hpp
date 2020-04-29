@@ -98,10 +98,9 @@ enum DeviceType {
 
 namespace MaximumNumberOfLeds
 {
+	// make sure to update SelectDevicePage.ui to reflect limits
 enum Devices
 {
-	AbsoluteMaximum = 511,
-
 	Adalight	= 511,
 	Ardulight	= 255,
 	AlienFx		= 1,
@@ -114,7 +113,9 @@ enum Devices
 	Lightpack5	= 10,
 	Lightpack6	= 10,
 
-	Default		= 10
+	Default		= Lightpack6,
+
+	AbsoluteMaximum = Dnrgb
 };
 }
 

@@ -32,12 +32,44 @@
 #define PIXEL_FORMAT_RGBA 3,2,1
 #define PIXEL_FORMAT_BGRA 1,2,3
 
+
 namespace {
 	const uint8_t bytesPerPixel = 4;
 	const uint8_t pixelsPerStep = 4;
 
 	struct ColorValue {
 		int r, g, b;
+	};
+
+
+#define PIXEL_INDEX(_channelOffset_,_position_) (index + _channelOffset_ + (bytesPerPixel * _position_))
+#define PIXEL_CHANNEL(_channel_,_position_) (buffer[PIXEL_INDEX(offset##_channel_,_position_)])
+#define PIXEL_R(_position_) (PIXEL_CHANNEL(R,_position_))
+#define PIXEL_G(_position_) (PIXEL_CHANNEL(G,_position_))
+#define PIXEL_B(_position_) (PIXEL_CHANNEL(B,_position_))
+
+	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
+	static ColorValue accumulateBuffer(
+		const int* const buff,
+		const size_t pitch,
+		const QRect& rect) {
+		const unsigned char* const buffer = (const unsigned char* const)buff;
+		size_t count = 0; // count the amount of pixels taken into account
+		ColorValue color{0,0,0};
+		for (int currentY = 0; currentY < rect.height(); currentY++) {
+			size_t index = pitch * bytesPerPixel * (rect.y() + currentY) + rect.x() * bytesPerPixel;
+			for (int currentX = 0; currentX < rect.width(); currentX += pixelsPerStep) {
+				color.r += PIXEL_R(0) + PIXEL_R(1) + PIXEL_R(2) + PIXEL_R(3);
+				color.g += PIXEL_G(0) + PIXEL_G(1) + PIXEL_G(2) + PIXEL_G(3);
+				color.b += PIXEL_B(0) + PIXEL_B(1) + PIXEL_B(2) + PIXEL_B(3);
+				count += pixelsPerStep;
+				index += bytesPerPixel * pixelsPerStep;
+			}
+		}
+		color.r = (color.r / count) & 0xff;
+		color.g = (color.g / count) & 0xff;
+		color.b = (color.b / count) & 0xff;
+		return color;
 	};
 
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
@@ -114,6 +146,7 @@ namespace {
 		const size_t softlimit = rect.width() / pixelsPerStep / 2;
 		const size_t hardlimit = (rect.width() + pixelsPerStep) / pixelsPerStep / 2;
 		__m256i sum[bytesPerPixel] = {0,0,0,0}; // A,R,G,B sums
+
 		size_t index = pitch * rect.y() + rect.x(); // starting offset for lines
 		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
 			for (size_t currentX = 0; currentX < hardlimit; ++currentX) {
@@ -125,6 +158,7 @@ namespace {
 			}
 			index += pitch;
 		}
+
 		const __m256i horizontalSum256 = _mm256_hadd_epi32(_mm256_hadd_epi32(sum[0], sum[1]) , _mm256_hadd_epi32(sum[2], sum[3]));
 		const __m128i horizontalSum128 = _mm_add_epi32(_mm256_extracti128_si256(horizontalSum256, 0), _mm256_extracti128_si256(horizontalSum256, 1));
 		const size_t count = rect.height() * rect.width();
@@ -135,35 +169,77 @@ namespace {
 		return color;
 	};
 
+
+enum SIMDLevel {
+    None = 0,
+    SSE4_1 = 1 << 0,
+    AVX2 = 1 << 1
+};
 // https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
 #if defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
-static bool avx2_available() {
-	return _may_i_use_cpu_feature(_FEATURE_AVX2) != 0;
+static uint32_t available_simd() {
+    uint32_t level = SIMDLevel::None;
+    if (_may_i_use_cpu_feature(_FEATURE_AVX2))
+        level |= SIMDLevel::AVX2;
+    if (_may_i_use_cpu_feature(_FEATURE_SSE4_1))
+        level |= SIMDLevel::SSE4_1;
+    return level;
 }
 #else /* non-Intel compiler */
+void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
+{
+#if defined(_MSC_VER)
+    __cpuidex(abcd, eax, ecx);
+#else
+    uint32_t ebx = 0;
+    uint32_t edx = 0;
+# if defined( __i386__ ) && defined ( __PIC__ )
+     /* in case of PIC under 32-bit EBX cannot be clobbered */
+    __asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+# else
+    __asm__ ( "cpuid" : "+b" (ebx),
+# endif
+              "+a" (eax), "+c" (ecx), "=d" (edx) );
+    abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+#endif
+}
+
+
 #if defined(_MSC_VER)
 # include <intrin.h>
 #endif
-static bool avx2_available() {
-	uint32_t abcd[4] = {0,0,0,0};
-	uint32_t eax = 0x07;
-	uint32_t ecx = 0x00;
+static uint32_t available_simd() {
+    uint32_t abcd[4] = {0,0,0,0};
+
+    run_cpuid(1, 0, abcd);
+    uint32_t eax = 0x07;
+    uint32_t ecx = 0x00;
 #if defined(_MSC_VER)
-	__cpuidex((int*)abcd, eax, ecx);
+    __cpuidex((int*)abcd, eax, ecx);
 #else
-	uint32_t ebx = 0;
-	uint32_t edx = 0;
+    uint32_t ebx = 0;
+    uint32_t edx = 0;
 # if defined( __i386__ ) && defined ( __PIC__ )
-	 /* in case of PIC under 32-bit EBX cannot be clobbered */
-	__asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+     /* in case of PIC under 32-bit EBX cannot be clobbered */
+    __asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
 # else
-	__asm__ ( "cpuid" : "+b" (ebx),
+    __asm__ ( "cpuid" : "+b" (ebx),
 # endif
-			  "+a" (eax), "+c" (ecx), "=d" (edx) );
-	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+              "+a" (eax), "+c" (ecx), "=d" (edx) );
+    abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
 #endif
-	// CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
-	return (abcd[1] & (1 << 5)) != 0;
+    uint32_t level = SIMDLevel::None;
+    // CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
+    run_cpuid(7, 0, abcd);
+    if ((abcd[1] & (1 << 5)))
+        level |= SIMDLevel::AVX2;
+
+    // CPUID.(EAX=01H, ECX=0H):ECX.SSE4_1[bit 19]==1
+    run_cpuid(1, 0, abcd);
+    if ((abcd[2] & (1 << 19)))
+        level |= SIMDLevel::SSE4_1;
+
+    return level;
 }
 #endif
 
@@ -176,24 +252,31 @@ static bool avx2_available() {
 	SSE4.1   97.88% / +0.69%
 	AVX2     74.19% / +2.73%
 
-	by default set functions to SSE and upgrade to AVX2 when available
+	by default set functions to non-SIMD and upgrade to AVX2 or SSE4.1 when available
 */
-auto accumulateARGB = accumulateBuffer128<PIXEL_FORMAT_ARGB>;
-auto accumulateABGR = accumulateBuffer128<PIXEL_FORMAT_ABGR>;
-auto accumulateRGBA = accumulateBuffer128<PIXEL_FORMAT_RGBA>;
-auto accumulateBGRA = accumulateBuffer128<PIXEL_FORMAT_BGRA>;
+auto accumulateARGB = accumulateBuffer<PIXEL_FORMAT_ARGB>;
+auto accumulateABGR = accumulateBuffer<PIXEL_FORMAT_ABGR>;
+auto accumulateRGBA = accumulateBuffer<PIXEL_FORMAT_RGBA>;
+auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
 
-struct avxupgrade {
-	avxupgrade() {
-		if (avx2_available()) {
+struct simdupgrade {
+	simdupgrade() {
+		uint32_t level = available_simd();
+		if (level & SIMDLevel::AVX2) {
 			accumulateARGB = accumulateBuffer256<PIXEL_FORMAT_ARGB>;
 			accumulateABGR = accumulateBuffer256<PIXEL_FORMAT_ABGR>;
 			accumulateRGBA = accumulateBuffer256<PIXEL_FORMAT_RGBA>;
 			accumulateBGRA = accumulateBuffer256<PIXEL_FORMAT_BGRA>;
 		}
+		else if (level & SIMDLevel::SSE4_1) {
+			accumulateARGB = accumulateBuffer128<PIXEL_FORMAT_ARGB>;
+			accumulateABGR = accumulateBuffer128<PIXEL_FORMAT_ABGR>;
+			accumulateRGBA = accumulateBuffer128<PIXEL_FORMAT_RGBA>;
+			accumulateBGRA = accumulateBuffer128<PIXEL_FORMAT_BGRA>;
+		}
 	}
 };
-avxupgrade avxup;
+simdupgrade avxup;
 } // namespace
 
 namespace Grab {
@@ -201,7 +284,6 @@ namespace Grab {
 		QRgb calculateAvgColor(const unsigned char * const buffer, BufferFormat bufferFormat, const size_t pitch, const QRect &rect) {
 
 			Q_ASSERT_X(rect.width() % pixelsPerStep == 0, "average color calculation", "rect width should be aligned by 4 bytes");
-
 			ColorValue color;
 			switch(bufferFormat) {
 			case BufferFormatArgb:

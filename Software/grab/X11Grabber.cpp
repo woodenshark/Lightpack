@@ -157,7 +157,7 @@ GrabResult X11Grabber::grabScreens()
                      reinterpret_cast<X11GrabberData *>(_screensWithWidgets[i].associatedData)->image,
                      0,
                      0,
-                     0x00FFFFFF
+                     AllPlanes
                      );
     }
 #if 0

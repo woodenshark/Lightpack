@@ -134,6 +134,7 @@ bool X11Grabber::reallocate(const QList<ScreenInfo> &screens)
         d->shminfo.readOnly = False;
 
         XShmAttach(_display, &d->shminfo);
+        XSync(_display, False);
 
         GrabbedScreen grabScreen;
         grabScreen.imgData = (unsigned char *)mem;

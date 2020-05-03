@@ -189,7 +189,7 @@ static uint32_t available_simd() {
 void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
 {
 #if defined(_MSC_VER)
-    __cpuidex(abcd, eax, ecx);
+    __cpuidex((int*)abcd, eax, ecx);
 #else
     uint32_t ebx = 0;
     uint32_t edx = 0;

@@ -140,7 +140,7 @@ namespace {
 		constexpr uint64_t full = 0xFFFFFFFFFFFFFFFFLLU;
 		constexpr uint64_t zero = 0x0000000000000000LLU;
 		const __m256i loadmasks[2] = {
-			_mm256_set_epi64x(full,full,zero,zero),
+			_mm256_setr_epi64x(full,full,zero,zero),
 			_mm256_set1_epi64x(full)
 		};
 		const size_t softlimit = rect.width() / pixelsPerStep / 2;

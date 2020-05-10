@@ -65,7 +65,7 @@ void ZonePlacementPage::initializePage()
 
 	device()->setSmoothSlowdown(70);
 
-	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount()); 
+	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 
 	if (_isInitFromSettings) {
 		int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
@@ -165,59 +165,72 @@ void ZonePlacementPage::removeLastGrabArea()
 void ZonePlacementPage::on_pbAndromeda_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
-	double a = (double)screen.width() / screen.height();
-	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + 2 * a));
+	const int bottomWidth = screen.width() * (1.0 - STAND_WIDTH);
+	const int perimiter = screen.width() + screen.height() * 2 + bottomWidth;
+	const int ledSize = perimiter / _ui->sbNumberOfLeds->value();
 
-	int baseCount = (PrismatikMath::round(_ui->sbNumberOfLeds->value() - 2 * sideLeds)) / 2;
-	int rawCount = PrismatikMath::round(baseCount * (1 - STAND_WIDTH));
-	// we need symmetric bottom
-	int bottomLeds = rawCount + rawCount % 2;
-
+	const int topLeds = screen.width() / ledSize;
+	const int sideLeds = screen.height() / ledSize;
+	const int bottomLeds = _ui->sbNumberOfLeds->value() - topLeds - sideLeds * 2;
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
-		_ui->sbNumberOfLeds->value() - 2 * sideLeds - bottomLeds,
+		topLeds,
 		sideLeds,
 		bottomLeds,
 		THICKNESS,
-		0.5);
+		STAND_WIDTH);
 
 	distributeAreas(custom);
-
+	_ui->sbTopLeds->setValue(topLeds);
+	_ui->sbSideLeds->setValue(sideLeds);
+	_ui->sbBottomLeds->setValue(bottomLeds);
+	_ui->sbThickness->setValue(THICKNESS * 100);
+	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 
 void ZonePlacementPage::on_pbCassiopeia_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
-	double a = (double)screen.width() / screen.height();
-	int sideLeds = PrismatikMath::round(_ui->sbNumberOfLeds->value() / (2 + a));
-
+	const int perimiter = screen.width() + screen.height() * 2;
+	const int ledSize = perimiter / _ui->sbNumberOfLeds->value();
+	const int sideLeds = screen.height() / ledSize;
+	const int topLeds = _ui->sbNumberOfLeds->value() - sideLeds * 2;
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
-		_ui->sbNumberOfLeds->value() - 2 * sideLeds,
+		topLeds,
 		sideLeds,
 		0,
 		THICKNESS,
 		STAND_WIDTH);
 
 	distributeAreas(custom);
-
+	_ui->sbTopLeds->setValue(topLeds);
+	_ui->sbSideLeds->setValue(sideLeds);
+	_ui->sbBottomLeds->setValue(0);
+	_ui->sbThickness->setValue(THICKNESS * 100);
+	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 
 void ZonePlacementPage::on_pbPegasus_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
+	const int sideLeds = _ui->sbNumberOfLeds->value() / 2;
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
 		0,
-		_ui->sbNumberOfLeds->value() / 2,
+		sideLeds,
 		0,
 		THICKNESS,
 		STAND_WIDTH);
 
 	distributeAreas(custom);
-
+	_ui->sbTopLeds->setValue(0);
+	_ui->sbSideLeds->setValue(sideLeds);
+	_ui->sbBottomLeds->setValue(0);
+	_ui->sbThickness->setValue(THICKNESS * 100);
+	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 
@@ -227,10 +240,10 @@ void ZonePlacementPage::on_pbCustom_clicked()
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
-		_ui->sbTopLeds->value(), 
+		_ui->sbTopLeds->value(),
 		_ui->sbSideLeds->value(),
 		_ui->sbBottomLeds->value(),
-		_ui->sbThickness->value() / 100.0, 
+		_ui->sbThickness->value() / 100.0,
 		_ui->sbStandWidth->value() / 100.0);
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
@@ -264,4 +277,3 @@ void ZonePlacementPage::on_numberOfLeds_valueChanged(int numOfLed)
 
 	_transSettings->ledCount = numOfLed;
 }
-

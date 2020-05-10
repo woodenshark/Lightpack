@@ -169,9 +169,9 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 	const int perimiter = screen.width() + screen.height() * 2 + bottomWidth;
 	const int ledSize = perimiter / _ui->sbNumberOfLeds->value();
 
-	const int topLeds = screen.width() / ledSize;
+	const int bottomLeds = ((bottomWidth / ledSize) + 1) & ~1;//round up / down to next even number
 	const int sideLeds = screen.height() / ledSize;
-	const int bottomLeds = _ui->sbNumberOfLeds->value() - topLeds - sideLeds * 2;
+	const int topLeds = _ui->sbNumberOfLeds->value() - bottomLeds - sideLeds * 2;
 	CustomDistributor *custom = new CustomDistributor(
 		screen,
 		topLeds,

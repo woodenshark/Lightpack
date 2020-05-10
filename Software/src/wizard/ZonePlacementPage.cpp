@@ -166,8 +166,8 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	const int bottomWidth = screen.width() * (1.0 - STAND_WIDTH);
-	const int perimiter = screen.width() + screen.height() * 2 + bottomWidth;
-	const int ledSize = perimiter / _ui->sbNumberOfLeds->value();
+	const int perimeter = screen.width() + screen.height() * 2 + bottomWidth;
+	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
 
 	const int bottomLeds = ((bottomWidth / ledSize) + 1) & ~1;//round up / down to next even number
 	const int sideLeds = screen.height() / ledSize;
@@ -192,8 +192,8 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 void ZonePlacementPage::on_pbCassiopeia_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
-	const int perimiter = screen.width() + screen.height() * 2;
-	const int ledSize = perimiter / _ui->sbNumberOfLeds->value();
+	const int perimeter = screen.width() + screen.height() * 2;
+	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
 	const int sideLeds = screen.height() / ledSize;
 	const int topLeds = _ui->sbNumberOfLeds->value() - sideLeds * 2;
 	CustomDistributor *custom = new CustomDistributor(

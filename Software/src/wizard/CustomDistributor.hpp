@@ -33,8 +33,10 @@ class CustomDistributor : public AreaDistributor
 public:
 	CustomDistributor(QRect screen, int top, int side, int bottom, double thickness = 0.15, double standWidth = 0.0) :
 		AreaDistributor(screen, top + 2 * side + bottom),
-		_topLeds(top), _sideLeds(side), _bottomLeds(bottom), _thickness(thickness), _standWidth(bottom % 2 == 0 ? standWidth : 0.0),
-		_dx(0), _dy(0)
+		_dx(0), _dy(0), _sizeBudget(0),
+		_topLeds(top), _sideLeds(side), _bottomLeds(bottom),
+		_thickness(thickness), _standWidth(standWidth)
+
 	{}
 	virtual ~CustomDistributor();
 
@@ -42,6 +44,7 @@ public:
 
 protected:
 	char _dx, _dy;
+	uint8_t _sizeBudget;
 	int _width, _height;
 	int _x, _y;
 	int _topLeds, _sideLeds, _bottomLeds;

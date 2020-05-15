@@ -78,30 +78,48 @@ namespace {
 		const size_t pitch,
 		const QRect& rect) {
 
-		const __m128i* const buffer128 = (const __m128i* const)buffer;
+		__m128i sum[bytesPerPixel] = {
+			_mm_setzero_si128(),
+			_mm_setzero_si128(),
+			_mm_setzero_si128(),
+			_mm_setzero_si128()
+		};
 
-		const size_t pitch4px = pitch / pixelsPerStep;
-
-		// (000000FF 000000FF 000000FF 000000FF)
-		const __m128i colorByteMask = _mm_set1_epi32(0x000000FFU);
-
-		__m128i sum[bytesPerPixel] = {0,0,0,0};
-		size_t index = pitch4px * rect.y() + rect.x() / pixelsPerStep;
-
+		// masks to re-arrange ARGB into 000A, 000R...
+		// without doing right shift (ARGB >> 2*8 => 00AR) and applying AND mask (00AR & 000F => 000R)
+		// to isolate color components
+		constexpr const char zero = (char)(1<<7);
+		const __m128i shuffleR = _mm_set_epi8(
+			zero,zero,zero,3*4+offsetR,
+			zero,zero,zero,2*4+offsetR,
+			zero,zero,zero,1*4+offsetR,
+			zero,zero,zero,0*4+offsetR
+		);
+		const __m128i shuffleG = _mm_set_epi8(
+			zero,zero,zero,3*4+offsetG,
+			zero,zero,zero,2*4+offsetG,
+			zero,zero,zero,1*4+offsetG,
+			zero,zero,zero,0*4+offsetG
+		);
+		const __m128i shuffleB = _mm_set_epi8(
+			zero,zero,zero,3*4+offsetB,
+			zero,zero,zero,2*4+offsetB,
+			zero,zero,zero,1*4+offsetB,
+			zero,zero,zero,0*4+offsetB
+		);
+		const size_t softlimit = rect.width() / pixelsPerStep;
 		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
-			for (size_t currentX = 0; currentX < (size_t)rect.width() / pixelsPerStep; ++currentX) {
+			for (size_t currentX = 0; currentX < softlimit; ++currentX) {
+				const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep;
 				// (AARRGGBB AARRGGBB AARRGGBB AARRGGBB)
-				const __m128i vec4 = _mm_loadu_si128(&buffer128[index + currentX]);
+				const __m128i vec4 = _mm_loadu_si128((const __m128i*)&buffer[index]);
 
-				//   (AARRGGBB AARRGGBB AARRGGBB AARRGGBB) >> offsetR
-				// = (0000AARR GGBBAARR GGBBAARR GGBBAARR)
-				// & (000000FF 000000FF 000000FF 000000FF)
+				//   (AARRGGBB AARRGGBB AARRGGBB AARRGGBB) shuffleR
 				// = (000000RR 000000RR 000000RR 000000RR)
-				sum[offsetR] = _mm_add_epi32(sum[offsetR], _mm_and_si128(_mm_srli_si128(vec4, offsetR), colorByteMask));
-				sum[offsetG] = _mm_add_epi32(sum[offsetG], _mm_and_si128(_mm_srli_si128(vec4, offsetG), colorByteMask));
-				sum[offsetB] = _mm_add_epi32(sum[offsetB], _mm_and_si128(_mm_srli_si128(vec4, offsetB), colorByteMask));
+				sum[offsetR] = _mm_add_epi32(sum[offsetR], _mm_shuffle_epi8(vec4, shuffleR));
+				sum[offsetG] = _mm_add_epi32(sum[offsetG], _mm_shuffle_epi8(vec4, shuffleG));
+				sum[offsetB] = _mm_add_epi32(sum[offsetB], _mm_shuffle_epi8(vec4, shuffleB));
 			}
-			index += pitch4px;
 		}
 		//   ((BBBBBBBB BBBBBBBB BBBBBBBB BBBBBBBB) + (GGGGGGGG GGGGGGGG GGGGGGGG GGGGGGGG))
 		// + ((RRRRRRRR RRRRRRRR RRRRRRRR RRRRRRRR) + (AAAAAAAA AAAAAAAA AAAAAAAA AAAAAAAA))
@@ -122,41 +140,65 @@ namespace {
 		const size_t pitch,
 		const QRect& rect) {
 
-		const __m256i colorByteMask = _mm256_set1_epi32(0x000000FFU);
+		__m256i sum[bytesPerPixel] = {
+			_mm256_setzero_si256(),
+			_mm256_setzero_si256(),
+			_mm256_setzero_si256(),
+			_mm256_setzero_si256()
+		}; // A,R,G,B sums
 
-		/*
-			rect min width is 4px, here we do 8px steps
-			in order to get the remaining 4px we make 2 load masks:
-				- one full width (8px)
-				- one half width (4px)
-			we calculate 2 horizontal (x) limits:
-				- softlimit = number of 8px steps excluding the remainder
-				- hardlimit = number of 8px steps including the remainder (equal to softlimit or softlimit+1)
-			while we are under the softlimit we can du full loads
-			and a half load when we reach the hardlimit
-
-			note: this is much faster without half loads
-		*/
-		constexpr uint64_t full = 0xFFFFFFFFFFFFFFFFLLU;
-		constexpr uint64_t zero = 0x0000000000000000LLU;
-		const __m256i loadmasks[2] = {
-			_mm256_set_epi64x(full,full,zero,zero),
-			_mm256_set1_epi64x(full)
-		};
+		constexpr const char zero = (char)(1<<7);
+		const __m256i shuffleR = _mm256_broadcastsi128_si256(_mm_set_epi8(
+			zero,zero,zero,3*4+offsetR,
+			zero,zero,zero,2*4+offsetR,
+			zero,zero,zero,1*4+offsetR,
+			zero,zero,zero,0*4+offsetR
+		));
+		const __m256i shuffleG = _mm256_broadcastsi128_si256(_mm_set_epi8(
+			zero,zero,zero,3*4+offsetG,
+			zero,zero,zero,2*4+offsetG,
+			zero,zero,zero,1*4+offsetG,
+			zero,zero,zero,0*4+offsetG
+		));
+		const __m256i shuffleB = _mm256_broadcastsi128_si256(_mm_set_epi8(
+			zero,zero,zero,3*4+offsetB,
+			zero,zero,zero,2*4+offsetB,
+			zero,zero,zero,1*4+offsetB,
+			zero,zero,zero,0*4+offsetB
+		));
+		// 2 part processing:
+		//   1) inner rect with multiple-of-8 width so we can do full 8px loads all the way
 		const size_t softlimit = rect.width() / pixelsPerStep / 2;
-		const size_t hardlimit = (rect.width() + pixelsPerStep) / pixelsPerStep / 2;
-		__m256i sum[bytesPerPixel] = {0,0,0,0}; // A,R,G,B sums
-
-		size_t index = pitch * rect.y() + rect.x(); // starting offset for lines
 		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
-			for (size_t currentX = 0; currentX < hardlimit; ++currentX) {
-				const size_t maskIdx = (currentX < softlimit); // use bool as load mask index to avoid branches
-				const __m256i vec8 = _mm256_maskload_epi32(&buffer[index + currentX * pixelsPerStep * 2], loadmasks[maskIdx]);
-				sum[offsetR] = _mm256_add_epi32(sum[offsetR], _mm256_and_si256(_mm256_srli_si256(vec8, offsetR), colorByteMask));
-				sum[offsetG] = _mm256_add_epi32(sum[offsetG], _mm256_and_si256(_mm256_srli_si256(vec8, offsetG), colorByteMask));
-				sum[offsetB] = _mm256_add_epi32(sum[offsetB], _mm256_and_si256(_mm256_srli_si256(vec8, offsetB), colorByteMask));
+			for (size_t currentX = 0; currentX < softlimit; ++currentX) {
+				const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep * 2;
+				const __m256i vec8 = _mm256_loadu_si256((const __m256i*)&buffer[index]);
+				sum[offsetR] = _mm256_add_epi32(sum[offsetR], _mm256_shuffle_epi8(vec8, shuffleR));
+				sum[offsetG] = _mm256_add_epi32(sum[offsetG], _mm256_shuffle_epi8(vec8, shuffleG));
+				sum[offsetB] = _mm256_add_epi32(sum[offsetB], _mm256_shuffle_epi8(vec8, shuffleB));
 			}
-			index += pitch;
+		}
+		//   2) the remaining delta-px wide rect
+		const size_t delta = (size_t)rect.width() - (softlimit * pixelsPerStep * 2);
+		if (delta > 0) {
+			// masks to load only delta number of pixels
+			const __m256i loadmasks[7] = {
+				_mm256_setr_epi32(0xFFFFFFFFU,0,0,0,0,0,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0,0,0,0,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0,0,0,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0,0,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0,0),
+				_mm256_setr_epi32(0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,0)
+			};
+			const __m256i loadmask = loadmasks[delta - 1];
+			for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
+				const size_t index = pitch * (rect.y() + currentY) + rect.x() + softlimit * pixelsPerStep * 2;
+				const __m256i vec8 = _mm256_maskload_epi32(&buffer[index], loadmask);
+				sum[offsetR] = _mm256_add_epi32(sum[offsetR], _mm256_shuffle_epi8(vec8, shuffleR));
+				sum[offsetG] = _mm256_add_epi32(sum[offsetG], _mm256_shuffle_epi8(vec8, shuffleG));
+				sum[offsetB] = _mm256_add_epi32(sum[offsetB], _mm256_shuffle_epi8(vec8, shuffleB));
+			}
 		}
 
 		const __m256i horizontalSum256 = _mm256_hadd_epi32(_mm256_hadd_epi32(sum[0], sum[1]) , _mm256_hadd_epi32(sum[2], sum[3]));

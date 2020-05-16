@@ -34,8 +34,8 @@
 
 
 namespace {
-	const uint8_t bytesPerPixel = 4;
-	const uint8_t pixelsPerStep = 4;
+	constexpr const uint8_t bytesPerPixel = 4;
+	constexpr const uint8_t pixelsPerStep = 4;
 
 	struct ColorValue {
 		int r, g, b;
@@ -54,18 +54,28 @@ namespace {
 		const size_t pitch,
 		const QRect& rect) {
 		const unsigned char* const buffer = (const unsigned char* const)buff;
-		size_t count = 0; // count the amount of pixels taken into account
+
 		ColorValue color{0,0,0};
-		for (int currentY = 0; currentY < rect.height(); currentY++) {
-			size_t index = pitch * bytesPerPixel * (rect.y() + currentY) + rect.x() * bytesPerPixel;
-			for (int currentX = 0; currentX < rect.width(); currentX += pixelsPerStep) {
-				color.r += PIXEL_R(0) + PIXEL_R(1) + PIXEL_R(2) + PIXEL_R(3);
-				color.g += PIXEL_G(0) + PIXEL_G(1) + PIXEL_G(2) + PIXEL_G(3);
-				color.b += PIXEL_B(0) + PIXEL_B(1) + PIXEL_B(2) + PIXEL_B(3);
-				count += pixelsPerStep;
-				index += bytesPerPixel * pixelsPerStep;
+
+		const int delta = rect.width() % pixelsPerStep;
+		if (rect.width() >= pixelsPerStep)
+			for (int currentY = 0; currentY < rect.height(); currentY++) {
+				for (int currentX = 0; currentX < rect.width() - delta; currentX += pixelsPerStep) {
+					const size_t index = pitch * bytesPerPixel * (rect.y() + currentY) + (rect.x() + currentX) * bytesPerPixel;
+					color.r += PIXEL_R(0) + PIXEL_R(1) + PIXEL_R(2) + PIXEL_R(3);
+					color.g += PIXEL_G(0) + PIXEL_G(1) + PIXEL_G(2) + PIXEL_G(3);
+					color.b += PIXEL_B(0) + PIXEL_B(1) + PIXEL_B(2) + PIXEL_B(3);
+				}
+			}
+		for (int currentX = rect.width() - delta; currentX < rect.width(); ++currentX) {
+			for (int currentY = 0; currentY < rect.height(); ++currentY) {
+				const size_t index = pitch * bytesPerPixel * (rect.y() + currentY) + (rect.x() + currentX) * bytesPerPixel;
+				color.r += PIXEL_R(0);
+				color.g += PIXEL_G(0);
+				color.b += PIXEL_B(0);
 			}
 		}
+		const size_t count = rect.height() * rect.width();
 		color.r = (color.r / count) & 0xff;
 		color.g = (color.g / count) & 0xff;
 		color.b = (color.b / count) & 0xff;
@@ -108,29 +118,41 @@ namespace {
 			zero,zero,zero,0*4+offsetB
 		);
 		const size_t softlimit = rect.width() / pixelsPerStep;
-		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
-			for (size_t currentX = 0; currentX < softlimit; ++currentX) {
-				const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep;
-				// (AARRGGBB AARRGGBB AARRGGBB AARRGGBB)
-				const __m128i vec4 = _mm_loadu_si128((const __m128i*)&buffer[index]);
+		if (softlimit > 0)
+			for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
+				for (size_t currentX = 0; currentX < softlimit; ++currentX) {
+					const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep;
+					// (AARRGGBB AARRGGBB AARRGGBB AARRGGBB)
+					const __m128i vec4 = _mm_loadu_si128((const __m128i*)&buffer[index]);
 
-				//   (AARRGGBB AARRGGBB AARRGGBB AARRGGBB) shuffleR
-				// = (000000RR 000000RR 000000RR 000000RR)
-				sum[offsetR] = _mm_add_epi32(sum[offsetR], _mm_shuffle_epi8(vec4, shuffleR));
-				sum[offsetG] = _mm_add_epi32(sum[offsetG], _mm_shuffle_epi8(vec4, shuffleG));
-				sum[offsetB] = _mm_add_epi32(sum[offsetB], _mm_shuffle_epi8(vec4, shuffleB));
+					//   (AARRGGBB AARRGGBB AARRGGBB AARRGGBB) shuffleR
+					// = (000000RR 000000RR 000000RR 000000RR)
+					sum[offsetR] = _mm_add_epi32(sum[offsetR], _mm_shuffle_epi8(vec4, shuffleR));
+					sum[offsetG] = _mm_add_epi32(sum[offsetG], _mm_shuffle_epi8(vec4, shuffleG));
+					sum[offsetB] = _mm_add_epi32(sum[offsetB], _mm_shuffle_epi8(vec4, shuffleB));
+				}
 			}
-		}
 		//   ((BBBBBBBB BBBBBBBB BBBBBBBB BBBBBBBB) + (GGGGGGGG GGGGGGGG GGGGGGGG GGGGGGGG))
 		// + ((RRRRRRRR RRRRRRRR RRRRRRRR RRRRRRRR) + (AAAAAAAA AAAAAAAA AAAAAAAA AAAAAAAA))
 		// = ((GGGGGGGG GGGGGGGG BBBBBBBB BBBBBBBB) + (AAAAAAAA AAAAAAAA RRRRRRRR RRRRRRRR))
 		// =  (AAAAAAAA RRRRRRRR GGGGGGGG BBBBBBBB)
 		const __m128i horizontalSum128 = _mm_hadd_epi32(_mm_hadd_epi32(sum[0], sum[1]), _mm_hadd_epi32(sum[2], sum[3]));
 		const size_t count = rect.height() * rect.width();
-		ColorValue color;
-		color.r = (_mm_extract_epi32(horizontalSum128, offsetR) / count) & 0xff;
-		color.g = (_mm_extract_epi32(horizontalSum128, offsetG) / count) & 0xff;
-		color.b = (_mm_extract_epi32(horizontalSum128, offsetB) / count) & 0xff;
+
+		ColorValue color{0,0,0};
+
+		const int delta = rect.width() % pixelsPerStep;
+		for (int currentX = rect.width() - delta; currentX < rect.width(); ++currentX) {
+			for (int currentY = 0; currentY < rect.height(); ++currentY) {
+				const size_t index = pitch * (rect.y() + currentY) + (rect.x() + currentX);
+				color.r += ((const unsigned char* const)&buffer[index])[offsetR];
+				color.g += ((const unsigned char* const)&buffer[index])[offsetG];
+				color.b += ((const unsigned char* const)&buffer[index])[offsetB];
+			}
+		}
+		color.r = ((color.r + _mm_extract_epi32(horizontalSum128, offsetR)) / count) & 0xff;
+		color.g = ((color.g + _mm_extract_epi32(horizontalSum128, offsetG)) / count) & 0xff;
+		color.b = ((color.b + _mm_extract_epi32(horizontalSum128, offsetB)) / count) & 0xff;
 		return color;
 	};
 
@@ -169,17 +191,18 @@ namespace {
 		// 2 part processing:
 		//   1) inner rect with multiple-of-8 width so we can do full 8px loads all the way
 		const size_t softlimit = rect.width() / pixelsPerStep / 2;
-		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
-			for (size_t currentX = 0; currentX < softlimit; ++currentX) {
-				const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep * 2;
-				const __m256i vec8 = _mm256_loadu_si256((const __m256i*)&buffer[index]);
-				sum[offsetR] = _mm256_add_epi32(sum[offsetR], _mm256_shuffle_epi8(vec8, shuffleR));
-				sum[offsetG] = _mm256_add_epi32(sum[offsetG], _mm256_shuffle_epi8(vec8, shuffleG));
-				sum[offsetB] = _mm256_add_epi32(sum[offsetB], _mm256_shuffle_epi8(vec8, shuffleB));
+		if (softlimit > 0)
+			for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
+				for (size_t currentX = 0; currentX < softlimit; ++currentX) {
+					const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerStep * 2;
+					const __m256i vec8 = _mm256_loadu_si256((const __m256i*)&buffer[index]);
+					sum[offsetR] = _mm256_add_epi32(sum[offsetR], _mm256_shuffle_epi8(vec8, shuffleR));
+					sum[offsetG] = _mm256_add_epi32(sum[offsetG], _mm256_shuffle_epi8(vec8, shuffleG));
+					sum[offsetB] = _mm256_add_epi32(sum[offsetB], _mm256_shuffle_epi8(vec8, shuffleB));
+				}
 			}
-		}
 		//   2) the remaining delta-px wide rect
-		const size_t delta = (size_t)rect.width() - (softlimit * pixelsPerStep * 2);
+		const size_t delta = rect.width() % (pixelsPerStep * 2);
 		if (delta > 0) {
 			// masks to load only delta number of pixels
 			const __m256i loadmasks[7] = {

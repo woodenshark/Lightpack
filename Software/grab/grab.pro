@@ -23,9 +23,9 @@ INCLUDEPATH += ./include \
                ../math/include \
                ..
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++17
 CONFIG(clang) {
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    QMAKE_CXXFLAGS += -stdlib=libc++
     LIBS += -stdlib=libc++
 }
 
@@ -129,6 +129,22 @@ macx {
     #        -framework CoreGraphics
     #        -framework CoreFoundation
     #QMAKE_MAC_SDK = macosx10.8
+
+    QMAKE_CFLAGS += -mavx2
+    QMAKE_CFLAGS_RELEASE -= -O2
+    QMAKE_CFLAGS_RELEASE += -O3
+    QMAKE_CXXFLAGS += -mavx2
+    QMAKE_CXXFLAGS_RELEASE -= -O2
+    QMAKE_CXXFLAGS_RELEASE += -O3
+}
+
+unix:!macx {
+    QMAKE_CFLAGS += -mavx2
+    QMAKE_CFLAGS_RELEASE -= -O2
+    QMAKE_CFLAGS_RELEASE += -O3
+    QMAKE_CXXFLAGS += -mavx2
+    QMAKE_CXXFLAGS_RELEASE -= -O2
+    QMAKE_CXXFLAGS_RELEASE += -O3
 }
 
 OTHER_FILES += \

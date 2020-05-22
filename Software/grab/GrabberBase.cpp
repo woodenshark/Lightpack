@@ -141,6 +141,10 @@ void GrabberBase::grab()
 		_context->grabResult->clear();
 
 		for (int i = 0; i < _context->grabWidgets->size(); ++i) {
+			if (!_context->grabWidgets->at(i)->isAreaEnabled()) {
+				_context->grabResult->append(qRgb(0,0,0));
+				continue;
+			}
 			QRect widgetRect = _context->grabWidgets->at(i)->frameGeometry();
 			getValidRect(widgetRect);
 
@@ -168,28 +172,30 @@ void GrabberBase::grab()
 			QRect preparedRect = clippedRect.translated(-monitorRect.x(), -monitorRect.y());
 
 			// grabbed screen is rotated => rotate the widget
-			if (grabbedScreen->rotation != 0)
-				if (grabbedScreen->rotation % 4 == 1) // rotated 90
+			if (grabbedScreen->rotation != 0) {
+				if (grabbedScreen->rotation % 4 == 1) { // rotated 90
 					preparedRect.setCoords(
 						monitorRect.height() - preparedRect.bottom(),
 						preparedRect.left(),
 						monitorRect.height() - preparedRect.top(),
 						preparedRect.right()
 					);
-				else if (grabbedScreen->rotation % 4 == 2) // rotated 180
+				} else if (grabbedScreen->rotation % 4 == 2) { // rotated 180
 					preparedRect.setCoords(
 						monitorRect.width() - preparedRect.right(),
 						monitorRect.height() - preparedRect.bottom(),
 						monitorRect.width() - preparedRect.left(),
 						monitorRect.height() - preparedRect.top()
 					);
-				else if (grabbedScreen->rotation % 4 == 3) // rotated 270
+				} else if (grabbedScreen->rotation % 4 == 3) { // rotated 270
 					preparedRect.setCoords(
 						preparedRect.top(),
 						monitorRect.width() - preparedRect.right(),
 						preparedRect.bottom(),
 						monitorRect.width() - preparedRect.left()
 					);
+				}
+			}
 
 			// grabbed screen was scaled => scale the widget
 			if (grabbedScreen->scale != 1.0)
@@ -212,19 +218,13 @@ void GrabberBase::grab()
 				continue;
 			}
 
-			using namespace Grab;
 			const int bytesPerPixel = 4;
-			QRgb avgColor;
-			if (_context->grabWidgets->at(i)->isAreaEnabled()) {
-				Q_ASSERT(grabbedScreen->imgData);
-				Calculations::calculateAvgColor(
-					&avgColor, grabbedScreen->imgData, grabbedScreen->imgFormat,
-					grabbedScreen->bytesPerRow > 0 ? grabbedScreen->bytesPerRow : grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
-					preparedRect);
-				_context->grabResult->append(avgColor);
-			} else {
-				_context->grabResult->append(qRgb(0,0,0));
-			}
+			Q_ASSERT(grabbedScreen->imgData);
+			QRgb avgColor = Grab::Calculations::calculateAvgColor(
+				grabbedScreen->imgData, grabbedScreen->imgFormat,
+				grabbedScreen->bytesPerRow > 0 ? grabbedScreen->bytesPerRow : grabbedScreen->screenInfo.rect.width() * bytesPerPixel,
+				preparedRect);
+			_context->grabResult->append(avgColor);
 		}
 
 	}

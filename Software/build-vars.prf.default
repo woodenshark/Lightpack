@@ -25,6 +25,12 @@ win32: {
 
 unix:!macx {
 	# CONFIG += debug
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
+	# QMAKE_CFLAGS_DEBUG += -ggdb
+	# QMAKE_CFLAGS_RELEASE += -march=native
+	# QMAKE_CXXFLAGS_DEBUG += -ggdb
+	# QMAKE_CXXFLAGS_RELEASE += -march=native
 	DEFINES += PULSEAUDIO_SUPPORT
 	# PULSEAUDIO_INC_DIR = "../../../pulseaudio/src"
 	# PULSEAUDIO_LIB_DIR = "../../../pulseaudio/src/.libs"
@@ -39,4 +45,12 @@ macx {
 	# QMAKE_MAC_SDK_OVERRIDE = macosx10.8
 	DEFINES += SOUNDVIZ_SUPPORT
 	# DEFINES += SAVE_FRAME_TO_FILE
+
+	# CONFIG += debug
+	# QMAKE_CC += clang
+	# QMAKE_CXX += clang++
+	# QMAKE_CFLAGS_DEBUG += -ggdb
+	# QMAKE_CFLAGS_RELEASE += -march=native
+	# QMAKE_CXXFLAGS_DEBUG += -ggdb
+	# QMAKE_CXXFLAGS_RELEASE += -march=native
 }

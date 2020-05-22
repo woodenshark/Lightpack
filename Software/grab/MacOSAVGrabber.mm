@@ -18,7 +18,7 @@
 
 namespace {
 	// see notes below about pixel format and scaling
-	static const double kScaleFactor = [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:NSOperatingSystemVersion{10,14,0}] ? 0.05 : 0.17;
+	static const double kScaleFactor = 0.2;
 }
 
 @interface MacOSNativeAVCapture : NSDocument <AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -30,11 +30,11 @@ namespace {
 
 @implementation MacOSNativeAVCapture {
 	CGDirectDisplayID		_display;
-	
+
 	AVCaptureSession*		_captureSession;
 	AVCaptureScreenInput*	_captureScreenInput; // setting scale + framerate
 	BOOL _running;
-	
+
 	dispatch_queue_t	_sessionQueue;
 	dispatch_queue_t	_videoDataOutputQueue;
 }
@@ -46,7 +46,7 @@ namespace {
 	{
 		_running = NO;
 		_display = display;
-		
+
 		_sessionQueue = dispatch_queue_create("com.prismatik.avcapture.session", DISPATCH_QUEUE_SERIAL);
 		_videoDataOutputQueue = dispatch_queue_create("com.prismatik.avcapture.videodata", DISPATCH_QUEUE_SERIAL);
 		dispatch_set_target_queue(_videoDataOutputQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
@@ -72,7 +72,7 @@ namespace {
 		return YES;
 	/* Create a capture session. */
 	_captureSession = [[AVCaptureSession alloc] init];
-	
+
 	/*
 	 - scaleFactor overrides SessionPreset's Width / Height (they are removed from output.videoSettings)
 	 - setting Width / Height manually in videoSettings is technically possible, but does not provide advantage over scaleFactor
@@ -80,7 +80,7 @@ namespace {
 	 */
 //	if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetLow])
 //		[_captureSession setSessionPreset:AVCaptureSessionPresetLow];
-	
+
 	/* Add the display as a capture input. */
 	AVCaptureScreenInput* captureScreenInput = [[AVCaptureScreenInput alloc] initWithDisplayID:_display];
 	captureScreenInput.scaleFactor = kScaleFactor / MacOSAVGrabber::getDisplayScalingRatio(_display);
@@ -109,10 +109,10 @@ namespace {
 	 @0.15 scaleFactor : vert scale is ~98% of what it should be
 	 @0.05 scaleFactor : vert scale is ~74%
 	 @0.03 scaleFactor : vert scale is ~25%
-	 
+
 	 The resulting image/data itself still has the desired dimensions
 	 but the content is vertically squeeshed towards the top and the remaining bottom part contains garbage pixels
-	 
+
 	 among these available (on the test device) formats
 		kCVPixelFormatType_422YpCbCr8
 		kCVPixelFormatType_422YpCbCr8_yuvs
@@ -120,13 +120,15 @@ namespace {
 		kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
 		kCVPixelFormatType_32ARGB
 		kCVPixelFormatType_32BGRA
-	 
+
 	 only kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange was not having this issue
-	 
+
 	 On macOS 10.14.2 / 10.14 SDK no such issue
-	 
+
 	 Bundling AVFoundation, CoreVideo, CoreMedia frameworks from 10.14 SDK does not help
-	 
+
+	 April 2020 update: issue still present on 10.14 (see #326), setting scaleFactor to 0.2 for the time being
+
 	 */
 	captureDataOutput.videoSettings = @{ (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA) };
 
@@ -140,9 +142,9 @@ namespace {
 		return NO;
 	}
 	[captureDataOutput release];
-	
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:_captureSession];
-	
+
 	return YES;
 }
 
@@ -222,7 +224,7 @@ namespace {
 {
 	_running = NO;
 	[self destroyCaptureSession];
-	
+
 	@synchronized(self) {
 		self.captureError = error;
 	}
@@ -292,7 +294,7 @@ namespace {
 	@synchronized (self) {
 		self.currentPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 	}
-	
+
 }
 
 - (CVPixelBufferRef) getLastPixelBuffer:(NSError **)error
@@ -319,7 +321,7 @@ namespace {
 		{
 			setImageRef(nullptr);
 		}
-		
+
 		void setImageRef(CVPixelBufferRef _displayImageRef)
 		{
 			if (_displayImageRef == displayImageRef)
@@ -332,10 +334,10 @@ namespace {
 			if (displayImageRef)
 				CVPixelBufferLockBaseAddress(displayImageRef, kCVPixelBufferLock_ReadOnly);
 		}
-		
+
 		CVPixelBufferRef displayImageRef{nullptr};
 	};
-	
+
 	void toGrabbedScreen(CVPixelBufferRef imageRef, GrabbedScreen& screen)
 	{
 		if (!screen.associatedData)
@@ -416,7 +418,7 @@ void MacOSAVGrabber::stopGrabbing()
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << this->metaObject()->className();
 	DEBUG_MID_LEVEL << "grabbed" << grabScreensCount << "frames";
 	m_timer->stop();
-	
+
 	foreach (MacOSNativeAVCapture* capture, _captures) {
 		[capture stop];
 		[capture release];
@@ -435,7 +437,7 @@ GrabResult MacOSAVGrabber::grabDisplay(const CGDirectDisplayID display, GrabbedS
 
 	NSError* error = nil;
 	CVPixelBufferRef imageRef = [capture getLastPixelBuffer:&error];
-	
+
 	if (!imageRef) {
 		if (error) {
 			qCritical() << Q_FUNC_INFO << "[capture getLastPixelBuffer:] returned error: " << error.localizedDescription.UTF8String;
@@ -443,7 +445,7 @@ GrabResult MacOSAVGrabber::grabDisplay(const CGDirectDisplayID display, GrabbedS
 		}
 		return GrabResultFrameNotReady;
 	}
-	
+
 	toGrabbedScreen(imageRef, screen);
 	CVPixelBufferRelease(imageRef);
 

@@ -157,6 +157,7 @@ bool WinAPIGrabber::reallocate(const QList< ScreenInfo > &screens)
 		GrabbedScreen grabScreen;
 		grabScreen.imgDataSize = pixelsBuffSizeNew;
 		grabScreen.imgData = (unsigned char*)malloc(grabScreen.imgDataSize);
+		grabScreen.bytesPerRow = bmp.bmWidthBytes;
 		grabScreen.imgFormat = BufferFormatArgb;
 		grabScreen.screenInfo = screen;
 		grabScreen.associatedData = d;

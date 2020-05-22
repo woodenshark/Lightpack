@@ -39,57 +39,85 @@ CustomDistributor::~CustomDistributor() {
 }
 
 void CustomDistributor::startBottomRight() {
+	_sizeBudget = 0;
 	if (_bottomLeds) {
 		_dx = 1;
-		_width = _screen.width() * (1.0 - _standWidth) / _bottomLeds;
+		_dy = 0;
+		const int leds = roundDown(_bottomLeds) / 2;
+		if (_standWidth == 0.0) { // without stand, use top side logic
+			_width = _screen.width() / _bottomLeds;
+			_sizeBudget = std::floor((_screen.width() % _bottomLeds) / 2.0);
+		}
+		else {
+			// use left side led count as they'll have 1 more with an odd total number
+			// this will give the smaller width that'll fit on both sides
+			const int leftLeds = _bottomLeds - roundDown(_bottomLeds) / 2;
+			const int halfWidth = _screen.width() * (1.0 - _standWidth) / 2;
+			_width = halfWidth / leftLeds;
+		}
 		_height = _screen.height() * _thickness;
-		_x = _screen.left() + _screen.width() - (roundDown(_bottomLeds) / 2 * _width);
+		_x = _screen.left() + _screen.width() - (leds * _width) - _sizeBudget;
 		_y = _screen.top() + _screen.height() - _height;
 	} else startRightUp();
 }
 
 void CustomDistributor::startRightUp() {
+	_sizeBudget = 0;
 	if (_sideLeds) {
 		cleanCurrentArea();
 		_dx = 0;
 		_dy = -1;
 		_width = _screen.width() *	_thickness;
 		_height = _screen.height() / _sideLeds;
+		_sizeBudget = _screen.height() % _sideLeds;
 		_x = _screen.left() + _screen.width() - _width;
 		_y = _screen.top() + _screen.height() - _height;
 	} else startTopLeft();
 }
 
 void CustomDistributor::startTopLeft() {
+	_sizeBudget = 0;
 	if (_topLeds) {
 		cleanCurrentArea();
 		_dx = -1;
 		_dy = 0;
 		_width = _screen.width() / _topLeds;
 		_height = _screen.height() * _thickness;
+		_sizeBudget = _screen.width() % _topLeds;
 		_x = _screen.left() + _screen.width() - _width;
 		_y = _screen.top();
 	} else startLeftDown();
 }
 
 void CustomDistributor::startLeftDown() {
+	_sizeBudget = 0;
 	if (_sideLeds) {
 		cleanCurrentArea();
 		_dx = 0;
 		_dy = 1;
 		_width = _screen.width() * _thickness;
 		_height = _screen.height() / _sideLeds;
+		_sizeBudget = _screen.height() % _sideLeds;
 		_x = _screen.left();
 		_y = _screen.top();
 	} else startBottomRight2();
 }
 
 void CustomDistributor::startBottomRight2() {
+	_sizeBudget = 0;
 	if (_bottomLeds) {
 		cleanCurrentArea();
 		_dx = 1;
 		_dy = 0;
-		_width = _screen.width() * (1.0 - _standWidth) / _bottomLeds;
+		if (_standWidth == 0.0) {
+			_width = _screen.width() / _bottomLeds;
+			_sizeBudget = std::ceil((_screen.width() % _bottomLeds) / 2.0);
+		}
+		else {
+			const int leds = _bottomLeds - roundDown(_bottomLeds) / 2;
+			const int halfWidth = _screen.width() * (1.0 - _standWidth) / 2;
+			_width = halfWidth / leds;
+		}
 		_height = _screen.height() * _thickness;
 		_x = _screen.left();
 		_y = _screen.top() + _screen.height() - _height;
@@ -110,77 +138,56 @@ ScreenArea * CustomDistributor::next() {
 		startBottomRight2();
 	}
 
-	if (!_currentArea) {
-		_currentArea = new ScreenArea(_x, _x + _width, _y, _y + _height);
-	} else {
-		int dx = _width * _dx;
-		int dy = _height * _dy;
+	int wAdjust = 0;
+	int hAdjust = 0;
 
-		ScreenArea *result = new ScreenArea(_currentArea->hScanStart() + dx, _currentArea->hScanEnd() + dx,
-										_currentArea->vScanStart() + dy, _currentArea->vScanEnd() + dy);
+	if (_sizeBudget > 0) {
+		if (_dx < 0 && _dy == 0) {//top left
+			// distribute around the middle
+			const int startTopSide = (_topLeds - ((_topLeds - _sizeBudget) / 2)) * _width + _sizeBudget;
+			if (_currentArea && _currentArea->hScanStart() <= startTopSide) {
+				wAdjust = 1;
+				_sizeBudget--;
+			}
+		}
+		else if (_dx > 0 && _dy == 0) {//bottom
+			wAdjust = 1;
+			_sizeBudget--;
+		}
+		else if (_dx == 0 && _dy < 0) {//right up
+			// distribute around the middle
+			const int startRightSide = (_sideLeds - ((_sideLeds - _sizeBudget) / 2)) * _height + _sizeBudget;
+			if (_currentArea && _currentArea->vScanStart() <= startRightSide) {
+				hAdjust = 1;
+				_sizeBudget--;
+			}
+		}
+		else if (_dx == 0 && _dy > 0) {//left down
+			// distribute around the middle
+			const int startLeftSide = ((_sideLeds - _sizeBudget) / 2) * _height;
+			if (_currentArea && _currentArea->vScanEnd() >= startLeftSide) {
+				hAdjust = 1;
+				_sizeBudget--;
+			}
+		}
+	}
+
+	if (!_currentArea) {
+		_currentArea = new ScreenArea(_x, _x + _width + wAdjust, _y, _y + _height + hAdjust);
+	} else {
+		const int dx = (_width + wAdjust) * _dx;
+		const int dy = (_height + hAdjust) * _dy;
+
+		ScreenArea* result = new ScreenArea(
+			(_dx > 0 && _dy == 0) ? _currentArea->hScanEnd() : _currentArea->hScanStart() + dx,
+			(_dx < 0 && _dy == 0) ? _currentArea->hScanStart() : _currentArea->hScanEnd() + dx,
+			(_dx == 0 && _dy > 0) ? _currentArea->vScanEnd() : _currentArea->vScanStart() + dy,
+			(_dx == 0 && _dy < 0) ? _currentArea->vScanStart() : _currentArea->vScanEnd() + dy
+		);
+
 		cleanCurrentArea();
 		_currentArea = result;
 	}
-
-	// compensate for sum of all widgets != screen
-	if (_dy < 0 && _screen.height() % _sideLeds != 0) {
-		int screenMid = _screen.height() / 2;
-		if (_currentArea->vScanStart() < screenMid && _currentArea->vScanEnd() > screenMid) {
-			int dy = _screen.height() % _sideLeds;
-			ScreenArea *cf = _currentArea;
-			ScreenArea *result = new ScreenArea(cf->hScanStart(), cf->hScanEnd(),
-				cf->vScanStart() - dy, cf->vScanEnd() - dy);
-			cleanCurrentArea();
-			_currentArea = result;
-
-			return new ScreenArea(_currentArea->hScanStart(), _currentArea->hScanEnd(),
-				_currentArea->vScanStart(), _currentArea->vScanEnd() + dy);
-		}
-	}
-	if (_dx < 0 && _screen.width() % _topLeds != 0) {
-		int screenMid = _screen.width() / 2;
-		if (_currentArea->hScanStart() < screenMid && _currentArea->hScanEnd() > screenMid) {
-			int dx = _screen.width() % _topLeds;
-			ScreenArea *cf = _currentArea;
-			ScreenArea *result = new ScreenArea(cf->hScanStart() - dx, cf->hScanEnd() - dx,
-				cf->vScanStart(), cf->vScanEnd());
-			cleanCurrentArea();
-			_currentArea = result;
-
-			return new ScreenArea(_currentArea->hScanStart(), _currentArea->hScanEnd() + dx,
-				_currentArea->vScanStart(), _currentArea->vScanEnd());
-		}
-	}
-	if (_dy > 0 && _screen.height() % _sideLeds != 0) {
-		int screenMid = _screen.height() / 2;
-		if (_currentArea->vScanStart() < screenMid && _currentArea->vScanEnd() > screenMid) {
-			int dy = _screen.height() % _sideLeds;
-			ScreenArea *cf = _currentArea;
-			ScreenArea *result = new ScreenArea(cf->hScanStart(), cf->hScanEnd(),
-				cf->vScanStart() + dy, cf->vScanEnd() + dy);
-			cleanCurrentArea();
-			_currentArea = result;
-
-			return new ScreenArea(_currentArea->hScanStart(), _currentArea->hScanEnd(),
-				_currentArea->vScanStart() - dy, _currentArea->vScanEnd());
-		}
-	}
-	if (_dx > 0 && _screen.width() % _bottomLeds != 0) {
-		int screenMid = _screen.width() / 2;
-		if (_currentArea->hScanStart() < screenMid && _currentArea->hScanEnd() > screenMid) {
-			int dx = _screen.width() % _bottomLeds;
-			ScreenArea *cf = _currentArea;
-			ScreenArea *result = new ScreenArea(cf->hScanStart() + dx, cf->hScanEnd() + dx,
-				cf->vScanStart(), cf->vScanEnd());
-			cleanCurrentArea();
-			_currentArea = result;
-
-			return new ScreenArea(_currentArea->hScanStart() - dx, _currentArea->hScanEnd(),
-				_currentArea->vScanStart(), _currentArea->vScanEnd());
-		}
-
-	}
-
 	return new ScreenArea(*_currentArea);
 
 }

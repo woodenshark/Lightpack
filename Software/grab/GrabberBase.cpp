@@ -206,10 +206,6 @@ void GrabberBase::grab()
 					std::floor(grabbedScreen->scale * preparedRect.bottom())
 				);
 
-			// Align width by 4 for accelerated calculations
-			preparedRect.setWidth(preparedRect.width() - (preparedRect.width() % 4));
-
-
 			if( !preparedRect.isValid() ){
 				qWarning() << Q_FUNC_INFO << " preparedRect is not valid:" << Debug::toString(preparedRect);
 				// width and height can't be negative

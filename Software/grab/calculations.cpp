@@ -348,7 +348,6 @@ namespace Grab {
 	namespace Calculations {
 		QRgb calculateAvgColor(const unsigned char * const buffer, BufferFormat bufferFormat, const size_t pitch, const QRect &rect) {
 
-			Q_ASSERT_X(rect.width() % pixelsPerStep == 0, "average color calculation", "rect width should be aligned by 4 bytes");
 			ColorValue color;
 			switch(bufferFormat) {
 			case BufferFormatArgb:

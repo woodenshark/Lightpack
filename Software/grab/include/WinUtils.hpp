@@ -89,6 +89,7 @@ VOID FreeRestrictedSD(PVOID ptr);
 		void apply(QList<QRgb>& colors, const double/*gamma*/);
 		static bool isSupported();
 	private:
+		time_t _gammaAge = 0;
 		WORD _gammaArray[3][256];
 		static bool loadGamma(LPVOID gamma, HDC* dc);
 	};

@@ -421,14 +421,22 @@ VOID FreeRestrictedSD(PVOID ptr) {
 			qWarning() << Q_FUNC_INFO << "Unable to create DC:" << GetLastError();
 			return false;
 		}
+
 		return true;
 	}
 
 	void GammaRamp::apply(QList<QRgb>& colors, const double/*gamma*/)
 	{
 		HDC dc = NULL;
-		if (!loadGamma(&_gammaArray, &dc))
-			return;
+
+		// Reload the gamma ramp every 15 seconds only.
+		// There seems to be a memory leak somewhere in the API and we don't
+		// expect the ramp to change every frame.
+		if (time(nullptr) - _gammaAge > 15) {
+			if (!loadGamma(&_gammaArray, &dc))
+				return;
+			_gammaAge = time(nullptr);
+		}
 
 		for (QRgb& color : colors) {
 			int red = qRed(color);

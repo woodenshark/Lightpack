@@ -29,6 +29,7 @@
 #include <QBitmap>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QPainterPath>
 #include "debug.h"
 
 const unsigned GrabConfigWidget::MarginArrow = 20;

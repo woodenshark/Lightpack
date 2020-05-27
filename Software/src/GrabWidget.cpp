@@ -490,8 +490,8 @@ void GrabWidget::wheelEvent(QWheelEvent *pe)
 		return;
 	}
 
-	if (pe->delta() > 0) m_colorIndex++;
-	if (pe->delta() < 0) m_colorIndex--;
+	if (pe->angleDelta().y() > 0) m_colorIndex++;
+	if (pe->angleDelta().y() < 0) m_colorIndex--;
 
 	if (m_colorIndex >= ColorsCount)
 	{

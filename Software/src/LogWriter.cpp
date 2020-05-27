@@ -45,11 +45,11 @@ int LogWriter::initWith(const QString& logsDirPath)
 		QMutexLocker locker(&m_mutex);
 
 		m_logStream.setDevice(logFile.take());
-		m_logStream << endl;
+		m_logStream << Qt::endl;
 
 		const QDateTime currentDateTime(QDateTime::currentDateTime());
 		m_logStream << currentDateTime.date().toString("yyyy_MM_dd") << " ";
-		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR << endl;
+		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR << Qt::endl;
 
 		// write the cached log
 		m_logStream << m_startupLogStore;

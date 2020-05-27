@@ -65,7 +65,7 @@ LedDeviceLightpack::~LedDeviceLightpack()
 
 void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << (colors.isEmpty() ? -1 : colors.first());
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << (colors.isEmpty() ? -1 : colors.first());
 #if 0
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 #endif

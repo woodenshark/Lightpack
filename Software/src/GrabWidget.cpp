@@ -705,7 +705,7 @@ void GrabWidget::onBlueCoef_ValueChanged(double value)
 
 void GrabWidget::setBackgroundColor(QColor color)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
 
 	m_backgroundColor = color;
 
@@ -723,7 +723,7 @@ void GrabWidget::setBackgroundColor(QColor color)
 
 void GrabWidget::setTextColor(QColor color)
 {
-	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
 
 	setOpenConfigButtonBackground(color);
 

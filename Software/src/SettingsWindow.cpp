@@ -2249,15 +2249,15 @@ QString SettingsWindow::getPluginName(const Plugin *plugin) const
 
 void SettingsWindow::on_pbRunConfigurationWizard_clicked()
 {
+	const QStringList args("--wizard");
 #ifdef Q_OS_WIN
 	QString cmdLine;
 	cmdLine.append("\"");
 	cmdLine.append(QApplication::applicationFilePath());
 	cmdLine.append("\"");
-	cmdLine.append(" --wizard");
-	QProcess::startDetached(cmdLine);
+	QProcess::startDetached(cmdLine, args);
 #else
-	QProcess::startDetached(QApplication::applicationFilePath().append(" --wizard"));
+	QProcess::startDetached(QApplication::applicationFilePath(), args);
 #endif
 
 	quit();

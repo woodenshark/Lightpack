@@ -107,7 +107,6 @@ void Plugin::Start()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _exec;
 
-	QString program = _exec;
 	//QStringList arguments;
 	//arguments << "-style" << "fusion";
 
@@ -119,7 +118,8 @@ void Plugin::Start()
 
 	process->setEnvironment(QProcess::systemEnvironment());
 //	process->setProcessChannelMode(QProcess::ForwardedChannels);
-	process->start(program,NULL);
+	process->setProgram(_exec);
+	process->start();
 }
 
 void Plugin::Stop()

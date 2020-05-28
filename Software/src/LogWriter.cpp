@@ -29,15 +29,15 @@ int LogWriter::initWith(const QString& logsDirPath)
 
 	QDir logsDir(logsDirPath);
 	if (logsDir.exists() == false) {
-		cout << "mkdir " << logsDirPath.toStdString() << endl;
+		std::cout << "mkdir " << logsDirPath.toStdString() << std::endl;
 		if (logsDir.mkdir(logsDirPath) == false) {
-			cerr << "Failed mkdir '" << logsDirPath.toStdString() << "' for logs. Exit." << endl;
+			std::cerr << "Failed mkdir '" << logsDirPath.toStdString() << "' for logs. Exit." << std::endl;
 			return LightpackApplication::LogsDirecroryCreationFail_ErrorCode;
 		}
 	}
 
 	if (rotateLogFiles(logsDir) == false)
-		cerr << "Failed to rotate old log files." << endl;
+		std::cerr << "Failed to rotate old log files." << std::endl;
 
 	const QString logFilePath = logsDirPath + "/Prismatik.0.log";
 	QScopedPointer<QFile> logFile(new QFile(logFilePath));
@@ -45,17 +45,26 @@ int LogWriter::initWith(const QString& logsDirPath)
 		QMutexLocker locker(&m_mutex);
 
 		m_logStream.setDevice(logFile.take());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		m_logStream << Qt::endl;
+#else
 		m_logStream << endl;
+#endif
 
 		const QDateTime currentDateTime(QDateTime::currentDateTime());
 		m_logStream << currentDateTime.date().toString("yyyy_MM_dd") << " ";
-		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR << endl;
+		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		m_logStream << Qt::endl;
+#else
+		m_logStream << endl;
+#endif
 
 		// write the cached log
 		m_logStream << m_startupLogStore;
 		m_startupLogStore.clear();
 	} else {
-		cerr << "Failed to open logs file: '" << logFilePath.toStdString() << "'. Exit." << endl;
+		std::cerr << "Failed to open logs file: '" << logFilePath.toStdString() << "'. Exit." << std::endl;
 		return LightpackApplication::OpenLogsFail_ErrorCode;
 	}
 

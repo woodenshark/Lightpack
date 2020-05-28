@@ -65,7 +65,12 @@ LedDeviceLightpack::~LedDeviceLightpack()
 
 void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << (colors.isEmpty() ? -1 : colors.first());
+#else
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << (colors.isEmpty() ? -1 : colors.first());
+#endif
+
 #if 0
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 #endif
@@ -355,7 +360,7 @@ bool LedDeviceLightpack::readDataFromDevice()
 }
 
 bool LedDeviceLightpack::writeBufferToDevice(int command, hid_device *phid_device)
-{	
+{
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << command;
 #if 0
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();

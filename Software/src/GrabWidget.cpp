@@ -344,7 +344,7 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 }
 
 bool GrabWidget::snapEdgeToScreenOrClosestFellow(
-	QRect& newRect, 
+	QRect& newRect,
 	const QRect& screen,
 	std::function<void(QRect&,int)> setter,
 	std::function<int(const QRect&)> getter,
@@ -384,8 +384,8 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "pe->pos() =" << pe->pos();
 
 	QRect screen = QApplication::desktop()->screenGeometry(this);
-	
-	
+
+
 	if (cmd == NOP ){
 		checkAndSetCursors(pe);
 	} else if (cmd == MOVE) {
@@ -455,7 +455,7 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 				[](const QRect& r) { return r.bottom(); },
 				[](const QRect& r) { return r.top() - 1; });
 		}
-		
+
 		if (newRect.size() != geometry().size()) {
 			resize(newRect.size());
 		}
@@ -705,7 +705,11 @@ void GrabWidget::onBlueCoef_ValueChanged(double value)
 
 void GrabWidget::setBackgroundColor(QColor color)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
+#else
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
+#endif
 
 	m_backgroundColor = color;
 
@@ -723,7 +727,11 @@ void GrabWidget::setBackgroundColor(QColor color)
 
 void GrabWidget::setTextColor(QColor color)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
+#else
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
+#endif
 
 	setOpenConfigButtonBackground(color);
 

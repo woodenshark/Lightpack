@@ -2043,18 +2043,20 @@ void SettingsWindow::versionsUpdate()
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
 	// use template to construct version string
-	QString versionsTemplate = tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"> <html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\"> <p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">software <span style=\" font-size:8pt; font-weight:600;\">%1</span><span style=\" font-size:8pt;\"> (revision </span><a href=\"https://github.com/psieg/Lightpack/commit/%2\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">%2</span></a><span style=\" font-size:8pt;\">), firmware <b>%3</b></span></p></body></html>");
+	QString versionsTemplate = tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\"> <html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\"> <p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">software <span style=\" font-size:8pt; font-weight:600;\">%1</span><span style=\" font-size:8pt;\"> (rev </span><a href=\"https://github.com/psieg/Lightpack/commit/%2\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">%2</span></a><span style=\" font-size:8pt;\">, Qt %4), firmware <b>%3</b></span></p></body></html>");
 
 #ifdef GIT_REVISION
 	versionsTemplate = versionsTemplate.arg(
 				QApplication::applicationVersion(),
 				GIT_REVISION,
-				fimwareVersion );
+				fimwareVersion,
+				QT_VERSION_STR);
 #else
 	versionsTemplate = versionsTemplate.arg(
 				QApplication::applicationVersion(),
 				"unknown",
-				fimwareVersion );
+				fimwareVersion,
+				QT_VERSION_STR);
 	versionsTemplate.remove(QRegExp(" \\([^()]+unknown[^()]+\\)"));
 #endif
 

@@ -211,6 +211,7 @@ static const QString RefreshDelay = "Device/RefreshDelay";
 static const QString IsUsbPowerLedDisabled = "Device/IsUsbPowerLedDisabled";
 static const QString Smooth = "Device/Smooth";
 static const QString Brightness = "Device/Brightness";
+static const QString BrightnessCap = "Device/BrightnessCap";
 static const QString ColorDepth = "Device/ColorDepth";
 static const QString Gamma = "Device/Gamma";
 }
@@ -664,7 +665,7 @@ void Settings::setApiKey(const QString & apiKey)
 }
 
 bool Settings::isExpertModeEnabled()
-{	
+{
 	return valueMain(Main::Key::IsExpertModeEnabled).toBool();
 }
 
@@ -1282,6 +1283,18 @@ void Settings::setDeviceBrightness(int value)
 	m_this->deviceBrightnessChanged(value);
 }
 
+int Settings::getDeviceBrightnessCap()
+{
+	return getValidDeviceBrightnessCap(value(Profile::Key::Device::BrightnessCap).toInt());
+}
+
+void Settings::setDeviceBrightnessCap(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Device::BrightnessCap, getValidDeviceBrightnessCap(value));
+	m_this->deviceBrightnessCapChanged(value);
+}
+
 int Settings::getDeviceSmooth()
 {
 	return getValidDeviceSmooth(value(Profile::Key::Device::Smooth).toInt());
@@ -1743,6 +1756,15 @@ int Settings::getValidDeviceBrightness(int value)
 	return value;
 }
 
+int Settings::getValidDeviceBrightnessCap(int value)
+{
+	if (value < Profile::Device::BrightnessCapMin)
+		value = Profile::Device::BrightnessCapMin;
+	else if (value > Profile::Device::BrightnessCapMax)
+		value = Profile::Device::BrightnessCapMax;
+	return value;
+}
+
 int Settings::getValidDeviceSmooth(int value)
 {
 	if (value < Profile::Device::SmoothMin)
@@ -1826,7 +1848,7 @@ void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coe
 					<< keyCoef
 					<< error
 					<< "Convert to double error. Set it to default value" << keyCoef << "=" << Profile::Led::CoefDefault;
-		coef = Profile::Led::CoefDefault;		
+		coef = Profile::Led::CoefDefault;
 	}
 	Settings::setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + "/" + keyCoef, coef);
 }
@@ -1928,6 +1950,7 @@ void Settings::initCurrentProfile(bool isResetDefault)
 	setNewOption(Profile::Key::Device::RefreshDelay,				Profile::Device::RefreshDelayDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,		Profile::Device::IsUsbPowerLedDisabled, isResetDefault);
 	setNewOption(Profile::Key::Device::Brightness,					Profile::Device::BrightnessDefault, isResetDefault);
+	setNewOption(Profile::Key::Device::BrightnessCap,				Profile::Device::BrightnessCapDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Smooth,						Profile::Device::SmoothDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Gamma,						Profile::Device::GammaDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::ColorDepth,					Profile::Device::ColorDepthDefault, isResetDefault);

@@ -171,6 +171,7 @@ enum Cmd {
 	SetSmoothSlowdown,
 	SetGamma,
 	SetBrightness,
+	SetBrightnessCap,
 	SetLuminosityThreshold,
 	SetMinimumLuminosityEnabled,
 	SetColorSequence,

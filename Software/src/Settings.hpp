@@ -189,6 +189,8 @@ public:
 	static void setDeviceUsbPowerLedDisabled(bool isDisabled);
 	static int getDeviceBrightness();
 	static void setDeviceBrightness(int value);
+	static int getDeviceBrightnessCap();
+	static void setDeviceBrightnessCap(int value);
 	static int getDeviceSmooth();
 	static void setDeviceSmooth(int value);
 	static int getDeviceColorDepth();
@@ -256,9 +258,10 @@ public:
 	static QString getAutoUpdatingVersion();
 	static void setAutoUpdatingVersion(const QString & version);
 
-private:		
+private:
 	static int getValidDeviceRefreshDelay(int value);
 	static int getValidDeviceBrightness(int value);
+	static int getValidDeviceBrightnessCap(int value);
 	static int getValidDeviceSmooth(int value);
 	static int getValidDeviceColorDepth(int value);
 	static double getValidDeviceGamma(double value);
@@ -340,6 +343,7 @@ signals:
 	void deviceRefreshDelayChanged(int value);
 	void deviceUsbPowerLedDisabledChanged(bool isDisabled);
 	void deviceBrightnessChanged(int value);
+	void deviceBrightnessCapChanged(int value);
 	void deviceSmoothChanged(int value);
 	void deviceColorDepthChanged(int value);
 	void deviceGammaChanged(double gamma);

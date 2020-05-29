@@ -60,6 +60,7 @@ signals:
 	void ledDeviceSetSmoothSlowdown(int value);
 	void ledDeviceSetGamma(double value);
 	void ledDeviceSetBrightness(int value);
+	void ledDeviceSetBrightnessCap(int value);
 	void ledDeviceSetLuminosityThreshold(int value);
 	void ledDeviceSetMinimumLuminosityEnabled(bool);
 	void ledDeviceSetColorSequence(QString value);
@@ -82,6 +83,7 @@ public slots:
 	void setSmoothSlowdown(int value);
 	void setGamma(double value);
 	void setBrightness(int value);
+	void setBrightnessCap(int value);
 	void setLuminosityThreshold(int value);
 	void setMinimumLuminosityEnabled(bool value);
 	void setColorSequence(QString value);
@@ -119,6 +121,7 @@ private:
 	int m_savedSmoothSlowdown;
 	double m_savedGamma;
 	int m_savedBrightness;
+	int m_savedBrightnessCap;
 	int m_savedLuminosityThreshold;
 	bool m_savedIsMinimumLuminosityEnabled;
 	QString m_savedColorSequence;

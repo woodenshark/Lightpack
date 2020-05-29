@@ -222,6 +222,10 @@ static const int BrightnessMin = 0;
 static const int BrightnessDefault = 100;
 static const int BrightnessMax = 100;
 
+static const int BrightnessCapMin = 1;
+static const int BrightnessCapDefault = 100;
+static const int BrightnessCapMax = 100;
+
 static const int SmoothMin = 0;
 static const int SmoothDefault = 100;
 static const int SmoothMax = 255;

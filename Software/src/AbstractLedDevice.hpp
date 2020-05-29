@@ -71,6 +71,7 @@ public slots:
 	virtual void setSmoothSlowdown(int value) = 0;
 	virtual void setGamma(double value, bool updateColors = true);
 	virtual void setBrightness(int value, bool updateColors = true);
+	virtual void setBrightnessCap(int value, bool updateColors = true);
 	virtual void setColorSequence(QString value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
@@ -98,6 +99,7 @@ protected:
 	QString m_colorSequence;
 	double m_gamma;
 	int m_brightness;
+	int m_brightnessCap;
 	int m_luminosityThreshold;
 	bool m_isMinimumLuminosityEnabled;
 

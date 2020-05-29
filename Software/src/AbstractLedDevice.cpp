@@ -41,6 +41,12 @@ void AbstractLedDevice::setBrightness(int value, bool updateColors) {
 		setColors(m_colorsSaved);
 }
 
+void AbstractLedDevice::setBrightnessCap(int value, bool updateColors) {
+	m_brightnessCap = value;
+	if (updateColors)
+		setColors(m_colorsSaved);
+}
+
 void AbstractLedDevice::setLuminosityThreshold(int value, bool updateColors) {
 	m_luminosityThreshold = value;
 	if (updateColors)
@@ -69,6 +75,7 @@ void AbstractLedDevice::updateDeviceSettings()
 	using namespace SettingsScope;
 	setGamma(Settings::getDeviceGamma(), false);
 	setBrightness(Settings::getDeviceBrightness(), false);
+	setBrightnessCap(Settings::getDeviceBrightnessCap(), false);
 	setLuminosityThreshold(Settings::getLuminosityThreshold(), false);
 	setMinimumLuminosityThresholdEnabled(Settings::isMinimumLuminosityEnabled(), false);
 	updateWBAdjustments(Settings::getLedCoefs(), false);
@@ -89,9 +96,9 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
 
 		//renormalize to 12bit
 		double k = 4095/255.0;
-		outColors[i].r = qRed(inColors[i])	* k;
+		outColors[i].r = qRed(inColors[i]) * k;
 		outColors[i].g = qGreen(inColors[i]) * k;
-		outColors[i].b = qBlue(inColors[i])	* k;
+		outColors[i].b = qBlue(inColors[i]) * k;
 
 		PrismatikMath::gammaCorrection(m_gamma, outColors[i]);
 	}
@@ -127,6 +134,13 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
 			outColors[i].g *= m_wbAdjustments[i].green;
 			outColors[i].b *= m_wbAdjustments[i].blue;
 		}
+		if (m_brightnessCap < SettingsScope::Profile::Device::BrightnessCapMax) {
+			const double bcapFactor = (40.95 * 3 * m_brightnessCap) / (outColors[i].r + outColors[i].g + outColors[i].b);
+			if (bcapFactor < 1.0) {
+				outColors[i].r *= bcapFactor;
+				outColors[i].g *= bcapFactor;
+				outColors[i].b *= bcapFactor;
+			}
+		}
 	}
-
 }

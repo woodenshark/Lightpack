@@ -20,6 +20,7 @@ May 29, 2020
 * Reduce CPU load using SSE/AVX
 * Fixes to Zone Distributors
 * Tweaks for MacOS grabbing
+* Fix Windows Night Light detection
 * Slowed gamma ramp memory leak (Windows)
 
 Version 5.11.2.22

@@ -13,6 +13,15 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.23
+---------------
+May 29, 2020
+
+* Reduce CPU load using SSE/AVX
+* Fixes to Zone Distributors
+* Tweaks for MacOS grabbing
+* Slowed gamma ramp memory leak (Windows)
+
 Version 5.11.2.22
 ---------------
 March 29, 2020

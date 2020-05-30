@@ -634,7 +634,7 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 		case LedDeviceCommands::SetBrightnessCap:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetBrightness(m_savedBrightness);
+			emit ledDeviceSetBrightnessCap(m_savedBrightnessCap);
 			break;
 
 		case LedDeviceCommands::SetColorSequence:

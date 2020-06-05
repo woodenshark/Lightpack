@@ -39,11 +39,11 @@ enum {
 	Page_LightpackDiscovery,
 	Page_ChooseDevice,
 	Page_ConfigureDevice,
-    Page_ConfigureUdpDevice,
+	Page_ConfigureUdpDevice,
 	Page_MonitorConfiguration,
 	Page_ChooseProfile,
 	Page_ZonePlacement,
-    Page_ConfigureDevicePower,
+	Page_ConfigureDevicePower,
 	Page_GlobalColorCoef
 };
 

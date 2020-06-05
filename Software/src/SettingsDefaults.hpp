@@ -103,6 +103,11 @@ static const int PortDefault = 3636;
 static const QString AuthKey = "";
 // See ApiKey generation in Settings initialization
 }
+namespace Device
+{
+static const int LedMilliAmpsDefault = 50;
+static const double PowerSupplyAmpsDefault = 0.0;
+}
 namespace Adalight
 {
 static const int NumberOfLedsDefault = 25;

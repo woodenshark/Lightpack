@@ -150,6 +150,10 @@ public:
 	static void setWarlsPort(const QString& port);
 	static int getWarlsTimeout();
 	static void setWarlsTimeout(const int timeout);
+	static int getDeviceLedMilliAmps(const SupportedDevices::DeviceType device);
+	static void setDeviceLedMilliAmps(const SupportedDevices::DeviceType device, const int mamps);
+	static double getDevicePowerSupplyAmps(const SupportedDevices::DeviceType device);
+	static void setDevicePowerSupplyAmps(const SupportedDevices::DeviceType device, const double amps);
 	static QStringList getSupportedSerialPortBaudRates();
 	static bool isConnectedDeviceUsesSerialPort();
 	// [Adalight | Ardulight | Lightpack | ... | Virtual]
@@ -311,24 +315,38 @@ signals:
 	void hotkeyChanged(const QString &actionName, const QKeySequence & newKeySequence, const QKeySequence &oldKeySequence);
 	void adalightSerialPortNameChanged(const QString & port);
 	void adalightSerialPortBaudRateChanged(const QString & baud);
+	void adalightLedMilliAmpsChanged(const int mAmps);
+	void adalightPowerSupplyAmpsChanged(const double amps);
 	void ardulightSerialPortNameChanged(const QString & port);
 	void ardulightSerialPortBaudRateChanged(const QString & baud);
+	void ardulightLedMilliAmpsChanged(const int mAmps);
+	void ardulightPowerSupplyAmpsChanged(const double amps);
 	void drgbAddressChanged(const QString& address);
 	void drgbPortChanged(const QString& port);
 	void drgbTimeoutChanged(const int timeout);
+	void drgbLedMilliAmpsChanged(const int mAmps);
+	void drgbPowerSupplyAmpsChanged(const double amps);
 	void dnrgbAddressChanged(const QString& address);
 	void dnrgbPortChanged(const QString& port);
 	void dnrgbTimeoutChanged(const int timeout);
+	void dnrgbLedMilliAmpsChanged(const int mAmps);
+	void dnrgbPowerSupplyAmpsChanged(const double amps);
 	void warlsAddressChanged(const QString& address);
 	void warlsPortChanged(const QString& port);
 	void warlsTimeoutChanged(const int timeout);
+	void warlsLedMilliAmpsChanged(const int mAmps);
+	void warlsPowerSupplyAmpsChanged(const double amps);
 	void lightpackNumberOfLedsChanged(int numberOfLeds);
+	void lightpackLedMilliAmpsChanged(const int mAmps);
+	void lightpackPowerSupplyAmpsChanged(const double amps);
 	void adalightNumberOfLedsChanged(int numberOfLeds);
 	void ardulightNumberOfLedsChanged(int numberOfLeds);
-	void virtualNumberOfLedsChanged(int numberOfLeds);
 	void drgbNumberOfLedsChanged(int numberOfLeds);
 	void dnrgbNumberOfLedsChanged(int numberOfLeds);
 	void warlsNumberOfLedsChanged(int numberOfLeds);
+	void virtualNumberOfLedsChanged(int numberOfLeds);
+	void virtualLedMilliAmpsChanged(const int mAmps);
+	void virtualPowerSupplyAmpsChanged(const double amps);
 	void grabSlowdownChanged(int value);
 	void backlightEnabledChanged(bool isEnabled);
 	void grabAvgColorsEnabledChanged(bool isEnabled);
@@ -381,5 +399,7 @@ private:
 	static Settings *m_this;
 	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToNameMap;
 	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToKeyNumberOfLedsMap;
+	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToKeyLedMilliAmpsMap;
+	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToKeyPowerSupplyAmpsMap;
 };
 } /*SettingsScope*/

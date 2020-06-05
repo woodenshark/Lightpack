@@ -450,54 +450,62 @@ AbstractLedDevice * LedDeviceManager::createLedDevice(SupportedDevices::DeviceTy
 #		endif /* Q_OS_WIN */
 	}
 
+	AbstractLedDevice* device = nullptr;
+
 	switch (deviceType){
 
 	case SupportedDevices::DeviceTypeLightpack:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::LightpackDevice";
-		return (AbstractLedDevice *)new LedDeviceLightpack();
+		device = (AbstractLedDevice *)new LedDeviceLightpack();
 
 	case SupportedDevices::DeviceTypeAlienFx:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::AlienFxDevice";
 
 #		ifdef Q_OS_WIN
-		return (AbstractLedDevice *)new LedDeviceAlienFx();
+		device = (AbstractLedDevice *)new LedDeviceAlienFx();
 #		else
 		break;
 #		endif /* Q_OS_WIN */
 
 	case SupportedDevices::DeviceTypeAdalight:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::AdalightDevice";
-		return (AbstractLedDevice *)new LedDeviceAdalight(Settings::getAdalightSerialPortName(), Settings::getAdalightSerialPortBaudRate());
+		device = (AbstractLedDevice *)new LedDeviceAdalight(Settings::getAdalightSerialPortName(), Settings::getAdalightSerialPortBaudRate());
 
 	case SupportedDevices::DeviceTypeArdulight:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::ArdulightDevice";
-		return (AbstractLedDevice *)new LedDeviceArdulight(Settings::getArdulightSerialPortName(), Settings::getArdulightSerialPortBaudRate());
+		device = (AbstractLedDevice *)new LedDeviceArdulight(Settings::getArdulightSerialPortName(), Settings::getArdulightSerialPortBaudRate());
 
 	case SupportedDevices::DeviceTypeDrgb:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::DrgbDevice";
-		return (AbstractLedDevice*)new LedDeviceDrgb(Settings::getDrgbAddress(), Settings::getDrgbPort(), Settings::getDrgbTimeout());
+		device = (AbstractLedDevice*)new LedDeviceDrgb(Settings::getDrgbAddress(), Settings::getDrgbPort(), Settings::getDrgbTimeout());
 
 	case SupportedDevices::DeviceTypeDnrgb:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::DnrgbDevice";
-		return (AbstractLedDevice*)new LedDeviceDnrgb(Settings::getDnrgbAddress(), Settings::getDnrgbPort(), Settings::getDnrgbTimeout());
+		device = (AbstractLedDevice*)new LedDeviceDnrgb(Settings::getDnrgbAddress(), Settings::getDnrgbPort(), Settings::getDnrgbTimeout());
 
 	case SupportedDevices::DeviceTypeWarls:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::WarlsDevice";
-		return (AbstractLedDevice*)new LedDeviceWarls(Settings::getWarlsAddress(), Settings::getWarlsPort(), Settings::getWarlsTimeout());
+		device = (AbstractLedDevice*)new LedDeviceWarls(Settings::getWarlsAddress(), Settings::getWarlsPort(), Settings::getWarlsTimeout());
 
 	case SupportedDevices::DeviceTypeVirtual:
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "SupportedDevices::VirtualDevice";
-		return (AbstractLedDevice *)new LedDeviceVirtual();
+		device = (AbstractLedDevice *)new LedDeviceVirtual();
 
 	default:
 		break;
+	}
+
+	if (device) {
+		device->setLedMilliAmps(Settings::getDeviceLedMilliAmps(deviceType));
+		device->setPowerSupplyAmps(Settings::getDevicePowerSupplyAmps(deviceType));
+		return device;
 	}
 
 	qFatal("%s %s%d%s", Q_FUNC_INFO,
 			"Create LedDevice fail. deviceType = '", deviceType,
 			"'. Application exit.");
 
-	return NULL; // Avoid compiler warning
+	return nullptr; // Avoid compiler warning
 }
 
 void LedDeviceManager::connectSignalSlotsLedDevice()

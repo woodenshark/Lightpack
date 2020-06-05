@@ -72,6 +72,8 @@ public slots:
 	virtual void setGamma(double value, bool updateColors = true);
 	virtual void setBrightness(int value, bool updateColors = true);
 	virtual void setBrightnessCap(int value, bool updateColors = true);
+	virtual void setLedMilliAmps(const int value, const bool updateColors = true);
+	virtual void setPowerSupplyAmps(const double value, const bool updateColors = true);
 	virtual void setColorSequence(QString value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
@@ -100,6 +102,8 @@ protected:
 	double m_gamma;
 	int m_brightness;
 	int m_brightnessCap;
+	int m_ledMilliAmps{0};
+	double m_powerSupplyAmps{0.0};
 	int m_luminosityThreshold;
 	bool m_isMinimumLuminosityEnabled;
 

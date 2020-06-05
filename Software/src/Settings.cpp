@@ -1253,7 +1253,7 @@ double Settings::getDevicePowerSupplyAmps(const SupportedDevices::DeviceType dev
 	}
 
 	// TODO: validator on maximum number of leds for current 'device'
-	return valueMain(key).toInt();
+	return valueMain(key).toDouble();
 }
 
 void Settings::setColorSequence(SupportedDevices::DeviceType device, QString colorSequence)

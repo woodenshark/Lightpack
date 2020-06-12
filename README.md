@@ -34,20 +34,20 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
 * The device is simple to build (just Do-It-Yourself)
 * Ambilight
 
-![Ambilight](screenshots/ambilight_win.png)
+  ![Ambilight](screenshots/ambilight_win.png)
 
 * Sound Visualizers
 
-![SoundViz](screenshots/soundviz_win.png)
+  ![SoundViz](screenshots/soundviz_win.png)
 
 * Mood Lamps
 
-![Mood Lamps](screenshots/moodlamps_win.png)
+  ![Mood Lamps](screenshots/moodlamps_win.png)
 
 * Profiles
 * Network accessible API ([documentation](https://github.com/Atarity/Lightpack-docs/blob/master/EN/Prismatik_API.md))
 
-![API](screenshots/api_win.png)
+  ![API](screenshots/api_win.png)
 
   * [code samples](Software/apiexamples)
   * [Home Assistant integration](https://github.com/zomfg/home-assistant-prismatik)

@@ -40,7 +40,7 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
 #### Prerequisites:
 * [Qt SDK](http://qt-project.org/downloads), you may need to set `%QTDIR%` (sysdm.cpl &rarr; Advanced &rarr; Environment Variables &rarr; New) to something like `C:\Qt\x.xx.x\msvc_xxxx\`.
 * Visual Studio, [Windows SDK](https://msdn.microsoft.com/en-us/windows/desktop/ff851942.aspx) or [Microsoft DirectX SDK](http://www.microsoft.com/en-us/download/details.aspx?id=6812)
-* optional (if you want to create an installer) POSIX shell utilities [MSYS for example](http://www.mingw.org/wiki/MSYS). 
+* optional (if you want to create an installer) POSIX shell utilities [MSYS for example](http://www.mingw.org/wiki/MSYS).
 * optional [any](https://wiki.openssl.org/index.php/Binaries) [OpenSSL binaries](https://slproweb.com/products/Win32OpenSSL.html) to include them in the setup. If you just want to build, you can skip them in `build-vars.prf` (this will render the update check ineffective).
 * optional [BASS and BASSWASAPI](http://www.un4seen.com/) for the Sound Visualizer. You can skip them in `build-vars.prf`.
 
@@ -70,7 +70,7 @@ You will need the following packages, usually all of them are in distro's reposi
 * qttools5-dev-tools
 * if you are using Ubuntu: libappindicator-dev
 * not required, but the update checker uses SSL sockets: openssl
-* for sound visualizer: libpulse-dev, libfftw3-dev
+* for sound visualizer: `libpulse-dev`, `libfftw3-dev`
 
 #### Build Process:
 1. Go to `<repo>/Software`

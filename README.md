@@ -12,6 +12,8 @@ Lightpack project with Prismatik flavour
 
 **Table of Contents:** <br />
 &nbsp;&nbsp;[Short Description](#lightpack-project-with-prismatik-flavour) <br />
+&nbsp;&nbsp;[Main Features](#main-features) <br />
+&nbsp;&nbsp;[Supported Devices and Protocols](#supported-devices-and-protocols) <br />
 &nbsp;&nbsp;[Useful URLs](#useful-urls) <br />
 &nbsp;&nbsp;[Build Prismatik with Windows](#prismatik-build-instructions-for-windows) <br />
 &nbsp;&nbsp;[Build with Linux](#build-instructions-for-linux) <br />
@@ -30,6 +32,41 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
 * Cross-platform GUI (Qt)
 * USB HID (no need to install any drivers)
 * The device is simple to build (just Do-It-Yourself)
+* Ambilight
+
+![Ambilight](screenshots/ambilight_win.png)
+
+* Sound Visualizers
+
+![SoundViz](screenshots/soundviz_win.png)
+
+* Mood Lamps
+
+![Mood Lamps](screenshots/moodlamps_win.png)
+
+* Profiles
+* Network accessible API ([documentation](https://github.com/Atarity/Lightpack-docs/blob/master/EN/Prismatik_API.md))
+
+![API](screenshots/api_win.png)
+
+  * [code samples](Software/apiexamples)
+  * [Home Assistant integration](https://github.com/zomfg/home-assistant-prismatik)
+  * [AutoHotKeys example](https://github.com/psieg/Lightpack/issues/306#issuecomment-586597755)
+
+
+##### Supported Devices and Protocols:
+* Lightpack PC/v1
+* Serial
+  * Adalight
+  * Ardulight
+  * Arduino
+  * ESP8266/ESP32 ([WLED](https://github.com/Aircoookie/WLED) firmware highly recommended)
+* Wi-Fi UDP:
+  * WARLS
+  * DRGB
+  * DNRGB
+  * ESP8266/ESP32 ([WLED](https://github.com/Aircoookie/WLED) firmware highly recommended)
+
 
 ##### Useful URLs:
 * [Project mothership](https://github.com/psieg/Lightpack/)

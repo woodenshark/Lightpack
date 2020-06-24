@@ -2106,6 +2106,11 @@ void SettingsWindow::on_pushButton_GammaCorrectionHelp_clicked()
 	showHelpOf(ui->horizontalSlider_GammaCorrection);
 }
 
+void SettingsWindow::on_pushButton_BrightnessCapHelp_clicked()
+{
+	showHelpOf(ui->horizontalSlider_DeviceBrightnessCap);
+}
+
 void SettingsWindow::on_pushButton_lumosityThresholdHelp_clicked()
 {
 	showHelpOf(ui->horizontalSlider_LuminosityThreshold);

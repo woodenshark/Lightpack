@@ -216,6 +216,7 @@ private slots:
 	void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
 	void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_BrightnessCapHelp_clicked();
 
 	void on_pushButton_lumosityThresholdHelp_clicked();
 

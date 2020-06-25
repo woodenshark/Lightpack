@@ -1916,7 +1916,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
          <widget class="QSpinBox" name="spinBox_DeviceBrightnessCap">
           <property name="maximumSize">
            <size>
-            <width>45</width>
+            <width>50</width>
             <height>16777215</height>
            </size>
           </property>
@@ -1953,7 +1953,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
           <property name="maximumSize">
            <size>
-            <width>45</width>
+            <width>50</width>
             <height>16777215</height>
            </size>
           </property>

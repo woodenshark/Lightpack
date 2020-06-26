@@ -133,13 +133,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Start offset</string>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0" colspan="2">
         <widget class="QCheckBox" name="cbInvertOrder">
          <property name="text">
@@ -197,16 +190,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
-        <widget class="QSpinBox" name="sbNumberingOffset">
-         <property name="minimum">
-          <number>-999</number>
-         </property>
-         <property name="maximum">
-          <number>999</number>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -228,6 +211,30 @@
         <widget class="QPushButton" name="pbApply">
          <property name="text">
           <string>Apply</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Start offset</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QSpinBox" name="sbNumberingOffset">
+         <property name="minimum">
+          <number>-999</number>
+         </property>
+         <property name="maximum">
+          <number>999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="2">
+        <widget class="QCheckBox" name="checkBox_skipCorners">
+         <property name="text">
+          <string>skip corners</string>
          </property>
         </widget>
        </item>

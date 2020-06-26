@@ -176,7 +176,8 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 		sideLeds,
 		bottomLeds,
 		_ui->sbThickness->value() / 100.0,
-		_ui->sbStandWidth->value() / 100.0);
+		_ui->sbStandWidth->value() / 100.0,
+		_ui->checkBox_skipCorners->isChecked());
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
@@ -198,7 +199,8 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 		sideLeds,
 		0,
 		_ui->sbThickness->value() / 100.0,
-		_ui->sbStandWidth->value() / 100.0);
+		_ui->sbStandWidth->value() / 100.0,
+		_ui->checkBox_skipCorners->isChecked());
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
@@ -217,7 +219,8 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 		sideLeds,
 		0,
 		_ui->sbThickness->value() / 100.0,
-		_ui->sbStandWidth->value() / 100.0);
+		_ui->sbStandWidth->value() / 100.0,
+		_ui->checkBox_skipCorners->isChecked());
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(0);
@@ -236,7 +239,8 @@ void ZonePlacementPage::on_pbApply_clicked()
 		_ui->sbSideLeds->value(),
 		_ui->sbBottomLeds->value(),
 		_ui->sbThickness->value() / 100.0,
-		_ui->sbStandWidth->value() / 100.0);
+		_ui->sbStandWidth->value() / 100.0,
+		_ui->checkBox_skipCorners->isChecked());
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 

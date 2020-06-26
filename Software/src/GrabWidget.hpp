@@ -81,8 +81,10 @@ private:
 	virtual void closeEvent(QCloseEvent *event);
 	void setCursorOnAll(Qt::CursorShape cursor);
 	void checkAndSetCursors(QMouseEvent *pe);
-	void setBackgroundColor(QColor color);
-	void setTextColor(QColor color);
+	void setBackgroundColor(const QColor& color);
+	void setTextColor(const QColor& color);
+	QColor getBackgroundColor();
+	QColor getTextColor();
 	void setOpenConfigButtonBackground(const QColor &color);
 
 	QRect resizeAccordingly(QMouseEvent *pe);

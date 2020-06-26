@@ -531,7 +531,7 @@ void GrabWidget::paintEvent(QPaintEvent *)
 	painter.setOpacity(0.4);
 
 	// Draw icon 12x12px with 3px padding from the bottom right corner
-	if (m_textColor == Qt::white)
+	if (getTextColor() == Qt::white)
 		painter.drawPixmap(width() - 18, height() - 18, 12, 12, QPixmap(":/icons/res_light.png"));
 	else{
 		//painter.setOpacity(0.5);
@@ -539,15 +539,15 @@ void GrabWidget::paintEvent(QPaintEvent *)
 	}
 
 	// Self ID and size text opacity
-	painter.setOpacity(0.25);
+	painter.setOpacity(isAreaEnabled() ? 0.25 : 1.0);
 
 	QFont font = painter.font();
 	font.setBold(true);
 	font.setPixelSize((height() / 3 < width() / 3) ? height() / 3 : width() / 3);
 	painter.setFont(font);
 
-	painter.setPen(m_textColor);
-	painter.setBrush(QBrush(m_textColor));
+	painter.setPen(getTextColor());
+	painter.setBrush(QBrush(getTextColor()));
 	painter.drawText(rect(), m_selfIdString, QTextOption(Qt::AlignCenter));
 
 	font.setBold(false);
@@ -667,7 +667,7 @@ void GrabWidget::checkAndSetCursors(QMouseEvent *pe)
 	}
 }
 
-void GrabWidget::onIsAreaEnabled_Toggled(bool state)
+void GrabWidget::onIsAreaEnabled_Toggled(const bool state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
 
@@ -675,6 +675,7 @@ void GrabWidget::onIsAreaEnabled_Toggled(bool state)
 		Settings::setLedEnabled(m_selfId, state);
 	}
 	setBackgroundColor(m_backgroundColor);
+	setTextColor(m_textColor);
 }
 
 void GrabWidget::onOpenConfigButton_Clicked()
@@ -708,7 +709,7 @@ void GrabWidget::onBlueCoef_ValueChanged(double value)
 	m_coefBlue = Settings::getLedCoefBlue(m_selfId);
 }
 
-void GrabWidget::setBackgroundColor(QColor color)
+void GrabWidget::setBackgroundColor(const QColor& color)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
@@ -719,18 +720,11 @@ void GrabWidget::setBackgroundColor(QColor color)
 	m_backgroundColor = color;
 
 	QPalette pal = palette();
-
-	if (isAreaEnabled())
-	{
-		pal.setBrush(backgroundRole(), QBrush(m_backgroundColor));
-	} else {
-		// Disabled widget
-		pal.setBrush(backgroundRole(), QBrush(Qt::darkGray));
-	}
+	pal.setBrush(backgroundRole(), QBrush(getBackgroundColor()));
 	setPalette(pal);
 }
 
-void GrabWidget::setTextColor(QColor color)
+void GrabWidget::setTextColor(const QColor& color)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << Qt::hex << color.rgb();
@@ -739,14 +733,21 @@ void GrabWidget::setTextColor(QColor color)
 #endif
 
 	setOpenConfigButtonBackground(color);
+	m_textColor = color;
 
-	if (isAreaEnabled())
-	{
-		m_textColor = color;
-	} else {
-		// Disabled widget
-		m_textColor = Qt::black;
-	}
+	QPalette pal = palette();
+	pal.setBrush(foregroundRole(), QBrush(getTextColor()));
+	setPalette(pal);
+}
+
+QColor GrabWidget::getTextColor()
+{
+	return isAreaEnabled() ? m_textColor : Qt::red;
+}
+
+QColor GrabWidget::getBackgroundColor()
+{
+	return isAreaEnabled() ? m_backgroundColor : Qt::black;
 }
 
 void GrabWidget::setOpenConfigButtonBackground(const QColor &color)

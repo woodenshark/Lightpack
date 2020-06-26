@@ -34,10 +34,11 @@ namespace Ui {
 }
 
 enum GrabWidgetFeature : int {
-	SyncSettings = 0x1,
-	AllowCoefAndEnableConfig = 0x10,
-	AllowColorCycle = 0x100,
-	DimUntilInteractedWith = 0x1000
+	SyncSettings = 1 << 0,
+	AllowCoefConfig = 1 << 1,
+	AllowEnableConfig = 1 << 2,
+	AllowColorCycle = 1 << 3,
+	DimUntilInteractedWith = 1 << 4
 };
 
 class GrabWidget : public QWidget

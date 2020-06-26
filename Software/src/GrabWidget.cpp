@@ -78,25 +78,25 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 
 	//fillBackgroundColored(); ??
 
-	if (features & AllowCoefAndEnableConfig) {
-
+	if (features & (AllowCoefConfig | AllowEnableConfig)) {
 		m_configWidget = new GrabConfigWidget();
-		connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
-		connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
-		connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
-		connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
-
+		if (features & AllowEnableConfig) {
+			connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
+		}
+		if (features & AllowCoefConfig) {
+			connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
+			connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
+			connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
+		}
 	} else {
 		ui->button_OpenConfig->setVisible(false);
 	}
 
-	if (features & SyncSettings) {
-
+	if (features & SyncSettings)
 		settingsProfileChanged();
 
+	if (features & (SyncSettings | AllowCoefConfig | AllowEnableConfig))
 		connect(ui->button_OpenConfig, SIGNAL(clicked()), this, SLOT(onOpenConfigButton_Clicked()));
-
-	}
 }
 
 GrabWidget::~GrabWidget()
@@ -585,7 +585,7 @@ bool GrabWidget::isAreaEnabled()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-	if (m_features & AllowCoefAndEnableConfig) {
+	if (m_features & AllowEnableConfig) {
 		return m_configWidget->isAreaEnabled();
 	} else {
 		return true;
@@ -679,7 +679,7 @@ void GrabWidget::onOpenConfigButton_Clicked()
 	// Find y-coordinate for center of the button
 	int buttonCenter = ui->button_OpenConfig->pos().y() + ui->button_OpenConfig->height() / 2;
 
-	m_configWidget->showConfigFor(geometry(), buttonCenter);
+	m_configWidget->showConfigFor(geometry(), buttonCenter, m_features & AllowEnableConfig, m_features & AllowCoefConfig);
 }
 
 void GrabWidget::onRedCoef_ValueChanged(double value)

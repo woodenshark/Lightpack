@@ -30,6 +30,7 @@
 #include "LedDeviceVirtual.hpp"
 #include "LedDeviceDrgb.hpp"
 #include "QDesktopWidget"
+#include "Settings.hpp"
 
 SelectDevicePage::SelectDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
 	QWizardPage(parent),
@@ -46,12 +47,25 @@ SelectDevicePage::~SelectDevicePage()
 
 void SelectDevicePage::initializePage()
 {
+	const SupportedDevices::DeviceType deviceType = SettingsScope::Settings::getConnectedDevice();
 	registerField("isAdalight", ui->rbAdalight);
+	if (deviceType == SupportedDevices::DeviceTypeAdalight)
+		ui->rbAdalight->setChecked(true);
 	registerField("isArdulight", ui->rbArdulight);
+	if (deviceType == SupportedDevices::DeviceTypeArdulight)
+		ui->rbArdulight->setChecked(true);
 	registerField("isVirtual", ui->rbVirtual);
+	if (deviceType == SupportedDevices::DeviceTypeVirtual)
+		ui->rbVirtual->setChecked(true);
     registerField("isDrgb", ui->rbDrgb);
+	if (deviceType == SupportedDevices::DeviceTypeDrgb)
+		ui->rbDrgb->setChecked(true);
     registerField("isDnrgb", ui->rbDnrgb);
+	if (deviceType == SupportedDevices::DeviceTypeDnrgb)
+		ui->rbDnrgb->setChecked(true);
     registerField("isWarls", ui->rbWarls);
+	if (deviceType == SupportedDevices::DeviceTypeWarls)
+		ui->rbWarls->setChecked(true);
 }
 
 void SelectDevicePage::cleanupPage()

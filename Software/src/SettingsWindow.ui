@@ -1307,19 +1307,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
          </widget>
         </item>
-        <item row="4" column="3">
-         <widget class="QLabel" name="label_12">
-          <property name="maximumSize">
-           <size>
-            <width>16</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>%</string>
-          </property>
-         </widget>
-        </item>
         <item row="6" column="0">
          <widget class="QSlider" name="horizontalSlider_GammaCorrection">
           <property name="sizePolicy">
@@ -1435,25 +1422,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </spacer>
           </item>
          </layout>
-        </item>
-        <item row="2" column="3">
-         <widget class="QLabel" name="label_15">
-          <property name="maximumSize">
-           <size>
-            <width>16</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">margin:0px;</string>
-          </property>
-          <property name="text">
-           <string>%</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
         </item>
         <item row="4" column="5">
          <widget class="QPushButton" name="pushButton_BrightnessCapHelp">
@@ -1916,7 +1884,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
          <widget class="QSpinBox" name="spinBox_DeviceBrightnessCap">
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -1935,7 +1903,10 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           <property name="value">
            <number>100</number>
           </property>
-         </widget>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          </widget>
         </item>
         <item row="2" column="2">
          <widget class="QSpinBox" name="spinBox_DeviceBrightness">
@@ -1953,7 +1924,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -1972,7 +1943,10 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           <property name="value">
            <number>100</number>
           </property>
-         </widget>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          </widget>
         </item>
         <item row="6" column="5">
          <widget class="QPushButton" name="pushButton_GammaCorrectionHelp">

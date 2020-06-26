@@ -61,6 +61,11 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 
 	// Button image size 24x24 px
 	ui->button_OpenConfig->setFixedSize(24, 24);
+	ui->button_OpenConfig->setStyleSheet(
+		"QPushButton		{ border-image: url(:/buttons/settings_24px.png) }"
+		"QPushButton:hover	{ border-image: url(:/buttons/settings_24px.png) }"
+		"QPushButton:pressed { border-image: url(:/buttons/settings_24px.png) }"
+	);
 
 	m_selfId = id;
 	m_selfIdString = QString::number(m_selfId + 1);
@@ -746,11 +751,10 @@ void GrabWidget::setTextColor(QColor color)
 
 void GrabWidget::setOpenConfigButtonBackground(const QColor &color)
 {
-	QString image = (color == Qt::white && isAreaEnabled()) ? "light" : "dark";
-
+	QString image = (color == Qt::white && isAreaEnabled()) ? "dark" : "light";
 	ui->button_OpenConfig->setStyleSheet(
-				"QPushButton			{ border-image: url(:/buttons/arrow_right_" + image + "_24px.png) }"
-				"QPushButton:hover	{ border-image: url(:/buttons/arrow_right_" + image + "_24px_hover.png) }"
-				"QPushButton:pressed { border-image: url(:/buttons/arrow_right_" + image + "_24px_pressed.png) }"
-				);
+		"QPushButton		{ border-image: url(:/buttons/settings_" + image + "_24px.png) }"
+		"QPushButton:hover	{ border-image: url(:/buttons/settings_" + image + "_24px_hover.png) }"
+		"QPushButton:pressed { border-image: url(:/buttons/settings_" + image + "_24px_pressed.png) }"
+	);
 }

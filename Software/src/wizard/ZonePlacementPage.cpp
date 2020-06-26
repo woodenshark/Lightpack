@@ -33,10 +33,6 @@
 #include "GrabWidget.hpp"
 #include "LedDeviceLightpack.hpp"
 
-#define STAND_WIDTH 0.3333
-#define THICKNESS 0.15
-
-
 ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
 	WizardPageUsingDevice(isInitFromSettings, ts, parent),
 	_ui(new Ui::ZonePlacementPage)
@@ -165,7 +161,7 @@ void ZonePlacementPage::removeLastGrabArea()
 void ZonePlacementPage::on_pbAndromeda_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
-	const int bottomWidth = screen.width() * (1.0 - STAND_WIDTH);
+	const int bottomWidth = screen.width() * (1.0 - _ui->sbStandWidth->value() / 100.0);
 	const int perimeter = screen.width() + screen.height() * 2 + bottomWidth;
 	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
 
@@ -177,15 +173,13 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 		topLeds,
 		sideLeds,
 		bottomLeds,
-		THICKNESS,
-		STAND_WIDTH);
+		_ui->sbThickness->value() / 100.0,
+		_ui->sbStandWidth->value() / 100.0);
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(bottomLeds);
-	_ui->sbThickness->setValue(THICKNESS * 100);
-	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 
@@ -201,15 +195,13 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 		topLeds,
 		sideLeds,
 		0,
-		THICKNESS,
-		STAND_WIDTH);
+		_ui->sbThickness->value() / 100.0,
+		_ui->sbStandWidth->value() / 100.0);
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);
-	_ui->sbThickness->setValue(THICKNESS * 100);
-	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 
@@ -222,15 +214,13 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 		0,
 		sideLeds,
 		0,
-		THICKNESS,
-		STAND_WIDTH);
+		_ui->sbThickness->value() / 100.0,
+		_ui->sbStandWidth->value() / 100.0);
 
 	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(0);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);
-	_ui->sbThickness->setValue(THICKNESS * 100);
-	_ui->sbStandWidth->setValue(STAND_WIDTH * 100);
 	delete custom;
 }
 

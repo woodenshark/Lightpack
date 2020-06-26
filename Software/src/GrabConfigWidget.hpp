@@ -40,7 +40,7 @@ public:
 	explicit GrabConfigWidget(QWidget *parent = 0);
 	~GrabConfigWidget();
 
-	void showConfigFor(QRect widgetGeometry, int buttonCenter);
+	void showConfigFor(QRect widgetGeometry, int buttonCenter, const bool showEnable, const bool showCoefs);
 	void setCoefs(double red, double green, double blue);
 	void setIsAreaEnabled(bool isAreaEnabled);
 	bool isAreaEnabled();

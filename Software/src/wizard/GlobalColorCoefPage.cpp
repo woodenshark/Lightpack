@@ -137,6 +137,7 @@ bool GlobalColorCoefPage::validatePage()
 	for (int id : _transSettings->zonePositions.keys()) {
 		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
+		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
 		Settings::setLedCoefRed(id, _ui->sbRed->value() / (double)_ui->sbRed->maximum());
 		Settings::setLedCoefGreen(id, _ui->sbGreen->value() / (double)_ui->sbGreen->maximum());
 		Settings::setLedCoefBlue(id, _ui->sbBlue->value() / (double)_ui->sbBlue->maximum());

@@ -103,9 +103,11 @@ bool ZonePlacementPage::validatePage()
 {
 	_transSettings->zonePositions.clear();
 	_transSettings->zoneSizes.clear();
-	for (int i = 0; i < _grabAreas.size(); i++) {
-		_transSettings->zonePositions.insert(_grabAreas[i]->getId(), _grabAreas[i]->geometry().topLeft());
-		_transSettings->zoneSizes.insert(_grabAreas[i]->getId(), _grabAreas[i]->geometry().size());
+	_transSettings->zoneEnabled.clear();
+	for (GrabWidget* const grabArea : _grabAreas) {
+		_transSettings->zonePositions.insert(grabArea->getId(), grabArea->geometry().topLeft());
+		_transSettings->zoneSizes.insert(grabArea->getId(), grabArea->geometry().size());
+		_transSettings->zoneEnabled.insert(grabArea->getId(), grabArea->isAreaEnabled());
 	}
 
 	cleanupGrabAreas();

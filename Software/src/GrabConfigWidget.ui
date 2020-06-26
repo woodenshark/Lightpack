@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>152</width>
+    <width>105</width>
     <height>139</height>
    </rect>
   </property>
@@ -21,17 +21,17 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_Green">
-     <property name="text">
-      <string>Green</string>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_Blue">
      <property name="text">
       <string>Blue</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_Green">
+     <property name="text">
+      <string>Green</string>
      </property>
     </widget>
    </item>
@@ -45,39 +45,11 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="label_Percent_1">
-     <property name="text">
-      <string notr="true">%</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="label_Percent_2">
-     <property name="text">
-      <string notr="true">%</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="label_Percent_3">
-     <property name="text">
-      <string notr="true">%</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QSpinBox" name="spinBox_Red">
-     <property name="maximum">
-      <number>100</number>
+     <property name="suffix">
+      <string>%</string>
      </property>
-     <property name="value">
-      <number>100</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QSpinBox" name="spinBox_Green">
      <property name="maximum">
       <number>100</number>
      </property>
@@ -88,6 +60,22 @@
    </item>
    <item row="3" column="1">
     <widget class="QSpinBox" name="spinBox_Blue">
+     <property name="suffix">
+      <string>%</string>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="spinBox_Green">
+     <property name="suffix">
+      <string>%</string>
+     </property>
      <property name="maximum">
       <number>100</number>
      </property>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>640</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <string>Zone placement</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="2">
+   <item row="4" column="2">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -43,7 +43,7 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -56,7 +56,7 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="2">
+   <item row="2" column="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -235,7 +235,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="6">
+   <item row="2" column="6">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -247,6 +247,15 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;p&gt;You can disable some zones by using the gear button of the zone.&lt;br/&gt;
+You'll be able to re-adjust each zone individually later:&lt;br/&gt;
+Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustement&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;p&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot;/&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

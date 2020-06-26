@@ -60,8 +60,8 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	ui->setupUi(this);
 
 	// Button image size 24x24 px, but it makes it impossible to resize widgets to less than that
-	// Setting minimumSize instead does not respect the aspect ratio, leaving at 12 for now
-	ui->button_OpenConfig->setFixedSize(12, 12);
+	// Setting minimumSize instead does not respect the aspect ratio, leaving at 16 for now
+	ui->button_OpenConfig->setFixedSize(16, 16);
 	ui->button_OpenConfig->setStyleSheet(
 		"QPushButton		{ border-image: url(:/buttons/settings_24px.png) }"
 		"QPushButton:hover	{ border-image: url(:/buttons/settings_24px.png) }"

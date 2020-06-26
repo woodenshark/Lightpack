@@ -235,7 +235,7 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 }
 
 
-void ZonePlacementPage::on_pbCustom_clicked()
+void ZonePlacementPage::on_pbApply_clicked()
 {
 	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 	CustomDistributor *custom = new CustomDistributor(

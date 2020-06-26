@@ -180,7 +180,7 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 		THICKNESS,
 		STAND_WIDTH);
 
-	distributeAreas(custom);
+	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(bottomLeds);
@@ -204,7 +204,7 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 		THICKNESS,
 		STAND_WIDTH);
 
-	distributeAreas(custom);
+	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);
@@ -225,7 +225,7 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 		THICKNESS,
 		STAND_WIDTH);
 
-	distributeAreas(custom);
+	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(0);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);

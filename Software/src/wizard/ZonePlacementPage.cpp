@@ -124,6 +124,7 @@ void ZonePlacementPage::resetNewAreaRect()
 void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool invertIds, int idOffset) {
 
 	cleanupGrabAreas();
+	_grabAreas.reserve(_transSettings->ledCount);
 	for(int i = 0; i < distributor->areaCount(); i++) {
 		ScreenArea *sf = distributor->next();
 		qDebug() << sf->hScanStart() << sf->vScanStart();
@@ -180,20 +181,20 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 	const int bottomLeds = ((bottomWidth / ledSize) + 1) & ~1;//round up / down to next even number
 	const int sideLeds = screen.height() / ledSize;
 	const int topLeds = _ui->sbNumberOfLeds->value() - bottomLeds - sideLeds * 2;
-	CustomDistributor *custom = new CustomDistributor(
+	CustomDistributor custom(
 		screen,
 		topLeds,
 		sideLeds,
 		bottomLeds,
 		_ui->sbThickness->value() / 100.0,
 		_ui->sbStandWidth->value() / 100.0,
-		_ui->checkBox_skipCorners->isChecked());
+		_ui->checkBox_skipCorners->isChecked()
+	);
 
-	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+	distributeAreas(&custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(bottomLeds);
-	delete custom;
 }
 
 void ZonePlacementPage::on_pbCassiopeia_clicked()
@@ -203,60 +204,59 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
 	const int sideLeds = screen.height() / ledSize;
 	const int topLeds = _ui->sbNumberOfLeds->value() - sideLeds * 2;
-	CustomDistributor *custom = new CustomDistributor(
+	CustomDistributor custom(
 		screen,
 		topLeds,
 		sideLeds,
 		0,
 		_ui->sbThickness->value() / 100.0,
 		_ui->sbStandWidth->value() / 100.0,
-		_ui->checkBox_skipCorners->isChecked());
+		_ui->checkBox_skipCorners->isChecked()
+	);
 
-	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+	distributeAreas(&custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(topLeds);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);
-	delete custom;
 }
 
 void ZonePlacementPage::on_pbPegasus_clicked()
 {
 	QRect screen = screenRect();
 	const int sideLeds = _ui->sbNumberOfLeds->value() / 2;
-	CustomDistributor *custom = new CustomDistributor(
+	CustomDistributor custom(
 		screen,
 		0,
 		sideLeds,
 		0,
 		_ui->sbThickness->value() / 100.0,
 		_ui->sbStandWidth->value() / 100.0,
-		_ui->checkBox_skipCorners->isChecked());
+		_ui->checkBox_skipCorners->isChecked()
+	);
 
-	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+	distributeAreas(&custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 	_ui->sbTopLeds->setValue(0);
 	_ui->sbSideLeds->setValue(sideLeds);
 	_ui->sbBottomLeds->setValue(0);
-	delete custom;
 }
 
 
 void ZonePlacementPage::on_pbApply_clicked()
 {
 	QRect screen = screenRect();
-	CustomDistributor *custom = new CustomDistributor(
+	CustomDistributor custom(
 		screen,
 		_ui->sbTopLeds->value(),
 		_ui->sbSideLeds->value(),
 		_ui->sbBottomLeds->value(),
 		_ui->sbThickness->value() / 100.0,
 		_ui->sbStandWidth->value() / 100.0,
-		_ui->checkBox_skipCorners->isChecked());
+		_ui->checkBox_skipCorners->isChecked()
+	);
 
-	distributeAreas(custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
+	distributeAreas(&custom, _ui->cbInvertOrder->isChecked(), _ui->sbNumberingOffset->value());
 
 	_ui->sbNumberOfLeds->setValue(_grabAreas.size());
-
-	delete custom;
 }
 
 

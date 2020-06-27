@@ -57,8 +57,7 @@ private slots:
 	void on_pbCassiopeia_clicked();
 	void on_pbPegasus_clicked();
 	void on_pbApply_clicked();
-
-	void on_numberOfLeds_valueChanged(int arg1);
+	void on_sbNumberOfLeds_valueChanged(int arg1);
 
 private:
 	void addGrabArea(int id, const QRect &rect);

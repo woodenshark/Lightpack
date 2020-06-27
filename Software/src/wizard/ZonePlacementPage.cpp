@@ -62,6 +62,7 @@ void ZonePlacementPage::initializePage()
 	device()->setSmoothSlowdown(70);
 
 	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
+	_ui->sbNumberOfLeds->blockSignals(true);
 
 	if (_isInitFromSettings) {
 		int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
@@ -79,8 +80,7 @@ void ZonePlacementPage::initializePage()
 		_transSettings->ledCount = device()->defaultLedsCount();
 		on_pbAndromeda_clicked();
 	}
-	connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(on_numberOfLeds_valueChanged(int)));
-
+	_ui->sbNumberOfLeds->blockSignals(false);
 	resetDeviceSettings();
 	turnLightsOff();
 }
@@ -88,7 +88,6 @@ void ZonePlacementPage::initializePage()
 void ZonePlacementPage::cleanupPage()
 {
 	cleanupGrabAreas();
-	_ui->sbNumberOfLeds->disconnect();
 }
 
 void ZonePlacementPage::cleanupGrabAreas()
@@ -261,7 +260,7 @@ void ZonePlacementPage::on_pbApply_clicked()
 }
 
 
-void ZonePlacementPage::on_numberOfLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::on_sbNumberOfLeds_valueChanged(int numOfLed)
 {
 	while (numOfLed < _grabAreas.size()) {
 		removeLastGrabArea();

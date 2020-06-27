@@ -44,8 +44,6 @@ public:
 	int hScanEnd() const { return _hScanEnd; }
 	int vScanStart() const { return _vScanStart; }
 	int vScanEnd() const { return _vScanEnd; }
-	int vSize() const { return _vScanEnd - _vScanStart; }
-	int hSize() const { return _hScanEnd - _hScanStart; }
 protected:
 	int _hScanStart;
 	int _hScanEnd;

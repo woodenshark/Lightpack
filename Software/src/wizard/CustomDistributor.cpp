@@ -40,11 +40,13 @@ CustomDistributor::~CustomDistributor() {
 
 void CustomDistributor::startBottomRight() {
 	_sizeBudget = 0;
+	_ledCount = 0;
 	if (_bottomLeds) {
 		_dx = 1;
 		_dy = 0;
+		_ledCount = roundDown(_bottomLeds) / 2;
 		const int bLeds = _bottomLeds + _skipCorners * 2;
-		const int hLeds = roundDown(_bottomLeds) / 2 + _skipCorners;
+		const int hLeds = _ledCount + _skipCorners;
 		if (_standWidth == 0.0) { // without stand, use top side logic
 			_width = _screen.width() / bLeds;
 			_sizeBudget = std::floor((_screen.width() % bLeds) / 2.0);
@@ -63,8 +65,10 @@ void CustomDistributor::startBottomRight() {
 
 void CustomDistributor::startRightUp() {
 	_sizeBudget = 0;
+	_ledCount = 0;
 	if (_sideLeds) {
 		cleanCurrentArea();
+		_ledCount = _sideLeds;
 		const int leds = _sideLeds + (_skipCorners * 2);
 		_dx = 0;
 		_dy = -1;
@@ -78,8 +82,10 @@ void CustomDistributor::startRightUp() {
 
 void CustomDistributor::startTopLeft() {
 	_sizeBudget = 0;
+	_ledCount = 0;
 	if (_topLeds) {
 		cleanCurrentArea();
+		_ledCount = _topLeds;
 		const int leds = _topLeds + (_skipCorners * 2);
 		_dx = -1;
 		_dy = 0;
@@ -93,8 +99,10 @@ void CustomDistributor::startTopLeft() {
 
 void CustomDistributor::startLeftDown() {
 	_sizeBudget = 0;
+	_ledCount = 0;
 	if (_sideLeds) {
 		cleanCurrentArea();
+		_ledCount = _sideLeds;
 		const int leds = _sideLeds + (_skipCorners * 2);
 		_dx = 0;
 		_dy = 1;
@@ -108,12 +116,14 @@ void CustomDistributor::startLeftDown() {
 
 void CustomDistributor::startBottomRight2() {
 	_sizeBudget = 0;
+	_ledCount = 0;
 	if (_bottomLeds) {
 		cleanCurrentArea();
 		_dx = 1;
 		_dy = 0;
+		_ledCount = roundDown(_bottomLeds) / 2;
 		const int bLeds = _bottomLeds + _skipCorners * 2;
-		const int hLeds = roundDown(_bottomLeds) / 2 + _skipCorners;
+		const int hLeds = _ledCount + _skipCorners;
 		if (_standWidth == 0.0) {
 			_width = _screen.width() / bLeds;
 			_sizeBudget = std::ceil((_screen.width() % bLeds) / 2.0);
@@ -132,13 +142,13 @@ void CustomDistributor::startBottomRight2() {
 ScreenArea * CustomDistributor::next() {
 	if (_dx == 0 && _dy == 0) {
 		startBottomRight();
-	} else if (_dx > 0 && cmp(_currentArea->hScanEnd(), _screen.left() + _screen.width() - _skipCorners * _currentArea->hSize(), .01) >= 0) {
+	} else if (_dx > 0 && _ledCount == 0) {
 		startRightUp();
-	} else if (_dy < 0 && cmp(_currentArea->vScanStart(), _screen.top() + _skipCorners * _currentArea->vSize(), .01) <= 0) {
+	} else if (_dy < 0 && _ledCount == 0) {
 		startTopLeft();
-	} else if (_dx < 0 && cmp(_currentArea->hScanStart(), _screen.left() + _skipCorners * _currentArea->hSize(), .01) <= 0) {
+	} else if (_dx < 0 && _ledCount == 0) {
 		startLeftDown();
-	} else if (_dy > 0 && cmp(_currentArea->vScanEnd(), _screen.top() + _screen.height() - _skipCorners * _currentArea->vSize(), .01) >= 0) {
+	} else if (_dy > 0 && _ledCount == 0) {
 		startBottomRight2();
 	}
 
@@ -195,6 +205,7 @@ ScreenArea * CustomDistributor::next() {
 		cleanCurrentArea();
 		_currentArea = result;
 	}
+	_ledCount--;
 	return new ScreenArea(*_currentArea);
 
 }

@@ -51,6 +51,7 @@ protected:
 	double _thickness;
 	double _standWidth;
 	bool _skipCorners;
+	int _ledCount{ 0 };
 
 	void startBottomRight();
 	void startRightUp();

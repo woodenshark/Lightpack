@@ -66,6 +66,7 @@ private:
 	void cleanupGrabAreas();
 	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);
 	void resetNewAreaRect();
+	QRect screenRect() const;
 
 	Ui::ZonePlacementPage *_ui;
 	int _screenId;

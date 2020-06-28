@@ -73,6 +73,7 @@ signals:
 	void updateSlowdown(int value);
 	void updateGamma(double value);
 	void updateBrightness(int percent);
+	void updateBrightnessCap(int percent);
 	void requestFirmwareVersion();
 #ifdef SOUNDVIZ_SUPPORT
 	void requestSoundVizDevices();
@@ -179,6 +180,7 @@ private slots:
 	void onDisableUsbPowerLed_toggled(bool state);
 	void onDeviceSmooth_valueChanged(int value);
 	void onDeviceBrightness_valueChanged(int value);
+	void onDeviceBrightnessCap_valueChanged(int value);
 	void onDeviceColorDepth_valueChanged(int value);
 	void onDeviceGammaCorrection_valueChanged(double value);
 	void onSliderDeviceGammaCorrection_valueChanged(int value);
@@ -214,6 +216,7 @@ private slots:
 	void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
 	void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_BrightnessCapHelp_clicked();
 
 	void on_pushButton_lumosityThresholdHelp_clicked();
 

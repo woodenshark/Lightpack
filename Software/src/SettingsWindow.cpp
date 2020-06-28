@@ -233,6 +233,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->checkBox_DisableUsbPowerLed, SIGNAL(toggled(bool)), this, SLOT(onDisableUsbPowerLed_toggled(bool)));
 	connect(ui->spinBox_DeviceSmooth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceSmooth_valueChanged(int)));
 	connect(ui->spinBox_DeviceBrightness, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightness_valueChanged(int)));
+	connect(ui->spinBox_DeviceBrightnessCap, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightnessCap_valueChanged(int)));
 	connect(ui->spinBox_DeviceColorDepth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceColorDepth_valueChanged(int)));
 	connect(ui->doubleSpinBox_DeviceGamma, SIGNAL(valueChanged(double)), this, SLOT(onDeviceGammaCorrection_valueChanged(double)));
 	connect(ui->horizontalSlider_GammaCorrection, SIGNAL(valueChanged(int)), this, SLOT(onSliderDeviceGammaCorrection_valueChanged(int)));
@@ -267,7 +268,7 @@ void SettingsWindow::connectSignalsSlots()
 #else
 	ui->pushButton_SoundVizDeviceHelp->hide();
 #endif // Q_OS_MACOS
-	
+
 #endif// SOUNDVIZ_SUPPORT
 	connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
@@ -464,6 +465,7 @@ void SettingsWindow::setDeviceTabWidgetsVisibility(DeviceTab::Options options)
 void SettingsWindow::syncLedDeviceWithSettingsWindow()
 {
 	emit updateBrightness(Settings::getDeviceBrightness());
+	emit updateBrightnessCap(Settings::getDeviceBrightnessCap());
 	emit updateGamma(Settings::getDeviceGamma());
 }
 
@@ -1076,7 +1078,7 @@ void SettingsWindow::ledDeviceOpenSuccess(bool isSuccess)
 }
 
 void SettingsWindow::ledDeviceCallSuccess(bool isSuccess)
-{	
+{
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << isSuccess << m_backlightStatus << sender();
 
 	// If Backlight::StatusOff then nothings changed
@@ -1135,7 +1137,7 @@ void SettingsWindow::ledDeviceFirmwareVersionUnofficialResult(const int version)
 }
 
 void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
-{	
+{
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << updateResultMs;
 
 	double hz = 0;
@@ -1161,7 +1163,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 		DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "Therotical Max Hz for led count and baud rate:" << theoreticalMaxHz << ledCount << baudRate;
 		if (theoreticalMaxHz <= hz)
 			qWarning() << Q_FUNC_INFO << hz << "FPS went over theoretical max of" << theoreticalMaxHz;
-		
+
 		const QPalette& defaultPalette = ui->label_GrabFrequency_txt_fps->palette();
 
 		QPalette palette = ui->label_GrabFrequency_value->palette();
@@ -1343,6 +1345,13 @@ void SettingsWindow::onDeviceBrightness_valueChanged(int percent)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
 
 	Settings::setDeviceBrightness(percent);
+}
+
+void SettingsWindow::onDeviceBrightnessCap_valueChanged(int percent)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
+
+	Settings::setDeviceBrightnessCap(percent);
 }
 
 void SettingsWindow::onDeviceColorDepth_valueChanged(int value)
@@ -1850,7 +1859,7 @@ void SettingsWindow::updateUiFromSettings()
 	onLightpackModeChanged(mode);
 
 	ui->checkBox_ExpertModeEnabled->setChecked						(Settings::isExpertModeEnabled());
-	
+
 	ui->checkBox_checkForUpdates->setChecked							(Settings::isCheckForUpdatesEnabled());
 	ui->checkBox_installUpdates->setChecked							(Settings::isInstallUpdatesEnabled());
 
@@ -1913,6 +1922,7 @@ void SettingsWindow::updateUiFromSettings()
 	ui->checkBox_DisableUsbPowerLed->setChecked						(Settings::isDeviceUsbPowerLedDisabled());
 	ui->horizontalSlider_DeviceRefreshDelay->setValue				(Settings::getDeviceRefreshDelay());
 	ui->horizontalSlider_DeviceBrightness->setValue					(Settings::getDeviceBrightness());
+	ui->horizontalSlider_DeviceBrightnessCap->setValue					(Settings::getDeviceBrightnessCap());
 	ui->horizontalSlider_DeviceSmooth->setValue						(Settings::getDeviceSmooth());
 	ui->horizontalSlider_DeviceColorDepth->setValue					(Settings::getDeviceColorDepth());
 	ui->doubleSpinBox_DeviceGamma->setValue							(Settings::getDeviceGamma());
@@ -2096,6 +2106,11 @@ void SettingsWindow::on_pushButton_LightpackRefreshDelayHelp_clicked()
 void SettingsWindow::on_pushButton_GammaCorrectionHelp_clicked()
 {
 	showHelpOf(ui->horizontalSlider_GammaCorrection);
+}
+
+void SettingsWindow::on_pushButton_BrightnessCapHelp_clicked()
+{
+	showHelpOf(ui->horizontalSlider_DeviceBrightnessCap);
 }
 
 void SettingsWindow::on_pushButton_lumosityThresholdHelp_clicked()

@@ -647,6 +647,7 @@ void LightpackApplication::startLedDeviceManager()
 	connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceGammaChanged(double)),				m_ledDeviceManager, SLOT(setGamma(double)),						Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceBrightnessChanged(int)),			m_ledDeviceManager, SLOT(setBrightness(int)),					Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceBrightnessCapChanged(int)),		m_ledDeviceManager, SLOT(setBrightnessCap(int)),				Qt::QueuedConnection);
 	connect(settings(), SIGNAL(luminosityThresholdChanged(int)),		m_ledDeviceManager, SLOT(setLuminosityThreshold(int)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(minimumLuminosityEnabledChanged(bool)),	m_ledDeviceManager, SLOT(setMinimumLuminosityEnabled(bool)),	Qt::QueuedConnection);
 	connect(settings(), SIGNAL(ledCoefBlueChanged(int,double)),			m_ledDeviceManager, SLOT(updateWBAdjustments()),				Qt::QueuedConnection);
@@ -709,7 +710,7 @@ void LightpackApplication::initGrabManager()
 	else
 		qWarning() << Q_FUNC_INFO << "No compatible Sound Manager";
 #endif
-	
+
 	connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)),	m_grabManager,		SLOT(onGrabberTypeChanged(const Grab::GrabberType &)),	Qt::QueuedConnection);
 	connect(settings(), SIGNAL(grabSlowdownChanged(int)),						m_grabManager,		SLOT(onGrabSlowdownChanged(int)),						Qt::QueuedConnection);
 	connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)),				m_grabManager,		SLOT(onGrabAvgColorsEnabledChanged(bool)),				Qt::QueuedConnection);

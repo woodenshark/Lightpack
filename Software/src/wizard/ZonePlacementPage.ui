@@ -371,7 +371,7 @@
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;p&gt;You can disable some zones by using the gear button of the zone.&lt;br/&gt;
 You'll be able to re-adjust each zone individually later:&lt;br/&gt;
-Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustement&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;p&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot;/&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustment&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;p&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot; width=&quot;16&quot;/&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

@@ -676,7 +676,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
-               <string>Grab widget adjustment / test</string>
+               <string>Grab widget adjustment</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>

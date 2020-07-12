@@ -103,20 +103,20 @@ public:
 	QMutex m_mutex;
 
 private:
-	SettingsWindow *m_settingsWindow;
-	ApiServer *m_apiServer;
-	LedDeviceManager *m_ledDeviceManager;
-	QThread *m_ledDeviceManagerThread;
-	QThread *m_apiServerThread;
-	GrabManager *m_grabManager;
-	MoodLampManager *m_moodlampManager;
+	SettingsWindow *m_settingsWindow{nullptr};
+	ApiServer *m_apiServer{nullptr};
+	LedDeviceManager *m_ledDeviceManager{nullptr};
+	QThread *m_ledDeviceManagerThread{nullptr};
+	QThread *m_apiServerThread{nullptr};
+	GrabManager *m_grabManager{nullptr};
+	MoodLampManager *m_moodlampManager{nullptr};
 #ifdef SOUNDVIZ_SUPPORT
-	SoundManagerBase *m_soundManager;
+	SoundManagerBase *m_soundManager{nullptr};
 #endif
 
-	PluginsManager *m_pluginManager;
-	LightpackPluginInterface *m_pluginInterface;
-	QWidget *consolePlugin;
+	PluginsManager *m_pluginManager{nullptr};
+	LightpackPluginInterface *m_pluginInterface{nullptr};
+	QWidget *consolePlugin{nullptr};
 
 	QString m_applicationDirPath;
 	bool m_isDebugLevelObtainedFromCmdArgs;

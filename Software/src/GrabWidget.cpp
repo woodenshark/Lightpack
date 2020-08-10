@@ -548,7 +548,7 @@ void GrabWidget::paintEvent(QPaintEvent *)
 
 	painter.setPen(getTextColor());
 	painter.setBrush(QBrush(getTextColor()));
-	painter.drawText(rect(), m_selfIdString, QTextOption(Qt::AlignCenter));
+	painter.drawText(rect(), isAreaEnabled() ? m_selfIdString : "OFF", QTextOption(Qt::AlignCenter));
 
 	font.setBold(false);
 	font.setPointSize(10);
@@ -742,7 +742,7 @@ void GrabWidget::setTextColor(const QColor& color)
 
 QColor GrabWidget::getTextColor()
 {
-	return isAreaEnabled() ? m_textColor : Qt::red;
+	return isAreaEnabled() ? m_textColor : Qt::white;
 }
 
 QColor GrabWidget::getBackgroundColor()

@@ -48,7 +48,7 @@ const QColor GrabWidget::m_colors[GrabWidget::ColorsCount][2] = {
 	{ qRgb(0,242,123), Qt::black },
 	{ Qt::magenta,		Qt::black },
 	{ Qt::cyan,		Qt::black },
-	{ Qt::white,		Qt::black }, // ColorIndexWhite == 11
+	{ Qt::white,		Qt::black },
 };
 
 GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidget *parent) :

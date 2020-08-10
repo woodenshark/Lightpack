@@ -95,9 +95,6 @@ private:
 		std::function<int(const QRect&)> getter,
 		std::function<int(const QRect&)> oppositeGetter);
 
-public:
-	static const int ColorIndexWhite = 11;
-
 private:
 	enum {
 		NOP,

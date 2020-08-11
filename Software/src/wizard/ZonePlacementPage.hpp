@@ -58,6 +58,8 @@ private slots:
 	void on_pbPegasus_clicked();
 	void on_pbApply_clicked();
 	void on_sbNumberOfLeds_valueChanged(int arg1);
+	void on_sbTopLeds_valueChanged(int arg1);
+	void on_sbSideLeds_valueChanged(int arg1);
 
 private:
 	void addGrabArea(int id, const QRect &rect);

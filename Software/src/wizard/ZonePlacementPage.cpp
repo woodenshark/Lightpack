@@ -283,3 +283,13 @@ void ZonePlacementPage::on_sbNumberOfLeds_valueChanged(int numOfLed)
 
 	_transSettings->ledCount = numOfLed;
 }
+
+void ZonePlacementPage::on_sbTopLeds_valueChanged(int numOfLed)
+{
+	_ui->sbBottomLeds->setValue(_transSettings->ledCount - numOfLed - _ui->sbSideLeds->value() * 2);
+}
+
+void ZonePlacementPage::on_sbSideLeds_valueChanged(int numOfLed)
+{
+	_ui->sbBottomLeds->setValue(_transSettings->ledCount - _ui->sbTopLeds->value() - numOfLed * 2);
+}

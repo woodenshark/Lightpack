@@ -272,7 +272,6 @@ void SettingsWindow::connectSignalsSlots()
 #endif // Q_OS_MACOS
 
 #endif// SOUNDVIZ_SUPPORT
-	connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
@@ -392,19 +391,6 @@ void SettingsWindow::onBlur()
 	emit showLedWidgets(false);
 }
 
-void SettingsWindow::onExpertModeEnabled_Toggled(bool isEnabled)
-{
-	Settings::setExpertModeEnabled(isEnabled);
-	updateExpertModeWidgetsVisibility();
-}
-
-void SettingsWindow::updateExpertModeWidgetsVisibility()
-{
-	ui->listWidget->item(4)->setHidden(!Settings::isExpertModeEnabled());
-
-	updateDeviceTabWidgetsVisibility();
-}
-
 void SettingsWindow::updateStatusBar() {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
@@ -449,7 +435,7 @@ void SettingsWindow::setDeviceTabWidgetsVisibility(DeviceTab::Options options)
 
 #ifdef QT_NO_DEBUG
 	int majorVersion = getLigtpackFirmwareVersionMajor();
-	bool isShowOldSettings = (majorVersion == 4 || majorVersion == 5) && Settings::isExpertModeEnabled();
+	bool isShowOldSettings = (majorVersion == 4 || majorVersion == 5);
 
 	// Show color depth only if lightpack hw4.x or hw5.x
 	ui->label_DeviceColorDepth->setVisible(isShowOldSettings);
@@ -536,7 +522,7 @@ void SettingsWindow::checkOutdatedGrabber() {
 #ifdef Q_OS_WIN
 	if ((QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS10 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8_1 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8)
 		&& Settings::getGrabberType() == Grab::GrabberTypeWinAPI
-		&& !Settings::isExpertModeEnabled()) {
+		&& false/*!Settings::isExpertModeEnabled()*/) {
 		if (QMessageBox::warning(
 			this,
 			tr("Prismatik Grabber Update"),
@@ -714,8 +700,7 @@ void SettingsWindow::startBacklight()
 				{
 					if (m_deviceLockStatus != DeviceLocked::Api	&& m_deviceLockKey.indexOf(key)==0)
 						m_deviceLockModule = _plugins[indexPlugin]->Name();
-					if (Settings::isExpertModeEnabled())
-						item->setText(getPluginName(_plugins[indexPlugin])+" (Lock)");
+					item->setText(getPluginName(_plugins[indexPlugin])+" (Lock)");
 				}
 				else
 					item->setText(getPluginName(_plugins[indexPlugin]));
@@ -1860,8 +1845,6 @@ void SettingsWindow::updateUiFromSettings()
 	Lightpack::Mode mode = Settings::getLightpackMode();
 	onLightpackModeChanged(mode);
 
-	ui->checkBox_ExpertModeEnabled->setChecked						(Settings::isExpertModeEnabled());
-
 	ui->checkBox_checkForUpdates->setChecked							(Settings::isCheckForUpdatesEnabled());
 	ui->checkBox_installUpdates->setChecked							(Settings::isInstallUpdatesEnabled());
 
@@ -1975,7 +1958,7 @@ void SettingsWindow::updateUiFromSettings()
 #endif
 
 	onMoodLampLiquidMode_Toggled(ui->radioButton_LiquidColorMoodLampMode->isChecked());
-	updateExpertModeWidgetsVisibility();
+	updateDeviceTabWidgetsVisibility();
 	onGrabberChanged();
 	settingsProfileChanged_UpdateUI(Settings::getCurrentProfileName());
 	updatingFromSettings = false;

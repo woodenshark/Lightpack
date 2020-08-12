@@ -2211,19 +2211,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_ExpertModeEnabled">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Expert mode</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -3214,7 +3201,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>pushButton_DeleteProfile</tabstop>
   <tabstop>commandLinkButton_OpenSettings</tabstop>
   <tabstop>comboBox_Language</tabstop>
-  <tabstop>checkBox_ExpertModeEnabled</tabstop>
   <tabstop>pushButton_AllPluginsHelp</tabstop>
   <tabstop>list_Plugins</tabstop>
   <tabstop>pushButton_UpPriority</tabstop>

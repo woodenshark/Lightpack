@@ -76,7 +76,6 @@ namespace Main
 static const QString ProfileNameDefault = "Lightpack";
 static const QString LanguageDefault = "<System>";
 static const Debug::DebugLevels DebugLevelDefault = Debug::ZeroLevel;
-static const bool IsExpertModeEnabledDefault = false;
 static const bool IsKeepLightsOnAfterExit = false;
 static const bool IsKeepLightsOnAfterLock = true;
 static const bool IsKeepLightsOnAfterSuspend = false;

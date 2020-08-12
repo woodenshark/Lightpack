@@ -203,7 +203,6 @@ private slots:
 
 	void loadTranslation(const QString & language);
 
-	void onExpertModeEnabled_Toggled(bool isEnabled);
 	void onEnableApi_Toggled(bool isEnabled);
 	void onListenOnlyOnLoInterface_Toggled(bool localOnly);
 	void onApiKey_EditingFinished();
@@ -246,7 +245,6 @@ private slots:
 	void clearBaudrateWarning();
 
 private:
-	void updateExpertModeWidgetsVisibility();
 	void updateDeviceTabWidgetsVisibility();
 	void setDeviceTabWidgetsVisibility(DeviceTab::Options options);
 	void syncLedDeviceWithSettingsWindow();

@@ -2622,6 +2622,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </item>
            <item row="5" column="2">
             <widget class="QPushButton" name="pushButton_GenerateNewApiKey">
+             <property name="toolTip">
+              <string>Generate a random one</string>
+             </property>
              <property name="text">
               <string>Generate</string>
              </property>

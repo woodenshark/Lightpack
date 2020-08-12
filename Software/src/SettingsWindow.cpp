@@ -165,6 +165,32 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 	m_deviceLockStatus = DeviceLocked::Unlocked;
 
+	// Expert tab update tooltips with actual defaults
+	ui->groupBox_Api->setToolTip(ui->groupBox_Api->toolTip()
+		.arg(SettingsScope::Main::Api::IsEnabledDefault ? tr("ON") : tr("OFF")));
+
+	ui->checkBox_listenOnlyOnLoInterface->setToolTip(ui->checkBox_listenOnlyOnLoInterface->toolTip()
+		.arg(SettingsScope::Main::Api::ListenOnlyOnLoInterfaceDefault ? tr("ON") : tr("OFF")));
+
+	ui->label_ApiPort->setToolTip(ui->label_ApiPort->toolTip().arg(SettingsScope::Main::Api::PortDefault));
+	ui->lineEdit_ApiPort->setToolTip(ui->label_ApiPort->toolTip());
+
+	ui->lineEdit_ApiKey->setToolTip(ui->lineEdit_ApiKey->toolTip()
+		.arg(ui->lineEdit_ApiKey->maxLength())
+		.arg(SettingsScope::Main::Api::AuthKey.isEmpty() ? tr("none") : SettingsScope::Main::Api::AuthKey));
+	ui->label_ApiKey->setToolTip(ui->lineEdit_ApiKey->toolTip());
+
+	ui->spinBox_LoggingLevel->setToolTip(ui->spinBox_LoggingLevel->toolTip()
+		.arg(Debug::DebugLevels::ZeroLevel)
+		.arg(Debug::DebugLevels::HighLevel)
+		.arg(SettingsScope::Main::DebugLevelDefault));
+	ui->label_LoggingLevel->setToolTip(ui->spinBox_LoggingLevel->toolTip());
+
+	ui->checkBox_SendDataOnlyIfColorsChanges->setToolTip(ui->checkBox_SendDataOnlyIfColorsChanges->toolTip()
+		.arg(SettingsScope::Profile::Grab::IsSendDataOnlyIfColorsChangesDefault ? tr("ON") : tr("OFF")));
+
+	// /Expert tab tooltips update
+
 	adjustSize();
 	resize(minimumSize());
 

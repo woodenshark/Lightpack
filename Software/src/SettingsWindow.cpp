@@ -38,6 +38,7 @@
 #include "LedDeviceManager.hpp"
 #include "enums.hpp"
 #include "debug.h"
+#include "LogWriter.hpp"
 #include "Plugin.hpp"
 #include "systrayicon/SysTrayIcon.hpp"
 #include "version.h"
@@ -308,6 +309,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->lineEdit_ApiKey, SIGNAL(editingFinished()), this, SLOT(onApiKey_EditingFinished()));
 
 	connect(ui->spinBox_LoggingLevel, SIGNAL(valueChanged(int)), this, SLOT(onLoggingLevel_valueChanged(int)));
+	connect(ui->toolButton_OpenLogs, SIGNAL(clicked()), this, SLOT(onOpenLogs_clicked()));
 	connect(ui->checkBox_PingDeviceEverySecond, SIGNAL(toggled(bool)), this, SLOT(onPingDeviceEverySecond_Toggled(bool)));
 
 	//Plugins
@@ -598,10 +600,28 @@ void SettingsWindow::onLoggingLevel_valueChanged(int value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
+	const unsigned int oldValue = g_debugLevel;
 	// WARNING: Multithreading bug here with g_debugLevel
 	g_debugLevel = value;
 
 	Settings::setDebugLevel(value);
+
+	if (value != Debug::DebugLevels::ZeroLevel) {
+		ui->toolButton_OpenLogs->show();
+		if (oldValue == Debug::DebugLevels::ZeroLevel) {
+			ui->toolButton_OpenLogs->setEnabled(false);
+			ui->toolButton_OpenLogs->setToolTip(tr("Program needs to be restarted"));
+		}
+	}
+	else
+		ui->toolButton_OpenLogs->hide();
+}
+
+void SettingsWindow::onOpenLogs_clicked()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+
+	QDesktopServices::openUrl(QUrl(LogWriter::getLogsDir().absolutePath()));
 }
 
 void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status,	QList<QString> modules)
@@ -1919,6 +1939,11 @@ void SettingsWindow::updateUiFromSettings()
 	ui->lineEdit_ApiPort->setValidator(new QIntValidator(1, 49151));
 	ui->lineEdit_ApiKey->setText										(Settings::getApiAuthKey());
 	ui->spinBox_LoggingLevel->setValue								(g_debugLevel);
+
+	if (g_debugLevel != Debug::DebugLevels::ZeroLevel)
+		ui->toolButton_OpenLogs->show();
+	else
+		ui->toolButton_OpenLogs->hide();
 
 	switch (Settings::getGrabberType())
 	{

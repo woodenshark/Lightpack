@@ -2808,6 +2808,20 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="toolButton_OpenLogs">
+            <property name="toolTip">
+             <string>open Log folder</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/LightpackResources.qrc">
+              <normaloff>:/buttons/arrow_right_dark_24px.png</normaloff>:/buttons/arrow_right_dark_24px.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -3220,6 +3234,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>checkBox_EnableDx1011Capture</tabstop>
   <tabstop>checkBox_EnableDx9Capture</tabstop>
   <tabstop>spinBox_LoggingLevel</tabstop>
+  <tabstop>toolButton_OpenLogs</tabstop>
   <tabstop>checkBox_PingDeviceEverySecond</tabstop>
   <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
   <tabstop>checkBox_checkForUpdates</tabstop>

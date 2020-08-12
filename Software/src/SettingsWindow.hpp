@@ -209,6 +209,7 @@ private slots:
 	void onGenerateNewApiKey_Clicked();
 	void onSetApiPort_Clicked();
 	void onLoggingLevel_valueChanged(int value);
+	void onOpenLogs_clicked();
 
 	void on_pushButton_LightpackSmoothnessHelp_clicked();
 	void on_pushButton_LightpackColorDepthHelp_clicked();

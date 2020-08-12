@@ -174,7 +174,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Experimental</string>
+        <string>Expert</string>
        </property>
        <property name="textAlignment">
         <set>AlignHCenter|AlignTop</set>
@@ -2527,7 +2527,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabExperimental">
+      <widget class="QWidget" name="tabExpert">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -2535,7 +2535,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Experimental</string>
+        <string>Expert</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
         <property name="spacing">

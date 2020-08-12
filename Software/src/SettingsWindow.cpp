@@ -144,6 +144,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	ui->checkBox_GrabApplyBlueLightReduction->setVisible(false);
 	ui->checkBox_installUpdates->setVisible(false);
 #endif
+	if (Settings::getConnectedDevice() != SupportedDevices::DeviceType::DeviceTypeLightpack)
+		ui->checkBox_PingDeviceEverySecond->hide();
 
 	initGrabbersRadioButtonsVisibility();
 	initLanguages();

@@ -27,16 +27,16 @@ int LogWriter::initWith(const QString& logsDirPath)
 	// Using locale codec for console output in messageHandler(..) function ( cout << qstring.toStdString() )
 	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
 
-	QDir logsDir(logsDirPath);
-	if (logsDir.exists() == false) {
+	m_logsDir.setPath(logsDirPath);
+	if (m_logsDir.exists() == false) {
 		std::cout << "mkdir " << logsDirPath.toStdString() << std::endl;
-		if (logsDir.mkdir(logsDirPath) == false) {
+		if (m_logsDir.mkdir(logsDirPath) == false) {
 			std::cerr << "Failed mkdir '" << logsDirPath.toStdString() << "' for logs. Exit." << std::endl;
 			return LightpackApplication::LogsDirecroryCreationFail_ErrorCode;
 		}
 	}
 
-	if (rotateLogFiles(logsDir) == false)
+	if (rotateLogFiles(m_logsDir) == false)
 		std::cerr << "Failed to rotate old log files." << std::endl;
 
 	const QString logFilePath = logsDirPath + "/Prismatik.0.log";
@@ -94,6 +94,14 @@ void LogWriter::writeMessage(const QString& msg, Level level)
 		m_logStream << finalMsg;
 		m_logStream.flush();
 	}
+}
+
+QDir LogWriter::logsDir() const {
+	return m_logsDir;
+}
+
+QDir LogWriter::getLogsDir() {
+	return g_logWriter->logsDir();
 }
 
 void LogWriter::messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)

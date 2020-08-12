@@ -36,6 +36,8 @@ public:
 	int initWith(const QString& logsDirPath);
 	void initDisabled();
 	void writeMessage(const QString& msg, Level level = Debug);
+	QDir logsDir() const;
+	static QDir getLogsDir();
 
 	struct ScopedMessageHandler
 	{
@@ -64,5 +66,6 @@ private:
 	QTextStream m_logStream;
 	QMutex m_mutex;
 	QString m_startupLogStore;
+	QDir m_logsDir;
 	bool m_disabled;
 };

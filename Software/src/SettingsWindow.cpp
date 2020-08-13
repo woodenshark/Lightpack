@@ -633,14 +633,17 @@ void SettingsWindow::onLoggingLevel_valueChanged(int value)
 	Settings::setDebugLevel(value);
 
 	if (value != Debug::DebugLevels::ZeroLevel) {
-		ui->toolButton_OpenLogs->show();
 		if (oldValue == Debug::DebugLevels::ZeroLevel) {
 			ui->toolButton_OpenLogs->setEnabled(false);
-			ui->toolButton_OpenLogs->setToolTip(tr("Program needs to be restarted"));
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (restart the program first)"));
+		} else {
+			ui->toolButton_OpenLogs->setEnabled(true);
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis());
 		}
+	} else {
+		ui->toolButton_OpenLogs->setEnabled(false);
+		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
 	}
-	else
-		ui->toolButton_OpenLogs->hide();
 }
 
 void SettingsWindow::onOpenLogs_clicked()
@@ -1966,10 +1969,10 @@ void SettingsWindow::updateUiFromSettings()
 	ui->lineEdit_ApiKey->setText										(Settings::getApiAuthKey());
 	ui->spinBox_LoggingLevel->setValue								(g_debugLevel);
 
-	if (g_debugLevel != Debug::DebugLevels::ZeroLevel)
-		ui->toolButton_OpenLogs->show();
-	else
-		ui->toolButton_OpenLogs->hide();
+	if (g_debugLevel == Debug::DebugLevels::ZeroLevel) {
+		ui->toolButton_OpenLogs->setEnabled(false);
+		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
+	}
 
 	switch (Settings::getGrabberType())
 	{

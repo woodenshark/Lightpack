@@ -2833,6 +2833,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <property name="toolTip">
              <string>open Log folder</string>
             </property>
+            <property name="whatsThis">
+             <string>open Log folder</string>
+            </property>
             <property name="text">
              <string>...</string>
             </property>

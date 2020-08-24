@@ -2870,7 +2870,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         <item>
          <widget class="QCheckBox" name="checkBox_SendDataOnlyIfColorsChanges">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When disabled every frame will be sent to the device  (recommended with UDP devices).&lt;/p&gt;&lt;p&gt;When enabled every new frame will be compared with the previous one, and will be sent only if differences are detected (can be useful in low bandwidth situations).&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When disabled every frame will be sent to the device. This is recommended for devices with inactivity timers built into firmwares (some custom Adalight sketches for example) or configured via Prismatik (UDP devices with a &amp;lt; 255 timeout value).&lt;/p&gt;&lt;p&gt;When enabled every new frame will be compared with the previous one, and will be sent only if differences are detected (can be useful in low bandwidth situations).&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>Send data only if colors changed</string>

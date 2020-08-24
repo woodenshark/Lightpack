@@ -96,7 +96,7 @@ static const QString HotkeyDefault = "Undefined";
 // [API]
 namespace Api
 {
-static const bool IsEnabledDefault = true;
+static const bool IsEnabledDefault = false;
 static const bool ListenOnlyOnLoInterfaceDefault = true;
 static const int PortDefault = 3636;
 static const QString AuthKey = "";

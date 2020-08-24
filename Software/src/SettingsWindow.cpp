@@ -541,27 +541,6 @@ void SettingsWindow::onPostInit() {
 		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
 			QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
 	}
-
-
-	QTimer::singleShot(50, this, SLOT(checkOutdatedGrabber()));
-}
-
-void SettingsWindow::checkOutdatedGrabber() {
-#ifdef Q_OS_WIN
-	if ((QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS10 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8_1 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8)
-		&& Settings::getGrabberType() == Grab::GrabberTypeWinAPI
-		&& false/*!Settings::isExpertModeEnabled()*/) {
-		if (QMessageBox::warning(
-			this,
-			tr("Prismatik Grabber Update"),
-			tr("The profile '") + Settings::getCurrentProfileName() + tr("' is using the outdated WinAPI grabber.\n")
-			+ tr("Do you want to switch to the new Desktop Duplication grabber?\nNote: You can disable this message by enabling expert mode."),
-			QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No)
-			== QMessageBox::StandardButton::Yes) {
-			ui->radioButton_GrabDDupl->setChecked(true);
-		}
-	}
-#endif
 }
 
 void SettingsWindow::onEnableApi_Toggled(bool isEnabled)
@@ -1669,7 +1648,6 @@ void SettingsWindow::handleProfileLoaded(const QString &configName) {
 
 	this->labelProfile->setText(tr("Profile: %1").arg(configName));
 	updateUiFromSettings();
-	checkOutdatedGrabber();
 }
 
 void SettingsWindow::profileTraySwitch(const QString &profileName)

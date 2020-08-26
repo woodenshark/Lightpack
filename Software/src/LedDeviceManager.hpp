@@ -58,11 +58,11 @@ signals:
 	void ledDeviceSetRefreshDelay(int value);
 	void ledDeviceSetColorDepth(int value);
 	void ledDeviceSetSmoothSlowdown(int value);
-	void ledDeviceSetGamma(double value);
-	void ledDeviceSetBrightness(int value);
-	void ledDeviceSetBrightnessCap(int value);
-	void ledDeviceSetLuminosityThreshold(int value);
-	void ledDeviceSetMinimumLuminosityEnabled(bool);
+	void ledDeviceSetGamma(double value, bool);
+	void ledDeviceSetBrightness(int value, bool);
+	void ledDeviceSetBrightnessCap(int value, bool);
+	void ledDeviceSetLuminosityThreshold(int value, bool);
+	void ledDeviceSetMinimumLuminosityEnabled(bool, bool);
 	void ledDeviceSetColorSequence(QString value);
 	void ledDeviceRequestFirmwareVersion();
 	void ledDeviceUpdateWBAdjustments();

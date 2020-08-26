@@ -590,8 +590,8 @@ void LightpackApplication::startApiServer()
 
 	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)),	m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)),	Qt::QueuedConnection);
 	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)),			m_pluginInterface, SLOT(updateSmoothCache(int)),					Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double)),					m_pluginInterface, SLOT(updateGammaCache(double)),					Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int)),				m_pluginInterface, SLOT(updateBrightnessCache(int)),				Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double, bool)),			m_pluginInterface, SLOT(updateGammaCache(double)),					Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int, bool)),			m_pluginInterface, SLOT(updateBrightnessCache(int)),				Qt::QueuedConnection);
 
 #ifdef SOUNDVIZ_SUPPORT
 	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)), m_pluginInterface, SLOT(updateSoundVizMinColorCache(QColor)), Qt::QueuedConnection);

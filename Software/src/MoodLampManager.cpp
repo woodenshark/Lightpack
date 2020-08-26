@@ -52,7 +52,7 @@ void MoodLampManager::start(bool isEnabled)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << isEnabled;
 
 	m_isMoodLampEnabled = isEnabled;
-	
+
 	if (m_isMoodLampEnabled)
 	{
 		// This is usable if start is called after API unlock, and we should force set current color
@@ -76,7 +76,8 @@ void MoodLampManager::setCurrentColor(QColor color)
 
 	m_currentColor = color;
 
-	updateColors();
+	if (m_isMoodLampEnabled)
+		updateColors();
 }
 
 void MoodLampManager::setLiquidMode(bool state)

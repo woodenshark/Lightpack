@@ -227,7 +227,7 @@ void LedDeviceManager::setGamma(double value)
 	{
 		m_isLastCommandCompleted = false;
 		m_cmdTimeoutTimer->start();
-		emit ledDeviceSetGamma(value);
+		emit ledDeviceSetGamma(value, m_backlightStatus != Backlight::StatusOff);
 	} else {
 		m_savedGamma = value;
 		cmdQueueAppend(LedDeviceCommands::SetGamma);
@@ -242,7 +242,7 @@ void LedDeviceManager::setBrightness(int value)
 	{
 		m_isLastCommandCompleted = false;
 		m_cmdTimeoutTimer->start();
-		emit ledDeviceSetBrightness(value);
+		emit ledDeviceSetBrightness(value, m_backlightStatus != Backlight::StatusOff);
 	} else {
 		m_savedBrightness = value;
 		cmdQueueAppend(LedDeviceCommands::SetBrightness);
@@ -257,7 +257,7 @@ void LedDeviceManager::setBrightnessCap(int value)
 	{
 		m_isLastCommandCompleted = false;
 		m_cmdTimeoutTimer->start();
-		emit ledDeviceSetBrightnessCap(value);
+		emit ledDeviceSetBrightnessCap(value, m_backlightStatus != Backlight::StatusOff);
 	}
 	else {
 		m_savedBrightnessCap = value;
@@ -273,7 +273,7 @@ void LedDeviceManager::setLuminosityThreshold(int value)
 	{
 		m_isLastCommandCompleted = false;
 		m_cmdTimeoutTimer->start();
-		emit ledDeviceSetLuminosityThreshold(value);
+		emit ledDeviceSetLuminosityThreshold(value, m_backlightStatus != Backlight::StatusOff);
 	} else {
 		m_savedLuminosityThreshold = value;
 		cmdQueueAppend(LedDeviceCommands::SetLuminosityThreshold);
@@ -288,7 +288,7 @@ void LedDeviceManager::setMinimumLuminosityEnabled(bool value)
 	{
 		m_isLastCommandCompleted = false;
 		m_cmdTimeoutTimer->start();
-		emit ledDeviceSetMinimumLuminosityEnabled(value);
+		emit ledDeviceSetMinimumLuminosityEnabled(value, m_backlightStatus != Backlight::StatusOff);
 	} else {
 		m_savedIsMinimumLuminosityEnabled = value;
 		cmdQueueAppend(LedDeviceCommands::SetMinimumLuminosityEnabled);
@@ -537,12 +537,12 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
 	connect(this, SIGNAL(ledDeviceSetRefreshDelay(int)),				m_ledDevice, SLOT(setRefreshDelay(int)),						Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetColorDepth(int)),					m_ledDevice, SLOT(setColorDepth(int)),							Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetSmoothSlowdown(int)),				m_ledDevice, SLOT(setSmoothSlowdown(int)),						Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetGamma(double)),					m_ledDevice, SLOT(setGamma(double)),							Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetBrightness(int)),					m_ledDevice, SLOT(setBrightness(int)),							Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetBrightnessCap(int)),				m_ledDevice, SLOT(setBrightnessCap(int)),						Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetGamma(double, bool)),				m_ledDevice, SLOT(setGamma(double, bool)),						Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetBrightness(int, bool)),			m_ledDevice, SLOT(setBrightness(int, bool)),					Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetBrightnessCap(int, bool)),			m_ledDevice, SLOT(setBrightnessCap(int, bool)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetColorSequence(QString)),			m_ledDevice, SLOT(setColorSequence(QString)),					Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int)),			m_ledDevice, SLOT(setLuminosityThreshold(int)),					Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool)),	Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int, bool)),	m_ledDevice, SLOT(setLuminosityThreshold(int, bool)),			Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool, bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool, bool)),	Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),			m_ledDevice, SLOT(requestFirmwareVersion()),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()),						Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()),						Qt::QueuedConnection);
@@ -571,12 +571,12 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 	disconnect(this, SIGNAL(ledDeviceSetRefreshDelay(int)),					m_ledDevice, SLOT(setRefreshDelay(int)));
 	disconnect(this, SIGNAL(ledDeviceSetColorDepth(int)),					m_ledDevice, SLOT(setColorDepth(int)));
 	disconnect(this, SIGNAL(ledDeviceSetSmoothSlowdown(int)),				m_ledDevice, SLOT(setSmoothSlowdown(int)));
-	disconnect(this, SIGNAL(ledDeviceSetGamma(double)),						m_ledDevice, SLOT(setGamma(double)));
-	disconnect(this, SIGNAL(ledDeviceSetBrightness(int)),					m_ledDevice, SLOT(setBrightness(int)));
-	disconnect(this, SIGNAL(ledDeviceSetBrightnessCap(int)),				m_ledDevice, SLOT(setBrightnessCap(int)));
+	disconnect(this, SIGNAL(ledDeviceSetGamma(double, bool)),				m_ledDevice, SLOT(setGamma(double, bool)));
+	disconnect(this, SIGNAL(ledDeviceSetBrightness(int, bool)),				m_ledDevice, SLOT(setBrightness(int, bool)));
+	disconnect(this, SIGNAL(ledDeviceSetBrightnessCap(int, bool)),			m_ledDevice, SLOT(setBrightnessCap(int, bool)));
 	disconnect(this, SIGNAL(ledDeviceSetColorSequence(QString)),			m_ledDevice, SLOT(setColorSequence(QString)));
-	disconnect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int)),			m_ledDevice, SLOT(setLuminosityThreshold(int)));
-	disconnect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool)));
+	disconnect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int, bool)),	m_ledDevice, SLOT(setLuminosityThreshold(int, bool)));
+	disconnect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool, bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool, bool)));
 	disconnect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),				m_ledDevice, SLOT(requestFirmwareVersion()));
 	disconnect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()));
 	disconnect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()));
@@ -638,17 +638,17 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 		case LedDeviceCommands::SetGamma:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetGamma(m_savedGamma);
+			emit ledDeviceSetGamma(m_savedGamma, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::SetBrightness:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetBrightness(m_savedBrightness);
+			emit ledDeviceSetBrightness(m_savedBrightness, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::SetBrightnessCap:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetBrightnessCap(m_savedBrightnessCap);
+			emit ledDeviceSetBrightnessCap(m_savedBrightnessCap, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::SetColorSequence:
@@ -658,12 +658,12 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 		case LedDeviceCommands::SetLuminosityThreshold:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetLuminosityThreshold(m_savedLuminosityThreshold);
+			emit ledDeviceSetLuminosityThreshold(m_savedLuminosityThreshold, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::SetMinimumLuminosityEnabled:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetMinimumLuminosityEnabled(m_savedIsMinimumLuminosityEnabled);
+			emit ledDeviceSetMinimumLuminosityEnabled(m_savedIsMinimumLuminosityEnabled, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::RequestFirmwareVersion:

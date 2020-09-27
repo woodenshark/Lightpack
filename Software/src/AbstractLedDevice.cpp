@@ -170,3 +170,56 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
 		}
 	}
 }
+
+void AbstractLedDevice::applyDithering(QList<StructRgb>& colors, int colorDepth)
+{
+	unsigned int maxColorValueIn = 4095;
+	unsigned int maxColorValueOut = (1 << colorDepth) - 1;
+
+	double k = (double)maxColorValueIn / (double)maxColorValueOut;
+
+	double carryR = 0;
+	double carryG = 0;
+	double carryB = 0;
+
+	double meanIndR = 0;
+	double meanIndG = 0;
+	double meanIndB = 0;
+
+	for (double i = 0; i < colors.count(); ++i) {
+		double tempR = colors[i].r;
+		double tempG = colors[i].g;
+		double tempB = colors[i].b;
+
+		colors[i].r = (double)colors[i].r / k;
+		colors[i].g = (double)colors[i].g / k;
+		colors[i].b = (double)colors[i].b / k;
+
+		carryR += tempR - (double)colors[i].r * k;
+		carryG += tempG - (double)colors[i].g * k;
+		carryB += tempB - (double)colors[i].b * k;
+
+		meanIndR += (tempR - (double)colors[i].r * k) * i;
+		meanIndG += (tempG - (double)colors[i].g * k) * i;
+		meanIndB += (tempB - (double)colors[i].b * k) * i;
+
+		if (carryR >= k) {
+			int ind = (meanIndR - (carryR - k) * i) / k;
+			colors[ind].r++;
+			carryR -= k;
+			meanIndR = carryR * i;
+		}
+		if (carryG >= k) {
+			int ind = (meanIndG - (carryG - k) * i) / k;
+			colors[ind].g++;
+			carryG -= k;
+			meanIndG = carryG * i;
+		}
+		if (carryB >= k) {
+			int ind = (meanIndB - (carryB - k) * i) / k;
+			colors[ind].b++;
+			carryB -= k;
+			meanIndB = carryB * i;
+		}
+	}
+}

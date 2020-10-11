@@ -13,6 +13,15 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.24
+---------------
+October 11, 2020
+
+* Add power limit and brightness cap (#342)
+* Add dithering for higher color accuracy
+* Fix some crashes (#354, #368)
+* Fix device initialization (#375, #385)
+
 Version 5.11.2.23
 ---------------
 May 29, 2020

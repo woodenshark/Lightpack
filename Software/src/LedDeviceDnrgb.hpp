@@ -46,5 +46,5 @@ protected:
     void reinitBufferHeader();
 
 private:
-    const int LEDS_PER_PACKET = 489;
+    constexpr static const int LedsPerPacket = 489;
 };

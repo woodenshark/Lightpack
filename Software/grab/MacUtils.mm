@@ -183,9 +183,9 @@ namespace MacUtils
         uint32_t sampleCount = 0;
         if (loadGammaTables(&_gammaR, &_gammaG, &_gammaB, &_rampCapacity, &sampleCount))
             for (QRgb& color : colors) {
-                color = qRgb(static_cast<int>(_gammaR[qRed(color) * sampleCount / UINT8_MAX] * UINT8_MAX),
-                             static_cast<int>(_gammaG[qGreen(color) * sampleCount / UINT8_MAX] * UINT8_MAX),
-                             static_cast<int>(_gammaB[qBlue(color) * sampleCount / UINT8_MAX] * UINT8_MAX));
+                color = qRgb(static_cast<int>(_gammaR[qRed(color) * (sampleCount - 1) / UINT8_MAX] * UINT8_MAX),
+                             static_cast<int>(_gammaG[qGreen(color) * (sampleCount - 1) / UINT8_MAX] * UINT8_MAX),
+                             static_cast<int>(_gammaB[qBlue(color) * (sampleCount - 1) / UINT8_MAX] * UINT8_MAX));
             }
     }
 }

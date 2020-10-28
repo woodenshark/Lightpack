@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QIcon>
 #include "debug.h"
 
 class Plugin : public QObject
@@ -30,11 +31,16 @@ public:
 
 
 signals:
+	void pluginStateChanged(QProcess::ProcessState newState);
 
-	void stateChanged(QProcess::ProcessState);
-	
 public slots:
-	
+	void stateChanged(QProcess::ProcessState newState);
+	void errorOccurred(QProcess::ProcessError error);
+	void started();
+	void finished(int exitCode, QProcess::ExitStatus exitStatus);
+	void readyReadStandardError();
+	void readyReadStandardOutput();
+
 private:
 
 	QString _guid;
@@ -42,12 +48,10 @@ private:
 	QString _description;
 	QString _author;
 	QString _version;
-	QString _icon;
+	QIcon	_icon;
 	QString _exec;
-	QString _arguments;
+	QStringList _arguments;
 	QString _pathPlugin;
 	QProcess *process;
 
 };
-
-

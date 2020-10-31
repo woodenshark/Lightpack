@@ -174,7 +174,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Experimental</string>
+        <string>Expert</string>
        </property>
        <property name="textAlignment">
         <set>AlignHCenter|AlignTop</set>
@@ -2211,19 +2211,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_ExpertModeEnabled">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Expert mode</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -2540,7 +2527,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabExperimental">
+      <widget class="QWidget" name="tabExpert">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -2548,7 +2535,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Experimental</string>
+        <string>Expert</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
         <property name="spacing">
@@ -2578,6 +2565,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enables TCP socket server.&lt;/p&gt;&lt;p&gt;You can connect via &amp;quot;telnet &amp;lt;ip&amp;gt; &amp;lt;port&amp;gt;&amp;quot; for example and manually execute available commands.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -2593,6 +2583,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
             <widget class="QCheckBox" name="checkBox_listenOnlyOnLoInterface">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, you can connect ONLY from the same computer through 127.0.0.1/localhost address.&lt;/p&gt;&lt;p&gt;Disable this if you want to connect from anywhere else.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Listen only on local interface (127.0.0.1)</string>
              </property>
@@ -2606,10 +2599,16 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_ApiPort">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top: .1em</string>
              </property>
@@ -2623,6 +2622,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </item>
            <item row="5" column="2">
             <widget class="QPushButton" name="pushButton_GenerateNewApiKey">
+             <property name="toolTip">
+              <string>Generate a random one</string>
+             </property>
              <property name="text">
               <string>Generate</string>
              </property>
@@ -2643,7 +2645,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </size>
              </property>
              <property name="toolTip">
-              <string>Copy and paste this key into the application using the API, for authorization on the server</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="styleSheet">
               <string notr="true"/>
@@ -2658,6 +2660,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="label_ApiKey">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top:0</string>
              </property>
@@ -2815,8 +2820,28 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_LoggingLevel">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log verbosity: %1-%2 where %1 = no logs.&lt;/p&gt;&lt;p&gt;After enabling logs you need to restart the program.&lt;/p&gt;&lt;p&gt;When enabled you can use the &lt;img src=&quot;:/buttons/arrow_right_dark_24px.png&quot; width=&quot;12&quot;&gt; button to open the log directory.&lt;/p&gt;&lt;p&gt;Default: %3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="maximum">
              <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButton_OpenLogs">
+            <property name="toolTip">
+             <string>open Log folder</string>
+            </property>
+            <property name="whatsThis">
+             <string>open Log folder</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/LightpackResources.qrc">
+              <normaloff>:/buttons/arrow_right_dark_24px.png</normaloff>:/buttons/arrow_right_dark_24px.png</iconset>
             </property>
            </widget>
           </item>
@@ -2844,6 +2869,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </item>
         <item>
          <widget class="QCheckBox" name="checkBox_SendDataOnlyIfColorsChanges">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When disabled every frame will be sent to the device. This is recommended for devices with inactivity timers built into firmwares (some custom Adalight sketches for example) or configured via Prismatik (UDP devices with a &amp;lt; 255 timeout value).&lt;/p&gt;&lt;p&gt;When enabled every new frame will be compared with the previous one, and will be sent only if differences are detected (can be useful in low bandwidth situations).&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Send data only if colors changed</string>
           </property>
@@ -3214,7 +3242,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>pushButton_DeleteProfile</tabstop>
   <tabstop>commandLinkButton_OpenSettings</tabstop>
   <tabstop>comboBox_Language</tabstop>
-  <tabstop>checkBox_ExpertModeEnabled</tabstop>
   <tabstop>pushButton_AllPluginsHelp</tabstop>
   <tabstop>list_Plugins</tabstop>
   <tabstop>pushButton_UpPriority</tabstop>
@@ -3234,6 +3261,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>checkBox_EnableDx1011Capture</tabstop>
   <tabstop>checkBox_EnableDx9Capture</tabstop>
   <tabstop>spinBox_LoggingLevel</tabstop>
+  <tabstop>toolButton_OpenLogs</tabstop>
   <tabstop>checkBox_PingDeviceEverySecond</tabstop>
   <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
   <tabstop>checkBox_checkForUpdates</tabstop>

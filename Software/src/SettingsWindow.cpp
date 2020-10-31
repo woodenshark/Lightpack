@@ -38,6 +38,7 @@
 #include "LedDeviceManager.hpp"
 #include "enums.hpp"
 #include "debug.h"
+#include "LogWriter.hpp"
 #include "Plugin.hpp"
 #include "systrayicon/SysTrayIcon.hpp"
 #include "version.h"
@@ -144,6 +145,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	ui->checkBox_GrabApplyBlueLightReduction->setVisible(false);
 	ui->checkBox_installUpdates->setVisible(false);
 #endif
+	if (Settings::getConnectedDevice() != SupportedDevices::DeviceType::DeviceTypeLightpack)
+		ui->checkBox_PingDeviceEverySecond->hide();
 
 	initGrabbersRadioButtonsVisibility();
 	initLanguages();
@@ -161,6 +164,32 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 	emit backlightStatusChanged(m_backlightStatus);
 
 	m_deviceLockStatus = DeviceLocked::Unlocked;
+
+	// Expert tab update tooltips with actual defaults
+	ui->groupBox_Api->setToolTip(ui->groupBox_Api->toolTip()
+		.arg(SettingsScope::Main::Api::IsEnabledDefault ? tr("ON") : tr("OFF")));
+
+	ui->checkBox_listenOnlyOnLoInterface->setToolTip(ui->checkBox_listenOnlyOnLoInterface->toolTip()
+		.arg(SettingsScope::Main::Api::ListenOnlyOnLoInterfaceDefault ? tr("ON") : tr("OFF")));
+
+	ui->label_ApiPort->setToolTip(ui->label_ApiPort->toolTip().arg(SettingsScope::Main::Api::PortDefault));
+	ui->lineEdit_ApiPort->setToolTip(ui->label_ApiPort->toolTip());
+
+	ui->lineEdit_ApiKey->setToolTip(ui->lineEdit_ApiKey->toolTip()
+		.arg(ui->lineEdit_ApiKey->maxLength())
+		.arg(SettingsScope::Main::Api::AuthKey.isEmpty() ? tr("none") : SettingsScope::Main::Api::AuthKey));
+	ui->label_ApiKey->setToolTip(ui->lineEdit_ApiKey->toolTip());
+
+	ui->spinBox_LoggingLevel->setToolTip(ui->spinBox_LoggingLevel->toolTip()
+		.arg(Debug::DebugLevels::ZeroLevel)
+		.arg(Debug::DebugLevels::HighLevel)
+		.arg(SettingsScope::Main::DebugLevelDefault));
+	ui->label_LoggingLevel->setToolTip(ui->spinBox_LoggingLevel->toolTip());
+
+	ui->checkBox_SendDataOnlyIfColorsChanges->setToolTip(ui->checkBox_SendDataOnlyIfColorsChanges->toolTip()
+		.arg(SettingsScope::Profile::Grab::IsSendDataOnlyIfColorsChangesDefault ? tr("ON") : tr("OFF")));
+
+	// /Expert tab tooltips update
 
 	adjustSize();
 	resize(minimumSize());
@@ -270,7 +299,6 @@ void SettingsWindow::connectSignalsSlots()
 #endif // Q_OS_MACOS
 
 #endif// SOUNDVIZ_SUPPORT
-	connect(ui->checkBox_ExpertModeEnabled, SIGNAL(toggled(bool)), this, SLOT(onExpertModeEnabled_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
 	connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
@@ -307,6 +335,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->lineEdit_ApiKey, SIGNAL(editingFinished()), this, SLOT(onApiKey_EditingFinished()));
 
 	connect(ui->spinBox_LoggingLevel, SIGNAL(valueChanged(int)), this, SLOT(onLoggingLevel_valueChanged(int)));
+	connect(ui->toolButton_OpenLogs, SIGNAL(clicked()), this, SLOT(onOpenLogs_clicked()));
 	connect(ui->checkBox_PingDeviceEverySecond, SIGNAL(toggled(bool)), this, SLOT(onPingDeviceEverySecond_Toggled(bool)));
 
 	//Plugins
@@ -390,19 +419,6 @@ void SettingsWindow::onBlur()
 	emit showLedWidgets(false);
 }
 
-void SettingsWindow::onExpertModeEnabled_Toggled(bool isEnabled)
-{
-	Settings::setExpertModeEnabled(isEnabled);
-	updateExpertModeWidgetsVisibility();
-}
-
-void SettingsWindow::updateExpertModeWidgetsVisibility()
-{
-	ui->listWidget->item(4)->setHidden(!Settings::isExpertModeEnabled());
-
-	updateDeviceTabWidgetsVisibility();
-}
-
 void SettingsWindow::updateStatusBar() {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
@@ -447,7 +463,7 @@ void SettingsWindow::setDeviceTabWidgetsVisibility(DeviceTab::Options options)
 
 #ifdef QT_NO_DEBUG
 	int majorVersion = getLigtpackFirmwareVersionMajor();
-	bool isShowOldSettings = (majorVersion == 4 || majorVersion == 5) && Settings::isExpertModeEnabled();
+	bool isShowOldSettings = (majorVersion == 4 || majorVersion == 5);
 
 	// Show color depth only if lightpack hw4.x or hw5.x
 	ui->label_DeviceColorDepth->setVisible(isShowOldSettings);
@@ -525,27 +541,6 @@ void SettingsWindow::onPostInit() {
 		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
 			QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
 	}
-
-
-	QTimer::singleShot(50, this, SLOT(checkOutdatedGrabber()));
-}
-
-void SettingsWindow::checkOutdatedGrabber() {
-#ifdef Q_OS_WIN
-	if ((QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS10 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8_1 || QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS8)
-		&& Settings::getGrabberType() == Grab::GrabberTypeWinAPI
-		&& !Settings::isExpertModeEnabled()) {
-		if (QMessageBox::warning(
-			this,
-			tr("Prismatik Grabber Update"),
-			tr("The profile '") + Settings::getCurrentProfileName() + tr("' is using the outdated WinAPI grabber.\n")
-			+ tr("Do you want to switch to the new Desktop Duplication grabber?\nNote: You can disable this message by enabling expert mode."),
-			QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No)
-			== QMessageBox::StandardButton::Yes) {
-			ui->radioButton_GrabDDupl->setChecked(true);
-		}
-	}
-#endif
 }
 
 void SettingsWindow::onEnableApi_Toggled(bool isEnabled)
@@ -610,10 +605,31 @@ void SettingsWindow::onLoggingLevel_valueChanged(int value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
+	const unsigned int oldValue = g_debugLevel;
 	// WARNING: Multithreading bug here with g_debugLevel
 	g_debugLevel = value;
 
 	Settings::setDebugLevel(value);
+
+	if (value != Debug::DebugLevels::ZeroLevel) {
+		if (oldValue == Debug::DebugLevels::ZeroLevel) {
+			ui->toolButton_OpenLogs->setEnabled(false);
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (restart the program first)"));
+		} else {
+			ui->toolButton_OpenLogs->setEnabled(true);
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis());
+		}
+	} else {
+		ui->toolButton_OpenLogs->setEnabled(false);
+		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
+	}
+}
+
+void SettingsWindow::onOpenLogs_clicked()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+
+	QDesktopServices::openUrl(QUrl(LogWriter::getLogsDir().absolutePath()));
 }
 
 void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status,	QList<QString> modules)
@@ -712,8 +728,7 @@ void SettingsWindow::startBacklight()
 				{
 					if (m_deviceLockStatus != DeviceLocked::Api	&& m_deviceLockKey.indexOf(key)==0)
 						m_deviceLockModule = _plugins[indexPlugin]->Name();
-					if (Settings::isExpertModeEnabled())
-						item->setText(getPluginName(_plugins[indexPlugin])+" (Lock)");
+					item->setText(getPluginName(_plugins[indexPlugin])+" (Lock)");
 				}
 				else
 					item->setText(getPluginName(_plugins[indexPlugin]));
@@ -1633,7 +1648,6 @@ void SettingsWindow::handleProfileLoaded(const QString &configName) {
 
 	this->labelProfile->setText(tr("Profile: %1").arg(configName));
 	updateUiFromSettings();
-	checkOutdatedGrabber();
 }
 
 void SettingsWindow::profileTraySwitch(const QString &profileName)
@@ -1858,8 +1872,6 @@ void SettingsWindow::updateUiFromSettings()
 	Lightpack::Mode mode = Settings::getLightpackMode();
 	onLightpackModeChanged(mode);
 
-	ui->checkBox_ExpertModeEnabled->setChecked						(Settings::isExpertModeEnabled());
-
 	ui->checkBox_checkForUpdates->setChecked							(Settings::isCheckForUpdatesEnabled());
 	ui->checkBox_installUpdates->setChecked							(Settings::isInstallUpdatesEnabled());
 
@@ -1935,6 +1947,11 @@ void SettingsWindow::updateUiFromSettings()
 	ui->lineEdit_ApiKey->setText										(Settings::getApiAuthKey());
 	ui->spinBox_LoggingLevel->setValue								(g_debugLevel);
 
+	if (g_debugLevel == Debug::DebugLevels::ZeroLevel) {
+		ui->toolButton_OpenLogs->setEnabled(false);
+		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
+	}
+
 	switch (Settings::getGrabberType())
 	{
 #ifdef WINAPI_GRAB_SUPPORT
@@ -1973,7 +1990,7 @@ void SettingsWindow::updateUiFromSettings()
 #endif
 
 	onMoodLampLiquidMode_Toggled(ui->radioButton_LiquidColorMoodLampMode->isChecked());
-	updateExpertModeWidgetsVisibility();
+	updateDeviceTabWidgetsVisibility();
 	onGrabberChanged();
 	settingsProfileChanged_UpdateUI(Settings::getCurrentProfileName());
 	updatingFromSettings = false;

@@ -76,7 +76,6 @@ namespace Main
 static const QString ProfileNameDefault = "Lightpack";
 static const QString LanguageDefault = "<System>";
 static const Debug::DebugLevels DebugLevelDefault = Debug::ZeroLevel;
-static const bool IsExpertModeEnabledDefault = false;
 static const bool IsKeepLightsOnAfterExit = false;
 static const bool IsKeepLightsOnAfterLock = true;
 static const bool IsKeepLightsOnAfterSuspend = false;
@@ -97,7 +96,7 @@ static const QString HotkeyDefault = "Undefined";
 // [API]
 namespace Api
 {
-static const bool IsEnabledDefault = true;
+static const bool IsEnabledDefault = false;
 static const bool ListenOnlyOnLoInterfaceDefault = true;
 static const int PortDefault = 3636;
 static const QString AuthKey = "";
@@ -170,7 +169,7 @@ namespace Grab
 static const ::Grab::GrabberType GrabberDefault = GRABMODE_DEFAULT;
 static const QString GrabberDefaultString = GRABMODE_DEFAULT_STR;
 static const bool IsAvgColorsEnabledDefault = false;
-static const bool IsSendDataOnlyIfColorsChangesDefault = true;
+static const bool IsSendDataOnlyIfColorsChangesDefault = false;
 static const bool IsMinimumLuminosityEnabledDefault = true;
 static const bool IsDx1011GrabberEnabledDefault = false;
 static const bool IsDx9GrabbingEnabledDefault = false;

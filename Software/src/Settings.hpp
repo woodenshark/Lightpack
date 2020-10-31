@@ -103,8 +103,6 @@ public:
 	static QString getApiAuthKey();
 	static void setApiKey(const QString & apiKey);
 	static void setIsApiAuthEnabled(bool isEnabled);
-	static bool isExpertModeEnabled();
-	static void setExpertModeEnabled(bool isEnabled);
 	static bool isKeepLightsOnAfterExit();
 	static void setKeepLightsOnAfterExit(bool isEnabled);
 	static bool isKeepLightsOnAfterLock();

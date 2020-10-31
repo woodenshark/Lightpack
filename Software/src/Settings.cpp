@@ -67,7 +67,6 @@ static const QString MainConfigVersion = "MainConfigVersion";
 static const QString ProfileLast = "ProfileLast";
 static const QString Language = "Language";
 static const QString DebugLevel = "DebugLevel";
-static const QString IsExpertModeEnabled = "IsExpertModeEnabled";
 static const QString IsKeepLightsOnAfterExit = "IsKeepLightsOnAfterExit";
 static const QString IsKeepLightsOnAfterLock = "IsKeepLightsOnAfterLock";
 static const QString IsKeepLightsOnAfterSuspend = "IsKeepLightsOnAfterSuspend";
@@ -317,7 +316,6 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::ProfileLast,			Main::ProfileNameDefault);
 	setNewOptionMain(Main::Key::Language,				Main::LanguageDefault);
 	setNewOptionMain(Main::Key::DebugLevel,				Main::DebugLevelDefault);
-	setNewOptionMain(Main::Key::IsExpertModeEnabled,	Main::IsExpertModeEnabledDefault);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit, Main::IsKeepLightsOnAfterExit);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterSuspend, Main::IsKeepLightsOnAfterSuspend);
@@ -698,18 +696,6 @@ void Settings::setApiKey(const QString & apiKey)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	setValueMain(Main::Key::Api::AuthKey, apiKey);
 	m_this->apiKeyChanged(apiKey);
-}
-
-bool Settings::isExpertModeEnabled()
-{
-	return valueMain(Main::Key::IsExpertModeEnabled).toBool();
-}
-
-void Settings::setExpertModeEnabled(bool isEnabled)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValueMain(Main::Key::IsExpertModeEnabled, isEnabled);
-	m_this->expertModeEnabledChanged(isEnabled);
 }
 
 bool Settings::isKeepLightsOnAfterExit()

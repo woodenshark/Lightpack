@@ -47,6 +47,12 @@ void AbstractLedDevice::setBrightnessCap(int value, bool updateColors) {
 		setColors(m_colorsSaved);
 }
 
+void AbstractLedDevice::setDitheringEnabled(bool value, bool updateColors) {
+	m_isDitheringEnabled = value;
+	if (updateColors)
+		setColors(m_colorsSaved);
+}
+
 void AbstractLedDevice::setLedMilliAmps(const int value, const bool updateColors) {
 	m_ledMilliAmps = value;
 	if (updateColors)
@@ -195,31 +201,33 @@ void AbstractLedDevice::applyDithering(QList<StructRgb>& colors, int colorDepth)
 		colors[i].g = (double)colors[i].g / k;
 		colors[i].b = (double)colors[i].b / k;
 
-		carryR += tempR - (double)colors[i].r * k;
-		carryG += tempG - (double)colors[i].g * k;
-		carryB += tempB - (double)colors[i].b * k;
+		if (m_isDitheringEnabled) {
+			carryR += tempR - (double)colors[i].r * k;
+			carryG += tempG - (double)colors[i].g * k;
+			carryB += tempB - (double)colors[i].b * k;
 
-		meanIndR += (tempR - (double)colors[i].r * k) * i;
-		meanIndG += (tempG - (double)colors[i].g * k) * i;
-		meanIndB += (tempB - (double)colors[i].b * k) * i;
+			meanIndR += (tempR - (double)colors[i].r * k) * i;
+			meanIndG += (tempG - (double)colors[i].g * k) * i;
+			meanIndB += (tempB - (double)colors[i].b * k) * i;
 
-		if (carryR >= k) {
-			int ind = (meanIndR - (carryR - k) * i) / k;
-			colors[ind].r++;
-			carryR -= k;
-			meanIndR = carryR * i;
-		}
-		if (carryG >= k) {
-			int ind = (meanIndG - (carryG - k) * i) / k;
-			colors[ind].g++;
-			carryG -= k;
-			meanIndG = carryG * i;
-		}
-		if (carryB >= k) {
-			int ind = (meanIndB - (carryB - k) * i) / k;
-			colors[ind].b++;
-			carryB -= k;
-			meanIndB = carryB * i;
+			if (carryR >= k) {
+				int ind = (meanIndR - (carryR - k) * i) / k;
+				colors[ind].r++;
+				carryR -= k;
+				meanIndR = carryR * i;
+			}
+			if (carryG >= k) {
+				int ind = (meanIndG - (carryG - k) * i) / k;
+				colors[ind].g++;
+				carryG -= k;
+				meanIndG = carryG * i;
+			}
+			if (carryB >= k) {
+				int ind = (meanIndB - (carryB - k) * i) / k;
+				colors[ind].b++;
+				carryB -= k;
+				meanIndB = carryB * i;
+			}
 		}
 	}
 }

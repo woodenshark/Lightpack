@@ -72,6 +72,7 @@ public slots:
 	virtual void setGamma(double value, bool updateColors = true);
 	virtual void setBrightness(int value, bool updateColors = true);
 	virtual void setBrightnessCap(int value, bool updateColors = true);
+	virtual void setDitheringEnabled(bool value, bool updateColors = true);
 	virtual void setLedMilliAmps(const int value, const bool updateColors = true);
 	virtual void setPowerSupplyAmps(const double value, const bool updateColors = true);
 	virtual void setColorSequence(QString value) = 0;
@@ -107,6 +108,7 @@ protected:
 	double m_powerSupplyAmps{0.0};
 	int m_luminosityThreshold;
 	bool m_isMinimumLuminosityEnabled;
+	bool m_isDitheringEnabled;
 
 	QList<WBAdjustment> m_wbAdjustments;
 

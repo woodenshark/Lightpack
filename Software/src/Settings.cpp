@@ -229,6 +229,7 @@ static const QString Brightness = "Device/Brightness";
 static const QString BrightnessCap = "Device/BrightnessCap";
 static const QString ColorDepth = "Device/ColorDepth";
 static const QString Gamma = "Device/Gamma";
+static const QString IsDitheringEnabled = "Device/IsDitheringEnabled";
 }
 // [LED_i]
 namespace Led
@@ -289,7 +290,6 @@ Settings::Settings() : QObject(NULL) {
 	qRegisterMetaType<QColor>("QColor");
 	qRegisterMetaType<SupportedDevices::DeviceType>("SupportedDevices::DeviceType");
 	qRegisterMetaType<Lightpack::Mode>("Lightpack::Mode");
-
 }
 
 // Desktop should be initialized before call Settings::Initialize()
@@ -1488,6 +1488,18 @@ void Settings::setDeviceGamma(double gamma)
 	m_this->deviceGammaChanged(gamma);
 }
 
+bool Settings::isDeviceDitheringEnabled()
+{
+	return value(Profile::Key::Device::IsDitheringEnabled).toBool();
+}
+
+void Settings::setDeviceDitheringEnabled(bool isEnabled)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Device::IsDitheringEnabled, isEnabled);
+	m_this->deviceDitheringEnabledChanged(isEnabled);
+}
+
 Grab::GrabberType Settings::getGrabberType()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
@@ -2105,12 +2117,13 @@ void Settings::initCurrentProfile(bool isResetDefault)
 #endif
 	// [Device]
 	setNewOption(Profile::Key::Device::RefreshDelay,				Profile::Device::RefreshDelayDefault, isResetDefault);
-	setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,		Profile::Device::IsUsbPowerLedDisabled, isResetDefault);
+	setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,		Profile::Device::IsUsbPowerLedDisabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Brightness,					Profile::Device::BrightnessDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::BrightnessCap,				Profile::Device::BrightnessCapDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Smooth,						Profile::Device::SmoothDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Gamma,						Profile::Device::GammaDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::ColorDepth,					Profile::Device::ColorDepthDefault, isResetDefault);
+	setNewOption(Profile::Key::Device::IsDitheringEnabled,			Profile::Device::IsDitheringEnabledDefault, isResetDefault);
 
 
 	QPoint ledPosition;

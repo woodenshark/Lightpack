@@ -199,6 +199,8 @@ public:
 	static void setDeviceColorDepth(int value);
 	static double getDeviceGamma();
 	static void setDeviceGamma(double gamma);
+	static bool isDeviceDitheringEnabled();
+	static void setDeviceDitheringEnabled(bool isEnabled);
 
 	static Grab::GrabberType getGrabberType();
 	static void setGrabberType(Grab::GrabberType grabMode);
@@ -363,6 +365,7 @@ signals:
 	void deviceSmoothChanged(int value);
 	void deviceColorDepthChanged(int value);
 	void deviceGammaChanged(double gamma);
+	void deviceDitheringEnabledChanged(bool isEnabled);
 	void deviceColorSequenceChanged(QString value);
 	void grabberTypeChanged(const Grab::GrabberType grabMode);
 #ifdef D3D10_GRAB_SUPPORT

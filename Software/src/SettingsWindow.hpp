@@ -183,6 +183,7 @@ private slots:
 	void onDeviceColorDepth_valueChanged(int value);
 	void onDeviceGammaCorrection_valueChanged(double value);
 	void onSliderDeviceGammaCorrection_valueChanged(int value);
+	void onDeviceDitheringEnabled_toggled(bool state);
 	void onDeviceSendDataOnlyIfColorsChanged_toggled(bool state);
 	void onDx1011CaptureEnabledChanged(bool isEnabled);
 	void onDx9CaptureEnabledChanged(bool isEnabled);
@@ -215,6 +216,7 @@ private slots:
 	void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
 	void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_DitheringHelp_clicked();
 	void on_pushButton_BrightnessCapHelp_clicked();
 
 	void on_pushButton_lumosityThresholdHelp_clicked();

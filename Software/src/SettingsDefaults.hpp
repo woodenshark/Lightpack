@@ -220,7 +220,7 @@ static const int RefreshDelayMin = 64;
 static const int RefreshDelayDefault = 100;
 static const int RefreshDelayMax = 1023;
 
-static const bool IsUsbPowerLedDisabled = false;
+static const bool IsUsbPowerLedDisabledDefault = false;
 
 static const int BrightnessMin = 0;
 static const int BrightnessDefault = 100;
@@ -241,6 +241,8 @@ static const int ColorDepthMax = 255;
 static const double GammaMin = 0.01;
 static const double GammaDefault = 2.0;
 static const double GammaMax = 10.0;
+
+static const bool IsDitheringEnabledDefault = false;
 }
 // [LED_i]
 namespace Led

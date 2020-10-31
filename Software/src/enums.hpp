@@ -174,6 +174,7 @@ enum Cmd {
 	SetBrightnessCap,
 	SetLuminosityThreshold,
 	SetMinimumLuminosityEnabled,
+	SetDitheringEnabled,
 	SetColorSequence,
 	RequestFirmwareVersion,
 	UpdateWBAdjustments,

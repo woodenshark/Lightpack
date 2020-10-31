@@ -57,6 +57,7 @@ protected:
     bool writeBuffer(const QByteArray& buff);
 
     int m_timeout;
+    constexpr static const char InfiniteTimeout = 255;
 
 private:
     QUdpSocket* m_Socket;

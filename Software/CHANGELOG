@@ -13,6 +13,15 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.25
+---------------
+November 1, 2020
+
+* Fix plugin startup (#396)
+* Optimized DNRGB packets (#402)
+* Disable Dithering by default (#398)
+* Fix incorrect colors on Mac (#399)
+
 Version 5.11.2.24
 ---------------
 October 11, 2020

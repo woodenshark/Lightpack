@@ -96,6 +96,7 @@ void AbstractLedDevice::updateDeviceSettings()
 	setBrightnessCap(Settings::getDeviceBrightnessCap(), false);
 	setLuminosityThreshold(Settings::getLuminosityThreshold(), false);
 	setMinimumLuminosityThresholdEnabled(Settings::isMinimumLuminosityEnabled(), false);
+	setDitheringEnabled(Settings::isDeviceDitheringEnabled(), false);
 	updateWBAdjustments(Settings::getLedCoefs(), false);
 
 	setColors(m_colorsSaved);

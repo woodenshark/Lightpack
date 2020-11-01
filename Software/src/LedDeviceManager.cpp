@@ -295,6 +295,21 @@ void LedDeviceManager::setMinimumLuminosityEnabled(bool value)
 	}
 }
 
+void LedDeviceManager::setDitheringEnabled(bool isEnabled) {
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << isEnabled
+		<< "Is last command completed:" << m_isLastCommandCompleted;
+
+	if (m_isLastCommandCompleted) {
+		m_cmdTimeoutTimer->start();
+		m_isLastCommandCompleted = false;
+		emit ledDeviceSetDitheringEnabled(isEnabled);
+	}
+	else {
+		m_savedDitheringEnabled = isEnabled;
+		cmdQueueAppend(LedDeviceCommands::SetDitheringEnabled);
+	}
+}
+
 void LedDeviceManager::setColorSequence(QString value)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << value << "Is last command completed:" << m_isLastCommandCompleted;
@@ -542,7 +557,8 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
 	connect(this, SIGNAL(ledDeviceSetBrightnessCap(int, bool)),			m_ledDevice, SLOT(setBrightnessCap(int, bool)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetColorSequence(QString)),			m_ledDevice, SLOT(setColorSequence(QString)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int, bool)),	m_ledDevice, SLOT(setLuminosityThreshold(int, bool)),			Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool, bool)),	m_ledDevice, SLOT(setMinimumLuminosityThresholdEnabled(bool, bool)),	Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool, bool)),	m_ledDevice,SLOT(setMinimumLuminosityThresholdEnabled(bool, bool)),	Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetDitheringEnabled(bool)),			m_ledDevice, SLOT(setDitheringEnabled(bool)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),			m_ledDevice, SLOT(requestFirmwareVersion()),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()),						Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()),						Qt::QueuedConnection);
@@ -664,6 +680,11 @@ void LedDeviceManager::cmdQueueProcessNext()
 		case LedDeviceCommands::SetMinimumLuminosityEnabled:
 			m_cmdTimeoutTimer->start();
 			emit ledDeviceSetMinimumLuminosityEnabled(m_savedIsMinimumLuminosityEnabled, m_backlightStatus != Backlight::StatusOff);
+			break;
+
+		case LedDeviceCommands::SetDitheringEnabled:
+			m_cmdTimeoutTimer->start();
+			emit ledDeviceSetDitheringEnabled(m_savedDitheringEnabled);
 			break;
 
 		case LedDeviceCommands::RequestFirmwareVersion:

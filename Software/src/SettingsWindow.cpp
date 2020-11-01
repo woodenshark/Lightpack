@@ -150,7 +150,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 	initGrabbersRadioButtonsVisibility();
 	initLanguages();
-	initVirtualLeds(Settings::getNumberOfLeds(SupportedDevices::DeviceTypeVirtual));
 
 	loadTranslation(Settings::getLanguage());
 
@@ -265,6 +264,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->spinBox_DeviceBrightnessCap, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightnessCap_valueChanged(int)));
 	connect(ui->spinBox_DeviceColorDepth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceColorDepth_valueChanged(int)));
 	connect(ui->doubleSpinBox_DeviceGamma, SIGNAL(valueChanged(double)), this, SLOT(onDeviceGammaCorrection_valueChanged(double)));
+	connect(ui->checkBox_EnableDithering, SIGNAL(toggled(bool)), this, SLOT(onDeviceDitheringEnabled_toggled(bool)));
 	connect(ui->horizontalSlider_GammaCorrection, SIGNAL(valueChanged(int)), this, SLOT(onSliderDeviceGammaCorrection_valueChanged(int)));
 	connect(ui->checkBox_SendDataOnlyIfColorsChanges, SIGNAL(toggled(bool)), this, SLOT(onDeviceSendDataOnlyIfColorsChanged_toggled(bool)));
 
@@ -1393,6 +1393,13 @@ void SettingsWindow::onSliderDeviceGammaCorrection_valueChanged(int value)
 	emit updateGamma(Settings::getDeviceGamma());
 }
 
+void SettingsWindow::onDeviceDitheringEnabled_toggled(bool state) {
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << state;
+
+	Settings::setDeviceDitheringEnabled(state);
+}
+
+
 void SettingsWindow::onLightpackModes_currentIndexChanged(int index)
 {
 	if (updatingFromSettings) return;
@@ -1926,7 +1933,7 @@ void SettingsWindow::updateUiFromSettings()
 
 	ui->pushButton_SelectColorSoundVizMin->setColor					(Settings::getSoundVisualizerMinColor());
 	ui->pushButton_SelectColorSoundVizMax->setColor					(Settings::getSoundVisualizerMaxColor());
-	ui->radioButton_SoundVizConstantMode->setChecked					(!Settings::isSoundVisualizerLiquidMode());
+	ui->radioButton_SoundVizConstantMode->setChecked				(!Settings::isSoundVisualizerLiquidMode());
 	ui->radioButton_SoundVizLiquidMode->setChecked					(Settings::isSoundVisualizerLiquidMode());
 	ui->horizontalSlider_SoundVizLiquidSpeed->setValue				(Settings::getSoundVisualizerLiquidSpeed());
 #endif
@@ -1934,17 +1941,18 @@ void SettingsWindow::updateUiFromSettings()
 	ui->checkBox_DisableUsbPowerLed->setChecked						(Settings::isDeviceUsbPowerLedDisabled());
 	ui->horizontalSlider_DeviceRefreshDelay->setValue				(Settings::getDeviceRefreshDelay());
 	ui->horizontalSlider_DeviceBrightness->setValue					(Settings::getDeviceBrightness());
-	ui->horizontalSlider_DeviceBrightnessCap->setValue					(Settings::getDeviceBrightnessCap());
+	ui->horizontalSlider_DeviceBrightnessCap->setValue				(Settings::getDeviceBrightnessCap());
 	ui->horizontalSlider_DeviceSmooth->setValue						(Settings::getDeviceSmooth());
 	ui->horizontalSlider_DeviceColorDepth->setValue					(Settings::getDeviceColorDepth());
 	ui->doubleSpinBox_DeviceGamma->setValue							(Settings::getDeviceGamma());
-	ui->horizontalSlider_GammaCorrection->setValue			(floor((Settings::getDeviceGamma() * 100 + 0.5)));
+	ui->horizontalSlider_GammaCorrection->setValue					(floor((Settings::getDeviceGamma() * 100 + 0.5)));
+	ui->checkBox_EnableDithering->setChecked						(Settings::isDeviceDitheringEnabled());
 
-	ui->groupBox_Api->setChecked										(Settings::isApiEnabled());
-	ui->checkBox_listenOnlyOnLoInterface->setChecked					(Settings::isListenOnlyOnLoInterface());
-	ui->lineEdit_ApiPort->setText					(QString::number(Settings::getApiPort()));
-	ui->lineEdit_ApiPort->setValidator(new QIntValidator(1, 49151));
-	ui->lineEdit_ApiKey->setText										(Settings::getApiAuthKey());
+	ui->groupBox_Api->setChecked									(Settings::isApiEnabled());
+	ui->checkBox_listenOnlyOnLoInterface->setChecked				(Settings::isListenOnlyOnLoInterface());
+	ui->lineEdit_ApiPort->setText									(QString::number(Settings::getApiPort()));
+	ui->lineEdit_ApiPort->setValidator								(new QIntValidator(1, 49151));
+	ui->lineEdit_ApiKey->setText									(Settings::getApiAuthKey());
 	ui->spinBox_LoggingLevel->setValue								(g_debugLevel);
 
 	if (g_debugLevel == Debug::DebugLevels::ZeroLevel) {
@@ -2123,6 +2131,11 @@ void SettingsWindow::on_pushButton_LightpackRefreshDelayHelp_clicked()
 void SettingsWindow::on_pushButton_GammaCorrectionHelp_clicked()
 {
 	showHelpOf(ui->horizontalSlider_GammaCorrection);
+}
+
+void SettingsWindow::on_pushButton_DitheringHelp_clicked()
+{
+	showHelpOf(ui->checkBox_EnableDithering);
 }
 
 void SettingsWindow::on_pushButton_BrightnessCapHelp_clicked()

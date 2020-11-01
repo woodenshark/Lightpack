@@ -646,6 +646,7 @@ void LightpackApplication::startLedDeviceManager()
 	connect(settings(), SIGNAL(deviceRefreshDelayChanged(int)),			m_ledDeviceManager, SLOT(setRefreshDelay(int)),					Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceUsbPowerLedDisabledChanged(bool)), m_ledDeviceManager, SLOT(setUsbPowerLedDisabled(bool)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceGammaChanged(double)),				m_ledDeviceManager, SLOT(setGamma(double)),						Qt::QueuedConnection);
+	connect(settings(), SIGNAL(deviceDitheringEnabledChanged(bool)),	m_ledDeviceManager, SLOT(setDitheringEnabled(bool)),			Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceBrightnessChanged(int)),			m_ledDeviceManager, SLOT(setBrightness(int)),					Qt::QueuedConnection);
 	connect(settings(), SIGNAL(deviceBrightnessCapChanged(int)),		m_ledDeviceManager, SLOT(setBrightnessCap(int)),				Qt::QueuedConnection);
 	connect(settings(), SIGNAL(luminosityThresholdChanged(int)),		m_ledDeviceManager, SLOT(setLuminosityThreshold(int)),			Qt::QueuedConnection);

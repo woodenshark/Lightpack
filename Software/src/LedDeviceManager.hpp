@@ -63,6 +63,7 @@ signals:
 	void ledDeviceSetBrightnessCap(int value, bool);
 	void ledDeviceSetLuminosityThreshold(int value, bool);
 	void ledDeviceSetMinimumLuminosityEnabled(bool, bool);
+	void ledDeviceSetDitheringEnabled(bool isEnabled);
 	void ledDeviceSetColorSequence(QString value);
 	void ledDeviceRequestFirmwareVersion();
 	void ledDeviceUpdateWBAdjustments();
@@ -86,6 +87,7 @@ public slots:
 	void setBrightnessCap(int value);
 	void setLuminosityThreshold(int value);
 	void setMinimumLuminosityEnabled(bool value);
+	void setDitheringEnabled(bool isEnabled);
 	void setColorSequence(QString value);
 	void requestFirmwareVersion();
 	void updateWBAdjustments();
@@ -124,6 +126,7 @@ private:
 	int m_savedBrightnessCap;
 	int m_savedLuminosityThreshold;
 	bool m_savedIsMinimumLuminosityEnabled;
+	bool m_savedDitheringEnabled;
 	QString m_savedColorSequence;
 
 	QList<AbstractLedDevice *> m_ledDevices;

@@ -3,7 +3,7 @@ Lightpack project with Prismatik flavour
 
 **Table of content:** <br />
 &nbsp;&nbsp;[Short description] (https://github.com/woodenshark/Lightpack#lightpack-project-with-prismatik-flavour) <br />
-&nbsp;&nbsp;[Useful URLs] (https://github.com/woodenshark/Lightpack#useful-urls) <br />
+&nbsp;&nbsp;[Useful URLs] (#useful-urls) <br />
 &nbsp;&nbsp;[Build Prismatik with Windows] (https://github.com/woodenshark/Lightpack#prismatik-build-instructions-for-windows) <br />
 &nbsp;&nbsp;[Build with Linux] (https://github.com/woodenshark/Lightpack#build-instructions-for-linux) <br />
 &nbsp;&nbsp;[Build with OS X] (https://github.com/woodenshark/Lightpack#build-instructions-for-os-x) <br />

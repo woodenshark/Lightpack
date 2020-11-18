@@ -2,12 +2,12 @@ Lightpack project with Prismatik flavour
 ---------
 
 **Table of content:** <br />
-&nbsp;&nbsp;<a href="#lightpack-project-with-prismatik-flavour">Short description</a> <br />
-&nbsp;&nbsp;[Useful URLs](useful-urls) <br />
-&nbsp;&nbsp;<a href="#prismatik-build-instructions-for-windows">Build Prismatik with Windows</a> <br />
-&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#build-instructions-for-linux">Build with Linux] </a><br />
-&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#build-instructions-for-os-x">Build with OS X</a><br />
-&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#firmware-building-instructions">Lightpack Firmware building</a><br />
+&nbsp;&nbsp; * <a href="#lightpack-project-with-prismatik-flavour">Short description</a> <br />
+&nbsp;&nbsp; * [Useful URLs](useful-urls) <br />
+&nbsp;&nbsp; * <a href="#prismatik-build-instructions-for-windows">Build Prismatik with Windows</a> <br />
+&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#build-instructions-for-linux">Build with Linux] </a><br />
+&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#build-instructions-for-os-x">Build with OS X</a><br />
+&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#firmware-building-instructions">Lightpack Firmware building</a><br />
 
 
 **Lightpack** is an fully open-source and simple hardware implementation of the backlight for any computer. It's USB content-driving ambient lighting system.
@@ -23,12 +23,12 @@ handle another devices with Prismatik such as Adalight, Ardulight or even Alienw
 * The device is simple to build (just Do-It-Yourself) 
 
 ##### Useful URLs:
-* [Project mothership] (https://github.com/woodenshark/Lightpack/)
-* [Original project mothership] (https://code.google.com/p/lightpack/)
-* [Binary downloads] (https://github.com/woodenshark/Lightpack/releases)
-* Wiki with DIY and documentation [ENG] (http://code.google.com/p/light-pack/w/list) / [RUS] (http://code.google.com/p/lightpack/w/list)
-* [Post new issue] (https://github.com/woodenshark/Lightpack/issues)
-* [Team] (https://github.com/woodenshark/Lightpack/graphs/contributors)
+* <a href="https://github.com/woodenshark/Lightpack/">Project mothership</a>
+* <a href="https://code.google.com/p/lightpack/">Original project mothership</a>
+* <a href="https://github.com/woodenshark/Lightpack/releases">Binary downloads</a>
+* Wiki with DIY and documentation [<a href="http://code.google.com/p/light-pack/w/list">ENG</a>] / [<a href="http://code.google.com/p/lightpack/w/list">RUS</a>] 
+* <a href="https://github.com/woodenshark/Lightpack/issues">Post new issue</a>
+* <a href="https://github.com/woodenshark/Lightpack/graphs/contributors">Team</a>
 
 ---
 

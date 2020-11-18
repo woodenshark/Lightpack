@@ -2,12 +2,12 @@ Lightpack project with Prismatik flavour
 ---------
 
 **Table of content:** <br />
-&nbsp;&nbsp; * <a href="#lightpack-project-with-prismatik-flavour">Short description</a> <br />
-&nbsp;&nbsp; * [Useful URLs](useful-urls) <br />
-&nbsp;&nbsp; * <a href="#prismatik-build-instructions-for-windows">Build Prismatik with Windows</a> <br />
-&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#build-instructions-for-linux">Build with Linux] </a><br />
-&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#build-instructions-for-os-x">Build with OS X</a><br />
-&nbsp;&nbsp; * <a href="https://github.com/woodenshark/Lightpack#firmware-building-instructions">Lightpack Firmware building</a><br />
+&nbsp;&nbsp;<a href="#lightpack-project-with-prismatik-flavour">Short description</a> <br />
+&nbsp;&nbsp;[Useful URLs](useful-urls) <br />
+&nbsp;&nbsp;<a href="#prismatik-build-instructions-for-windows">Build Prismatik with Windows</a> <br />
+&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#build-instructions-for-linux">Build with Linux] </a><br />
+&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#build-instructions-for-os-x">Build with OS X</a><br />
+&nbsp;&nbsp;<a href="https://github.com/woodenshark/Lightpack#firmware-building-instructions">Lightpack Firmware building</a><br />
 
 
 **Lightpack** is an fully open-source and simple hardware implementation of the backlight for any computer. It's USB content-driving ambient lighting system.

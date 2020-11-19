@@ -605,23 +605,21 @@ void SettingsWindow::onLoggingLevel_valueChanged(int value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
-	const unsigned int oldValue = g_debugLevel;
 	// WARNING: Multithreading bug here with g_debugLevel
 	g_debugLevel = value;
 
 	Settings::setDebugLevel(value);
 
-	if (value != Debug::DebugLevels::ZeroLevel) {
-		if (oldValue == Debug::DebugLevels::ZeroLevel) {
-			ui->toolButton_OpenLogs->setEnabled(false);
-			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (restart the program first)"));
-		} else {
-			ui->toolButton_OpenLogs->setEnabled(true);
-			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis());
-		}
+	if (LogWriter::getLogsDir().exists()) {
+		ui->toolButton_OpenLogs->setEnabled(true);
+		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis());
 	} else {
 		ui->toolButton_OpenLogs->setEnabled(false);
-		ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
+
+		if (value != Debug::DebugLevels::ZeroLevel)
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (restart the program first)"));
+		else
+			ui->toolButton_OpenLogs->setToolTip(ui->toolButton_OpenLogs->whatsThis() + tr(" (enable logs first and restart the program)"));
 	}
 }
 

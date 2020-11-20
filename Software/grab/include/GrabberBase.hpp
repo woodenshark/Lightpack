@@ -91,22 +91,21 @@ public:
 
 	virtual const char * name() const = 0;
 
-public slots:
 	virtual void startGrabbing();
 	virtual void stopGrabbing();
 	virtual bool isGrabbingStarted() const;
-	virtual void setGrabInterval(int msec);
+public slots:
 
+	virtual void setGrabInterval(int msec);
 	virtual void grab();
 
-protected slots:
+protected:
 	/*!
 		Grabs screens and saves them to \a GrabberBase#_screensWithWidgets field. Called by
 		\a GrabberBase#grab() slot. Needs to be implemented in derived classes.
 		\return GrabResult
 	*/
 	virtual GrabResult grabScreens() = 0;
-
 	/*!
 		* Frees unnecessary resources and allocates needed ones based on \a ScreenInfo
 		* \param grabScreens
@@ -121,10 +120,7 @@ protected slots:
 		* \return
 		*/
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets) = 0;
-
 	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
-
-protected:
 	const GrabbedScreen * screenOfRect(const QRect &rect) const;
 
 signals:

@@ -36,9 +36,9 @@ class LedDeviceAdalight : public AbstractLedDevice
 public:
 	LedDeviceAdalight(const QString &portName, const int baudRate, QObject * parent = 0);
 	virtual ~LedDeviceAdalight();
+	QString name() const { return QStringLiteral("adalight"); }
 
 public slots:
-	const QString name() const { return "adalight"; }
 	void open();
 	void close();
 	void setColors(const QList<QRgb> & /*colors*/);
@@ -46,7 +46,7 @@ public slots:
 	void setRefreshDelay(int /*value*/);
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString value);
+	void setColorSequence(const QString& value);
 	void requestFirmwareVersion();
 	void updateDeviceSettings();
 	int maxLedsCount() { return 511; }

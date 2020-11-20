@@ -40,6 +40,7 @@ class AbstractLedDevice : public QObject
 public:
 	AbstractLedDevice(QObject * parent) : QObject(parent) {}
 	virtual ~AbstractLedDevice(){}
+	virtual QString name() const = 0;
 
 signals:
 	void openDeviceSuccess(bool isSuccess);
@@ -56,7 +57,6 @@ signals:
 	void colorsUpdated(QList<QRgb> colors);
 
 public slots:
-	virtual const QString name() const = 0;
 	virtual void open() = 0;
 	virtual void close() = 0;
 	virtual void setColors(const QList<QRgb> & colors) = 0;
@@ -75,7 +75,7 @@ public slots:
 	virtual void setDitheringEnabled(bool value, bool updateColors = true);
 	virtual void setLedMilliAmps(const int value, const bool updateColors = true);
 	virtual void setPowerSupplyAmps(const double value, const bool updateColors = true);
-	virtual void setColorSequence(QString value) = 0;
+	virtual void setColorSequence(const QString& value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
 	virtual void updateWBAdjustments(); // Reads from settings

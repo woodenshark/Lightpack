@@ -217,7 +217,7 @@ void PulseAudioSoundManager::addDevice(const pa_source_info *l, int eol)
 void PulseAudioSoundManager::populatePulseaudioDeviceList()
 {
 	m_devices.clear();
-	m_devices.push_back({"Default device", ""});
+	m_devices.push_back({QStringLiteral("Default device"), QLatin1String("")});
 
 	pa_operation *pa_op;
 	pa_op = pa_context_get_source_info_list(m_context,

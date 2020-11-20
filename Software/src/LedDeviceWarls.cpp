@@ -31,9 +31,9 @@ LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, cons
 {
 }
 
-const QString LedDeviceWarls::name() const
-{ 
-	return "warls"; 
+QString LedDeviceWarls::name() const
+{
+	return QStringLiteral("warls");
 }
 
 int LedDeviceWarls::maxLedsCount()
@@ -96,7 +96,7 @@ void LedDeviceWarls::switchOffLeds()
 
 void LedDeviceWarls::requestFirmwareVersion()
 {
-	emit firmwareVersion("1.0 (warls device)");
+	emit firmwareVersion(QStringLiteral("1.0 (warls device)"));
 	emit commandCompleted(true);
 }
 

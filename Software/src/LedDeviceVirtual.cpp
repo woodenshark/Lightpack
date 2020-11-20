@@ -90,30 +90,32 @@ void LedDeviceVirtual::setSmoothSlowdown(int /*value*/)
 	emit commandCompleted(true);
 }
 
-void LedDeviceVirtual::setColorSequence(QString /*value*/)
+void LedDeviceVirtual::setColorSequence(const QString& /*value*/)
 {
 	emit commandCompleted(true);
 }
 
-void LedDeviceVirtual::setGamma(double value)
+void LedDeviceVirtual::setGamma(double value, const bool update = true)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
 	m_gamma = value;
-	setColors(m_colorsSaved);
+	if (update)
+		setColors(m_colorsSaved);
 }
 
-void LedDeviceVirtual::setBrightness(int percent)
+void LedDeviceVirtual::setBrightness(int percent, const bool update = true)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
 
 	m_brightness = percent;
-	setColors(m_colorsSaved);
+	if (update)
+		setColors(m_colorsSaved);
 }
 
 void LedDeviceVirtual::requestFirmwareVersion()
 {
-	emit firmwareVersion("1.0 (virtual device)");
+	emit firmwareVersion(QStringLiteral("1.0 (virtual device)"));
 	emit commandCompleted(true);
 }
 

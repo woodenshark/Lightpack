@@ -23,7 +23,7 @@ void PluginsManager::dropPlugins(){
 	//cleanAll();
 	for(QMap<QString, Plugin*>::iterator it = _plugins.begin(); it != _plugins.end(); ++it){
 		Plugin* p = it.value();
-		QString name = p->Name();
+		// QString name = p->Name();
 		p->Stop();
 		delete p;
 	}
@@ -33,18 +33,18 @@ void PluginsManager::dropPlugins(){
 void PluginsManager::reloadPlugins(){
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	dropPlugins();
-	LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
+	LoadPlugins(Settings::getApplicationDirPath() + QStringLiteral("Plugins"));
 	StartPlugins();
 }
 
-void PluginsManager::LoadPlugins(QString path)
+void PluginsManager::LoadPlugins(const QString& path)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << path;
 
 	QDir dir(path);
 
 	if (!dir.exists()) {
-		dir.mkpath(".");
+		dir.mkpath(QStringLiteral("."));
 	}
 
 	QStringList lstDirs = dir.entryList(QDir::Dirs |
@@ -60,7 +60,7 @@ void PluginsManager::LoadPlugins(QString path)
 				continue;
 			}
 
-			Plugin* p = new Plugin(plugin,path+"/"+pluginDir,this);
+			Plugin* p = new Plugin(plugin,path+QStringLiteral("/")+pluginDir,this);
 			//DEBUG_LOW_LEVEL <<p->getName()<<	p->getAuthor() << p->getDescription() << p->getVersion();
 			//connect(p, SIGNAL(executed()), this, SIGNAL(pluginExecuted()));
 			_plugins[plugin] = p;

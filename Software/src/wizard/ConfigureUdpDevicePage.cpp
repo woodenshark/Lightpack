@@ -49,7 +49,7 @@ void ConfigureUdpDevicePage::initializePage()
 {
 	QString currentAddress = NULL;
 	QString currentPort = NULL;
-	int currentTimeout = NULL;
+	int currentTimeout = 0;
 
 	if (field("isDrgb").toBool()) {
 		currentAddress = Settings::getDrgbAddress();
@@ -71,7 +71,7 @@ void ConfigureUdpDevicePage::initializePage()
 		ui->leAddress->setText(currentAddress);
 	if (currentPort != NULL && currentPort.isEmpty() == false)
 		ui->lePort->setText(currentPort);
-	if (currentTimeout != NULL)
+	if (currentTimeout != 0)
 		ui->sbTimeout->setValue(currentTimeout);
 
 	registerField("address", ui->leAddress);
@@ -94,7 +94,7 @@ bool ConfigureUdpDevicePage::validatePage()
 
 	if (field("isDrgb").toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port, timeout));
-	} 
+	}
 	else if (field("isDnrgb").toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port, timeout));
 	}

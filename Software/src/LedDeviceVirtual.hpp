@@ -35,9 +35,9 @@ class LedDeviceVirtual : public AbstractLedDevice
 public:
 	LedDeviceVirtual(QObject * parent = 0);
 	virtual ~LedDeviceVirtual() {}
+	QString name() const { return QStringLiteral("virtual"); }
 
 public slots:
-	const QString name() const { return "virtual"; }
 	void open();
 	void close(){}
 	void setColors(const QList<QRgb> & colors);
@@ -45,9 +45,9 @@ public slots:
 	void setRefreshDelay(int /*value*/);
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString /*value*/);
-	void setGamma(double value);
-	void setBrightness(int value);
+	void setColorSequence(const QString& /*value*/);
+	void setGamma(double value, bool update);
+	void setBrightness(int value, bool update);
 	void requestFirmwareVersion();
 	int maxLedsCount() { return 511; }
 	int defaultLedsCount() { return 10; }

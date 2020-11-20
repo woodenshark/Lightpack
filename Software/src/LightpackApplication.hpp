@@ -73,7 +73,7 @@ public slots:
 
 private slots:
 	void requestBacklightStatus();
-	void setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, QList<QString> modules);
+	void setDeviceLockViaAPI(const DeviceLocked::DeviceLockStatus status, const QList<QString>& modules);
 	void profileSwitch(const QString & configName);
 	void settingsChanged();
 //	void numberOfLedsChanged(int);
@@ -86,7 +86,7 @@ private slots:
 
 private:
 	void processCommandLineArguments();
-	void outputMessage(QString message) const;
+	void outputMessage(const QString& message) const;
 	void printVersionsSoftwareQtOS() const;
 	bool checkSystemTrayAvailability() const;
 	void startApiServer();

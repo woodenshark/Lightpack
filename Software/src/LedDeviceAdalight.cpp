@@ -90,31 +90,31 @@ void LedDeviceAdalight::setColors(const QList<QRgb> & colors)
 	{
 		StructRgb color = m_colorsBuffer[i];
 
-		if (m_colorSequence == "RBG")
+		if (m_colorSequence == QStringLiteral("RBG"))
 		{
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.g);
 		}
-		else if (m_colorSequence == "BRG")
+		else if (m_colorSequence == QStringLiteral("BRG"))
 		{
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.g);
 		}
-		else if (m_colorSequence == "BGR")
+		else if (m_colorSequence == QStringLiteral("BGR"))
 		{
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.r);
 		}
-		else if (m_colorSequence == "GRB")
+		else if (m_colorSequence == QStringLiteral("GRB"))
 		{
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.b);
 		}
-		else if (m_colorSequence == "GBR")
+		else if (m_colorSequence == QStringLiteral("GBR"))
 		{
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.b);
@@ -169,7 +169,7 @@ void LedDeviceAdalight::setSmoothSlowdown(int /*value*/)
 	emit commandCompleted(true);
 }
 
-void LedDeviceAdalight::setColorSequence(QString value)
+void LedDeviceAdalight::setColorSequence(const QString& value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
@@ -179,7 +179,7 @@ void LedDeviceAdalight::setColorSequence(QString value)
 
 void LedDeviceAdalight::requestFirmwareVersion()
 {
-	emit firmwareVersion("unknown (adalight device)");
+	emit firmwareVersion(QStringLiteral("unknown (adalight device)"));
 	emit commandCompleted(true);
 }
 

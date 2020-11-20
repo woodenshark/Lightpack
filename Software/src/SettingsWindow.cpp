@@ -55,13 +55,13 @@ using namespace SettingsScope;
 // ----------------------------------------------------------------------------
 namespace {
 #ifdef Q_OS_WIN
-const QString BaudrateWarningSign = " <b>!!!</b>";
+const QString BaudrateWarningSign = QStringLiteral(" <b>!!!</b>");
 #else
-const QString BaudrateWarningSign = " ⚠️";
+const QString BaudrateWarningSign = QStringLiteral(" ⚠️");
 #endif
 }
-const QString SettingsWindow::DeviceFirmvareVersionUndef = "undef";
-const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.com/p/lightpack/downloads/list";
+const QString SettingsWindow::DeviceFirmvareVersionUndef = QStringLiteral("undef");
+const QString SettingsWindow::LightpackDownloadsPageUrl = QStringLiteral("http://code.google.com/p/lightpack/downloads/list");
 
 // Indexes of supported modes listed in ui->comboBox_Modes and ui->stackedWidget_Modes
 const int SettingsWindow::GrabModeIndex = 0;
@@ -111,14 +111,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 
 	m_labelStatusIcon = new QLabel(statusBar());
-	m_labelStatusIcon->setStyleSheet("QLabel{margin-right: .5em}");
-	m_labelStatusIcon->setPixmap(Settings::isBacklightEnabled() ? *(m_pixmapCache["on16"]) : *(m_pixmapCache["off16"]));
+	m_labelStatusIcon->setStyleSheet(QStringLiteral("QLabel{margin-right: .5em}"));
+	m_labelStatusIcon->setPixmap(Settings::isBacklightEnabled() ? *(m_pixmapCache[QStringLiteral("on16")]) : *(m_pixmapCache[QStringLiteral("off16")]));
 	labelProfile = new QLabel(statusBar());
-	labelProfile->setStyleSheet("margin-left:1em");
+	labelProfile->setStyleSheet(QStringLiteral("margin-left:1em"));
 	labelDevice = new QLabel(statusBar());
 	labelFPS	= new QLabel(statusBar());
 
-	statusBar()->setStyleSheet("QStatusBar{border-top: 1px solid; border-color: palette(midlight);} QLabel{margin:0.2em}");
+	statusBar()->setStyleSheet(QStringLiteral("QStatusBar{border-top: 1px solid; border-color: palette(midlight);} QLabel{margin:0.2em}"));
 	statusBar()->setSizeGripEnabled(false);
 	statusBar()->addWidget(labelProfile, 4);
 	statusBar()->addWidget(labelDevice, 4);
@@ -268,6 +268,8 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->horizontalSlider_GammaCorrection, SIGNAL(valueChanged(int)), this, SLOT(onSliderDeviceGammaCorrection_valueChanged(int)));
 	connect(ui->checkBox_SendDataOnlyIfColorsChanges, SIGNAL(toggled(bool)), this, SLOT(onDeviceSendDataOnlyIfColorsChanged_toggled(bool)));
 
+	connect(ui->pbRunConfigurationWizard, SIGNAL(clicked()), this, SLOT(onRunConfigurationWizard_clicked()));
+
 	// Open Settings file
 	connect(ui->commandLinkButton_OpenSettings, SIGNAL(clicked()), this, SLOT(openCurrentProfile()));
 
@@ -293,7 +295,7 @@ void SettingsWindow::connectSignalsSlots()
 	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
 	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
 #ifdef Q_OS_MACOS
-	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(on_pushButton_SoundVizDeviceHelp_clicked()));
+	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(onSoundVizDeviceHelp_clicked()));
 #else
 	ui->pushButton_SoundVizDeviceHelp->hide();
 #endif // Q_OS_MACOS
@@ -374,7 +376,7 @@ void SettingsWindow::changeEvent(QEvent *e)
 
 		setWindowTitle(tr("Prismatik: %1").arg(ui->comboBox_Profiles->lineEdit()->text()));
 
-		ui->listWidget->addItem("dirty hack");
+		ui->listWidget->addItem(QStringLiteral("dirty hack"));
 		item = ui->listWidget->takeItem(ui->listWidget->count()-1);
 		delete item;
 		ui->listWidget->setCurrentRow(currentPage);
@@ -424,7 +426,7 @@ void SettingsWindow::updateStatusBar() {
 
 	this->labelProfile->setText(tr("Profile: %1").arg(Settings::getCurrentProfileName()));
 	this->labelDevice->setText(tr("Device: %1").arg(Settings::getConnectedDeviceName()));
-	this->labelFPS->setText(tr("FPS: %1").arg(""));
+	this->labelFPS->setText(tr("FPS: %1").arg(QLatin1String("")));
 }
 
 void SettingsWindow::updateDeviceTabWidgetsVisibility()
@@ -513,29 +515,29 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 
 void SettingsWindow::onPostInit() {
 	updateUiFromSettings();
-	this->requestFirmwareVersion();
-	this->requestMoodLampLamps();
+	emit requestFirmwareVersion();
+	emit requestMoodLampLamps();
 #ifdef SOUNDVIZ_SUPPORT
-	this->requestSoundVizDevices();
-	this->requestSoundVizVisualizers();
+	emit requestSoundVizDevices();
+	emit requestSoundVizVisualizers();
 #endif
 
 	if (m_trayIcon) {
 		bool updateJustFailed = false;
 		if (!Settings::getAutoUpdatingVersion().isEmpty()) {
-			if (Settings::getAutoUpdatingVersion() != VERSION_STR) {
-				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
+			if (Settings::getAutoUpdatingVersion() != QStringLiteral(VERSION_STR)) {
+				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(QStringLiteral(VERSION_STR)));
 			} else {
 				QMessageBox::critical(
 					this,
 					tr("Prismatik automatic update failed"),
 					tr("There was a problem when trying to automatically update Prismatik to the latest version.\n")
-					+ tr("You are still on version %1.\n").arg(VERSION_STR)
+					+ tr("You are still on version %1.\n").arg(QStringLiteral(VERSION_STR))
 					+ tr("Installing updates automatically was disabled."));
 				updateJustFailed = true;
 				ui->checkBox_installUpdates->setChecked(false);
 			}
-			Settings::setAutoUpdatingVersion("");
+			Settings::setAutoUpdatingVersion(QLatin1String(""));
 		}
 
 		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
@@ -579,11 +581,11 @@ void SettingsWindow::onSetApiPort_Clicked()
 		emit updateApiPort(port);
 
 		ui->lineEdit_ApiPort->setStyleSheet(this->styleSheet());
-		ui->lineEdit_ApiPort->setToolTip("");
+		ui->lineEdit_ApiPort->setToolTip(QLatin1String(""));
 	} else {
-		QString errorMessage = "Convert to 'int' fail";
+		QString errorMessage = QStringLiteral("Convert to 'int' fail");
 
-		ui->lineEdit_ApiPort->setStyleSheet("background-color:red;");
+		ui->lineEdit_ApiPort->setStyleSheet(QStringLiteral("background-color:red;"));
 		ui->lineEdit_ApiPort->setToolTip(errorMessage);
 
 		qWarning() << Q_FUNC_INFO << errorMessage << "port:" << ui->lineEdit_ApiPort->text();
@@ -632,7 +634,7 @@ void SettingsWindow::onOpenLogs_clicked()
 	QDesktopServices::openUrl(QUrl(LogWriter::getLogsDir().absolutePath()));
 }
 
-void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status,	QList<QString> modules)
+void SettingsWindow::setDeviceLockViaAPI(const DeviceLocked::DeviceLockStatus status,	const QList<QString>& modules)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << status;
 	m_deviceLockStatus = status;
@@ -737,7 +739,7 @@ void SettingsWindow::startBacklight()
 
 
 	if (m_deviceLockKey.count()==0)
-		m_deviceLockModule = "";
+		m_deviceLockModule = QLatin1String("");
 
 	updateTrayAndActionStates();
 }
@@ -776,45 +778,45 @@ void SettingsWindow::updateTrayAndActionStates()
 	switch (m_backlightStatus)
 	{
 	case Backlight::StatusOn:
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["off16"]));
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("off16")]));
 		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights OFF"));
 
 		if (m_deviceLockStatus == DeviceLocked::Api)
 		{
-			m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
+			m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("lock16")]);
 			if (m_trayIcon)
 				m_trayIcon->setStatus(SysTrayIcon::StatusLockedByApi);
 		} else
 			if (m_deviceLockStatus == DeviceLocked::Plugin)
 			{
-				m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
+				m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("lock16")]);
 				if (m_trayIcon)
 					m_trayIcon->setStatus(SysTrayIcon::StatusLockedByPlugin, &m_deviceLockModule);
 			} else
 				if (m_deviceLockStatus == DeviceLocked::ApiPersist)
 				{
-					m_labelStatusIcon->setPixmap(*m_pixmapCache["persist16"]);
+					m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("persist16")]);
 					if (m_trayIcon)
 						m_trayIcon->setStatus(SysTrayIcon::StatusApiPersist);
 				} else {
-						m_labelStatusIcon->setPixmap(*m_pixmapCache["on16"]);
+						m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("on16")]);
 						if (m_trayIcon)
 							m_trayIcon->setStatus(SysTrayIcon::StatusOn);
 				}
 		break;
 
 	case Backlight::StatusOff:
-		m_labelStatusIcon->setPixmap(*m_pixmapCache["off16"]);
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["on16"]));
-		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights ON"));
+		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("off16")]);
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("on16")]));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	") + tr("Turn lights ON"));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusOff);
 		break;
 
 	case Backlight::StatusDeviceError:
-		m_labelStatusIcon->setPixmap(*m_pixmapCache["error16"]);
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["off16"]));
-		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights OFF"));
+		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("error16")]);
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("off16")]));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	") + tr("Turn lights OFF"));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusError);
 		break;
@@ -928,9 +930,9 @@ void SettingsWindow::requestBacklightStatus()
 	emit resultBacklightStatus(m_backlightStatus);
 }
 
-void SettingsWindow::onApiServer_ErrorOnStartListening(QString errorMessage)
+void SettingsWindow::onApiServer_ErrorOnStartListening(const QString& errorMessage)
 {
-	ui->lineEdit_ApiPort->setStyleSheet("background-color:red;");
+	ui->lineEdit_ApiPort->setStyleSheet(QStringLiteral("background-color:red;"));
 	ui->lineEdit_ApiPort->setToolTip(errorMessage);
 }
 
@@ -949,18 +951,18 @@ void SettingsWindow::processMessage(const QString &message)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << message;
 
-	if (message == "on")
+	if (message == QStringLiteral("on"))
 		setBacklightStatus(Backlight::StatusOn);
-	else if (message == "off")
+	else if (message == QStringLiteral("off"))
 		setBacklightStatus(Backlight::StatusOff);
-	else if (message.startsWith("set-profile ")) {
+	else if (message.startsWith(QStringLiteral("set-profile "))) {
 		QString profile = message.mid(12);
 		profileSwitch(profile);
-	} else if (message == "quitForWizard") {
+	} else if (message == QStringLiteral("quitForWizard")) {
 		qWarning() << "Wizard was started, quitting!";
 		LightpackApplication::quit();
 	} else if (m_trayIcon != NULL) { // "alreadyRunning"
-		qWarning(qPrintable(message));
+		qWarning() << message;
 		m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
 		this->show();
 		this->activateWindow();
@@ -1123,12 +1125,12 @@ void SettingsWindow::ledDeviceFirmwareVersionResult(const QString & fwVersion)
 
 	if (Settings::getConnectedDevice() == SupportedDevices::DeviceTypeLightpack)
 	{
-		if (m_deviceFirmwareVersion == "5.0" || m_deviceFirmwareVersion == "4.3")
+		if (m_deviceFirmwareVersion == QStringLiteral("5.0") || m_deviceFirmwareVersion == QStringLiteral("4.3"))
 		{
-			aboutDialogFirmwareString += QString(" ") +
-					"(<a href=\"" + LightpackDownloadsPageUrl + "\">" +
+			aboutDialogFirmwareString += QStringLiteral(" ") +
+					QStringLiteral("(<a href=\"") + LightpackDownloadsPageUrl + QStringLiteral("\">") +
 					tr("update firmware") +
-					"</a>)";
+					QStringLiteral("</a>)");
 
 			if (Settings::isUpdateFirmwareMessageShown() == false)
 			{
@@ -1163,7 +1165,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 	QString fpsText = QString::number(hz, 'f', 0);
 	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
 		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
-		fpsText += " / " + QString::number(maxHz, 'f', 0);
+		fpsText += QStringLiteral(" / ") + QString::number(maxHz, 'f', 0);
 	}
 	ui->label_GrabFrequency_value->setText(fpsText);
 
@@ -1213,7 +1215,7 @@ void SettingsWindow::clearBaudrateWarning()
 
 	ui->label_GrabFrequency_value->setPalette(palette);
 	this->labelFPS->setPalette(palette);
-	this->labelFPS->setToolTip("");
+	this->labelFPS->setToolTip(QLatin1String(""));
 
 	this->labelFPS->setText(this->labelFPS->text().remove(BaudrateWarningSign));
 }
@@ -1453,7 +1455,7 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
 		DEBUG_LOW_LEVEL << "LightpacckMode unsuppotred value =" << mode;
 		break;
 	}
-	backlightStatusChanged(m_backlightStatus);
+	emit backlightStatusChanged(m_backlightStatus);
 }
 
 void SettingsWindow::onMoodLampColor_changed(QColor color)
@@ -1577,10 +1579,10 @@ void SettingsWindow::openFile(const QString &filePath)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	QString filePrefix = "file://";
+	QString filePrefix = QStringLiteral("file://");
 
 #ifdef Q_OS_WIN
-	filePrefix = "file:///";
+	filePrefix = QStringLiteral("file:///");
 #endif
 
 	QDesktopServices::openUrl(QUrl(filePrefix + filePath, QUrl::TolerantMode));
@@ -1614,7 +1616,7 @@ void SettingsWindow::profileRename()
 		return;
 	}
 
-	if (configName == "")
+	if (configName.isEmpty())
 	{
 		configName = Settings::getCurrentProfileName();
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Profile name is empty, return back to" << configName;
@@ -1664,9 +1666,9 @@ void SettingsWindow::profileTraySwitch(const QString &profileName)
 	return;
 }
 
-void SettingsWindow::profileSwitchCombobox(QString profile)
+void SettingsWindow::profileSwitchCombobox(const QString& profile)
 {
-	int index = ui->comboBox_Profiles->findText(profile);
+	const int index = ui->comboBox_Profiles->findText(profile);
 	ui->comboBox_Profiles->setCurrentIndex(index);
 }
 
@@ -1681,7 +1683,7 @@ void SettingsWindow::profileNew()
 		while(ui->comboBox_Profiles->findText(profileName +" "+ QString::number(i)) != -1){
 			i++;
 		}
-		profileName += + " " + QString::number(i);
+		profileName += QStringLiteral(" ") + QString::number(i);
 	}
 
 	ui->comboBox_Profiles->insertItem(0, profileName);
@@ -1757,11 +1759,11 @@ void SettingsWindow::settingsProfileChanged_UpdateUI(const QString &profileName)
 
 void SettingsWindow::initPixmapCache()
 {
-	m_pixmapCache.insert("lock16", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(16, Qt::SmoothTransformation)));
-	m_pixmapCache.insert("on16", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("off16", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("error16", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("persist16", new QPixmap(QPixmap(":/icons/persist.png").scaledToWidth(16, Qt::SmoothTransformation)));
+	m_pixmapCache.insert(QStringLiteral("lock16"), new QPixmap(QPixmap(QStringLiteral(":/icons/lock.png")).scaledToWidth(16, Qt::SmoothTransformation)));
+	m_pixmapCache.insert(QStringLiteral("on16"), new QPixmap(QPixmap(QStringLiteral(":/icons/on.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("off16"), new QPixmap(QPixmap(QStringLiteral(":/icons/off.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("error16"), new QPixmap(QPixmap(QStringLiteral(":/icons/error.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("persist16"), new QPixmap(QPixmap(QStringLiteral(":/icons/persist.png")).scaledToWidth(16, Qt::SmoothTransformation)));
 }
 
 //void SettingsWindow::handleConnectedDeviceChange(const SupportedDevices::DeviceType deviceType) {
@@ -1779,13 +1781,13 @@ void SettingsWindow::initLanguages()
 
 	ui->comboBox_Language->clear();
 	ui->comboBox_Language->addItem(tr("System default"));
-	ui->comboBox_Language->addItem("English");
-	ui->comboBox_Language->addItem("Russian");
-	ui->comboBox_Language->addItem("Ukrainian");
+	ui->comboBox_Language->addItem(QStringLiteral("English"));
+	ui->comboBox_Language->addItem(QStringLiteral("Russian"));
+	ui->comboBox_Language->addItem(QStringLiteral("Ukrainian"));
 
 	int langIndex = 0; // "System default"
 	QString langSaved = Settings::getLanguage();
-	if(langSaved != "<System>"){
+	if(langSaved != QStringLiteral("<System>")){
 		langIndex = ui->comboBox_Language->findText(langSaved);
 	}
 	ui->comboBox_Language->setCurrentIndex(langIndex);
@@ -1813,9 +1815,9 @@ void SettingsWindow::loadTranslation(const QString & language)
 		DEBUG_LOW_LEVEL << "System locale" << locale;
 		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
 	}
-	else if (language == "English") locale = "en_EN"; // :/translations/en_EN.qm
-	else if (language == "Russian") locale = "ru_RU"; // :/translations/ru_RU.qm
-	else if (language == "Ukrainian") locale = "uk_UA"; // :/translations/uk_UA.qm
+	else if (language == QStringLiteral("English")) locale = QStringLiteral("en_EN"); // :/translations/en_EN.qm
+	else if (language == QStringLiteral("Russian")) locale = QStringLiteral("ru_RU"); // :/translations/ru_RU.qm
+	else if (language == QStringLiteral("Ukrainian")) locale = QStringLiteral("uk_UA"); // :/translations/uk_UA.qm
 	// append line for new language/locale here
 	else {
 		qWarning() << "Language" << language << "not found. Set to default" << SettingsScope::Main::LanguageDefault;
@@ -1824,7 +1826,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
 	}
 
-	QString pathToLocale = QString(":/translations/") + locale;
+	QString pathToLocale = QStringLiteral(":/translations/") + locale;
 
 	if(m_translator != NULL){
 		qApp->removeTranslator(m_translator);
@@ -1832,7 +1834,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 		m_translator = NULL;
 	}
 
-	if(locale == "en_EN" /* default no need to translate */){
+	if(locale == QStringLiteral("en_EN") /* default no need to translate */){
 		DEBUG_LOW_LEVEL << "Translation removed, using default locale" << locale;
 		return;
 	}
@@ -2107,7 +2109,7 @@ void SettingsWindow::showHelpOf(QObject *object)
 }
 
 #if defined(SOUNDVIZ_SUPPORT) && defined(Q_OS_MACOS)
-void SettingsWindow::on_pushButton_SoundVizDeviceHelp_clicked()
+void SettingsWindow::onSoundVizDeviceHelp_clicked()
 {
 	showHelpOf(ui->pushButton_SoundVizDeviceHelp);
 }
@@ -2173,7 +2175,7 @@ bool SettingsWindow::toPriority(Plugin* s1 ,Plugin* s2 )
 	return s1->getPriority() > s2->getPriority();
 }
 
-void SettingsWindow::updatePlugin(QList<Plugin*> plugins)
+void SettingsWindow::updatePlugin(const QList<Plugin*>& plugins)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
@@ -2225,11 +2227,11 @@ void SettingsWindow::pluginSwitch(int index)
 
 	if (index == -1)
 	{
-		ui->label_PluginName->setText("");
-		ui->label_PluginAuthor->setText("");
-		ui->label_PluginVersion->setText("");
-		ui->tb_PluginDescription->setText("");
-		ui->label_PluginIcon->setPixmap(QIcon(":/plugin/Plugin.png").pixmap(50,50));
+		ui->label_PluginName->setText(QLatin1String(""));
+		ui->label_PluginAuthor->setText(QLatin1String(""));
+		ui->label_PluginVersion->setText(QLatin1String(""));
+		ui->tb_PluginDescription->setText(QLatin1String(""));
+		ui->label_PluginIcon->setPixmap(QIcon(QStringLiteral(":/plugin/Plugin.png")).pixmap(50,50));
 		return;
 	}
 
@@ -2288,15 +2290,15 @@ void SettingsWindow::savePriorityPlugin()
 QString SettingsWindow::getPluginName(const Plugin *plugin) const
 {
 	if (plugin->state() == QProcess::Running) {
-		return plugin->Name().append(" (running)");
+		return plugin->Name().append(QStringLiteral(" (running)"));
 	} else {
-		return plugin->Name().append(" (not running)");
+		return plugin->Name().append(QStringLiteral(" (not running)"));
 	}
 }
 
-void SettingsWindow::on_pbRunConfigurationWizard_clicked()
+void SettingsWindow::onRunConfigurationWizard_clicked()
 {
-	const QStringList args("--wizard");
+	const QStringList args(QStringLiteral("--wizard"));
 	QString cmdLine(QApplication::applicationFilePath());
 #ifdef Q_OS_WIN
 	cmdLine.prepend('"');

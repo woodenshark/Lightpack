@@ -39,7 +39,7 @@ int LogWriter::initWith(const QString& logsDirPath)
 	if (rotateLogFiles(m_logsDir) == false)
 		std::cerr << "Failed to rotate old log files." << std::endl;
 
-	const QString logFilePath = logsDirPath + "/Prismatik.0.log";
+	const QString logFilePath = logsDirPath + QStringLiteral("/Prismatik.0.log");
 	QScopedPointer<QFile> logFile(new QFile(logFilePath));
 	if (logFile->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
 		QMutexLocker locker(&m_mutex);
@@ -52,8 +52,8 @@ int LogWriter::initWith(const QString& logsDirPath)
 #endif
 
 		const QDateTime currentDateTime(QDateTime::currentDateTime());
-		m_logStream << currentDateTime.date().toString("yyyy_MM_dd") << " ";
-		m_logStream << currentDateTime.time().toString("hh:mm:ss:zzz") << " Prismatik " << VERSION_STR;
+		m_logStream << currentDateTime.date().toString(QStringLiteral("yyyy_MM_dd")) << QStringLiteral(" ");
+		m_logStream << currentDateTime.time().toString(QStringLiteral("hh:mm:ss:zzz")) << QStringLiteral(" Prismatik ") << QStringLiteral(VERSION_STR);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 		m_logStream << Qt::endl;
 #else
@@ -86,8 +86,8 @@ void LogWriter::writeMessage(const QString& msg, Level level)
 	Q_ASSERT(level >= Debug && level < LevelCount);
 	Q_STATIC_ASSERT(sizeof(s_logLevelNames)/sizeof(s_logLevelNames[0]) == LevelCount);
 
-	const QString timeMark = QDateTime::currentDateTime().time().toString("hh:mm:ss:zzz");
-	const QString finalMsg = QString("%1 %2: %3\n").arg(timeMark, s_logLevelNames[level], msg);
+	const QString timeMark = QDateTime::currentDateTime().time().toString(QStringLiteral("hh:mm:ss:zzz"));
+	const QString finalMsg = QStringLiteral("%1 %2: %3\n").arg(timeMark, s_logLevelNames[level], msg);
 	QMutexLocker locker(&m_mutex);
 	cerr << finalMsg.toStdString();
 	if (!m_disabled) {
@@ -124,7 +124,7 @@ bool LogWriter::rotateLogFiles(const QDir& logsDir)
 	if (!logsDir.exists())
 		return false;
 
-	QStringList logFiles = logsDir.entryList(QStringList("Prismatik.?.log"), QDir::Files, QDir::Name);
+	QStringList logFiles = logsDir.entryList(QStringList(QStringLiteral("Prismatik.?.log")), QDir::Files, QDir::Name);
 	// Delete all old files except last |StoreLogsLaunches| files.
 	for (int i = logFiles.count() - 1; i >= StoreLogsLaunches - 1; i--)
 	{
@@ -134,7 +134,7 @@ bool LogWriter::rotateLogFiles(const QDir& logsDir)
 		}
 	}
 
-	logFiles = logsDir.entryList(QStringList("Prismatik.?.log"), QDir::Files, QDir::Name);
+	logFiles = logsDir.entryList(QStringList(QStringList(QStringLiteral("Prismatik.?.log"))), QDir::Files, QDir::Name);
 	Q_ASSERT(logFiles.count() <= StoreLogsLaunches);
 	// Move Prismatik.[N].log file to Prismatik.[N+1].log
 	for (int i = logFiles.count() - 1; i >= 0; i--)
@@ -144,7 +144,7 @@ bool LogWriter::rotateLogFiles(const QDir& logsDir)
 
 		const int num = splitted.at(1).toInt();
 		const QString from = logsDir.absoluteFilePath(logFiles.at(i));
-		const QString to = logsDir.absoluteFilePath(QString("Prismatik.") + QString::number(num + 1) + ".log");
+		const QString to = logsDir.absoluteFilePath(QStringLiteral("Prismatik.") + QString::number(num + 1) + QStringLiteral(".log"));
 
 		if (QFile::exists(to))
 			QFile::remove(to);

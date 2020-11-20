@@ -8,7 +8,7 @@
 
 ColorButton::ColorButton(QWidget * parent) : QPushButton(parent)
 {
-	this->setText("");
+	this->setText(QLatin1String(""));
 	connect(this, SIGNAL(clicked()), this, SLOT(click()));
 }
 

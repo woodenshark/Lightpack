@@ -51,7 +51,7 @@ namespace Debug
 	};
 #ifndef NO_QT
 	inline const QString toString(QRect rect) {
-		return QString("x=%1, y=%2, width=%3, height=%4").arg(QString::number(rect.x())
+		return QStringLiteral("x=%1, y=%2, width=%3, height=%4").arg(QString::number(rect.x())
 																, QString::number(rect.y())
 																, QString::number(rect.width())
 																, QString::number(rect.height()));

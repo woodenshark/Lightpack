@@ -32,16 +32,16 @@ class LedDeviceWarls : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceWarls(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
+	LedDeviceWarls(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
+	QString name() const;
 
 public slots:
-    const QString name() const;
 	void setColors(const QList<QRgb> & colors);
 	void switchOffLeds();
-    void requestFirmwareVersion();
-    int maxLedsCount();
+	void requestFirmwareVersion();
+	int maxLedsCount();
 
 protected:
-    void resizeColorsBuffer(int buffSize);
-    void reinitBufferHeader();
+	void resizeColorsBuffer(int buffSize);
+	void reinitBufferHeader();
 };

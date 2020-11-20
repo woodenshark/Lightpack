@@ -31,9 +31,9 @@ LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, cons
 {
 }
 
-const QString LedDeviceDnrgb::name() const
+QString LedDeviceDnrgb::name() const
 {
-	return "dnrgb";
+	return QStringLiteral("dnrgb");
 }
 
 int LedDeviceDnrgb::maxLedsCount()
@@ -152,7 +152,7 @@ void LedDeviceDnrgb::switchOffLeds()
 
 void LedDeviceDnrgb::requestFirmwareVersion()
 {
-	emit firmwareVersion("1.0 (dnrgb device)");
+	emit firmwareVersion(QStringLiteral("1.0 (dnrgb device)"));
 	emit commandCompleted(true);
 }
 

@@ -77,7 +77,7 @@ void AbstractLedDeviceUdp::setSmoothSlowdown(int /*value*/)
 	emit commandCompleted(true);
 }
 
-void AbstractLedDeviceUdp::setColorSequence(QString value)
+void AbstractLedDeviceUdp::setColorSequence(const QString& value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
@@ -87,20 +87,22 @@ void AbstractLedDeviceUdp::setColorSequence(QString value)
 	emit commandCompleted(true);
 }
 
-void AbstractLedDeviceUdp::setGamma(double value)
+void AbstractLedDeviceUdp::setGamma(double value, const bool update = true)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
 	m_gamma = value;
-	setColors(m_colorsSaved);
+	if (update)
+		setColors(m_colorsSaved);
 }
 
-void AbstractLedDeviceUdp::setBrightness(int percent)
+void AbstractLedDeviceUdp::setBrightness(int percent, const bool update = true)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
 
 	m_brightness = percent;
-	setColors(m_colorsSaved);
+	if (update)
+		setColors(m_colorsSaved);
 }
 
 void AbstractLedDeviceUdp::open()

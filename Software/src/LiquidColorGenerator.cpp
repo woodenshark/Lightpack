@@ -48,7 +48,7 @@ LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 
 	m_isEnabled = false;
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColor()));
+	connect(&m_timer, SIGNAL(timeout()), this, SLOT(doColorUpdate()));
 }
 
 void LiquidColorGenerator::start()
@@ -58,7 +58,7 @@ void LiquidColorGenerator::start()
 	m_isEnabled = true;
 
 	reset();
-	updateColor();
+	doColorUpdate();
 }
 
 void LiquidColorGenerator::stop()
@@ -90,7 +90,7 @@ void LiquidColorGenerator::reset()
 	m_unselectedColors.clear();
 }
 
-void LiquidColorGenerator::updateColor()
+void LiquidColorGenerator::doColorUpdate()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << m_speed;
 

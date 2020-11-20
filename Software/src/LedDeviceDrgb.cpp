@@ -31,9 +31,9 @@ LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, const 
 {
 }
 
-const QString LedDeviceDrgb::name() const
-{ 
-	return "drgb"; 
+QString LedDeviceDrgb::name() const
+{
+	return QStringLiteral("drgb");
 }
 
 int LedDeviceDrgb::maxLedsCount()
@@ -61,7 +61,7 @@ void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 		m_writeBuffer.append(color.g);
 		m_writeBuffer.append(color.b);
 	}
-	
+
 	bool ok = writeBuffer(m_writeBuffer);
 	emit commandCompleted(ok);
 }
@@ -90,7 +90,7 @@ void LedDeviceDrgb::switchOffLeds()
 
 void LedDeviceDrgb::requestFirmwareVersion()
 {
-	emit firmwareVersion("1.0 (drgb device)");
+	emit firmwareVersion(QStringLiteral("1.0 (drgb device)"));
 	emit commandCompleted(true);
 }
 

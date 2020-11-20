@@ -40,10 +40,10 @@ public:\
 _OBJ_NAME_ ## SoundVisualizer() = default;\
 ~_OBJ_NAME_ ## SoundVisualizer() = default;\
 \
-static const char* const name() { return _LABEL_; };\
+static const char* name() { return _LABEL_; };\
 static SoundVisualizerBase* create() { return new _OBJ_NAME_ ## SoundVisualizer(); };\
 \
-const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);\
+bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);\
 _BODY_\
 };\
 struct _OBJ_NAME_ ## Register {\
@@ -87,7 +87,7 @@ private:
 	const int SpecHeight = 1000;
 );
 
-const bool PrismatikSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
+bool PrismatikSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	size_t b0 = 0;
 	bool changed = false;
@@ -142,7 +142,7 @@ private:
 	const uint8_t FadeOutSpeed = 12;
 );
 
-const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
+bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	bool changed = false;
 	const size_t middleLed = std::floor(colors.size() / 2);
@@ -191,7 +191,7 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 			oldColor.setHsl(oldColor.hue(), oldColor.saturation(), luminosity);
 			color = oldColor.rgb();
 		}
-			
+
 		// peak A
 		QRgb colorA = Settings::isLedEnabled(idxA) ? color : 0;
 		changed = changed || (colors[idxA] != colorA);

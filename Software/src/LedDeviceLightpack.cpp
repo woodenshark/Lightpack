@@ -78,7 +78,7 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 		return;
 	}
 
-	if (static_cast<size_t>(colors.count()) > maxLedsCount()) {
+	if (colors.count() > maxLedsCount()) {
 		qWarning() << Q_FUNC_INFO << "data size is greater than max leds count";
 		// skip command with wrong data size
 		return;
@@ -149,7 +149,7 @@ void LedDeviceLightpack::switchOffLeds()
 
 	if (m_colorsSaved.empty())
 	{
-		for (size_t i = 0; i < maxLedsCount(); ++i)
+		for (int i = 0; i < maxLedsCount(); ++i)
 			m_colorsSaved << 0;
 	} else {
 		for (int i = 0; i < m_colorsSaved.count(); i++)
@@ -227,7 +227,7 @@ void LedDeviceLightpack::setSmoothSlowdown(int value)
 	emit commandCompleted(ok);
 }
 
-void LedDeviceLightpack::setColorSequence(QString /*value*/)
+void LedDeviceLightpack::setColorSequence(const QString& /*value*/)
 {
 	emit commandCompleted(true);
 }
@@ -247,7 +247,7 @@ void LedDeviceLightpack::requestFirmwareVersion()
 		int fw_major = m_readBuffer[INDEX_FW_VER_MAJOR];
 		int fw_minor = m_readBuffer[INDEX_FW_VER_MINOR];
 		fw_unofficial = m_readBuffer[INDEX_FW_VER_UNOFFICIAL];
-		fwVersion = QString::number(fw_major) + "." + QString::number(fw_minor) + (fw_unofficial > 0 ? "+" + QString::number(fw_unofficial) : "");
+		fwVersion = QString::number(fw_major) + QStringLiteral(".") + QString::number(fw_minor) + (fw_unofficial > 0 ? QStringLiteral("+") + QString::number(fw_unofficial) : QLatin1String(""));
 	} else {
 		fwVersion = tr("read device fail");
 	}
@@ -281,7 +281,7 @@ void LedDeviceLightpack::open()
 		return;
 	}
 
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << QString("hid_open(0x%1, 0x%2)")
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << QStringLiteral("hid_open(0x%1, 0x%2)")
 						.arg(USB_VENDOR_ID, 4, 16, QChar('0'))
 						.arg(USB_PRODUCT_ID, 4, 16, QChar('0'));
 
@@ -454,7 +454,7 @@ void LedDeviceLightpack::resizeColorsBuffer(int buffSize)
 
 	m_colorsBuffer.clear();
 
-	size_t checkedBufferSize = buffSize;
+	int checkedBufferSize = buffSize;
 	if (checkedBufferSize > maxLedsCount())
 	{
 		qCritical() << Q_FUNC_INFO << "buffSize > MaximumLedsCount" << checkedBufferSize << ">" << maxLedsCount();

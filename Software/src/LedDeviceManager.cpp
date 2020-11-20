@@ -310,7 +310,7 @@ void LedDeviceManager::setDitheringEnabled(bool isEnabled) {
 	}
 }
 
-void LedDeviceManager::setColorSequence(QString value)
+void LedDeviceManager::setColorSequence(const QString& value)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << value << "Is last command completed:" << m_isLastCommandCompleted;
 

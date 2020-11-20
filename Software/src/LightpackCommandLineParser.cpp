@@ -1,20 +1,20 @@
 #include "LightpackCommandLineParser.hpp"
 
 LightpackCommandLineParser::LightpackCommandLineParser()
-	: m_noGUIOption("nogui", "no GUI (console mode)")
-	, m_wizardOption("wizard", "run settings wizard first")
-	, m_backlightOffOption("off", "send 'off leds' command to the device or running instance")
-	, m_backlightOnOption("on", "send 'on leds' command to running instance, if any")
-	, m_debugLevelOption("debug", "verbosity level of debug output (high, mid, low, zero)", "debug")
-	, m_debugLevelHighOption("debug-high", "sets application debug level to high.")
-	, m_debugLevelMidOption("debug-mid", "sets application debug level to mid.")
-	, m_debugLevelLowOption("debug-low", "sets application debug level to low.")
-	, m_debugLevelZeroOption("debug-zero", "sets application debug level to zero.")
+	: m_noGUIOption(QStringLiteral("nogui"), QStringLiteral("no GUI (console mode)"))
+	, m_wizardOption(QStringLiteral("wizard"), QStringLiteral("run settings wizard first"))
+	, m_backlightOffOption(QStringLiteral("off"), QStringLiteral("send 'off leds' command to the device or running instance"))
+	, m_backlightOnOption(QStringLiteral("on"), QStringLiteral("send 'on leds' command to running instance, if any"))
+	, m_debugLevelOption(QStringLiteral("debug"), QStringLiteral("verbosity level of debug output (high, mid, low, zero)"), QStringLiteral("debug"))
+	, m_debugLevelHighOption(QStringLiteral("debug-high"), QStringLiteral("sets application debug level to high."))
+	, m_debugLevelMidOption(QStringLiteral("debug-mid"), QStringLiteral("sets application debug level to mid."))
+	, m_debugLevelLowOption(QStringLiteral("debug-low"), QStringLiteral("sets application debug level to low."))
+	, m_debugLevelZeroOption(QStringLiteral("debug-zero"), QStringLiteral("sets application debug level to zero."))
 	, m_versionOption(m_parser.addVersionOption())
 	, m_helpOption(m_parser.addHelpOption())
-	, m_optionSetProfile("set-profile", "switch to another profile in already running instance", "profile")
+	, m_optionSetProfile(QStringLiteral("set-profile"), QStringLiteral("switch to another profile in already running instance"), QStringLiteral("profile"))
 {
-	m_parser.setApplicationDescription("Prismatik of Lightpack");
+	m_parser.setApplicationDescription(QStringLiteral("Prismatik of Lightpack"));
 	m_parser.addOption(m_noGUIOption);
 	m_parser.addOption(m_wizardOption);
 	m_parser.addOption(m_backlightOffOption);
@@ -88,20 +88,20 @@ QString LightpackCommandLineParser::helpText() const {
 
 QString LightpackCommandLineParser::errorText() const {
 	if (isSetBacklightOff() && isSetBacklightOn())
-		return "Bad options specified!";
+		return QStringLiteral("Bad options specified!");
 	return m_parser.errorText();
 }
 
 // static
 Debug::DebugLevels LightpackCommandLineParser::parseDebugLevel(const QString& levelValue)
 {
-	if (levelValue == "high")
+	if (levelValue == QStringLiteral("high"))
 		return Debug::HighLevel;
-	else if (levelValue == "mid")
+	else if (levelValue == QStringLiteral("mid"))
 		return Debug::MidLevel;
-	else if (levelValue == "low")
+	else if (levelValue == QStringLiteral("low"))
 		return Debug::LowLevel;
-	else if (levelValue == "zero")
+	else if (levelValue == QStringLiteral("zero"))
 		return Debug::ZeroLevel;
 
 	Q_ASSERT(false);

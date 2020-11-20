@@ -102,9 +102,9 @@ LightpackApplication::~LightpackApplication()
 
 void LightpackApplication::initializeAll(const QString & appDirPath)
 {
-	setApplicationName("Prismatik");
-	setOrganizationName("Woodenshark LLC");
-	setApplicationVersion(VERSION_STR);
+	setApplicationName(QStringLiteral("Prismatik"));
+	setOrganizationName(QStringLiteral("Woodenshark LLC"));
+	setApplicationVersion(QStringLiteral(VERSION_STR));
 	setQuitOnLastWindowClosed(false);
 
 	m_applicationDirPath = appDirPath;
@@ -238,7 +238,7 @@ void LightpackApplication::setBacklightChanged(Lightpack::Mode mode)
 	startBacklight();
 }
 
-void LightpackApplication::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, QList<QString> modules)
+void LightpackApplication::setDeviceLockViaAPI(const DeviceLocked::DeviceLockStatus status, const QList<QString>& modules)
 {
 	Q_UNUSED(modules);
 	m_deviceLockStatus = status;
@@ -347,7 +347,7 @@ void LightpackApplication::onSessionChange(int change)
 				// Process all currently pending signals (which may include updating the color signals)
 				QApplication::processEvents(QEventLoop::AllEvents, 500);
 
-				getLightpackApp()->settingsWnd()->switchOffLeds();
+				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				QApplication::processEvents(QEventLoop::AllEvents, 500);
 			}
 			break;
@@ -357,7 +357,7 @@ void LightpackApplication::onSessionChange(int change)
 
 			if (!SettingsScope::Settings::isKeepLightsOnAfterLock())
 			{
-				getLightpackApp()->settingsWnd()->switchOffLeds();
+				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				m_isLightsTurnedOffBySessionChange = true;
 			}
 			m_isSessionLocked = true;
@@ -365,7 +365,7 @@ void LightpackApplication::onSessionChange(int change)
 		case SystemSession::Status::Unlocking:
 			if (m_isSessionLocked && !SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOnBeforeLock)
 			{
-				getLightpackApp()->settingsWnd()->switchOnLeds();
+				emit getLightpackApp()->settingsWnd()->switchOnLeds();
 				m_isLightsTurnedOffBySessionChange = false;
 			}
 			m_isSessionLocked = false;
@@ -376,7 +376,7 @@ void LightpackApplication::onSessionChange(int change)
 
 			if (!SettingsScope::Settings::isKeepLightsOnAfterSuspend())
 			{
-				getLightpackApp()->settingsWnd()->switchOffLeds();
+				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				m_isLightsTurnedOffBySessionChange = true;
 			}
 			m_isSuspending = true;
@@ -384,7 +384,7 @@ void LightpackApplication::onSessionChange(int change)
 		case SystemSession::Status::Resuming:
 			if (m_isSuspending && !SettingsScope::Settings::isKeepLightsOnAfterSuspend() && m_isLightsWereOnBeforeSuspend)
 			{
-				getLightpackApp()->settingsWnd()->switchOnLeds();
+				emit getLightpackApp()->settingsWnd()->switchOnLeds();
 				m_isLightsTurnedOffBySessionChange = false;
 			}
 			m_isSuspending = false;
@@ -396,7 +396,7 @@ void LightpackApplication::onSessionChange(int change)
 
 			if (!SettingsScope::Settings::isKeepLightsOnAfterScreenOff())
 			{
-				getLightpackApp()->settingsWnd()->switchOffLeds();
+				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				m_isLightsTurnedOffBySessionChange = true;
 			}
 			m_isDisplayOff = true;
@@ -404,7 +404,7 @@ void LightpackApplication::onSessionChange(int change)
 		case SystemSession::Status::DisplayOn:
 			if (m_isDisplayOff && !SettingsScope::Settings::isKeepLightsOnAfterScreenOff() && m_isLightsWereOnBeforeDisplaySleep)
 			{
-				getLightpackApp()->settingsWnd()->switchOnLeds();
+				emit getLightpackApp()->settingsWnd()->switchOnLeds();
 				m_isLightsTurnedOffBySessionChange = false;
 			}
 			m_isDisplayOff = false;
@@ -431,11 +431,11 @@ void LightpackApplication::processCommandLineArguments()
 	if (parser.isSetVersion())
 	{
 		const QString versionString =
-			"Version: " VERSION_STR "\n"
+			QStringLiteral("Version: " VERSION_STR "\n"
 #ifdef GIT_REVISION
 			"Revision: " GIT_REVISION "\n"
 #endif
-			"Build with Qt version " QT_VERSION_STR "\n";
+			"Build with Qt version " QT_VERSION_STR "\n");
 		outputMessage(versionString);
 		::exit(0);
 	}
@@ -447,7 +447,7 @@ void LightpackApplication::processCommandLineArguments()
 	} else if (parser.isSetWizard()) {
 		if (isRunning()) {
 			DEBUG_LOW_LEVEL << "Application still running, telling it to quit";
-			sendMessage("quitForWizard");
+			sendMessage(QStringLiteral("quitForWizard"));
 			while (isRunning()) {
 				QThread::sleep(200);
 			}
@@ -462,20 +462,20 @@ void LightpackApplication::processCommandLineArguments()
 			LedDeviceLightpack lightpackDevice;
 			lightpackDevice.switchOffLeds();
 		} else {
-			sendMessage("off");
+			sendMessage(QStringLiteral("off"));
 		}
 		::exit(0);
 	}
 	else if (parser.isSetBacklightOn())
 	{
 		if (isRunning())
-			sendMessage("on");
+			sendMessage(QStringLiteral("on"));
 		::exit(0);
 	}
 
 	if (parser.isSetProfile()) {
 		if (isRunning())
-			sendMessage("set-profile " + parser.profileName());
+			sendMessage(QStringLiteral("set-profile ") + parser.profileName());
 		::exit(0);
 	}
 
@@ -489,10 +489,10 @@ void LightpackApplication::processCommandLineArguments()
 		qDebug() << "Debug level" << g_debugLevel;
 }
 
-void LightpackApplication::outputMessage(QString message) const
+void LightpackApplication::outputMessage(const QString& message) const
 {
 #ifdef Q_OS_WIN
-	QMessageBox::information(NULL, "Prismatik", message, QMessageBox::Ok);
+	QMessageBox::information(NULL, QStringLiteral("Prismatik"), message, QMessageBox::Ok);
 #else
 	fprintf(stderr, "%s\n", message.toStdString().c_str());
 #endif
@@ -558,7 +558,7 @@ bool LightpackApplication::checkSystemTrayAvailability() const
 
 	if (QSystemTrayIcon::isSystemTrayAvailable() == false)
 	{
-		QMessageBox::critical(0, "Prismatik", "I couldn't detect any system tray on this system.");
+		QMessageBox::critical(0, QStringLiteral("Prismatik"), QStringLiteral("I couldn't detect any system tray on this system."));
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Systray couldn't be detected, running in trayless mode";
 		return false;
 	}
@@ -690,7 +690,7 @@ void LightpackApplication::startPluginManager()
 		connect(m_pluginManager,SIGNAL(updatePlugin(QList<Plugin*>)),m_pluginInterface,SLOT(updatePlugin(QList<Plugin*>)), Qt::QueuedConnection);
 	}
 
-	m_pluginManager->LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
+	m_pluginManager->LoadPlugins(QString(Settings::getApplicationDirPath() + QStringLiteral("Plugins")));
 	m_pluginManager->StartPlugins();
 
 }

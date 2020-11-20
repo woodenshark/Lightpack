@@ -161,7 +161,7 @@ void LedDeviceAlienFx::setSmoothSlowdown(int /*value*/)
 	emit commandCompleted(true);
 }
 
-void LedDeviceAlienFx::setColorSequence(QString /*value*/)
+void LedDeviceAlienFx::setColorSequence(const QString& /*value*/)
 {
 	emit commandCompleted(true);
 }
@@ -169,7 +169,7 @@ void LedDeviceAlienFx::setColorSequence(QString /*value*/)
 
 void LedDeviceAlienFx::requestFirmwareVersion()
 {
-	emit firmwareVersion("unknown (alienfx)");
+	emit firmwareVersion(QStringLiteral("unknown (alienfx)"));
 	emit commandCompleted(true);
 }
 

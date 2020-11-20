@@ -43,9 +43,9 @@ public slots:
 	void setRefreshDelay(int /*value*/);
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString /*value*/);
-	void setGamma(double value);
-	void setBrightness(int value);
+	void setColorSequence(const QString& /*value*/);
+	void setGamma(double value, bool update);
+	void setBrightness(int value, bool update);
 	int defaultLedsCount() { return 10; }
 
 protected:
@@ -57,7 +57,7 @@ protected:
     bool writeBuffer(const QByteArray& buff);
 
     int m_timeout;
-    constexpr static const char InfiniteTimeout = 255;
+    constexpr static const unsigned char InfiniteTimeout = (unsigned char)255;
 
 private:
     QUdpSocket* m_Socket;

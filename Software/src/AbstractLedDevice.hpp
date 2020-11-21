@@ -41,6 +41,8 @@ public:
 	AbstractLedDevice(QObject * parent) : QObject(parent) {}
 	virtual ~AbstractLedDevice(){}
 	virtual QString name() const = 0;
+	virtual int defaultLedsCount() = 0;
+	virtual int maxLedsCount() = 0;
 
 signals:
 	void openDeviceSuccess(bool isSuccess);
@@ -83,8 +85,6 @@ public slots:
 	virtual void requestFirmwareVersion() = 0;
 	virtual void updateDeviceSettings();
 
-	virtual int maxLedsCount() = 0;
-	virtual int defaultLedsCount() = 0;
 
 	/*!
 		\obsolete only form compatibility with Lightpack ver.<=5.5 hardware

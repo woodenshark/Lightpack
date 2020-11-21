@@ -27,7 +27,7 @@
 #include "LedDeviceDrgb.hpp"
 #include "enums.hpp"
 
-LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
+LedDeviceDrgb::LedDeviceDrgb(const QString& address, const QString& port, const uint8_t timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
@@ -51,69 +51,19 @@ void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 	applyDithering(m_colorsBuffer, 8);
 
 	m_writeBuffer.clear();
+	m_writeBuffer.reserve(m_writeBuffer.count() + m_colorsBuffer.count() * sizeof(char));
 	m_writeBuffer.append(m_writeBufferHeader);
+	// m_writeBuffer.resize(m_writeBuffer.count() + m_colorsBuffer.count() * sizeof(char));
 
-	for (int i = 0; i < m_colorsBuffer.count(); i++)
+	for (const StructRgb color : m_colorsBuffer)
 	{
-		StructRgb color = m_colorsBuffer[i];
-
 		m_writeBuffer.append(color.r);
 		m_writeBuffer.append(color.g);
 		m_writeBuffer.append(color.b);
 	}
 
-	bool ok = writeBuffer(m_writeBuffer);
+	const bool ok = writeBuffer(m_writeBuffer);
 	emit commandCompleted(ok);
-}
-
-void LedDeviceDrgb::switchOffLeds()
-{
-	int count = m_colorsSaved.count();
-	m_colorsSaved.clear();
-
-	for (int i = 0; i < count; i++) {
-		m_colorsSaved << 0;
-	}
-
-	m_writeBuffer.clear();
-	m_writeBuffer.append(m_writeBufferHeader);
-
-	for (int i = 0; i < count; i++) {
-		m_writeBuffer.append((char)0)
-			.append((char)0)
-			.append((char)0);
-	}
-
-	bool ok = writeBuffer(m_writeBuffer);
-	emit commandCompleted(ok);
-}
-
-void LedDeviceDrgb::requestFirmwareVersion()
-{
-	emit firmwareVersion(QStringLiteral("1.0 (drgb device)"));
-	emit commandCompleted(true);
-}
-
-void LedDeviceDrgb::resizeColorsBuffer(int buffSize)
-{
-	if (m_colorsBuffer.count() == buffSize)
-		return;
-
-	m_colorsBuffer.clear();
-
-	if (buffSize > MaximumNumberOfLeds::Drgb)
-	{
-		qCritical() << Q_FUNC_INFO << "buffSize > MaximumNumberOfLeds::Drgb" << buffSize << ">" << MaximumNumberOfLeds::Drgb;
-
-		buffSize = MaximumNumberOfLeds::Drgb;
-	}
-
-	for (int i = 0; i < buffSize; i++)
-	{
-		m_colorsBuffer << StructRgb();
-	}
-
-	reinitBufferHeader();
 }
 
 void LedDeviceDrgb::reinitBufferHeader()

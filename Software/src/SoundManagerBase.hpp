@@ -54,7 +54,7 @@ signals:
 	void visualizerFrametime(const double);
 
 public:
-	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
+	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT_X(false, "SoundManagerBase::start()", "not implemented"); };
 
 	// Common options
 	void reset();

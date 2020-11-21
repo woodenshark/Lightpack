@@ -27,7 +27,6 @@
 #pragma once
 
 #include "AbstractLedDevice.hpp"
-#include "colorspace_types.h"
 
 class LedDeviceVirtual : public AbstractLedDevice
 {
@@ -36,6 +35,8 @@ public:
 	LedDeviceVirtual(QObject * parent = 0);
 	virtual ~LedDeviceVirtual() {}
 	QString name() const { return QStringLiteral("virtual"); }
+	int maxLedsCount();
+	int defaultLedsCount() { return 10; }
 
 public slots:
 	void open();
@@ -46,14 +47,8 @@ public slots:
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
 	void setColorSequence(const QString& /*value*/);
-	void setGamma(double value, bool update);
-	void setBrightness(int value, bool update);
 	void requestFirmwareVersion();
-	int maxLedsCount() { return 511; }
-	int defaultLedsCount() { return 10; }
-
 
 private:
 	void resizeColorsBuffer(int buffSize);
-
 };

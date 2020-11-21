@@ -37,6 +37,8 @@ public:
 	LedDeviceAdalight(const QString &portName, const int baudRate, QObject * parent = 0);
 	virtual ~LedDeviceAdalight();
 	QString name() const { return QStringLiteral("adalight"); }
+	int maxLedsCount();
+	virtual int defaultLedsCount() { return 25; }
 
 public slots:
 	void open();
@@ -49,8 +51,6 @@ public slots:
 	void setColorSequence(const QString& value);
 	void requestFirmwareVersion();
 	void updateDeviceSettings();
-	int maxLedsCount() { return 511; }
-	virtual int defaultLedsCount() { return 25; }
 	void writeLastWill(const bool force = false);
 
 private:

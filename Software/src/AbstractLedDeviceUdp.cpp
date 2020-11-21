@@ -25,26 +25,26 @@
  */
 
 #include "AbstractLedDeviceUdp.hpp"
-#include "PrismatikMath.hpp"
-#include "Settings.hpp"
 #include "enums.hpp"
 #include "debug.h"
 
-using namespace SettingsScope;
-
-AbstractLedDeviceUdp::AbstractLedDeviceUdp(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDevice(parent)
+AbstractLedDeviceUdp::AbstractLedDeviceUdp(const QString& address, const QString& port, const uint8_t timeout, QObject * parent) : AbstractLedDevice(parent)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
 	m_address = address;
-	m_port = port.toInt();
+
+	bool ok = false;
+	// TODO: pass ushort
+	m_port = port.toUShort(&ok);
+	if (m_port == 0 || !ok) {
+		m_port = 21324;
+		qCritical() << "could not parse UDP port" << port << ". Using default" << m_port;
+	}
+
 	m_timeout = timeout;
 
-	m_gamma = Settings::getDeviceGamma();
-	m_brightness = Settings::getDeviceBrightness();
-
 	m_Socket = NULL;
-	m_writeBufferHeader.append((char)255);
 }
 
 AbstractLedDeviceUdp::~AbstractLedDeviceUdp()
@@ -62,58 +62,54 @@ void AbstractLedDeviceUdp::close()
 	}
 }
 
-void AbstractLedDeviceUdp::setRefreshDelay(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void AbstractLedDeviceUdp::setColorDepth(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void AbstractLedDeviceUdp::setSmoothSlowdown(int /*value*/)
-{
-	emit commandCompleted(true);
-}
-
-void AbstractLedDeviceUdp::setColorSequence(const QString& value)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-	m_colorSequence = value;
-	setColors(m_colorsSaved);
-
-	emit commandCompleted(true);
-}
-
-void AbstractLedDeviceUdp::setGamma(double value, const bool update = true)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-	m_gamma = value;
-	if (update)
-		setColors(m_colorsSaved);
-}
-
-void AbstractLedDeviceUdp::setBrightness(int percent, const bool update = true)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
-
-	m_brightness = percent;
-	if (update)
-		setColors(m_colorsSaved);
-}
-
 void AbstractLedDeviceUdp::open()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	emit openDeviceSuccess(true);
 
 	if (m_Socket != NULL)
 		m_Socket->close();
 	else
-		m_Socket = new QUdpSocket();
+		m_Socket = new QUdpSocket(this);
+
+	m_Socket->connectToHost(m_address, m_port, QIODevice::WriteOnly);
+	// TODO: connection slots
+	// emit openDeviceSuccess(m_Socket->isValid());
+	emit openDeviceSuccess(true);
+
+	reinitBufferHeader();
+}
+
+void AbstractLedDeviceUdp::switchOffLeds()
+{
+	const int count = m_colorsSaved.count();
+	QList<QRgb> blackFrame;
+	blackFrame.reserve(count);
+	for (int i = 0; i < count; i++)
+		blackFrame << 0;
+	setColors(blackFrame);
+}
+
+void AbstractLedDeviceUdp::resizeColorsBuffer(int buffSize)
+{
+	if (m_colorsBuffer.count() == buffSize)
+		return;
+
+	if (buffSize > maxLedsCount())
+	{
+		qCritical() << Q_FUNC_INFO << "buffSize > maxLedsCount()" << buffSize << ">" << maxLedsCount();
+
+		buffSize = maxLedsCount();
+	}
+	m_colorsBuffer.clear();
+	m_colorsBuffer.reserve(buffSize);
+	for (int i = 0; i < buffSize; i++)
+		m_colorsBuffer << StructRgb();
+}
+
+void AbstractLedDeviceUdp::requestFirmwareVersion()
+{
+	emit firmwareVersion(QStringLiteral("N/A (%1 device)").arg(name()));
+	emit commandCompleted(true);
 }
 
 bool AbstractLedDeviceUdp::writeBuffer(const QByteArray& buff)
@@ -123,7 +119,7 @@ bool AbstractLedDeviceUdp::writeBuffer(const QByteArray& buff)
 	if (m_Socket == NULL)
 		return false;
 
-	int bytesWritten = m_Socket->writeDatagram(buff, QHostAddress(m_address), m_port);
+	const qint64 bytesWritten = m_Socket->write(buff.data(), buff.size());
 
 	if (bytesWritten != buff.count())
 	{

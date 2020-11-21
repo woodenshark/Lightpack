@@ -27,7 +27,7 @@
 #include "LedDeviceDnrgb.hpp"
 #include "enums.hpp"
 
-LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
+LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, const uint8_t timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
@@ -52,6 +52,7 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 	applyDithering(m_colorsBuffer, 8);
 
 	// Send multiple buffers
+	const int totalColorsSaved = m_colorsSaved.count();
 	const int totalColors = colors.count();
 	uint16_t startIndex = 0;
 
@@ -59,6 +60,7 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 	{
 		// skip equals
 		while (startIndex < totalColors &&
+			startIndex < totalColorsSaved &&
 			m_colorsSaved[startIndex] == colors[startIndex])
 			startIndex++;
 
@@ -67,9 +69,10 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 		uint16_t colorPacketLen = 0;
 		while (colorPacketLen < LedsPerPacket &&
 			startIndex + colorPacketLen < totalColors &&
-			m_colorsSaved[startIndex + colorPacketLen] != colors[startIndex + colorPacketLen])
+			(startIndex + colorPacketLen >= totalColorsSaved ||
+			m_colorsSaved[startIndex + colorPacketLen] != colors[startIndex + colorPacketLen]))
 		{
-			StructRgb color = m_colorsBuffer[startIndex + colorPacketLen];
+			const StructRgb color = m_colorsBuffer[startIndex + colorPacketLen];
 
 			colorPacket.append(color.r);
 			colorPacket.append(color.g);
@@ -102,80 +105,6 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 	m_colorsSaved = colors;
 
 	emit commandCompleted(ok);
-}
-
-void LedDeviceDnrgb::switchOffLeds()
-{
-	int count = m_colorsSaved.count();
-	m_colorsSaved.clear();
-
-	for (int i = 0; i < count; i++) {
-		m_colorsSaved << 0;
-	}
-
-	// Send multiple buffers
-	int remainingColors = count;
-	int startIndex = 0;
-	int colorsToSend = 0;
-	bool ok = true;
-
-	while (remainingColors > 0)
-	{
-		m_writeBuffer.clear();
-		m_writeBuffer.append(m_writeBufferHeader);
-		m_writeBuffer.append((char)startIndex >> 8);  //High byte
-		m_writeBuffer.append((char)startIndex);       //Low byte
-
-		if (remainingColors > LedsPerPacket)
-		{
-			colorsToSend = LedsPerPacket;
-		}
-		else
-		{
-			colorsToSend = remainingColors;
-		}
-
-		for (int i = startIndex; i < startIndex + colorsToSend; i++)
-		{
-			m_writeBuffer.append((char)0)
-				.append((char)0)
-				.append((char)0);
-		}
-
-		startIndex += colorsToSend;
-		remainingColors -= colorsToSend;
-		ok &= writeBuffer(m_writeBuffer);
-	}
-
-	emit commandCompleted(ok);
-}
-
-void LedDeviceDnrgb::requestFirmwareVersion()
-{
-	emit firmwareVersion(QStringLiteral("1.0 (dnrgb device)"));
-	emit commandCompleted(true);
-}
-
-void LedDeviceDnrgb::resizeColorsBuffer(int buffSize)
-{
-	if (m_colorsBuffer.count() == buffSize)
-		return;
-
-	m_colorsBuffer.clear();
-
-	if (buffSize > MaximumNumberOfLeds::Dnrgb)
-	{
-		qCritical() << Q_FUNC_INFO << "buffSize > MaximumNumberOfLeds::Dnrgb" << buffSize << ">" << MaximumNumberOfLeds::Dnrgb;
-
-		buffSize = MaximumNumberOfLeds::Dnrgb;
-	}
-
-	for (int i = 0; i < buffSize; i++)
-	{
-		m_colorsBuffer << StructRgb();
-	}
-
-	reinitBufferHeader();
 }
 
 void LedDeviceDnrgb::reinitBufferHeader()

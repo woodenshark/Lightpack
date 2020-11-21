@@ -77,7 +77,7 @@ namespace {
 
 	const unsigned kBytesPerPixel = 4;
 
-	D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) : 
+	D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) :
 		QObject(parent),
 		m_lpsa(lpsa)
 	{
@@ -171,7 +171,7 @@ namespace {
 		if (m_libraryInjector) {
 			m_libraryInjector->Release();
 			CoUninitialize();
-		}	
+		}
 	}
 
 	void D3D10GrabberInjector::infectCleanDxProcesses() {
@@ -375,7 +375,7 @@ public:
 		connect(m_processesScanAndInfectTimer.data(), SIGNAL(timeout()), m_injector.data(), SLOT(infectCleanDxProcesses()));
 		m_processesScanAndInfectTimer->start();
 
-		m_checkIfFrameGrabbedTimer.reset(new QTimer());
+		m_checkIfFrameGrabbedTimer.reset(new QTimer(this));
 		m_checkIfFrameGrabbedTimer->setSingleShot(false);
 		m_checkIfFrameGrabbedTimer->setInterval(1000);
 		connect(m_checkIfFrameGrabbedTimer.data(), SIGNAL(timeout()), SLOT(handleIfFrameGrabbed()));

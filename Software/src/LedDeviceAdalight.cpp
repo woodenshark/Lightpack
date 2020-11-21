@@ -58,6 +58,11 @@ LedDeviceAdalight::~LedDeviceAdalight()
 	delete m_lastWillTimer;
 }
 
+int LedDeviceAdalight::maxLedsCount()
+{
+	return MaximumNumberOfLeds::Adalight;
+}
+
 void LedDeviceAdalight::close()
 {
 	if (m_AdalightDevice == NULL)

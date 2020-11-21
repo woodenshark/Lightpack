@@ -179,4 +179,9 @@ void LedDeviceAlienFx::open()
 	emit openDeviceSuccess(true);
 }
 
+int LedDeviceAlienFx::maxLedsCount()
+{
+	return MaximumNumberOfLeds::AlienFx;
+}
+
 #endif /* Q_OS_WIN */

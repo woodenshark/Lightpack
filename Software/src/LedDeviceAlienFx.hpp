@@ -39,6 +39,8 @@ public:
 	LedDeviceAlienFx(QObject *parent = 0);
 	virtual ~LedDeviceAlienFx();
 	QString name() const { return QStringLiteral("lightfx"); }
+	int maxLedsCount()
+	int defaultLedsCount() { return 1; }
 
 public slots:
 	void open();
@@ -50,8 +52,6 @@ public slots:
 	void setSmoothSlowdown(int /*value*/);
 	void setColorSequence(const QString& /*value*/);
 	void requestFirmwareVersion();
-	int maxLedsCount() { return 1; }
-	int defaultLedsCount() { return 1; }
 
 
 private:

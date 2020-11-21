@@ -305,7 +305,7 @@ static int is_language_supported(libusb_device_handle *dev, uint16_t lang)
 static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 {
 	char buf[512];
-	size_t len;
+	int len;
 	wchar_t *str = NULL;
 	wchar_t wbuf[256];
 
@@ -334,7 +334,7 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 
 	buf[sizeof(buf)-1] = '\0';
 
-	if (len+1 < sizeof(buf))
+	if ((size_t)len+1 < sizeof(buf))
 		buf[len+1] = '\0';
 
 	/* Initialize iconv. */
@@ -345,7 +345,7 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 	/* Convert to UTF-32 (wchar_t on glibc systems).
 	   Skip the first character (2-bytes). */
 	inptr = buf+2;
-	inbytes = len-2;
+	inbytes = (size_t)len-2;
 	outptr = (char*) wbuf;
 	outbytes = sizeof(wbuf);
 	res = iconv(ic, &inptr, &inbytes, &outptr, &outbytes);
@@ -743,7 +743,6 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path)
 
 	libusb_device **devs;
 	libusb_device *usb_dev;
-	ssize_t num_devs;
 	int res;
 	int d = 0;
 	int good_open = 0;
@@ -753,7 +752,7 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path)
 	if (!initialized)
 		hid_init();
 
-	num_devs = libusb_get_device_list(NULL, &devs);
+	libusb_get_device_list(NULL, &devs);
 	while ((usb_dev = devs[d++]) != NULL) {
 		struct libusb_device_descriptor desc;
 		struct libusb_config_descriptor *conf_desc = NULL;

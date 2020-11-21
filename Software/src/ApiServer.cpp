@@ -220,7 +220,7 @@ void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << test;
 	lightpack = lightpackInterface;
 	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(QList<QRgb>)), lightpack, SIGNAL(updateLedsColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(const QList<QRgb> &)), lightpack, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
+	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(QList<QRgb>)), lightpack, SLOT(updateColorsCache(QList<QRgb>)), Qt::QueuedConnection);
 
 }
 

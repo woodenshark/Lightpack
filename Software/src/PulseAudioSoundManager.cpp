@@ -310,10 +310,10 @@ void PulseAudioSoundManager::start(bool isEnabled)
 				qInfo() << "Pulseaudio device: Default device";
 			}
 
-			ret = pa_stream_connect_record(m_stream, dev.length() ? dev.toUtf8().constData() : nullptr, &buffer_attr, PA_STREAM_ADJUST_LATENCY);
+			ret = pa_stream_connect_record(m_stream, !dev.isEmpty() ? dev.toUtf8().constData() : nullptr, &buffer_attr, PA_STREAM_ADJUST_LATENCY);
 
 			if (ret != PA_OK) {
-				qCritical() << "Pulseaudio failed to connect to device" << (dev.length() ? dev : "Default device");
+				qCritical() << "Pulseaudio failed to connect to device" << (!dev.isEmpty() ? dev : QStringLiteral("Default device"));
 				goto unlock_and_fail;
 			}
 

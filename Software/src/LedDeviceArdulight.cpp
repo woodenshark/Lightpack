@@ -317,3 +317,7 @@ void LedDeviceArdulight::resizeColorsBuffer(int buffSize)
 	}
 }
 
+int LedDeviceArdulight::maxLedsCount()
+{
+	return MaximumNumberOfLeds::Ardulight;
+}

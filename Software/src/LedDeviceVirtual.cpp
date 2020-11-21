@@ -27,6 +27,7 @@
 #include "LedDeviceVirtual.hpp"
 #include "PrismatikMath.hpp"
 #include "Settings.hpp"
+#include "colorspace_types.h"
 #include "enums.hpp"
 #include "debug.h"
 
@@ -35,32 +36,33 @@ using namespace SettingsScope;
 LedDeviceVirtual::LedDeviceVirtual(QObject * parent) : AbstractLedDevice(parent)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-
-	m_gamma = Settings::getDeviceGamma();
-	m_brightness = Settings::getDeviceBrightness();
 }
 
 void LedDeviceVirtual::setColors(const QList<QRgb> & colors)
 {
-	if(colors.size()> 0)
+	if (!colors.isEmpty())
 	{
 		m_colorsSaved = colors;
 
 		QList<QRgb> callbackColors;
+		callbackColors.reserve(colors.size());
 
 		resizeColorsBuffer(colors.count());
 
 		applyColorModifications(colors, m_colorsBuffer);
 		applyDithering(m_colorsBuffer, 8);
 
-		for (int i = 0; i < m_colorsBuffer.count(); i++)
-		{
-			callbackColors.append(qRgb(m_colorsBuffer[i].r, m_colorsBuffer[i].g, m_colorsBuffer[i].b));
-		}
+		for (const StructRgb color : m_colorsBuffer)
+			callbackColors.append(qRgb(color.r, color.g, color.b));
 
 		emit colorsUpdated(callbackColors);
 	}
 	emit commandCompleted(true);
+}
+
+int LedDeviceVirtual::maxLedsCount()
+{
+	return MaximumNumberOfLeds::Virtual;
 }
 
 void LedDeviceVirtual::switchOffLeds()
@@ -95,24 +97,6 @@ void LedDeviceVirtual::setColorSequence(const QString& /*value*/)
 	emit commandCompleted(true);
 }
 
-void LedDeviceVirtual::setGamma(double value, const bool update = true)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
-
-	m_gamma = value;
-	if (update)
-		setColors(m_colorsSaved);
-}
-
-void LedDeviceVirtual::setBrightness(int percent, const bool update = true)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << percent;
-
-	m_brightness = percent;
-	if (update)
-		setColors(m_colorsSaved);
-}
-
 void LedDeviceVirtual::requestFirmwareVersion()
 {
 	emit firmwareVersion(QStringLiteral("1.0 (virtual device)"));
@@ -145,4 +129,3 @@ void LedDeviceVirtual::resizeColorsBuffer(int buffSize)
 		m_colorsBuffer << StructRgb();
 	}
 }
-

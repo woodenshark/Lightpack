@@ -133,7 +133,7 @@ void Plugin::Start()
 	connect(process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(errorOccurred(QProcess::ProcessError)));
 
 	connect(process, SIGNAL(started()), this, SLOT(started()));
-	connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int, QProcess::ExitStatus)));
+	connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
 
 	connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readyReadStandardError()));
 	connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));

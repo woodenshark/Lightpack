@@ -75,7 +75,7 @@ class _OBJ_NAME_ ## MoodLamp : public MoodLampBase \
 public:\
 _OBJ_NAME_ ## MoodLamp() : MoodLampBase() {};\
 ~_OBJ_NAME_ ## MoodLamp() = default;\
-static const char* const name() { return _LABEL_; };\
+static const char* name() { return _LABEL_; };\
 static MoodLampBase* create() { return new _OBJ_NAME_ ## MoodLamp(); };\
 \
 _BODY_\
@@ -139,9 +139,9 @@ public:
 			return false;
 
 		if (colors.size() > m_lightness.size()) {
-			const size_t oldSize = m_lightness.size();
+			const int oldSize = m_lightness.size();
 			m_lightness.reserve(colors.size());
-			for (size_t i = oldSize; i < colors.size(); ++i)
+			for (int i = oldSize; i < colors.size(); ++i)
 				m_lightness << 0;
 		}
 

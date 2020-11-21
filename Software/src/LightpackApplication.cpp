@@ -576,7 +576,7 @@ void LightpackApplication::startApiServer()
 	connect(this, SIGNAL(clearColorBuffers()), m_apiServer, SIGNAL(clearColorBuffers()));
 
 	connect(settings(), SIGNAL(apiServerSettingsChanged()),		m_apiServer, SLOT(apiServerSettingsChanged()));
-	connect(settings(), SIGNAL(apiKeyChanged(const QString &)), m_apiServer, SLOT(updateApiKey(const QString &)));
+	connect(settings(), SIGNAL(apiKeyChanged(QString)), m_apiServer, SLOT(updateApiKey(QString)));
 
 	connect(settings(), SIGNAL(lightpackNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
 	connect(settings(), SIGNAL(adalightNumberOfLedsChanged(int)),	m_apiServer, SIGNAL(updateApiDeviceNumberOfLeds(int)));
@@ -588,10 +588,10 @@ void LightpackApplication::startApiServer()
 		connect(m_apiServer, SIGNAL(errorOnStartListening(QString)), m_settingsWindow, SLOT(onApiServer_ErrorOnStartListening(QString)));
 	}
 
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(const QList<QRgb> &)),	m_pluginInterface, SLOT(updateColorsCache(const QList<QRgb> &)),	Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetColors(QList<QRgb>)),	m_pluginInterface, SLOT(updateColorsCache(QList<QRgb>)),	Qt::QueuedConnection);
 	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetSmoothSlowdown(int)),			m_pluginInterface, SLOT(updateSmoothCache(int)),					Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double, bool)),			m_pluginInterface, SLOT(updateGammaCache(double)),					Qt::QueuedConnection);
-	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int, bool)),			m_pluginInterface, SLOT(updateBrightnessCache(int)),				Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetGamma(double,bool)),			m_pluginInterface, SLOT(updateGammaCache(double)),					Qt::QueuedConnection);
+	connect(m_ledDeviceManager, SIGNAL(ledDeviceSetBrightness(int,bool)),			m_pluginInterface, SLOT(updateBrightnessCache(int)),				Qt::QueuedConnection);
 
 #ifdef SOUNDVIZ_SUPPORT
 	connect(settings(), SIGNAL(soundVisualizerMinColorChanged(QColor)), m_pluginInterface, SLOT(updateSoundVizMinColorCache(QColor)), Qt::QueuedConnection);
@@ -617,8 +617,8 @@ void LightpackApplication::startLedDeviceManager()
 //	connect(m_settingsWindow, SIGNAL(updateLedsColors(const QList<QRgb> &)),			m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 	m_pluginInterface = new LightpackPluginInterface(NULL);
 
-	connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus, QList<QString>)), this, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus, QList<QString>)));
-	connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus,QList<QString>)), this, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus,QList<QString>)));
+	connect(m_pluginInterface, SIGNAL(updateLedsColors(QList<QRgb>)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 	connect(m_pluginInterface, SIGNAL(updateGamma(double)),		m_ledDeviceManager, SLOT(setGamma(double)),		Qt::QueuedConnection);
 	connect(m_pluginInterface, SIGNAL(updateBrightness(int)),	m_ledDeviceManager, SLOT(setBrightness(int)),		Qt::QueuedConnection);
 	connect(m_pluginInterface, SIGNAL(updateSmooth(int)),		m_ledDeviceManager, SLOT(setSmoothSlowdown(int)), Qt::QueuedConnection);
@@ -630,8 +630,8 @@ void LightpackApplication::startLedDeviceManager()
 
 	if (!m_noGui)
 	{
-		connect(m_pluginInterface, SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)));
-		connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus, QList<QString>)), m_settingsWindow, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus, QList<QString>)));
+		connect(m_pluginInterface, SIGNAL(updateLedsColors(QList<QRgb>)),	m_settingsWindow, SLOT(updateVirtualLedsColors(QList<QRgb>)));
+		connect(m_pluginInterface, SIGNAL(updateDeviceLockStatus(DeviceLocked::DeviceLockStatus,QList<QString>)), m_settingsWindow, SLOT(setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus,QList<QString>)));
 		connect(m_pluginInterface, SIGNAL(updateProfile(QString)),						m_settingsWindow, SLOT(profileSwitch(QString)));
 		connect(m_pluginInterface, SIGNAL(updateStatus(Backlight::Status)),				m_settingsWindow, SLOT(setBacklightStatus(Backlight::Status)));
 	}
@@ -712,7 +712,7 @@ void LightpackApplication::initGrabManager()
 		qWarning() << Q_FUNC_INFO << "No compatible Sound Manager";
 #endif
 
-	connect(settings(), SIGNAL(grabberTypeChanged(const Grab::GrabberType &)),	m_grabManager,		SLOT(onGrabberTypeChanged(const Grab::GrabberType &)),	Qt::QueuedConnection);
+	connect(settings(), SIGNAL(grabberTypeChanged(Grab::GrabberType)),	m_grabManager,		SLOT(onGrabberTypeChanged(Grab::GrabberType)),	Qt::QueuedConnection);
 	connect(settings(), SIGNAL(grabSlowdownChanged(int)),						m_grabManager,		SLOT(onGrabSlowdownChanged(int)),						Qt::QueuedConnection);
 	connect(settings(), SIGNAL(grabAvgColorsEnabledChanged(bool)),				m_grabManager,		SLOT(onGrabAvgColorsEnabledChanged(bool)),				Qt::QueuedConnection);
 	connect(settings(), SIGNAL(grabOverBrightenChanged(int)),					m_grabManager,		SLOT(onGrabOverBrightenChanged(int)),					Qt::QueuedConnection);
@@ -749,12 +749,12 @@ void LightpackApplication::initGrabManager()
 	}
 #endif
 
-	connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_grabManager,		SLOT(settingsProfileChanged(const QString &)),			Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(QString)),			m_grabManager,		SLOT(settingsProfileChanged(QString)),			Qt::QueuedConnection);
 
-	connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_moodlampManager,	SLOT(settingsProfileChanged(const QString &)),			Qt::QueuedConnection);
+	connect(settings(), SIGNAL(currentProfileInited(QString)),			m_moodlampManager,	SLOT(settingsProfileChanged(QString)),			Qt::QueuedConnection);
 #ifdef SOUNDVIZ_SUPPORT
 	if (m_soundManager)
-		connect(settings(), SIGNAL(currentProfileInited(const QString &)),			m_soundManager,		SLOT(settingsProfileChanged(const QString &)));
+		connect(settings(), SIGNAL(currentProfileInited(QString)),			m_soundManager,		SLOT(settingsProfileChanged(QString)));
 #endif
 
 	// Connections to signals which will be connected to ILedDevice
@@ -769,30 +769,30 @@ void LightpackApplication::initGrabManager()
 #ifdef SOUNDVIZ_SUPPORT
 		if (m_soundManager) {
 			connect(m_settingsWindow, SIGNAL(requestSoundVizDevices()), m_soundManager, SLOT(requestDeviceList()));
-			connect(m_soundManager, SIGNAL(deviceList(const QList<SoundManagerDeviceInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizDevices(const QList<SoundManagerDeviceInfo> &, int)));
+			connect(m_soundManager, SIGNAL(deviceList(QList<SoundManagerDeviceInfo>,int)), m_settingsWindow, SLOT(updateAvailableSoundVizDevices(QList<SoundManagerDeviceInfo>,int)));
 
 			connect(m_settingsWindow, SIGNAL(requestSoundVizVisualizers()), m_soundManager, SLOT(requestVisualizerList()));
-			connect(m_soundManager, SIGNAL(visualizerList(const QList<SoundManagerVisualizerInfo> &, int)), m_settingsWindow, SLOT(updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> &, int)));
+			connect(m_soundManager, SIGNAL(visualizerList(QList<SoundManagerVisualizerInfo>,int)), m_settingsWindow, SLOT(updateAvailableSoundVizVisualizers(QList<SoundManagerVisualizerInfo>,int)));
 		}
 #endif
 
 		connect(m_settingsWindow, SIGNAL(requestMoodLampLamps()), m_moodlampManager, SLOT(requestLampList()));
-		connect(m_moodlampManager, SIGNAL(lampList(const QList<MoodLampLampInfo> &, int)), m_settingsWindow, SLOT(updateAvailableMoodLampLamps(const QList<MoodLampLampInfo> &, int)));
+		connect(m_moodlampManager, SIGNAL(lampList(QList<MoodLampLampInfo>,int)), m_settingsWindow, SLOT(updateAvailableMoodLampLamps(QList<MoodLampLampInfo>,int)));
 	}
 
 	connect(m_grabManager, SIGNAL(ambilightTimeOfUpdatingColors(double)), m_pluginInterface, SLOT(refreshAmbilightEvaluated(double)));
 
-	connect(m_grabManager,		SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_moodlampManager,	SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_grabManager,		SIGNAL(updateLedsColors(QList<QRgb>)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_moodlampManager,	SIGNAL(updateLedsColors(QList<QRgb>)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 	if (!m_noGui && m_settingsWindow)
-		connect(m_moodlampManager,	SIGNAL(moodlampFrametime(const double)),		m_settingsWindow, 	SLOT(refreshAmbilightEvaluated(double)), Qt::QueuedConnection);
+		connect(m_moodlampManager,	SIGNAL(moodlampFrametime(double)),		m_settingsWindow, 	SLOT(refreshAmbilightEvaluated(double)), Qt::QueuedConnection);
 	connect(m_ledDeviceManager,	SIGNAL(openDeviceSuccess(bool)),				m_grabManager,		SLOT(ledDeviceOpenSuccess(bool)), Qt::QueuedConnection);
 	connect(m_ledDeviceManager,	SIGNAL(ioDeviceSuccess(bool)),					m_grabManager,		SLOT(ledDeviceCallSuccess(bool)), Qt::QueuedConnection);
 #ifdef SOUNDVIZ_SUPPORT
 	if (m_soundManager) {
-		connect(m_soundManager,		SIGNAL(updateLedsColors(const QList<QRgb> &)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
+		connect(m_soundManager,		SIGNAL(updateLedsColors(QList<QRgb>)),	m_ledDeviceManager, SLOT(setColors(QList<QRgb>)), Qt::QueuedConnection);
 		if (!m_noGui && m_settingsWindow)
-			connect(m_soundManager,		SIGNAL(visualizerFrametime(const double)),	m_settingsWindow, SLOT(refreshAmbilightEvaluated(double)), Qt::QueuedConnection);
+			connect(m_soundManager,		SIGNAL(visualizerFrametime(double)),	m_settingsWindow, SLOT(refreshAmbilightEvaluated(double)), Qt::QueuedConnection);
 	}
 #endif
 }

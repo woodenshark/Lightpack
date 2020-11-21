@@ -33,8 +33,8 @@ class MoodLampBase;
 typedef MoodLampBase* (*LampFactory)();
 
 struct MoodLampLampInfo {
-	MoodLampLampInfo() { this->name = ""; this->id = -1; this->factory = nullptr; }
-	MoodLampLampInfo(QString name, LampFactory factory, int id) { this->name = name; this->id = id; this->factory = factory; }
+	MoodLampLampInfo() { this->name = QLatin1String(""); this->id = -1; this->factory = nullptr; }
+	MoodLampLampInfo(const QString& name, LampFactory factory, int id) { this->name = name; this->id = id; this->factory = factory; }
 	QString name;
 	LampFactory factory;
 	int id;
@@ -47,7 +47,7 @@ public:
 	MoodLampBase() { init(); };
 	virtual ~MoodLampBase() = default;
 
-	static const char* const name() { return "NO_NAME"; };
+	static const char* name() { return "NO_NAME"; };
 	static MoodLampBase* create() { Q_ASSERT_X(false, "MoodLampBase::create()", "not implemented"); return nullptr; };
 	static MoodLampBase* createWithID(const int id);
 	static void populateNameList(QList<MoodLampLampInfo>& list, int& recommended);

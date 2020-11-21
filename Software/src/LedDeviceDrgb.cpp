@@ -53,9 +53,8 @@ void LedDeviceDrgb::setColors(const QList<QRgb> & colors)
 	m_writeBuffer.clear();
 	m_writeBuffer.reserve(m_writeBuffer.count() + m_colorsBuffer.count() * sizeof(char));
 	m_writeBuffer.append(m_writeBufferHeader);
-	// m_writeBuffer.resize(m_writeBuffer.count() + m_colorsBuffer.count() * sizeof(char));
 
-	for (const StructRgb color : m_colorsBuffer)
+	for (const StructRgb& color : m_colorsBuffer)
 	{
 		m_writeBuffer.append(color.r);
 		m_writeBuffer.append(color.g);

@@ -39,7 +39,7 @@ public:
 	LedDeviceAlienFx(QObject *parent = 0);
 	virtual ~LedDeviceAlienFx();
 	QString name() const { return QStringLiteral("lightfx"); }
-	int maxLedsCount()
+	int maxLedsCount();
 	int defaultLedsCount() { return 1; }
 
 public slots:

@@ -651,7 +651,7 @@ void D3D10Grabber::init() {
 	connect(m_impl.data(), SIGNAL(frameGrabbed()), this, SLOT(grab()));
 	_screensWithWidgets.clear();
 	GrabbedScreen grabbedScreen;
-	grabbedScreen.screenInfo.handle = reinterpret_cast<void *>(QApplication::desktop()->primaryScreen());
+	grabbedScreen.screenInfo.handle = IntToPtr(QApplication::desktop()->primaryScreen());
 	grabbedScreen.screenInfo.rect = QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen());
 	_screensWithWidgets.append(grabbedScreen);
 

@@ -618,7 +618,7 @@ GrabResult DDuplGrabber::grabScreens()
 				// in theory, DXGI_ERROR_INVALID_CALL is returned if the frame was not released
 				// it also happens in conjunction with secure desktop (even though the frame was properly released)
 				m_state = LostAccess;
-				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Lost Access to desktop" << screen.screenInfo.handle << ":" << (void*)(0xffffffff & hr) << ", requesting realloc";
+				DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Lost Access to desktop" << screen.screenInfo.handle << ":" << IntToPtr(0xffffffff & hr) << ", requesting realloc";
 				return GrabResultFrameNotReady;
 			}
 			else if (FAILED(hr))

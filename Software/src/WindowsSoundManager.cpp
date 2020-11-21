@@ -47,7 +47,7 @@ WindowsSoundManager::~WindowsSoundManager()
 bool WindowsSoundManager::init() {
 	BASS_SetConfig(BASS_CONFIG_UNICODE, true);
 	// initialize "no sound" BASS device
-	if (!BASS_Init(0, 44100, 0, (HWND)m_hWnd, NULL)) {
+	if (!BASS_Init(0, 44100, 0, (HWND)IntToPtr(m_hWnd), NULL)) {
 		qCritical() << Q_FUNC_INFO << "Can't initialize BASS" << BASS_ErrorGetCode();
 		m_isInited = false;
 		return false;

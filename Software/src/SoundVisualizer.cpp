@@ -173,8 +173,8 @@ bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_
 	else // reset on slow down
 		m_speedCoef = 1.0;// std::max(1.0, speedCoef - 2.0);
 
-	for (size_t idxA = 0; idxA < middleLed; ++idxA) {
-		const size_t idxB = colors.size() - 1 - idxA;
+	for (int idxA = 0; idxA < middleLed; ++idxA) {
+		const int idxB = colors.size() - 1 - idxA;
 		QRgb color = 0;
 		if (idxA < thresholdLed) {
 			QColor from = m_isLiquidMode ? m_generator.current() : m_minColor;

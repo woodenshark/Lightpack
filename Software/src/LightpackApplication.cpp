@@ -431,11 +431,11 @@ void LightpackApplication::processCommandLineArguments()
 	if (parser.isSetVersion())
 	{
 		const QString versionString =
-			QStringLiteral("Version: " VERSION_STR "\n"
+			QStringLiteral("Version: " VERSION_STR "\n") +
 #ifdef GIT_REVISION
-			"Revision: " GIT_REVISION "\n"
+			QStringLiteral("Revision: " GIT_REVISION "\n") +
 #endif
-			"Build with Qt version " QT_VERSION_STR "\n");
+			QStringLiteral("Build with Qt version " QT_VERSION_STR "\n");
 		outputMessage(versionString);
 		::exit(0);
 	}

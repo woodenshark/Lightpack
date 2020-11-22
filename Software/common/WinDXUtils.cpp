@@ -154,7 +154,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 	int presentFuncOffset = static_cast<UINT>(presentFuncPtr - hDxgi);
 
 #ifndef NO_QT
-	sprintf(buf, "presentFuncOffset=%llx", presentFuncOffset);
+	sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -234,7 +234,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
 		UINT presentFuncOffset = (presentFuncPtr - reinterpret_cast<UINT>(hD3d9));
 
 #ifndef NO_QT
-		sprintf(buf, "presentFuncOffset=%llx", presentFuncOffset);
+		sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -314,7 +314,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
 		UINT presentFuncOffset = (presentFuncPtr - reinterpret_cast<UINT>(pD3d9));
 
 #ifndef NO_QT
-		sprintf(buf, "presentFuncOffset=%llx", presentFuncOffset);
+		sprintf(buf, "presentFuncOffset=%x", presentFuncOffset);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -394,7 +394,7 @@ UINT GetD3D9ResetOffset(HWND hWnd){
 		UINT resetFuncOffset = (resetFuncPtr - reinterpret_cast<UINT>(hD3d9));
 
 #ifndef NO_QT
-		sprintf(buf, "resetFuncOffset=%llx", resetFuncOffset);
+		sprintf(buf, "resetFuncOffset=%x", resetFuncOffset);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 

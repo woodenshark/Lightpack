@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------------
 # General
 #------------------------------------------------------------------------------
-win32: {
+win32 {
 	# Set this to -Win32 for 32-bit
 	OPENSSL_DIR = "C:\\OpenSSL-Win64\\bin"
 	# Set this to run without openssl. The updatecheck won't work.

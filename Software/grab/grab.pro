@@ -44,7 +44,7 @@ unix:!macx {
 
 # Mac platform
 macx {
-    contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) || contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
+    contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) | contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/MacOSGrabberBase.hpp
         GRABBERS_SOURCES += MacOSGrabberBase.mm
     }

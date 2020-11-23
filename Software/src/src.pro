@@ -15,6 +15,7 @@ CONFIG(msvc) {
 DESTDIR     = ../bin
 TEMPLATE    = app
 QT         += network widgets
+CONFIG += c++17
 win32 {
 	QT += serialport
 }
@@ -62,9 +63,8 @@ QMAKE_CFLAGS = $$(CFLAGS)
 QMAKE_CXXFLAGS = $$(CXXFLAGS)
 QMAKE_LFLAGS = $$(LDFLAGS)
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++17
 CONFIG(clang) {
-	QMAKE_CXXFLAGS += -std=c++17 -stdlib=libc++
+	QMAKE_CXXFLAGS += -stdlib=libc++
 	LIBS += -stdlib=libc++
 }
 
@@ -181,7 +181,6 @@ unix:!macx{
 	# For X11 grabber
 	LIBS +=-lXext -lX11
 
-	QMAKE_CXXFLAGS += -std=c++17
 	contains(DEFINES,PULSEAUDIO_SUPPORT) {
 		INCLUDEPATH += $${PULSEAUDIO_INC_DIR} \
 			$${FFTW3_INC_DIR}

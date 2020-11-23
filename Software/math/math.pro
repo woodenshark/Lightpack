@@ -7,7 +7,7 @@
 DESTDIR = ../lib
 TARGET = prismatik-math
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib c++17
 
 include(../build-config.prf)
 

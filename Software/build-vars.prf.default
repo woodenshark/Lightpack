@@ -47,8 +47,8 @@ macx {
 	# DEFINES += SAVE_FRAME_TO_FILE
 
 	# CONFIG += debug
-	# QMAKE_CC += clang
-	# QMAKE_CXX += clang++
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
 	# QMAKE_CFLAGS_DEBUG += -ggdb
 	# QMAKE_CFLAGS_RELEASE += -march=native
 	# QMAKE_CXXFLAGS_DEBUG += -ggdb

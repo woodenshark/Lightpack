@@ -63,8 +63,8 @@ namespace {
 
 SoundVisualizerBase* SoundVisualizerBase::createWithID(const int id)
 {
-	QMap<int, SoundManagerVisualizerInfo>::const_iterator i = visualizerMap.find(id);
-	if (i != visualizerMap.end())
+	QMap<int, SoundManagerVisualizerInfo>::const_iterator i = visualizerMap.constFind(id);
+	if (i != visualizerMap.cend())
 		return i.value().factory();
 	qWarning() << Q_FUNC_INFO << "failed to find visualizer ID: " << id;
 	return nullptr;

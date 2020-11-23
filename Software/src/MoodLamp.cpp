@@ -96,8 +96,8 @@ namespace {
 }
 
 MoodLampBase* MoodLampBase::createWithID(const int id) {
-	QMap<int, MoodLampLampInfo>::const_iterator i = g_moodLampMap.find(id);
-	if (i != g_moodLampMap.end())
+	QMap<int, MoodLampLampInfo>::const_iterator i = g_moodLampMap.constFind(id);
+	if (i != g_moodLampMap.cend())
 		return i.value().factory();
 	qWarning() << Q_FUNC_INFO << "failed to find mood lamp ID: " << id;
 	return nullptr;

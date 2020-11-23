@@ -36,7 +36,7 @@ WindowsSoundManager::WindowsSoundManager(int hWnd, QObject *parent) : SoundManag
 	m_hWnd = hWnd;
 
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	connect(&m_timer, &QTimer::timeout, this, &WindowsSoundManager::updateColors);
 }
 
 WindowsSoundManager::~WindowsSoundManager()

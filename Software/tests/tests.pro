@@ -14,9 +14,9 @@ CONFIG     -= app_bundle
 
 include(../build-config.prf)
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++17
 CONFIG(clang) {
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    QMAKE_CXXFLAGS += -std=c++17 -stdlib=libc++
     LIBS += -stdlib=libc++
 }
 

@@ -30,7 +30,7 @@ CONFIG(msvc) {
     # Place *.lib and *.exp files in ../lib
     QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
 } else {
-    QMAKE_CXXFLAGS += -std=c++11
+    QMAKE_CXXFLAGS += -std=c++17
     QMAKE_LFLAGS += -static
 }
 

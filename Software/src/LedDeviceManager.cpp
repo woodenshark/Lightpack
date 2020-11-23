@@ -303,7 +303,7 @@ void LedDeviceManager::setDitheringEnabled(bool isEnabled) {
 	if (m_isLastCommandCompleted) {
 		m_cmdTimeoutTimer->start();
 		m_isLastCommandCompleted = false;
-		emit ledDeviceSetDitheringEnabled(isEnabled);
+		emit ledDeviceSetDitheringEnabled(isEnabled, m_backlightStatus != Backlight::StatusOff);
 	}
 	else {
 		m_savedDitheringEnabled = isEnabled;
@@ -559,7 +559,7 @@ void LedDeviceManager::connectSignalSlotsLedDevice()
 	connect(this, SIGNAL(ledDeviceSetColorSequence(QString)),			m_ledDevice, SLOT(setColorSequence(QString)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetLuminosityThreshold(int,bool)),	m_ledDevice, SLOT(setLuminosityThreshold(int,bool)),			Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceSetMinimumLuminosityEnabled(bool,bool)),	m_ledDevice,SLOT(setMinimumLuminosityThresholdEnabled(bool,bool)),	Qt::QueuedConnection);
-	connect(this, SIGNAL(ledDeviceSetDitheringEnabled(bool)),			m_ledDevice, SLOT(setDitheringEnabled(bool)),					Qt::QueuedConnection);
+	connect(this, SIGNAL(ledDeviceSetDitheringEnabled(bool,bool)),			m_ledDevice, SLOT(setDitheringEnabled(bool,bool)),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceRequestFirmwareVersion()),			m_ledDevice, SLOT(requestFirmwareVersion()),					Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateWBAdjustments()),				m_ledDevice, SLOT(updateWBAdjustments()),						Qt::QueuedConnection);
 	connect(this, SIGNAL(ledDeviceUpdateDeviceSettings()),				m_ledDevice, SLOT(updateDeviceSettings()),						Qt::QueuedConnection);
@@ -685,7 +685,7 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 		case LedDeviceCommands::SetDitheringEnabled:
 			m_cmdTimeoutTimer->start();
-			emit ledDeviceSetDitheringEnabled(m_savedDitheringEnabled);
+			emit ledDeviceSetDitheringEnabled(m_savedDitheringEnabled, m_backlightStatus != Backlight::StatusOff);
 			break;
 
 		case LedDeviceCommands::RequestFirmwareVersion:

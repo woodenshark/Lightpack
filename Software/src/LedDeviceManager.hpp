@@ -63,7 +63,7 @@ signals:
 	void ledDeviceSetBrightnessCap(int value, bool);
 	void ledDeviceSetLuminosityThreshold(int value, bool);
 	void ledDeviceSetMinimumLuminosityEnabled(bool, bool);
-	void ledDeviceSetDitheringEnabled(bool isEnabled);
+	void ledDeviceSetDitheringEnabled(bool isEnabled, bool);
 	void ledDeviceSetColorSequence(QString value);
 	void ledDeviceRequestFirmwareVersion();
 	void ledDeviceUpdateWBAdjustments();

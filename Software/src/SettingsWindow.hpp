@@ -127,6 +127,7 @@ public slots:
 	void showSettings(); /* using in actions */
 	void hideSettings(); /* used in closeEvent(..) */
 	void toggleSettings(); /* using in iconActivated(..) */
+	void onPostInit();
 
 protected:
 	virtual void changeEvent(QEvent *e);
@@ -151,7 +152,6 @@ private slots:
 #endif
 #endif
 	void showAbout(); /* using in actions */
-	void onPostInit();
 
 	void scrollThanks();
 

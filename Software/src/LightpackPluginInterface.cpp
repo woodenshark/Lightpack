@@ -23,7 +23,7 @@ LightpackPluginInterface::LightpackPluginInterface(QObject *parent) :
 	initColors(10);
 	m_timerLock = new QTimer(this);
 	m_timerLock->start(5000); // check in 5000 ms
-	connect(m_timerLock, SIGNAL(timeout()), this, SLOT(timeoutLock()));
+	connect(m_timerLock, &QTimer::timeout, this, &LightpackPluginInterface::timeoutLock);
 	_plugins.clear();
 }
 

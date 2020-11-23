@@ -62,12 +62,10 @@ SysTrayIcon::~SysTrayIcon()
 
 void SysTrayIcon::init()
 {
-	connect(_qsystray, SIGNAL(activated(QSystemTrayIcon::ActivationReason))
-		, this, SLOT(onTrayIcon_Activated(QSystemTrayIcon::ActivationReason)));
-	connect(_qsystray, SIGNAL(messageClicked())
-		, this, SLOT(onTrayIcon_MessageClicked()));
+	connect(_qsystray, &QSystemTrayIcon::activated, this, &SysTrayIcon::onTrayIcon_Activated);
+	connect(_qsystray, &QSystemTrayIcon::messageClicked, this, &SysTrayIcon::onTrayIcon_MessageClicked);
 
-	connect(&_updatesProcessor, SIGNAL(readyRead()), this, SLOT(onCheckUpdate_Finished()));
+	connect(&_updatesProcessor, &UpdatesProcessor::readyRead, this, &SysTrayIcon::onCheckUpdate_Finished);
 
 	_pixmapCache.insert("lock32", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(32, Qt::SmoothTransformation)));
 	_pixmapCache.insert("on32", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(32, Qt::SmoothTransformation)));
@@ -325,11 +323,11 @@ void SysTrayIcon::createActions()
 
 	_switchOnBacklightAction = new QAction(QIcon(":/icons/on.png"), tr("&Turn on"), this);
 	_switchOnBacklightAction->setIconVisibleInMenu(true);
-	connect(_switchOnBacklightAction, SIGNAL(triggered()), this, SIGNAL(backlightOn()));
+	connect(_switchOnBacklightAction, &QAction::triggered, this, &SysTrayIcon::backlightOn);
 
 	_switchOffBacklightAction = new QAction(QIcon(":/icons/off.png"), tr("&Turn off"), this);
 	_switchOffBacklightAction->setIconVisibleInMenu(true);
-	connect(_switchOffBacklightAction, SIGNAL(triggered()), this, SIGNAL(backlightOff()));
+	connect(_switchOffBacklightAction, &QAction::triggered, this, &SysTrayIcon::backlightOff);
 
 
 	_profilesMenu = new QMenu(tr("&Profiles"));
@@ -338,10 +336,10 @@ void SysTrayIcon::createActions()
 
 	_settingsAction = new QAction(QIcon(":/icons/settings.png"), tr("&Settings"), this);
 	_settingsAction->setIconVisibleInMenu(true);
-	connect(_settingsAction, SIGNAL(triggered()), this, SIGNAL(showSettings()));
+	connect(_settingsAction, &QAction::triggered, this, &SysTrayIcon::showSettings);
 
 	_quitAction = new QAction(tr("&Quit"), this);
-	connect(_quitAction, SIGNAL(triggered()), this, SIGNAL(quit()));
+	connect(_quitAction, &QAction::triggered, this, &SysTrayIcon::quit);
 }
 
 void SysTrayIcon::fillProfilesFromSettings()
@@ -360,6 +358,6 @@ void SysTrayIcon::fillProfilesFromSettings()
 			profileAction->setChecked(true);
 		}
 		_profilesMenu->addAction(profileAction);
-		connect(profileAction, SIGNAL(triggered()), this, SLOT(onProfileAction_Triggered()));
+		connect(profileAction, &QAction::triggered, this, &SysTrayIcon::onProfileAction_Triggered);
 	}
 }

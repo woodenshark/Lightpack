@@ -50,9 +50,9 @@ LedDeviceLightpack::LedDeviceLightpack(QObject *parent) :
 
 	m_timerPingDevice = new QTimer(this);
 
-	connect(m_timerPingDevice, SIGNAL(timeout()), this, SLOT(timerPingDeviceTimeout()));
-	connect(this, SIGNAL(ioDeviceSuccess(bool)), this, SLOT(restartPingDevice(bool)));
-	connect(this, SIGNAL(openDeviceSuccess(bool)), this, SLOT(restartPingDevice(bool)));
+	connect(m_timerPingDevice, &QTimer::timeout, this, &LedDeviceLightpack::timerPingDeviceTimeout);
+	connect(this, &LedDeviceLightpack::ioDeviceSuccess, this, &LedDeviceLightpack::restartPingDevice);
+	connect(this, &LedDeviceLightpack::openDeviceSuccess, this, &LedDeviceLightpack::restartPingDevice);
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
 }
@@ -478,10 +478,8 @@ void LedDeviceLightpack::closeDevices()
 	m_devices.clear();
 }
 
-void LedDeviceLightpack::restartPingDevice(bool isSuccess)
+void LedDeviceLightpack::restartPingDevice()
 {
-	Q_UNUSED(isSuccess);
-
 	if (Settings::isBacklightEnabled() && Settings::isPingDeviceEverySecond())
 	{
 		// Start ping device with PingDeviceInterval ms after last data transfer complete

@@ -93,7 +93,7 @@ void PluginsManager::StartPlugins()
 			p->disconnect();
 			if (p->isEnabled())
 				p->Start();
-			connect(p, SIGNAL(pluginStateChanged(QProcess::ProcessState)), this, SLOT(onPluginStateChangedHandler()));
+			connect(p, &Plugin::pluginStateChanged, this, &PluginsManager::onPluginStateChangedHandler);
 		}
 
 }
@@ -109,9 +109,10 @@ void PluginsManager::StopPlugins()
 
 }
 
-void PluginsManager::onPluginStateChangedHandler()
+void PluginsManager::onPluginStateChangedHandler(QProcess::ProcessState state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	Q_UNUSED(state)
 
 	emit updatePlugin(_plugins.values());
 }

@@ -30,7 +30,7 @@ public slots:
 	void StopPlugins();
 
 private slots:
-	void onPluginStateChangedHandler();
+	void onPluginStateChangedHandler(QProcess::ProcessState state);
 
 };
 

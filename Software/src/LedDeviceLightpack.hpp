@@ -76,7 +76,7 @@ private:
 	void closeDevices();
 
 private slots:
-	void restartPingDevice(bool isSuccess);
+	void restartPingDevice();
 	void timerPingDeviceTimeout();
 
 private:

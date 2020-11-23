@@ -105,7 +105,7 @@ static void pa_context_state_cb(pa_context *c, void *userdata)
 PulseAudioSoundManager::PulseAudioSoundManager(QObject *parent) : SoundManagerBase(parent)
 {
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	connect(&m_timer, &QTimer::timeout, this, &PulseAudioSoundManager::updateColors);
 
 	m_pa_alive_timer.setTimerType(Qt::PreciseTimer);
 	connect(&m_pa_alive_timer, &QTimer::timeout, this, &PulseAudioSoundManager::checkPulse);

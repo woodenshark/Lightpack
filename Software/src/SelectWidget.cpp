@@ -5,8 +5,8 @@ SelectWidget::SelectWidget() {
 	list = new QListWidget(this);
 	upButton = new QPushButton(this);
 	downButton = new QPushButton(this);
-	connect(upButton, SIGNAL(clicked()), this, SLOT(MoveUp()));
-	connect(downButton, SIGNAL(clicked()), this, SLOT(MoveDown()));
+	connect(upButton, &QPushButton::clicked, this, &SelectWidget::MoveUp);
+	connect(downButton, &QPushButton::clicked, this, &SelectWidget::MoveDown);
 	list->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 SelectWidget::SelectWidget(QWidget *parent) {
@@ -14,8 +14,8 @@ SelectWidget::SelectWidget(QWidget *parent) {
 	list = new QListWidget(this);
 	upButton = new QPushButton(this);
 	downButton = new QPushButton(this);
-	connect(upButton, SIGNAL(clicked()), this, SLOT(MoveUp()));
-	connect(downButton, SIGNAL(clicked()), this, SLOT(MoveDown()));
+	connect(upButton, &QPushButton::clicked, this, &SelectWidget::MoveUp);
+	connect(downButton, &QPushButton::clicked, this, &SelectWidget::MoveDown);
 	list->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 void SelectWidget::MoveUp() {

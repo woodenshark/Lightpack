@@ -51,7 +51,8 @@ public slots:
 	void setColorSequence(const QString& value);
 	void requestFirmwareVersion();
 	void updateDeviceSettings();
-	void writeLastWill(const bool force = false);
+	void writeLastWill();
+	void writeLastWill(const bool force);
 
 private:
 	bool writeBuffer(const QByteArray & buff);

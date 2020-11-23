@@ -48,7 +48,7 @@ LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 
 	m_isEnabled = false;
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(doColorUpdate()));
+	connect(&m_timer, &QTimer::timeout, this, &LiquidColorGenerator::doColorUpdate);
 }
 
 void LiquidColorGenerator::start()

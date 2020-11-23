@@ -129,14 +129,14 @@ void Plugin::Start()
 
 	process->disconnect();
 
-	connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(stateChanged(QProcess::ProcessState)));
-	connect(process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(errorOccurred(QProcess::ProcessError)));
+	connect(process, &QProcess::stateChanged, this, &Plugin::stateChanged);
+	connect(process, &QProcess::errorOccurred, this, &Plugin::errorOccurred);
 
-	connect(process, SIGNAL(started()), this, SLOT(started()));
-	connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+	connect(process, &QProcess::started, this, &Plugin::started);
+	connect(process, qOverload<int,QProcess::ExitStatus>(&QProcess::finished), this, &Plugin::finished);
 
-	connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readyReadStandardError()));
-	connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
+	connect(process, &QProcess::readyReadStandardError, this, &Plugin::readyReadStandardError);
+	connect(process, &QProcess::readyReadStandardOutput, this, &Plugin::readyReadStandardOutput);
 
 	process->setEnvironment(QProcess::systemEnvironment());
 	process->setProgram(_exec);

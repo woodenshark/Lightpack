@@ -46,7 +46,7 @@ LedDeviceAdalight::LedDeviceAdalight(const QString &portName, const int baudRate
 	m_AdalightDevice = NULL;
 	m_lastWillTimer = new QTimer(this);
 	m_lastWillTimer->setTimerType(Qt::PreciseTimer);
-	connect(m_lastWillTimer, SIGNAL(timeout()), this, SLOT(writeLastWill()));
+	connect(m_lastWillTimer, &QTimer::timeout, this, qOverload<>(&LedDeviceAdalight::writeLastWill));
 	// TODO: think about init m_savedColors in all ILedDevices
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
@@ -253,6 +253,11 @@ void LedDeviceAdalight::open()
 	}
 
 	emit openDeviceSuccess(ok);
+}
+
+void LedDeviceAdalight::writeLastWill()
+{
+	writeLastWill(false);
 }
 
 void LedDeviceAdalight::writeLastWill(const bool force)

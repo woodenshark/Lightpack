@@ -50,7 +50,7 @@ LedDeviceArdulight::LedDeviceArdulight(const QString &portName, const int baudRa
 
 	m_lastWillTimer = new QTimer(this);
 	m_lastWillTimer->setTimerType(Qt::PreciseTimer);
-	connect(m_lastWillTimer, SIGNAL(timeout()), this, SLOT(writeLastWill()));
+	connect(m_lastWillTimer, &QTimer::timeout, this, qOverload<>(&LedDeviceArdulight::writeLastWill));
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
 }
@@ -260,6 +260,11 @@ void LedDeviceArdulight::open()
 	}
 
 	emit openDeviceSuccess(ok);
+}
+
+void LedDeviceArdulight::writeLastWill()
+{
+	writeLastWill(false);
 }
 
 void LedDeviceArdulight::writeLastWill(const bool force)

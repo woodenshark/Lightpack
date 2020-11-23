@@ -435,6 +435,7 @@ QStringList Settings::findAllProfiles()
 	QFileInfoList iniFiles = setsFile.absoluteDir().entryInfoList(QStringList(QStringLiteral("*.ini")));
 
 	QStringList settingsFiles;
+	settingsFiles.reserve(iniFiles.count());
 	for(int i=0; i<iniFiles.count(); i++){
 		QString compBaseName = iniFiles.at(i).completeBaseName();
 		settingsFiles.append(compBaseName);
@@ -1826,6 +1827,7 @@ QList<WBAdjustment> Settings::getLedCoefs()
 	QList<WBAdjustment> result;
 	const int numOfLeds = getNumberOfLeds(getConnectedDevice());
 
+	result.reserve(numOfLeds);
 	for (int led = 0; led < numOfLeds; ++led)
 		result.append(getLedAdjustment(led));
 

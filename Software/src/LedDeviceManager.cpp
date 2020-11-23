@@ -64,6 +64,7 @@ LedDeviceManager::LedDeviceManager(QObject *parent)
 
 	m_savedBrightnessCap = SettingsScope::Profile::Device::BrightnessCapDefault;
 
+	m_ledDevices.reserve(SupportedDevices::DeviceTypesCount);
 	for (int i = 0; i < SupportedDevices::DeviceTypesCount; i++)
 		m_ledDevices.append(NULL);
 }

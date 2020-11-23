@@ -631,8 +631,10 @@ QString LightpackPluginInterface::GetProfile()
 
 QList<QRect> LightpackPluginInterface::GetLeds()
 {
+	const int number = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 	QList<QRect> leds;
-	for (int i = 0; i < Settings::getNumberOfLeds(Settings::getConnectedDevice()); i++)
+	leds.reserve(number);
+	for (int i = 0; i < number; i++)
 	{
 		QPoint top = Settings::getLedPosition(i);
 		QSize size = Settings::getLedSize(i);

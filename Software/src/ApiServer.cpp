@@ -38,146 +38,146 @@
 using namespace SettingsScope;
 
 // Immediatly after successful connection server sends to client -- ApiVersion
-const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
-const char * ApiServer::CmdUnknown = "unknown command\r\n";
-const char * ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
-const char * ApiServer::CmdExit = "exit";
-const char * ApiServer::CmdHelp = "help";
-const char * ApiServer::CmdHelpShort = "?";
+const char * const ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
+const char * const ApiServer::CmdUnknown = "unknown command\r\n";
+const char * const ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
+const char * const ApiServer::CmdExit = "exit";
+const char * const ApiServer::CmdHelp = "help";
+const char * const ApiServer::CmdHelpShort = "?";
 
-const char * ApiServer::CmdApiKey = "apikey:";
-const char * ApiServer::CmdApiKeyResult_Ok = "ok\r\n";
-const char * ApiServer::CmdApiKeyResult_Fail = "fail\r\n";
-const char * ApiServer::CmdApiCheck_AuthRequired = "authorization required\r\n";
+const char * const ApiServer::CmdApiKey = "apikey:";
+const char * const ApiServer::CmdApiKeyResult_Ok = "ok\r\n";
+const char * const ApiServer::CmdApiKeyResult_Fail = "fail\r\n";
+const char * const ApiServer::CmdApiCheck_AuthRequired = "authorization required\r\n";
 
-const char * ApiServer::CmdGetStatus = "getstatus";
-const char * ApiServer::CmdResultStatus_On = "status:on\r\n";
-const char * ApiServer::CmdResultStatus_Off = "status:off\r\n";
-const char * ApiServer::CmdResultStatus_DeviceError = "status:device error\r\n";
-const char * ApiServer::CmdResultStatus_Unknown = "status:unknown\r\n";
+const char * const ApiServer::CmdGetStatus = "getstatus";
+const char * const ApiServer::CmdResultStatus_On = "status:on\r\n";
+const char * const ApiServer::CmdResultStatus_Off = "status:off\r\n";
+const char * const ApiServer::CmdResultStatus_DeviceError = "status:device error\r\n";
+const char * const ApiServer::CmdResultStatus_Unknown = "status:unknown\r\n";
 
-const char * ApiServer::CmdGetStatusAPI = "getstatusapi";
-const char * ApiServer::CmdResultStatusAPI_Busy = "statusapi:busy\r\n";
-const char * ApiServer::CmdResultStatusAPI_Idle = "statusapi:idle\r\n";
+const char * const ApiServer::CmdGetStatusAPI = "getstatusapi";
+const char * const ApiServer::CmdResultStatusAPI_Busy = "statusapi:busy\r\n";
+const char * const ApiServer::CmdResultStatusAPI_Idle = "statusapi:idle\r\n";
 
-const char * ApiServer::CmdGetProfiles = "getprofiles";
+const char * const ApiServer::CmdGetProfiles = "getprofiles";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultProfiles = "profiles:";
+const char * const ApiServer::CmdResultProfiles = "profiles:";
 
-const char * ApiServer::CmdGetProfile = "getprofile";
+const char * const ApiServer::CmdGetProfile = "getprofile";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultProfile = "profile:";
+const char * const ApiServer::CmdResultProfile = "profile:";
 
-const char * ApiServer::CmdGetDevices = "getdevices";
-const char * ApiServer::CmdResultDevices = "devices:";
-const char * ApiServer::CmdGetDevice = "getdevice";
-const char * ApiServer::CmdResultDevice = "device:";
+const char * const ApiServer::CmdGetDevices = "getdevices";
+const char * const ApiServer::CmdResultDevices = "devices:";
+const char * const ApiServer::CmdGetDevice = "getdevice";
+const char * const ApiServer::CmdResultDevice = "device:";
 
-const char * ApiServer::CmdGetMaxLeds = "getmaxleds";
-const char * ApiServer::CmdResultMaxLeds = "maxleds:";
+const char * const ApiServer::CmdGetMaxLeds = "getmaxleds";
+const char * const ApiServer::CmdResultMaxLeds = "maxleds:";
 
-const char * ApiServer::CmdGetCountLeds = "getcountleds";
+const char * const ApiServer::CmdGetCountLeds = "getcountleds";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultCountLeds = "countleds:";
+const char * const ApiServer::CmdResultCountLeds = "countleds:";
 
-const char * ApiServer::CmdGetLeds = "getleds";
-const char * ApiServer::CmdResultLeds = "leds:";
+const char * const ApiServer::CmdGetLeds = "getleds";
+const char * const ApiServer::CmdResultLeds = "leds:";
 
-const char * ApiServer::CmdGetColors = "getcolors";
-const char * ApiServer::CmdResultGetColors = "colors:";
+const char * const ApiServer::CmdGetColors = "getcolors";
+const char * const ApiServer::CmdResultGetColors = "colors:";
 
-const char * ApiServer::CmdGetFPS = "getfps";
-const char * ApiServer::CmdResultFPS = "fps:";
+const char * const ApiServer::CmdGetFPS = "getfps";
+const char * const ApiServer::CmdResultFPS = "fps:";
 
-const char * ApiServer::CmdGetScreenSize = "getscreensize";
-const char * ApiServer::CmdResultScreenSize = "screensize:";
+const char * const ApiServer::CmdGetScreenSize = "getscreensize";
+const char * const ApiServer::CmdResultScreenSize = "screensize:";
 
-const char * ApiServer::CmdGetCountMonitor = "getcountmonitors";
-const char * ApiServer::CmdResultCountMonitor = "countmonitors:";
+const char * const ApiServer::CmdGetCountMonitor = "getcountmonitors";
+const char * const ApiServer::CmdResultCountMonitor = "countmonitors:";
 
-const char * ApiServer::CmdGetSizeMonitor = "getsizemonitor:";
-const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
+const char * const ApiServer::CmdGetSizeMonitor = "getsizemonitor:";
+const char * const ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 
-const char * ApiServer::CmdGetBacklight = "getmode";
-const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
-const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
+const char * const ApiServer::CmdGetBacklight = "getmode";
+const char * const ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
+const char * const ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
+const char * const ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
 #endif
 
-const char * ApiServer::CmdGetGamma = "getgamma";
-const char * ApiServer::CmdResultGamma = "gamma:";
+const char * const ApiServer::CmdGetGamma = "getgamma";
+const char * const ApiServer::CmdResultGamma = "gamma:";
 
-const char * ApiServer::CmdGetBrightness = "getbrightness";
-const char * ApiServer::CmdResultBrightness = "brightness:";
+const char * const ApiServer::CmdGetBrightness = "getbrightness";
+const char * const ApiServer::CmdResultBrightness = "brightness:";
 
-const char * ApiServer::CmdGetSmooth = "getsmooth";
-const char * ApiServer::CmdResultSmooth = "smooth:";
+const char * const ApiServer::CmdGetSmooth = "getsmooth";
+const char * const ApiServer::CmdResultSmooth = "smooth:";
 
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
-const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
+const char * const ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
+const char * const ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
 
-const char * ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
-const char * ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
+const char * const ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
+const char * const ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
 #endif
-const char * ApiServer::CmdGetPersistOnUnlock = "getpersistonunlock";
-const char * ApiServer::CmdGetPersistOnUnlock_On = "persistonunlock:on\r\n";
-const char * ApiServer::CmdGetPersistOnUnlock_Off = "persistonunlock:off\r\n";
+const char * const ApiServer::CmdGetPersistOnUnlock = "getpersistonunlock";
+const char * const ApiServer::CmdGetPersistOnUnlock_On = "persistonunlock:on\r\n";
+const char * const ApiServer::CmdGetPersistOnUnlock_Off = "persistonunlock:off\r\n";
 
-const char * ApiServer::CmdGuid = "guid:";
+const char * const ApiServer::CmdGuid = "guid:";
 
-const char * ApiServer::CmdLockStatus = "getlockstatus";
+const char * const ApiServer::CmdLockStatus = "getlockstatus";
 
-const char * ApiServer::CmdLock = "lock";
-const char * ApiServer::CmdResultLock_Success = "lock:success\r\n";
-const char * ApiServer::CmdResultLock_Busy = "lock:busy\r\n";
+const char * const ApiServer::CmdLock = "lock";
+const char * const ApiServer::CmdResultLock_Success = "lock:success\r\n";
+const char * const ApiServer::CmdResultLock_Busy = "lock:busy\r\n";
 
-const char * ApiServer::CmdUnlock = "unlock";
-const char * ApiServer::CmdResultUnlock_Success = "unlock:success\r\n";
-const char * ApiServer::CmdResultUnlock_NotLocked = "unlock:not locked\r\n";
+const char * const ApiServer::CmdUnlock = "unlock";
+const char * const ApiServer::CmdResultUnlock_Success = "unlock:success\r\n";
+const char * const ApiServer::CmdResultUnlock_NotLocked = "unlock:not locked\r\n";
 
 // Set-commands works only after success lock
 // Set-commands can return, after self-name, only this results:
-const char * ApiServer::CmdSetResult_Ok = "ok\r\n";
-const char * ApiServer::CmdSetResult_Error = "error\r\n";
-const char * ApiServer::CmdSetResult_Busy = "busy\r\n";
-const char * ApiServer::CmdSetResult_NotLocked = "not locked\r\n";
+const char * const ApiServer::CmdSetResult_Ok = "ok\r\n";
+const char * const ApiServer::CmdSetResult_Error = "error\r\n";
+const char * const ApiServer::CmdSetResult_Busy = "busy\r\n";
+const char * const ApiServer::CmdSetResult_NotLocked = "not locked\r\n";
 
 // Set-commands contains at end semicolon!!!
-const char * ApiServer::CmdSetColor = "setcolor:";
-const char * ApiServer::CmdSetGamma = "setgamma:";
-const char * ApiServer::CmdSetBrightness = "setbrightness:";
-const char * ApiServer::CmdSetSmooth = "setsmooth:";
-const char * ApiServer::CmdSetProfile = "setprofile:";
+const char * const ApiServer::CmdSetColor = "setcolor:";
+const char * const ApiServer::CmdSetGamma = "setgamma:";
+const char * const ApiServer::CmdSetBrightness = "setbrightness:";
+const char * const ApiServer::CmdSetSmooth = "setsmooth:";
+const char * const ApiServer::CmdSetProfile = "setprofile:";
 
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
-const char * ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
+const char * const ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
+const char * const ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
 #endif
 
-const char * ApiServer::CmdSetDevice = "setdevice:";
+const char * const ApiServer::CmdSetDevice = "setdevice:";
 
-const char * ApiServer::CmdSetCountLeds = "setcountleds:";
-const char * ApiServer::CmdSetLeds = "setleds:";
+const char * const ApiServer::CmdSetCountLeds = "setcountleds:";
+const char * const ApiServer::CmdSetLeds = "setleds:";
 
-const char * ApiServer::CmdNewProfile = "newprofile:";
-const char * ApiServer::CmdDeleteProfile = "deleteprofile:";
+const char * const ApiServer::CmdNewProfile = "newprofile:";
+const char * const ApiServer::CmdDeleteProfile = "deleteprofile:";
 
-const char * ApiServer::CmdSetStatus = "setstatus:";
-const char * ApiServer::CmdSetStatus_On = "on";
-const char * ApiServer::CmdSetStatus_Off = "off";
+const char * const ApiServer::CmdSetStatus = "setstatus:";
+const char * const ApiServer::CmdSetStatus_On = "on";
+const char * const ApiServer::CmdSetStatus_Off = "off";
 
-const char * ApiServer::CmdSetBacklight = "setmode:";
-const char * ApiServer::CmdSetBacklight_Ambilight = "ambilight";
-const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
+const char * const ApiServer::CmdSetBacklight = "setmode:";
+const char * const ApiServer::CmdSetBacklight_Ambilight = "ambilight";
+const char * const ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
+const char * const ApiServer::CmdSetBacklight_SoundViz = "soundviz";
 #endif
 
-const char * ApiServer::CmdSetPersistOnUnlock = "setpersistonunlock:";
-const char * ApiServer::CmdSetPersistOnUnlock_On = "on";
-const char * ApiServer::CmdSetPersistOnUnlock_Off = "off";
+const char * const ApiServer::CmdSetPersistOnUnlock = "setpersistonunlock:";
+const char * const ApiServer::CmdSetPersistOnUnlock_On = "on";
+const char * const ApiServer::CmdSetPersistOnUnlock_Off = "off";
 
 const int ApiServer::SignalWaitTimeoutMs = 1000; // 1 second
 

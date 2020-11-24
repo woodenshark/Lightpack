@@ -650,7 +650,7 @@ void GrabManager::initGrabbers()
 #ifdef D3D10_GRAB_SUPPORT
 	if (Settings::isDx1011GrabberEnabled()) {
 		m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
-		connect(m_d3d10Grabber, &D3D10Grabber::grabberStateChangeRequested, this, GrabManager::onGrabberStateChangeRequested);
+		connect(m_d3d10Grabber, &D3D10Grabber::grabberStateChangeRequested, this, &GrabManager::onGrabberStateChangeRequested);
 		connect(getLightpackApp(), &LightpackApplication::postInitialization, m_d3d10Grabber, &D3D10Grabber::init);
 	} else {
 		m_d3d10Grabber = NULL;

@@ -660,7 +660,7 @@ void D3D10Grabber::init() {
 		qWarning() << Q_FUNC_INFO << "DX hooking is enabled but application not running elevated";
 		// Do not show the message box during initialization (creating a unwanted message loop)
 		// Show as soon as the message loop is established
-		QTimer::singleShot(0, this, SLOT(showAdminMessage()));
+		QTimer::singleShot(0, this, &D3D10Grabber::showAdminMessage);
 	}
 }
 

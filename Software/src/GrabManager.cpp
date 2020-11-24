@@ -26,7 +26,6 @@
 
 #include <QtCore/qmath.h>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 
 #include "debug.h"
 #include "PrismatikMath.hpp"

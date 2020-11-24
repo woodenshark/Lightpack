@@ -28,7 +28,7 @@
 #define AREADISTRIBUTOR_HPP
 #include <QList>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QRect>
 #include <math.h>
 
 class ScreenArea {

@@ -24,7 +24,6 @@
  *
  */
 
-#include <QDesktopWidget>
 #include <QRadioButton>
 #include <QScreen>
 #include "MonitorConfigurationPage.hpp"

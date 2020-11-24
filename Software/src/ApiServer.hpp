@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include <QDesktopWidget>
 #include <QStringList>
 #include <QTcpServer>
 #include <QTcpSocket>

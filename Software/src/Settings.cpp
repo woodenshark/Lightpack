@@ -28,7 +28,7 @@
 
 #include <QtDebug>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QKeySequence>
 #include <QSize>
 #include <QPoint>
 #include <QFileInfo>

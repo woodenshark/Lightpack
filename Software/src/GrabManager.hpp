@@ -87,12 +87,12 @@ private slots:
 	void timeoutUpdateFPS();
 	void pauseWhileResizeOrMoving();
 	void resumeAfterResizeOrMoving();
-	void scaleLedWidgets(int screenIndexResized);
 	void onFrameGrabAttempted(GrabResult result);
 	void updateScreenGeometry();
-	void onScreenCountChanged(int);
+	void onScreenCountChanged(QScreen* screen);
 
 private:
+	void scaleLedWidgets(const int screenIndexResized, const QRect& geometry);
 	GrabberBase *queryGrabber(Grab::GrabberType grabber);
 	void initGrabbers();
 	GrabberBase *initGrabber(GrabberBase *grabber);

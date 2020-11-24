@@ -84,14 +84,14 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 
 	m_timerUpdateFPS = new QTimer(this);
 	m_timerUpdateFPS->setTimerType(Qt::PreciseTimer);
-	connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
+	connect(m_timerUpdateFPS, &QTimer::timeout, this, &GrabManager::timeoutUpdateFPS);
 	m_timerUpdateFPS->setSingleShot(false);
 
 	m_timerUpdateFPS->setInterval(FPS_UPDATE_INTERVAL);
 
 	m_timerFakeGrab = new QTimer(this);
 	m_timerFakeGrab->setTimerType(Qt::PreciseTimer);
-	connect(m_timerFakeGrab, SIGNAL(timeout()), this, SLOT(timeoutFakeGrab()));
+	connect(m_timerFakeGrab, &QTimer::timeout, this, &GrabManager::timeoutFakeGrab);
 	m_timerFakeGrab->setSingleShot(false);
 	m_timerFakeGrab->setInterval(FAKE_GRAB_INTERVAL);
 
@@ -102,8 +102,16 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 	initColorLists(MaximumNumberOfLeds::Default);
 	initLedWidgets(MaximumNumberOfLeds::Default);
 
-	connect(QApplication::desktop(), SIGNAL(resized(int)), this, SLOT(scaleLedWidgets(int)));
-	connect(QApplication::desktop(), SIGNAL(screenCountChanged(int)), this, SLOT(onScreenCountChanged(int)));
+	int idx = 0;
+	for (const QScreen* screen : QGuiApplication::screens()) {
+		connect(screen, &QScreen::geometryChanged,
+			[=](const QRect& geometry) { this->scaleLedWidgets(idx, geometry); }
+		);
+		++idx;
+	}
+
+	connect(qGuiApp, &QGuiApplication::screenAdded, this, &GrabManager::onScreenCountChanged);
+	connect(qGuiApp, &QGuiApplication::screenRemoved, this, &GrabManager::onScreenCountChanged);
 
 	updateScreenGeometry();
 
@@ -541,16 +549,16 @@ void GrabManager::updateScreenGeometry()
 
 }
 
-void GrabManager::onScreenCountChanged(int)
+void GrabManager::onScreenCountChanged(QScreen* screen)
 {
+	Q_UNUSED(screen)
 	updateScreenGeometry();
 }
 
-void GrabManager::scaleLedWidgets(int screenIndexResized)
+void GrabManager::scaleLedWidgets(const int screenIndexResized, const QRect& screenGeometry)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screenIndexResized:" << screenIndexResized;
 
-	QRect screenGeometry = QGuiApplication::screens().value(screenIndexResized, QGuiApplication::primaryScreen())->geometry();
 	QRect lastScreenGeometry = m_lastScreenGeometry[screenIndexResized];
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screen " << screenIndexResized << " is resized to " << screenGeometry;
@@ -627,7 +635,7 @@ void GrabManager::initGrabbers()
 #ifdef DDUPL_GRAB_SUPPORT
 	DDuplGrabber* dDuplGrabber = new DDuplGrabber(NULL, m_grabberContext);
 	m_grabbers[Grab::GrabberTypeDDupl] = initGrabber(dDuplGrabber);
-	connect(this, SIGNAL(onSessionChange(int)), dDuplGrabber, SLOT(onSessionChange(int)));
+	connect(this, &GrabManager::onSessionChange, dDuplGrabber, &DDuplGrabber::onSessionChange);
 #endif
 
 #ifdef X11_GRAB_SUPPORT
@@ -643,8 +651,8 @@ void GrabManager::initGrabbers()
 #ifdef D3D10_GRAB_SUPPORT
 	if (Settings::isDx1011GrabberEnabled()) {
 		m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
-		connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
-		connect(getLightpackApp(), SIGNAL(postInitialization()), m_d3d10Grabber, SLOT(init()));
+		connect(m_d3d10Grabber, &D3D10Grabber::grabberStateChangeRequested, this, GrabManager::onGrabberStateChangeRequested);
+		connect(getLightpackApp(), &LightpackApplication::postInitialization, m_d3d10Grabber, &D3D10Grabber::init);
 	} else {
 		m_d3d10Grabber = NULL;
 	}
@@ -653,7 +661,7 @@ void GrabManager::initGrabbers()
 
 GrabberBase *GrabManager::initGrabber(GrabberBase * grabber) {
 	QMetaObject::invokeMethod(grabber, "setGrabInterval", Qt::QueuedConnection, Q_ARG(int, Settings::getGrabSlowdown()));
-	bool isConnected = connect(grabber, SIGNAL(frameGrabAttempted(GrabResult)), this, SLOT(onFrameGrabAttempted(GrabResult)), Qt::QueuedConnection);
+	bool isConnected = connect(grabber, &GrabberBase::frameGrabAttempted, this, &GrabManager::onFrameGrabAttempted, Qt::QueuedConnection);
 	Q_ASSERT_X(isConnected, "connecting grabber to grabManager", "failed");
 	Q_UNUSED(isConnected);
 
@@ -671,7 +679,7 @@ void GrabManager::reinitDx1011Grabber() {
 
 	if (Settings::isDx1011GrabberEnabled()) {
 		m_d3d10Grabber = static_cast<D3D10Grabber *>(initGrabber(new D3D10Grabber(NULL, m_grabberContext, &GetMainWindowHandle, Settings::isDx9GrabbingEnabled())));
-		connect(m_d3d10Grabber, SIGNAL(grabberStateChangeRequested(bool)), SLOT(onGrabberStateChangeRequested(bool)));
+		connect(m_d3d10Grabber, &D3D10Grabber::grabberStateChangeRequested, this, &GrabManager::onGrabberStateChangeRequested);
 		m_d3d10Grabber->init();
 	}
 
@@ -751,12 +759,12 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 
 		GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-		connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
-		connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
+		connect(ledWidget, &GrabWidget::resizeOrMoveStarted, this, &GrabManager::pauseWhileResizeOrMoving);
+		connect(ledWidget, &GrabWidget::resizeOrMoveCompleted, this, &GrabManager::resumeAfterResizeOrMoving);
 
 // TODO: Check out this line!
 //			First LED widget using to determine grabbing-monitor in WinAPI version of Grab
-//		connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(firstWidgetPositionChanged()));
+//		connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, &GrabManager::firstWidgetPositionChanged);
 
 		m_ledWidgets << ledWidget;
 
@@ -773,8 +781,8 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 		{
 			GrabWidget * ledWidget = new GrabWidget(m_ledWidgets.size(), widgetFlags, &m_ledWidgets, m_parentWidget);
 
-			connect(ledWidget, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(pauseWhileResizeOrMoving()));
-			connect(ledWidget, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(resumeAfterResizeOrMoving()));
+			connect(ledWidget, &GrabWidget::resizeOrMoveStarted, this, &GrabManager::pauseWhileResizeOrMoving);
+			connect(ledWidget, &GrabWidget::resizeOrMoveCompleted, this, &GrabManager::resumeAfterResizeOrMoving);
 
 			m_ledWidgets << ledWidget;
 		}

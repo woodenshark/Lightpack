@@ -47,7 +47,6 @@
 #include <QMessageBox>
 #include "PrismatikMath.hpp"
 
-
 using namespace SettingsScope;
 
 // ----------------------------------------------------------------------------
@@ -203,7 +202,8 @@ void SettingsWindow::changePage(int page)
 	ui->tabWidget->setCurrentIndex(page);
 	if (page == 5) {
 		ui->textBrowser->verticalScrollBar()->setValue(0);
-		m_smoothScrollTimer.setInterval(100);
+		using namespace std::chrono_literals;
+		m_smoothScrollTimer.setInterval(100ms);
 		m_smoothScrollTimer.start();
 	} else {
 		m_smoothScrollTimer.stop();
@@ -1035,7 +1035,8 @@ void SettingsWindow::showAbout()
 	ui->tabWidget->setCurrentWidget(ui->tabAbout);
 	this->show();
 
-	m_smoothScrollTimer.setInterval(100);
+	using namespace std::chrono_literals;
+	m_smoothScrollTimer.setInterval(100ms);
 	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
 	m_smoothScrollTimer.start();
 }
@@ -1196,7 +1197,8 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 			.arg(PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate), 0, 'f', 0)
 			.arg(std::round(PrismatikMath::theoreticalMinBaudRate(ledCount, m_maxFPS) / 100.0) * 100.0, 0, 'f', 0);
 			this->labelFPS->setToolTip(toolTipMsg);
-			m_baudrateWarningClearTimer.start(15000);
+			using namespace std::chrono_literals;
+			m_baudrateWarningClearTimer.start(15s);
 		} else
 			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
 

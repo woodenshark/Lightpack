@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 
+using namespace std::chrono_literals;
 class MoodLampBase;
 
 typedef MoodLampBase* (*LampFactory)();
@@ -40,7 +41,6 @@ struct MoodLampLampInfo {
 	int id;
 };
 Q_DECLARE_METATYPE(MoodLampLampInfo);
-
 class MoodLampBase
 {
 public:
@@ -53,10 +53,10 @@ public:
 	static void populateNameList(QList<MoodLampLampInfo>& list, int& recommended);
 
 	virtual void init() {};
-	virtual int interval() const { return DefaultInterval; };
+	virtual std::chrono::milliseconds interval() const { return DefaultInterval; };
 	virtual bool shine(const QColor& newColor, QList<QRgb>& colors) = 0;
 protected:
 	size_t m_frames{ 0 };
 private:
-	const int DefaultInterval = 33;
+	const std::chrono::milliseconds DefaultInterval = 33ms;
 };

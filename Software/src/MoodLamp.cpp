@@ -113,7 +113,7 @@ void MoodLampBase::populateNameList(QList<MoodLampLampInfo>& list, int& recommen
 
 DECLARE_LAMP(Static, "Static (default)",
 public:
-	int interval() const { return 50; };
+	std::chrono::milliseconds interval() const { return 50ms; };
 
 	bool shine(const QColor& newColor, QList<QRgb>& colors)
 	{

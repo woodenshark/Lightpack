@@ -279,7 +279,8 @@ bool LedDeviceAdalight::writeBuffer(const QByteArray & buff)
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Serial bytesToWrite:" << m_AdalightDevice->bytesToWrite() << ", skipping current frame";
 		// If no more writes will be done ("Send data only of colors changed")
 		// re-schedule last skipped frame in case it's important (for ex a black frame to turn off)
-		m_lastWillTimer->start(100);
+		using namespace std::chrono_literals;
+		m_lastWillTimer->start(100ms);
 		return true;
 	}
 	m_lastWillTimer->stop();

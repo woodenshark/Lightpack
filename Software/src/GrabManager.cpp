@@ -48,8 +48,9 @@
 
 using namespace SettingsScope;
 
-#define FPS_UPDATE_INTERVAL 500
-#define FAKE_GRAB_INTERVAL 900
+using namespace std::chrono_literals;
+constexpr const std::chrono::milliseconds FPS_UPDATE_INTERVAL = 500ms;
+constexpr const std::chrono::milliseconds FAKE_GRAB_INTERVAL = 900ms;
 
 #ifdef D3D10_GRAB_SUPPORT
 
@@ -85,6 +86,7 @@ GrabManager::GrabManager(QWidget *parent) : QObject(parent)
 	m_timerUpdateFPS->setTimerType(Qt::PreciseTimer);
 	connect(m_timerUpdateFPS, SIGNAL(timeout()), this, SLOT(timeoutUpdateFPS()));
 	m_timerUpdateFPS->setSingleShot(false);
+
 	m_timerUpdateFPS->setInterval(FPS_UPDATE_INTERVAL);
 
 	m_timerFakeGrab = new QTimer(this);
@@ -503,7 +505,7 @@ void GrabManager::timeoutFakeGrab()
 void GrabManager::timeoutUpdateFPS()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
-	emit ambilightTimeOfUpdatingColors((2.0 * FPS_UPDATE_INTERVAL) / (m_grabCountLastInterval + m_grabCountThisInterval));
+	emit ambilightTimeOfUpdatingColors((2.0 * FPS_UPDATE_INTERVAL.count()) / (m_grabCountLastInterval + m_grabCountThisInterval));
 
 	m_grabCountLastInterval = m_grabCountThisInterval;
 	m_grabCountThisInterval = 0;
@@ -529,7 +531,7 @@ void GrabManager::updateScreenGeometry()
 	foreach(QScreen* screen, screenList) {
 		m_lastScreenGeometry.append(screen->geometry());
 	}
-	
+
 	emit changeScreen();
 	if (m_grabber == NULL)
 	{

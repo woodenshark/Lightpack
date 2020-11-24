@@ -346,8 +346,9 @@ void PulseAudioSoundManager::start(bool isEnabled)
 		}
 
 		// setup update timer (40hz)
-		m_timer.start(25);
-		m_pa_alive_timer.start(1000);
+		using namespace std::chrono_literals;
+		m_timer.start(25ms);
+		m_pa_alive_timer.start(1s);
 	}
 	else
 	{

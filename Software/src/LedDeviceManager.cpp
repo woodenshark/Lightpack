@@ -87,8 +87,8 @@ void LedDeviceManager::init()
 {
 	if (!m_cmdTimeoutTimer) {
 		m_cmdTimeoutTimer = new QTimer(this);
-
-		m_cmdTimeoutTimer->setInterval(100);
+		using namespace std::chrono_literals;
+		m_cmdTimeoutTimer->setInterval(100ms);
 		connect(m_cmdTimeoutTimer, &QTimer::timeout, this, &LedDeviceManager::ledDeviceCommandTimedOut);
 	}
 
@@ -413,14 +413,15 @@ void LedDeviceManager::ledDeviceIoDeviceSuccess(bool isSuccess)
 void LedDeviceManager::triggerRecreateLedDevice()
 {
 	if (!m_recreateTimer->isActive()) {
+		using namespace std::chrono_literals;
 		if (m_failedCreationAttempts == 0) {
-			m_recreateTimer->setInterval(200);
+			m_recreateTimer->setInterval(200ms);
 		} else if (m_failedCreationAttempts == 1) {
-			m_recreateTimer->setInterval(500);
+			m_recreateTimer->setInterval(500ms);
 		} else if (m_failedCreationAttempts < 10) {
-			m_recreateTimer->setInterval(1000);
+			m_recreateTimer->setInterval(1s);
 		} else {
-			m_recreateTimer->setInterval(5000);
+			m_recreateTimer->setInterval(5s);
 		}
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Will try to recreate device in" << m_recreateTimer->interval() << "msec";
 		m_recreateTimer->start();
@@ -574,7 +575,7 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 	}
 	m_ledDevice->disconnect(this, nullptr, nullptr, nullptr);
 	disconnect(m_ledDevice, nullptr, nullptr, nullptr);
-/*	
+/*
     disconnect(m_ledDevice, &AbstractLedDevice::commandCompleted,		this, &LedDeviceManager::ledDeviceCommandCompleted);
 	disconnect(m_ledDevice, &AbstractLedDevice::ioDeviceSuccess,		this, &LedDeviceManager::ledDeviceIoDeviceSuccess);
 	disconnect(m_ledDevice, &AbstractLedDevice::openDeviceSuccess,	this, &LedDeviceManager::ledDeviceOpenDeviceSuccess);

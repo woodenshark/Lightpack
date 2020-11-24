@@ -1803,7 +1803,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << language;
 
-	Settings::setLanguage(language);
+	QString settingsLanguage = language;
 
 	QString locale = QLocale::system().name();
 
@@ -1816,8 +1816,14 @@ void SettingsWindow::loadTranslation(const QString & language)
 	// and only when all this done - append new line
 	// locale - name of translation binary file form resources: %locale%.qm
 	if(ui->comboBox_Language->currentIndex() == 0 /* System */){
+		settingsLanguage = SettingsScope::Main::LanguageDefault;
 		DEBUG_LOW_LEVEL << "System locale" << locale;
-		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
+
+		if (locale.startsWith(QStringLiteral("en_"))) locale = QStringLiteral("en_EN"); // :/translations/en_EN.qm
+		else if (locale.startsWith(QStringLiteral("ru_"))) locale = QStringLiteral("ru_RU"); // :/translations/ru_RU.qm
+		else if (locale.startsWith(QStringLiteral("uk_"))) locale = QStringLiteral("uk_UA"); // :/translations/uk_UA.qm
+
+		DEBUG_LOW_LEVEL << "System translation" << locale;
 	}
 	else if (language == QStringLiteral("English")) locale = QStringLiteral("en_EN"); // :/translations/en_EN.qm
 	else if (language == QStringLiteral("Russian")) locale = QStringLiteral("ru_RU"); // :/translations/ru_RU.qm
@@ -1827,10 +1833,12 @@ void SettingsWindow::loadTranslation(const QString & language)
 		qWarning() << "Language" << language << "not found. Set to default" << SettingsScope::Main::LanguageDefault;
 		DEBUG_LOW_LEVEL << "System locale" << locale;
 
-		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
+		settingsLanguage = SettingsScope::Main::LanguageDefault;
 	}
 
-	QString pathToLocale = QStringLiteral(":/translations/") + locale;
+	Settings::setLanguage(settingsLanguage);
+
+	const QString pathToLocale = QStringLiteral(":/translations/%1").arg(locale);
 
 	if(m_translator != NULL){
 		qApp->removeTranslator(m_translator);

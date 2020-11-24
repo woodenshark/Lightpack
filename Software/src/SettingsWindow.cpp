@@ -540,8 +540,10 @@ void SettingsWindow::onPostInit() {
 			Settings::setAutoUpdatingVersion(QLatin1String(""));
 		}
 
-		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
-			QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
+		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed) {
+			using namespace std::chrono_literals;
+			QTimer::singleShot(10s, m_trayIcon, &SysTrayIcon::checkUpdate);
+		}
 	}
 }
 

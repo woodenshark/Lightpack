@@ -369,15 +369,16 @@ public:
 		connect(m_worker.data(), &D3D10GrabberWorker::frameGrabbed, this, &D3D10GrabberImpl::frameGrabbed, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(m_worker.data(), "runLoop", Qt::QueuedConnection);
 
+		using namespace std::chrono_literals;
 		m_processesScanAndInfectTimer.reset(new QTimer(this));
-		m_processesScanAndInfectTimer->setInterval(5000);
+		m_processesScanAndInfectTimer->setInterval(5s);
 		m_processesScanAndInfectTimer->setSingleShot(false);
 		connect(m_processesScanAndInfectTimer.data(), &QTimer::timeout, m_injector.data(), &D3D10GrabberInjector::infectCleanDxProcesses);
 		m_processesScanAndInfectTimer->start();
 
 		m_checkIfFrameGrabbedTimer.reset(new QTimer(this));
 		m_checkIfFrameGrabbedTimer->setSingleShot(false);
-		m_checkIfFrameGrabbedTimer->setInterval(1000);
+		m_checkIfFrameGrabbedTimer->setInterval(1s);
 		connect(m_checkIfFrameGrabbedTimer.data(), &QTimer::timeout, this, &D3D10GrabberImpl::handleIfFrameGrabbed);
 		m_checkIfFrameGrabbedTimer->start();
 		m_isInited = true;

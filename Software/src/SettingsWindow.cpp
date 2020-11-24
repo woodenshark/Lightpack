@@ -226,131 +226,131 @@ void SettingsWindow::connectSignalsSlots()
 
 //	if (m_trayIcon!=NULL)
 //	{
-//		connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onTrayIcon_Activated(QSystemTrayIcon::ActivationReason)));
-//		connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(onTrayIcon_MessageClicked()));
+//		connect(m_trayIcon, &SysTrayIcon::activated, this, &SettingsWindow::onTrayIcon_Activated);
+//		connect(m_trayIcon, &SysTrayIcon::messageClicked, this, &SettingsWindow::onTrayIcon_MessageClicked);
 //	}
 
-	connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(changePage(int)));
-	connect(ui->spinBox_GrabSlowdown, SIGNAL(valueChanged(int)), this, SLOT(onGrabSlowdown_valueChanged(int)));
-	connect(ui->spinBox_LuminosityThreshold, SIGNAL(valueChanged(int)), this, SLOT(onLuminosityThreshold_valueChanged(int)));
-	connect(ui->radioButton_MinimumLuminosity, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
-	connect(ui->radioButton_LuminosityDeadZone, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
-	connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
-	connect(ui->spinBox_GrabOverBrighten, SIGNAL(valueChanged(int)), this, SLOT(onGrabOverBrighten_valueChanged(int)));
-	connect(ui->checkBox_GrabApplyBlueLightReduction, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyBlueLightReduction_toggled(bool)));
-	connect(ui->checkBox_GrabApplyColorTemperature, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyColorTemperature_toggled(bool)));
-	connect(ui->horizontalSlider_GrabColorTemperature, SIGNAL(valueChanged(int)), this, SLOT(onGrabColorTemperature_valueChanged(int)));
-	connect(ui->horizontalSlider_GrabGamma, SIGNAL(valueChanged(int)), this, SLOT(onSliderGrabGamma_valueChanged(int)));
-	connect(ui->doubleSpinBox_GrabGamma, SIGNAL(valueChanged(double)), this, SLOT(onGrabGamma_valueChanged(double)));
+	connect(ui->listWidget, &QListWidget::currentRowChanged, this, &SettingsWindow::changePage);
+	connect(ui->spinBox_GrabSlowdown, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onGrabSlowdown_valueChanged);
+	connect(ui->spinBox_LuminosityThreshold, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onLuminosityThreshold_valueChanged);
+	connect(ui->radioButton_MinimumLuminosity, &QRadioButton::toggled, this, &SettingsWindow::onMinimumLumosity_toggled);
+	connect(ui->radioButton_LuminosityDeadZone, &QRadioButton::toggled, this, &SettingsWindow::onMinimumLumosity_toggled);
+	connect(ui->checkBox_GrabIsAvgColors, &QCheckBox::toggled, this, &SettingsWindow::onGrabIsAvgColors_toggled);
+	connect(ui->spinBox_GrabOverBrighten, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onGrabOverBrighten_valueChanged);
+	connect(ui->checkBox_GrabApplyBlueLightReduction, &QCheckBox::toggled, this, &SettingsWindow::onGrabApplyBlueLightReduction_toggled);
+	connect(ui->checkBox_GrabApplyColorTemperature, &QCheckBox::toggled, this, &SettingsWindow::onGrabApplyColorTemperature_toggled);
+	connect(ui->horizontalSlider_GrabColorTemperature, &QSlider::valueChanged, this, &SettingsWindow::onGrabColorTemperature_valueChanged);
+	connect(ui->horizontalSlider_GrabGamma, &QSlider::valueChanged, this, &SettingsWindow::onSliderGrabGamma_valueChanged);
+	connect(ui->doubleSpinBox_GrabGamma, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::onGrabGamma_valueChanged);
 
-	connect(ui->radioButton_GrabWidgetsDontShow, SIGNAL(toggled(bool)), this, SLOT( onDontShowLedWidgets_Toggled(bool)));
-	connect(ui->radioButton_Colored, SIGNAL(toggled(bool)), this, SLOT(onSetColoredLedWidgets(bool)));
-	connect(ui->radioButton_White, SIGNAL(toggled(bool)), this, SLOT(onSetWhiteLedWidgets(bool)));
+	connect(ui->radioButton_GrabWidgetsDontShow, &QRadioButton::toggled, this, &SettingsWindow:: onDontShowLedWidgets_Toggled);
+	connect(ui->radioButton_Colored, &QRadioButton::toggled, this, &SettingsWindow::onSetColoredLedWidgets);
+	connect(ui->radioButton_White, &QRadioButton::toggled, this, &SettingsWindow::onSetWhiteLedWidgets);
 
-	connect(ui->radioButton_LiquidColorMoodLampMode, SIGNAL(toggled(bool)), this, SLOT(onMoodLampLiquidMode_Toggled(bool)));
-	connect(ui->horizontalSlider_MoodLampSpeed, SIGNAL(valueChanged(int)), this, SLOT(onMoodLampSpeed_valueChanged(int)));
-	connect(ui->comboBox_MoodLampLamp, SIGNAL(currentIndexChanged(int)), this, SLOT(onMoodLampLamp_currentIndexChanged(int)));
+	connect(ui->radioButton_LiquidColorMoodLampMode, &QRadioButton::toggled, this, &SettingsWindow::onMoodLampLiquidMode_Toggled);
+	connect(ui->horizontalSlider_MoodLampSpeed, &QSlider::valueChanged, this, &SettingsWindow::onMoodLampSpeed_valueChanged);
+	connect(ui->comboBox_MoodLampLamp, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onMoodLampLamp_currentIndexChanged);
 
 	// Main options
-	connect(ui->comboBox_LightpackModes, SIGNAL(currentIndexChanged(int)), this, SLOT(onLightpackModes_currentIndexChanged(int)));
-	connect(ui->comboBox_Language, SIGNAL(activated(QString)), this, SLOT(loadTranslation(QString)));
-	connect(ui->pushButton_EnableDisableDevice, SIGNAL(clicked()), this, SLOT(toggleBacklight()));
+	connect(ui->comboBox_LightpackModes, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onLightpackModes_currentIndexChanged);
+	connect(ui->comboBox_Language, &QComboBox::currentTextChanged, this, &SettingsWindow::loadTranslation);
+	connect(ui->pushButton_EnableDisableDevice, &QPushButton::clicked, this, &SettingsWindow::toggleBacklight);
 
 	// Device options
-	connect(ui->spinBox_DeviceRefreshDelay, SIGNAL(valueChanged(int)), this, SLOT(onDeviceRefreshDelay_valueChanged(int)));
-	connect(ui->checkBox_DisableUsbPowerLed, SIGNAL(toggled(bool)), this, SLOT(onDisableUsbPowerLed_toggled(bool)));
-	connect(ui->spinBox_DeviceSmooth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceSmooth_valueChanged(int)));
-	connect(ui->spinBox_DeviceBrightness, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightness_valueChanged(int)));
-	connect(ui->spinBox_DeviceBrightnessCap, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightnessCap_valueChanged(int)));
-	connect(ui->spinBox_DeviceColorDepth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceColorDepth_valueChanged(int)));
-	connect(ui->doubleSpinBox_DeviceGamma, SIGNAL(valueChanged(double)), this, SLOT(onDeviceGammaCorrection_valueChanged(double)));
-	connect(ui->checkBox_EnableDithering, SIGNAL(toggled(bool)), this, SLOT(onDeviceDitheringEnabled_toggled(bool)));
-	connect(ui->horizontalSlider_GammaCorrection, SIGNAL(valueChanged(int)), this, SLOT(onSliderDeviceGammaCorrection_valueChanged(int)));
-	connect(ui->checkBox_SendDataOnlyIfColorsChanges, SIGNAL(toggled(bool)), this, SLOT(onDeviceSendDataOnlyIfColorsChanged_toggled(bool)));
+	connect(ui->spinBox_DeviceRefreshDelay, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceRefreshDelay_valueChanged);
+	connect(ui->checkBox_DisableUsbPowerLed, &QCheckBox::toggled, this, &SettingsWindow::onDisableUsbPowerLed_toggled);
+	connect(ui->spinBox_DeviceSmooth, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceSmooth_valueChanged);
+	connect(ui->spinBox_DeviceBrightness, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceBrightness_valueChanged);
+	connect(ui->spinBox_DeviceBrightnessCap, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceBrightnessCap_valueChanged);
+	connect(ui->spinBox_DeviceColorDepth, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceColorDepth_valueChanged);
+	connect(ui->doubleSpinBox_DeviceGamma, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::onDeviceGammaCorrection_valueChanged);
+	connect(ui->checkBox_EnableDithering, &QCheckBox::toggled, this, &SettingsWindow::onDeviceDitheringEnabled_toggled);
+	connect(ui->horizontalSlider_GammaCorrection, &QSlider::valueChanged, this, &SettingsWindow::onSliderDeviceGammaCorrection_valueChanged);
+	connect(ui->checkBox_SendDataOnlyIfColorsChanges, &QCheckBox::toggled, this, &SettingsWindow::onDeviceSendDataOnlyIfColorsChanged_toggled);
 
-	connect(ui->pbRunConfigurationWizard, SIGNAL(clicked()), this, SLOT(onRunConfigurationWizard_clicked()));
+	connect(ui->pbRunConfigurationWizard, &QPushButton::clicked, this, &SettingsWindow::onRunConfigurationWizard_clicked);
 
 	// Open Settings file
-	connect(ui->commandLinkButton_OpenSettings, SIGNAL(clicked()), this, SLOT(openCurrentProfile()));
+	connect(ui->commandLinkButton_OpenSettings, &QCommandLinkButton::clicked, this, &SettingsWindow::openCurrentProfile);
 
 	// Connect profile signals to this slots
-	connect(ui->comboBox_Profiles->lineEdit(), SIGNAL(editingFinished()) /* or returnPressed() */, this, SLOT(profileRename()));
-	connect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	connect(ui->comboBox_Profiles->lineEdit(), &QLineEdit::editingFinished /* or returnPressed() */, this, &SettingsWindow::profileRename);
+	connect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 
-	connect(Settings::settingsSingleton(), SIGNAL(currentProfileInited(QString)), this, SLOT(handleProfileLoaded(QString)), Qt::QueuedConnection);
+	connect(Settings::settingsSingleton(), &Settings::currentProfileInited, this, &SettingsWindow::handleProfileLoaded);
 
-	// connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, SLOT(onHotkeyChanged(QString,QKeySequence,QKeySequence)));
-	connect(Settings::settingsSingleton(), SIGNAL(lightpackModeChanged(Lightpack::Mode)), this, SLOT(onLightpackModeChanged(Lightpack::Mode)));
+	// connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, &SettingsWindow::onHotkeyChanged);
+	connect(Settings::settingsSingleton(), &Settings::lightpackModeChanged, this, &SettingsWindow::onLightpackModeChanged);
 
-	connect(ui->pushButton_ProfileNew, SIGNAL(clicked()), this, SLOT(profileNew()));
-	connect(ui->pushButton_ProfileResetToDefault, SIGNAL(clicked()), this, SLOT(profileResetToDefaultCurrent()));
-	connect(ui->pushButton_DeleteProfile, SIGNAL(clicked()), this, SLOT(profileDeleteCurrent()));
+	connect(ui->pushButton_ProfileNew, &QPushButton::clicked, this, &SettingsWindow::profileNew);
+	connect(ui->pushButton_ProfileResetToDefault, &QPushButton::clicked, this, &SettingsWindow::profileResetToDefaultCurrent);
+	connect(ui->pushButton_DeleteProfile, &QPushButton::clicked, this, &SettingsWindow::profileDeleteCurrent);
 
-	connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
+	connect(ui->pushButton_SelectColorMoodLamp, &ColorButton::colorChanged, this, &SettingsWindow::onMoodLampColor_changed);
 #ifdef SOUNDVIZ_SUPPORT
-	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
-	connect(ui->comboBox_SoundVizVisualizer, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizVisualizer_currentIndexChanged(int)));
-	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
-	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
-	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
-	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
+	connect(ui->comboBox_SoundVizDevice, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onSoundVizDevice_currentIndexChanged);
+	connect(ui->comboBox_SoundVizVisualizer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onSoundVizVisualizer_currentIndexChanged);
+	connect(ui->pushButton_SelectColorSoundVizMin, &ColorButton::colorChanged, this, &SettingsWindow::onSoundVizMinColor_changed);
+	connect(ui->pushButton_SelectColorSoundVizMax, &ColorButton::colorChanged, this, &SettingsWindow::onSoundVizMaxColor_changed);
+	connect(ui->radioButton_SoundVizLiquidMode, &QRadioButton::toggled, this, &SettingsWindow::onSoundVizLiquidMode_Toggled);
+	connect(ui->horizontalSlider_SoundVizLiquidSpeed, &QSlider::valueChanged, this, &SettingsWindow::onSoundVizLiquidSpeed_valueChanged);
 #ifdef Q_OS_MACOS
-	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(onSoundVizDeviceHelp_clicked()));
+	connect(ui->pushButton_SoundVizDeviceHelp, &QPushButton::clicked, this, &SettingsWindow::onSoundVizDeviceHelp_clicked);
 #else
 	ui->pushButton_SoundVizDeviceHelp->hide();
 #endif // Q_OS_MACOS
 
 #endif// SOUNDVIZ_SUPPORT
-	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterScreenOff, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterScreenOff_Toggled(bool)));
+	connect(ui->checkBox_KeepLightsOnAfterExit, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterExit_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterLockComputer, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterLock_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterSuspend, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterSuspend_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterScreenOff, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterScreenOff_Toggled);
 
 	// Dev tab
 #ifdef WINAPI_GRAB_SUPPORT
-	connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabWinAPI, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef DDUPL_GRAB_SUPPORT
-	connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabDDupl, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef X11_GRAB_SUPPORT
-	connect(ui->radioButton_GrabX11, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabX11, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef MAC_OS_AV_GRAB_SUPPORT
-	connect(ui->radioButton_GrabMacAVFoundation, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabMacAVFoundation, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
-	connect(ui->radioButton_GrabMacCoreGraphics, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabMacCoreGraphics, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef D3D10_GRAB_SUPPORT
-	connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onDx1011CaptureEnabledChanged(bool)));
-	connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onDx9CaptureEnabledChanged(bool)));
+	connect(ui->checkBox_EnableDx1011Capture, &QCheckBox::toggled, this, &SettingsWindow::onDx1011CaptureEnabledChanged);
+	connect(ui->checkBox_EnableDx9Capture, &QCheckBox::toggled, this, &SettingsWindow::onDx9CaptureEnabledChanged);
 #endif
 
 
 	// Dev tab configure API (port, apikey)
-	connect(ui->groupBox_Api, SIGNAL(toggled(bool)), this, SLOT(onEnableApi_Toggled(bool)));
-	connect(ui->checkBox_listenOnlyOnLoInterface, SIGNAL(toggled(bool)), this, SLOT(onListenOnlyOnLoInterface_Toggled(bool)));
-	connect(ui->lineEdit_ApiPort, SIGNAL(editingFinished()), this, SLOT(onSetApiPort_Clicked()));
-	//connect(ui->checkBox_IsApiAuthEnabled, SIGNAL(toggled(bool)), this, SLOT(onIsApiAuthEnabled_Toggled(bool)));
-	connect(ui->pushButton_GenerateNewApiKey, SIGNAL(clicked()), this, SLOT(onGenerateNewApiKey_Clicked()));
-	connect(ui->lineEdit_ApiKey, SIGNAL(editingFinished()), this, SLOT(onApiKey_EditingFinished()));
+	connect(ui->groupBox_Api, &QGroupBox::toggled, this, &SettingsWindow::onEnableApi_Toggled);
+	connect(ui->checkBox_listenOnlyOnLoInterface, &QCheckBox::toggled, this, &SettingsWindow::onListenOnlyOnLoInterface_Toggled);
+	connect(ui->lineEdit_ApiPort, &QLineEdit::editingFinished, this, &SettingsWindow::onSetApiPort_Clicked);
+	//connect(ui->checkBox_IsApiAuthEnabled, &QCheckBox::toggled, this, &SettingsWindow::onIsApiAuthEnabled_Toggled);
+	connect(ui->pushButton_GenerateNewApiKey, &QPushButton::clicked, this, &SettingsWindow::onGenerateNewApiKey_Clicked);
+	connect(ui->lineEdit_ApiKey, &QLineEdit::editingFinished, this, &SettingsWindow::onApiKey_EditingFinished);
 
-	connect(ui->spinBox_LoggingLevel, SIGNAL(valueChanged(int)), this, SLOT(onLoggingLevel_valueChanged(int)));
-	connect(ui->toolButton_OpenLogs, SIGNAL(clicked()), this, SLOT(onOpenLogs_clicked()));
-	connect(ui->checkBox_PingDeviceEverySecond, SIGNAL(toggled(bool)), this, SLOT(onPingDeviceEverySecond_Toggled(bool)));
+	connect(ui->spinBox_LoggingLevel, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onLoggingLevel_valueChanged);
+	connect(ui->toolButton_OpenLogs, &QToolButton::clicked, this, &SettingsWindow::onOpenLogs_clicked);
+	connect(ui->checkBox_PingDeviceEverySecond, &QCheckBox::toggled, this, &SettingsWindow::onPingDeviceEverySecond_Toggled);
 
 	//Plugins
 	//	connected during setupUi by name:
 	//	connect(ui->list_Plugins,SIGNAL(currentRowChanged(int)),this,SLOT(on_list_Plugins_itemClicked(QListWidgetItem *)));
-	connect(ui->pushButton_UpPriority, SIGNAL(clicked()), this, SLOT(MoveUpPlugin()));
-	connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
+	connect(ui->pushButton_UpPriority, &QPushButton::clicked, this, &SettingsWindow::MoveUpPlugin);
+	connect(ui->pushButton_DownPriority, &QPushButton::clicked, this, &SettingsWindow::MoveDownPlugin);
 
 	// About page
-	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
-	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
-	connect(ui->checkBox_installUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_installUpdates_Toggled(bool)));
-	connect(&m_baudrateWarningClearTimer, SIGNAL(timeout()), this, SLOT(clearBaudrateWarning()));
+	connect(&m_smoothScrollTimer, &QTimer::timeout, this, &SettingsWindow::scrollThanks);
+	connect(ui->checkBox_checkForUpdates, &QCheckBox::toggled, this, &SettingsWindow::onCheckBox_checkForUpdates_Toggled);
+	connect(ui->checkBox_installUpdates, &QCheckBox::toggled, this, &SettingsWindow::onCheckBox_installUpdates_Toggled);
+	connect(&m_baudrateWarningClearTimer, &QTimer::timeout, this, &SettingsWindow::clearBaudrateWarning);
 }
 
 // ----------------------------------------------------------------------------
@@ -1039,7 +1039,7 @@ void SettingsWindow::showAbout()
 
 	using namespace std::chrono_literals;
 	m_smoothScrollTimer.setInterval(100ms);
-	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
+	connect(&m_smoothScrollTimer, &QTimer::timeout, this, &SettingsWindow::scrollThanks);
 	m_smoothScrollTimer.start();
 }
 
@@ -1732,7 +1732,7 @@ void SettingsWindow::profilesLoadAll()
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "found profiles:" << profiles;
 
 
-	disconnect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	disconnect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 
 	for (int i = 0; i < profiles.count(); i++)
 	{
@@ -1740,7 +1740,7 @@ void SettingsWindow::profilesLoadAll()
 			ui->comboBox_Profiles->addItem(profiles.at(i));
 	}
 
-	connect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	connect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 }
 
 void SettingsWindow::settingsProfileChanged_UpdateUI(const QString &profileName)
@@ -1862,15 +1862,15 @@ void SettingsWindow::createTrayIcon()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	m_trayIcon = new SysTrayIcon();
-	connect(m_trayIcon, SIGNAL(quit()), this, SLOT(quit()));
-	connect(m_trayIcon, SIGNAL(showSettings()), this, SLOT(showSettings()));
-	connect(m_trayIcon, SIGNAL(toggleSettings()), this, SLOT(toggleSettings()));
-	connect(m_trayIcon, SIGNAL(backlightOn()), this, SLOT(backlightOn()));
-	connect(m_trayIcon, SIGNAL(backlightOff()), this, SLOT(backlightOff()));
-	connect(m_trayIcon, SIGNAL(profileSwitched(QString)), this, SLOT(profileTraySwitch(QString)));
+	connect(m_trayIcon, &SysTrayIcon::quit, this, &SettingsWindow::quit);
+	connect(m_trayIcon, &SysTrayIcon::showSettings, this, &SettingsWindow::showSettings);
+	connect(m_trayIcon, &SysTrayIcon::toggleSettings, this, &SettingsWindow::toggleSettings);
+	connect(m_trayIcon, &SysTrayIcon::backlightOn, this, &SettingsWindow::backlightOn);
+	connect(m_trayIcon, &SysTrayIcon::backlightOff, this, &SettingsWindow::backlightOff);
+	connect(m_trayIcon, &SysTrayIcon::profileSwitched, this, &SettingsWindow::profileTraySwitch);
 
 	m_trayIcon->init();
-	connect(this, SIGNAL(backlightStatusChanged(Backlight::Status)), this, SLOT(updateTrayAndActionStates()));
+	connect(this, &SettingsWindow::backlightStatusChanged, this, &SettingsWindow::updateTrayAndActionStates);
 }
 
 void SettingsWindow::updateUiFromSettings()

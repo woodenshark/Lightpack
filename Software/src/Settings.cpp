@@ -310,7 +310,9 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	bool settingsWasPresent = QFileInfo::exists(mainConfigPath);
 
 	m_mainConfig = new QSettings(mainConfigPath, QSettings::IniFormat);
+	#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	m_mainConfig->setIniCodec("UTF-8");
+	#endif
 
 	setNewOptionMain(Main::Key::MainConfigVersion,		Main::Value::MainConfigVersion /* rewrite */);
 	setNewOptionMain(Main::Key::ProfileLast,			Main::ProfileNameDefault);
@@ -400,8 +402,10 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	QString profileLast = getLastProfileName();
 
 	// Load last profile
-	m_currentProfile = new QSettings(getProfilesPath() + profileLast + QStringLiteral(".ini"), QSettings::IniFormat);
+	m_currentProfile = new QSettings(QStringLiteral("%1%2.ini").arg(getProfilesPath(), profileLast), QSettings::IniFormat);
+	#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	m_currentProfile->setIniCodec("UTF-8");
+	#endif
 
 	DEBUG_LOW_LEVEL << "Settings file:" << m_currentProfile->fileName();
 
@@ -469,7 +473,9 @@ void Settings::loadOrCreateProfile(const QString & profileName)
 	}
 
 	m_currentProfile = new QSettings(profileNewPath, QSettings::IniFormat);
+	#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	m_currentProfile->setIniCodec("UTF-8");
+	#endif
 
 	locker.unlock();
 	initCurrentProfile(false);
@@ -504,8 +510,10 @@ void Settings::renameCurrentProfile(const QString & profileName)
 		delete m_currentProfile;
 
 		// Update m_currentProfile point to new QSettings with configName
-		m_currentProfile = new QSettings(getProfilesPath() + profileName + QStringLiteral(".ini"), QSettings::IniFormat );
+		m_currentProfile = new QSettings(QStringLiteral("%1%2.ini").arg(getProfilesPath(), profileName), QSettings::IniFormat);
+		#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		m_currentProfile->setIniCodec("UTF-8");
+		#endif
 
 		DEBUG_LOW_LEVEL << "Settings file renamed:" << m_currentProfile->fileName();
 

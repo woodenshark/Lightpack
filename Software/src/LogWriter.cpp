@@ -24,8 +24,12 @@ LogWriter::~LogWriter()
 
 int LogWriter::initWith(const QString& logsDirPath)
 {
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	#warning wrap log in QStringEncoder?
+	#else
 	// Using locale codec for console output in messageHandler(..) function ( cout << qstring.toStdString() )
 	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
+	#endif
 
 	m_logsDir.setPath(logsDirPath);
 	if (m_logsDir.exists() == false) {

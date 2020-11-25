@@ -47,13 +47,6 @@
 using namespace std;
 using namespace SettingsScope;
 
-struct QtMetaObject : private QObject
-{
-public:
-	static const QMetaObject *get()
-	{ return &static_cast<QtMetaObject*>(0)->staticQtMetaObject; }
-};
-
 LightpackApplication::LightpackApplication(int &argc, char **argv)
 	: QtSingleApplication(argc, argv)
 {

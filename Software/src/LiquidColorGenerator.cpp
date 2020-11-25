@@ -131,14 +131,15 @@ QColor LiquidColorGenerator::generateColor()
 {
 	if (m_unselectedColors.empty())
 	{
+		m_unselectedColors.reserve(ColorsMoodLampCount);
 		for (int i = 0; i < ColorsMoodLampCount; i++)
 			m_unselectedColors << AvailableColors[i];
 	}
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-	int randIndex = m_rnd.bounded(std::max(1, m_unselectedColors.size()));
+	int randIndex = m_rnd.bounded(std::max((QList<QColor>::size_type)1, m_unselectedColors.size()));
 #else
-	int randIndex = qrand() % std::max(1, m_unselectedColors.size());
+	int randIndex = qrand() % std::max((QList<QColor>::size_type)1, m_unselectedColors.size());
 #endif
 
 	return m_unselectedColors.takeAt(randIndex);

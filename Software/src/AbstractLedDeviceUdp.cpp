@@ -79,6 +79,30 @@ void AbstractLedDeviceUdp::open()
 	reinitBufferHeader();
 }
 
+void AbstractLedDeviceUdp::setRefreshDelay(int value)
+{
+	Q_UNUSED(value);
+	emit commandCompleted(true);
+}
+
+void AbstractLedDeviceUdp::setSmoothSlowdown(int value)
+{
+	Q_UNUSED(value);
+	emit commandCompleted(true);
+}
+
+void AbstractLedDeviceUdp::setColorSequence(const QString& value)
+{
+	Q_UNUSED(value);
+	emit commandCompleted(true);
+}
+
+void AbstractLedDeviceUdp::setColorDepth(int value)
+{
+	Q_UNUSED(value);
+	emit commandCompleted(true);
+}
+
 void AbstractLedDeviceUdp::switchOffLeds()
 {
 	const int count = m_colorsSaved.count();

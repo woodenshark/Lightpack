@@ -93,7 +93,7 @@ public slots:
 	virtual void setColorDepth(int value) = 0;
 
 
-	virtual void setUsbPowerLedDisabled(bool isDisabled) { Q_UNUSED(isDisabled) emit commandCompleted(true); };
+	virtual void setUsbPowerLedDisabled(bool isDisabled);
 
 protected:
 	virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors);

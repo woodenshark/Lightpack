@@ -41,10 +41,10 @@ public:
 public slots:
 	void open();
 	void close();
-	virtual void setRefreshDelay(int value) {Q_UNUSED(value); emit commandCompleted(true); };
-	virtual void setSmoothSlowdown(int value) {Q_UNUSED(value); emit commandCompleted(true); };
-	virtual void setColorSequence(const QString& value) {Q_UNUSED(value); emit commandCompleted(true); };
-	virtual void setColorDepth(int value) {Q_UNUSED(value); emit commandCompleted(true); };
+	virtual void setRefreshDelay(int value);
+	virtual void setSmoothSlowdown(int value);
+	virtual void setColorSequence(const QString& value);
+	virtual void setColorDepth(int value);
 	virtual void requestFirmwareVersion();
 	void switchOffLeds();
 

@@ -45,6 +45,7 @@ void WizardPageUsingDevice::resetDeviceSettings()
 
 	QList<WBAdjustment> adjustments;
 	const int numOfLeds = device()->maxLedsCount();
+	adjustments.reserve(numOfLeds);
 
 	for (int led = 0; led < numOfLeds; ++led) {
 		WBAdjustment wba;
@@ -71,6 +72,7 @@ AbstractLedDevice * WizardPageUsingDevice::device()
 void WizardPageUsingDevice::turnLightOn(int id)
 {
 	QList<QRgb> lights;
+	lights.reserve(_transSettings->ledCount);
 	for (int i = 0; i < _transSettings->ledCount; i++)
 	{
 		if (i == id)
@@ -84,6 +86,7 @@ void WizardPageUsingDevice::turnLightOn(int id)
 void WizardPageUsingDevice::turnLightsOn(QRgb color)
 {
 	QList<QRgb> lights;
+	lights.reserve(_transSettings->ledCount);
 	for (int i = 0; i < _transSettings->ledCount; i++)
 	{
 		lights.append(color);
@@ -94,6 +97,7 @@ void WizardPageUsingDevice::turnLightsOn(QRgb color)
 void WizardPageUsingDevice::turnLightsOff()
 {
 	QList<QRgb> lights;
+	lights.reserve(_transSettings->ledCount);
 	for (int i = 0; i < _transSettings->ledCount; i++)
 	{
 		lights.append(0);

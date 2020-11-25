@@ -62,11 +62,11 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	// Button image size 24x24 px, but it makes it impossible to resize widgets to less than that
 	// Setting minimumSize instead does not respect the aspect ratio, leaving at 16 for now
 	ui->button_OpenConfig->setFixedSize(16, 16);
-	ui->button_OpenConfig->setStyleSheet(
-		"QPushButton		{ border-image: url(:/buttons/settings_24px.png) }"
-		"QPushButton:hover	{ border-image: url(:/buttons/settings_24px.png) }"
-		"QPushButton:pressed { border-image: url(:/buttons/settings_24px.png) }"
-	);
+	ui->button_OpenConfig->setStyleSheet(QStringLiteral(
+		"QPushButton		{ border-image: url(:/buttons/settings_24px.png) }\
+		QPushButton:hover	{ border-image: url(:/buttons/settings_24px.png) }\
+		QPushButton:pressed { border-image: url(:/buttons/settings_24px.png) }"
+	));
 
 	m_selfId = id;
 	m_selfIdString = QString::number(m_selfId + 1);
@@ -513,7 +513,7 @@ void GrabWidget::resizeEvent(QResizeEvent *)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
 
-	m_widthHeight = QString::number(width()) + "x" + QString::number(height());
+	m_widthHeight = QStringLiteral("%1x%2").arg(QString::number(width()), QString::number(height()));
 }
 
 void GrabWidget::paintEvent(QPaintEvent *)
@@ -532,10 +532,10 @@ void GrabWidget::paintEvent(QPaintEvent *)
 
 	// Draw icon 12x12px with 3px padding from the bottom right corner
 	if (getTextColor() == Qt::white)
-		painter.drawPixmap(width() - 18, height() - 18, 12, 12, QPixmap(":/icons/res_light.png"));
+		painter.drawPixmap(width() - 18, height() - 18, 12, 12, QPixmap(QStringLiteral(":/icons/res_light.png")));
 	else{
 		//painter.setOpacity(0.5);
-		painter.drawPixmap(width() - 18, height() - 18, 12, 12, QPixmap(":/icons/res_dark.png"));
+		painter.drawPixmap(width() - 18, height() - 18, 12, 12, QPixmap(QStringLiteral(":/icons/res_dark.png")));
 	}
 
 	// Self ID and size text opacity
@@ -548,7 +548,7 @@ void GrabWidget::paintEvent(QPaintEvent *)
 
 	painter.setPen(getTextColor());
 	painter.setBrush(QBrush(getTextColor()));
-	painter.drawText(rect(), isAreaEnabled() ? m_selfIdString : "OFF", QTextOption(Qt::AlignCenter));
+	painter.drawText(rect(), isAreaEnabled() ? m_selfIdString : QStringLiteral("OFF"), QTextOption(Qt::AlignCenter));
 
 	font.setBold(false);
 	font.setPointSize(10);
@@ -752,10 +752,10 @@ QColor GrabWidget::getBackgroundColor()
 
 void GrabWidget::setOpenConfigButtonBackground(const QColor &color)
 {
-	QString image = (color == Qt::white && isAreaEnabled()) ? "dark" : "light";
-	ui->button_OpenConfig->setStyleSheet(
-		"QPushButton		{ border-image: url(:/buttons/settings_" + image + "_24px.png) }"
-		"QPushButton:hover	{ border-image: url(:/buttons/settings_" + image + "_24px_hover.png) }"
-		"QPushButton:pressed { border-image: url(:/buttons/settings_" + image + "_24px_pressed.png) }"
-	);
+	QString image = (color == Qt::white && isAreaEnabled()) ? QStringLiteral("dark") : QStringLiteral("light");
+	ui->button_OpenConfig->setStyleSheet(QStringLiteral(
+		"QPushButton		{ border-image: url(:/buttons/settings_%1_24px.png) }\
+		QPushButton:hover	{ border-image: url(:/buttons/settings_%1_24px_hover.png) }\
+		QPushButton:pressed { border-image: url(:/buttons/settings_%1_24px_pressed.png) }"
+	).arg(image));
 }

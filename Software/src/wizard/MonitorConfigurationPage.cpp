@@ -38,7 +38,7 @@ MonitorConfigurationPage::MonitorConfigurationPage(bool isInitFromSettings, Tran
 	_ui(new Ui::MonitorsConfigurationPage)
 {
 	_ui->setupUi(this);
-	registerField("screenId", _ui->cbMonitor);
+	registerField(QStringLiteral("screenId"), _ui->cbMonitor);
 }
 
 MonitorConfigurationPage::~MonitorConfigurationPage()
@@ -63,10 +63,10 @@ void MonitorConfigurationPage::initializePage()
 
 		monitorIdForm->setId(i+1);
 
-		QString text = QString("Monitor %0, %1x%2").arg(QString::number(i+1), QString::number(geom.width()), QString::number(geom.height()));
+		QString text = QStringLiteral("Monitor %0, %1x%2").arg(QString::number(i+1), QString::number(geom.width()), QString::number(geom.height()));
 		_ui->cbMonitor->addItem(text, (int)i);
 
-		DEBUG_LOW_LEVEL << Q_FUNC_INFO << QString("Monitor %0, %1x%2+%3+%4").arg(QString::number(i+1), QString::number(geom.width()), QString::number(geom.height()), QString::number(geom.left()), QString::number(geom.top()) );
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << QStringLiteral("Monitor %0, %1x%2+%3+%4").arg(QString::number(i+1), QString::number(geom.width()), QString::number(geom.height()), QString::number(geom.left()), QString::number(geom.top()) );
 
 		monitorIdForm->show();
 

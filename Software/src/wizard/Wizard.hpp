@@ -55,7 +55,7 @@ public:
 	~Wizard();
 
 	int skipMonitorConfigurationPage() {
-		this->setField("screenId", -1);
+		this->setField(QStringLiteral("screenId"), -1);
 		return Page_ChooseProfile;
 	}
 

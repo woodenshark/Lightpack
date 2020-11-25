@@ -54,7 +54,7 @@ void GlobalColorCoefPage::initializePage()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	_screenId = field("screenId").toInt();
+	_screenId = field(QStringLiteral("screenId")).toInt();
 
 	QList<QScreen*> screenList = QGuiApplication::screens();
 	int i = 0;
@@ -63,7 +63,7 @@ void GlobalColorCoefPage::initializePage()
 		MonitorIdForm *monitorIdForm = new MonitorIdForm();
 
 		monitorIdForm->setWindowFlags(Qt::FramelessWindowHint);
-		monitorIdForm->setStyleSheet("background: #fff");
+		monitorIdForm->setStyleSheet(QStringLiteral("background: #fff"));
 
 		monitorIdForm->move(geom.topLeft());
 		monitorIdForm->resize(geom.width(), geom.height());
@@ -93,40 +93,40 @@ bool GlobalColorCoefPage::validatePage()
 	using namespace SettingsScope;
 	QString deviceName = device()->name();
 	SupportedDevices::DeviceType devType;
-	if (deviceName.compare("lightpack", Qt::CaseInsensitive) == 0) {
+	if (deviceName.compare(QStringLiteral("lightpack"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeLightpack;
 	}
-	else if (deviceName.compare("adalight", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("adalight"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeAdalight;
-		Settings::setAdalightSerialPortName(field("serialPort").toString());
-		Settings::setAdalightSerialPortBaudRate(field("baudRate").toString());
-		Settings::setColorSequence(devType, field("colorFormat").toString());
+		Settings::setAdalightSerialPortName(field(QStringLiteral("serialPort")).toString());
+		Settings::setAdalightSerialPortBaudRate(field(QStringLiteral("baudRate")).toString());
+		Settings::setColorSequence(devType, field(QStringLiteral("colorFormat")).toString());
 
 	}
-	else if (deviceName.compare("ardulight", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("ardulight"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeArdulight;
-		Settings::setArdulightSerialPortName(field("serialPort").toString());
-		Settings::setArdulightSerialPortBaudRate(field("baudRate").toString());
-		Settings::setColorSequence(devType, field("colorFormat").toString());
+		Settings::setArdulightSerialPortName(field(QStringLiteral("serialPort")).toString());
+		Settings::setArdulightSerialPortBaudRate(field(QStringLiteral("baudRate")).toString());
+		Settings::setColorSequence(devType, field(QStringLiteral("colorFormat")).toString());
 
 	}
-	else if (deviceName.compare("drgb", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("drgb"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeDrgb;
-		Settings::setDrgbAddress(field("address").toString());
-		Settings::setDrgbPort(field("port").toString());
-		Settings::setDrgbTimeout(field("timeout").toInt());
+		Settings::setDrgbAddress(field(QStringLiteral("address")).toString());
+		Settings::setDrgbPort(field(QStringLiteral("port")).toString());
+		Settings::setDrgbTimeout(field(QStringLiteral("timeout")).toInt());
 	}
-	else if (deviceName.compare("dnrgb", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("dnrgb"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeDnrgb;
-		Settings::setDnrgbAddress(field("address").toString());
-		Settings::setDnrgbPort(field("port").toString());
-		Settings::setDnrgbTimeout(field("timeout").toInt());
+		Settings::setDnrgbAddress(field(QStringLiteral("address")).toString());
+		Settings::setDnrgbPort(field(QStringLiteral("port")).toString());
+		Settings::setDnrgbTimeout(field(QStringLiteral("timeout")).toInt());
 	}
-	else if (deviceName.compare("warls", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("warls"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeWarls;
-		Settings::setWarlsAddress(field("address").toString());
-		Settings::setWarlsPort(field("port").toString());
-		Settings::setWarlsTimeout(field("timeout").toInt());
+		Settings::setWarlsAddress(field(QStringLiteral("address")).toString());
+		Settings::setWarlsPort(field(QStringLiteral("port")).toString());
+		Settings::setWarlsTimeout(field(QStringLiteral("timeout")).toInt());
 	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;

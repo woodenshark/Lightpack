@@ -51,9 +51,9 @@ void SelectProfilePage::initializePage()
 
 	QRegExpValidator *validatorProfileName = new QRegExpValidator(QRegExp("[^<>:\"/\\|?*]*"), this);
 	ui->cbProfile->lineEdit()->setValidator(validatorProfileName);
-	connect(ui->cbProfile->lineEdit(), SIGNAL(editingFinished()) /* or returnPressed() */, this, SLOT(profileRename()));
+	connect(ui->cbProfile->lineEdit(), &QLineEdit::editingFinished /* or returnPressed() */, this, &SelectProfilePage::profileRename);
 	ui->cbProfile->setCurrentText(Settings::getCurrentProfileName());
-
+	connect(ui->pbAddProfile, &QPushButton::clicked, this, &SelectProfilePage::onAddProfile_clicked);
 }
 
 void SelectProfilePage::profileRename()
@@ -73,7 +73,7 @@ void SelectProfilePage::profileRename()
 		return;
 	}
 
-	if (configName == "")
+	if (configName.isEmpty())
 	{
 		configName = Settings::getCurrentProfileName();
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Profile name is empty, return back to" << configName;
@@ -94,7 +94,7 @@ bool SelectProfilePage::validatePage()
 	return true;
 }
 
-void SelectProfilePage::on_pbAddProfile_clicked()
+void SelectProfilePage::onAddProfile_clicked()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 

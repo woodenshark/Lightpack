@@ -56,16 +56,25 @@ void ZonePlacementPage::initializePage()
 {
 	using namespace SettingsScope;
 
-	_screenId = field("screenId").toInt();
-	registerField("numberOfLeds", _ui->sbNumberOfLeds);
+	_screenId = field(QStringLiteral("screenId")).toInt();
+	registerField(QStringLiteral("numberOfLeds"), _ui->sbNumberOfLeds);
 
 	device()->setSmoothSlowdown(70);
+
+	connect(_ui->pbAndromeda, &QPushButton::clicked, this, &ZonePlacementPage::onAndromeda_clicked);
+	connect(_ui->pbCassiopeia, &QPushButton::clicked, this, &ZonePlacementPage::onCassiopeia_clicked);
+	connect(_ui->pbPegasus, &QPushButton::clicked, this, &ZonePlacementPage::onPegasus_clicked);
+	connect(_ui->pbApply, &QPushButton::clicked, this, &ZonePlacementPage::onApply_clicked);
+
+	connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(onNumberOfLeds_valueChanged(int)));
+	connect(_ui->sbTopLeds, SIGNAL(valueChanged(int)), this, SLOT(onTopLeds_valueChanged(int)));
+	connect(_ui->sbSideLeds, SIGNAL(valueChanged(int)), this, SLOT(onSideLeds_valueChanged(int)));
 
 	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 	_ui->sbNumberOfLeds->blockSignals(true);
 
 	if (_isInitFromSettings) {
-		int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
+		const int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_ui->sbNumberOfLeds->setValue(ledCount);
 		_transSettings->ledCount = ledCount;
 
@@ -78,7 +87,7 @@ void ZonePlacementPage::initializePage()
 	} else {
 		_ui->sbNumberOfLeds->setValue(device()->defaultLedsCount());
 		_transSettings->ledCount = device()->defaultLedsCount();
-		on_pbAndromeda_clicked();
+		onAndromeda_clicked();
 	}
 	_ui->sbNumberOfLeds->blockSignals(false);
 	resetDeviceSettings();
@@ -171,7 +180,7 @@ QRect ZonePlacementPage::screenRect() const
 	return screen;
 }
 
-void ZonePlacementPage::on_pbAndromeda_clicked()
+void ZonePlacementPage::onAndromeda_clicked()
 {
 	QRect screen = screenRect();
 	const int bottomWidth = screen.width() * (1.0 - _ui->sbStandWidth->value() / 100.0);
@@ -197,7 +206,7 @@ void ZonePlacementPage::on_pbAndromeda_clicked()
 	_ui->sbBottomLeds->setValue(bottomLeds);
 }
 
-void ZonePlacementPage::on_pbCassiopeia_clicked()
+void ZonePlacementPage::onCassiopeia_clicked()
 {
 	QRect screen = screenRect();
 	const int perimeter = screen.width() + screen.height() * 2;
@@ -220,7 +229,7 @@ void ZonePlacementPage::on_pbCassiopeia_clicked()
 	_ui->sbBottomLeds->setValue(0);
 }
 
-void ZonePlacementPage::on_pbPegasus_clicked()
+void ZonePlacementPage::onPegasus_clicked()
 {
 	QRect screen = screenRect();
 	const int sideLeds = _ui->sbNumberOfLeds->value() / 2;
@@ -241,7 +250,7 @@ void ZonePlacementPage::on_pbPegasus_clicked()
 }
 
 
-void ZonePlacementPage::on_pbApply_clicked()
+void ZonePlacementPage::onApply_clicked()
 {
 	QRect screen = screenRect();
 	CustomDistributor custom(
@@ -260,7 +269,7 @@ void ZonePlacementPage::on_pbApply_clicked()
 }
 
 
-void ZonePlacementPage::on_sbNumberOfLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 {
 	while (numOfLed < _grabAreas.size()) {
 		removeLastGrabArea();
@@ -284,12 +293,12 @@ void ZonePlacementPage::on_sbNumberOfLeds_valueChanged(int numOfLed)
 	_transSettings->ledCount = numOfLed;
 }
 
-void ZonePlacementPage::on_sbTopLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::onTopLeds_valueChanged(int numOfLed)
 {
 	_ui->sbBottomLeds->setValue(_transSettings->ledCount - numOfLed - _ui->sbSideLeds->value() * 2);
 }
 
-void ZonePlacementPage::on_sbSideLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::onSideLeds_valueChanged(int numOfLed)
 {
 	_ui->sbBottomLeds->setValue(_transSettings->ledCount - _ui->sbTopLeds->value() - numOfLed * 2);
 }

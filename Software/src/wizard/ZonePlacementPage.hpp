@@ -53,13 +53,13 @@ protected:
 	bool validatePage();
 
 private slots:
-	void on_pbAndromeda_clicked();
-	void on_pbCassiopeia_clicked();
-	void on_pbPegasus_clicked();
-	void on_pbApply_clicked();
-	void on_sbNumberOfLeds_valueChanged(int arg1);
-	void on_sbTopLeds_valueChanged(int arg1);
-	void on_sbSideLeds_valueChanged(int arg1);
+	void onAndromeda_clicked();
+	void onCassiopeia_clicked();
+	void onPegasus_clicked();
+	void onApply_clicked();
+	void onNumberOfLeds_valueChanged(int arg1);
+	void onTopLeds_valueChanged(int arg1);
+	void onSideLeds_valueChanged(int arg1);
 
 private:
 	void addGrabArea(int id, const QRect &rect);

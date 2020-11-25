@@ -4,8 +4,7 @@
 #include <QtGui>
 #include <QObject>
 #include "enums.hpp"
-
-class Plugin;
+#include "Plugin.hpp"
 
 class LightpackPluginInterface : public QObject
 {

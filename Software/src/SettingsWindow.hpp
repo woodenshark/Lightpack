@@ -39,14 +39,13 @@
 #endif
 #include "ColorButton.hpp"
 #include "enums.hpp"
-
+#include "Plugin.hpp"
 
 namespace Ui {
 	class SettingsWindow;
 }
 
 class GrabManager; // forward declaration
-class Plugin;
 class SysTrayIcon;
 
 class SettingsWindow : public QMainWindow {

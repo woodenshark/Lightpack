@@ -3,8 +3,7 @@
 #include <QObject>
 #include <QMap>
 #include <QProcess>
-
-class Plugin;
+#include "Plugin.hpp"
 
 class PluginsManager : public QObject
 {

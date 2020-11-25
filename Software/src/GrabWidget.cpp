@@ -164,9 +164,15 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << pe->pos();
 
 	mousePressPosition = pe->pos();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	mousePressGlobalPosition = pe->globalPosistion().toPoint();
+	const QPoint eventPosition = pe->position().toPoint();
+#else
 	mousePressGlobalPosition = pe->globalPos();
-	mousePressDiffFromBorder.setWidth(width() - pe->x());
-	mousePressDiffFromBorder.setHeight(height() - pe->y());
+	const QPoint eventPosition(pe->x(), pe->y());
+#endif
+	mousePressDiffFromBorder.setWidth(width() - eventPosition.x());
+	mousePressDiffFromBorder.setHeight(height() - eventPosition.y());
 
 	if (pe->buttons() == Qt::RightButton)
 	{
@@ -177,43 +183,43 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
 	{
 		const bool resizable = m_features & AllowResize;
 		// First check corners
-		if (resizable && pe->x() < BorderWidth && pe->y() < BorderWidth)
+		if (resizable && eventPosition.x() < BorderWidth && eventPosition.y() < BorderWidth)
 		{
 			cmd = RESIZE_LEFT_UP;
 			setCursorOnAll(Qt::SizeFDiagCursor);
 		}
-		else if (resizable && pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
+		else if (resizable && eventPosition.x() < BorderWidth && (height() - eventPosition.y()) < BorderWidth)
 		{
 			cmd = RESIZE_LEFT_DOWN;
 			setCursorOnAll(Qt::SizeBDiagCursor);
 		}
-		else if (resizable && pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
+		else if (resizable && eventPosition.y() < BorderWidth && (width() - eventPosition.x()) < BorderWidth)
 		{
 			cmd = RESIZE_RIGHT_UP;
 			setCursorOnAll(Qt::SizeBDiagCursor);
 		}
-		else if (resizable && (height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
+		else if (resizable && (height() - eventPosition.y()) < BorderWidth && (width() - eventPosition.x()) < BorderWidth)
 		{
 			cmd = RESIZE_RIGHT_DOWN;
 			setCursorOnAll(Qt::SizeFDiagCursor);
 		}
 		// Next check sides
-		else if (resizable && pe->x() < BorderWidth)
+		else if (resizable && eventPosition.x() < BorderWidth)
 		{
 			cmd = RESIZE_HOR_LEFT;
 			setCursorOnAll(Qt::SizeHorCursor);
 		}
-		else if (resizable && (width() - pe->x()) < BorderWidth)
+		else if (resizable && (width() - eventPosition.x()) < BorderWidth)
 		{
 			cmd = RESIZE_HOR_RIGHT;
 			setCursorOnAll(Qt::SizeHorCursor);
 		}
-		else if (resizable && pe->y() < BorderWidth)
+		else if (resizable && eventPosition.y() < BorderWidth)
 		{
 			cmd = RESIZE_VER_UP;
 			setCursorOnAll(Qt::SizeVerCursor);
 		}
-		else if (resizable && (height() - pe->y()) < BorderWidth)
+		else if (resizable && (height() - eventPosition.y()) < BorderWidth)
 		{
 			cmd = RESIZE_VER_DOWN;
 			setCursorOnAll(Qt::SizeVerCursor);
@@ -239,18 +245,26 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 	int newX = x();
 	int newY = y();
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	const QPoint globalPos = pe->globalPosistion().toPoint();
+	const QPoint eventPosition = pe->position().toPoint();
+#else
+	const QPoint globalPos = pe->globalPos();
+	const QPoint eventPosition(pe->x(), pe->y());
+#endif
+
 	switch (cmd)
 	{
 		case MOVE:
 			break;
 
 		case RESIZE_HOR_RIGHT:
-			newWidth = pe->x() + mousePressDiffFromBorder.width();
+			newWidth = eventPosition.x() + mousePressDiffFromBorder.width();
 			newWidth = (newWidth <= MinimumWidth) ? MinimumWidth : newWidth;
 			break;
 
 		case RESIZE_VER_DOWN:
-			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			newHeight = eventPosition.y() + mousePressDiffFromBorder.height();
 			newHeight = (newHeight <= MinimumHeight) ? MinimumHeight : newHeight;
 			break;
 
@@ -258,14 +272,14 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 			newY = pos().y();
 			newHeight = height();
 
-			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+			newWidth = mousePressGlobalPosition.x() - globalPos.x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
 
 			if (newWidth < MinimumWidth)
 			{
 				newWidth = MinimumWidth;
 				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
 			} else {
-				newX = pe->globalPos().x() - mousePressPosition.x();
+				newX = globalPos.x() - mousePressPosition.x();
 			}
 			break;
 
@@ -273,76 +287,76 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 			newX = pos().x();
 			newWidth = width();
 
-			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+			newHeight = mousePressGlobalPosition.y() - globalPos.y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
 
 			if (newHeight < MinimumHeight)
 			{
 				newHeight = MinimumHeight;
 				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
 			} else {
-				newY = pe->globalPos().y() - mousePressPosition.y();
+				newY = globalPos.y() - mousePressPosition.y();
 			}
 			break;
 
 
 		case RESIZE_RIGHT_DOWN:
-			newWidth = pe->x() + mousePressDiffFromBorder.width();
-			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			newWidth = eventPosition.x() + mousePressDiffFromBorder.width();
+			newHeight = eventPosition.y() + mousePressDiffFromBorder.height();
 			newWidth = (newWidth <= MinimumWidth) ? MinimumWidth : newWidth;
 			newHeight = (newHeight <= MinimumHeight) ? MinimumHeight : newHeight;
 			break;
 
 		case RESIZE_RIGHT_UP:
-			newWidth = pe->x() + mousePressDiffFromBorder.width();
+			newWidth = eventPosition.x() + mousePressDiffFromBorder.width();
 			if (newWidth < MinimumWidth) newWidth = MinimumWidth;
 			newX = pos().x();
 
-			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+			newHeight = mousePressGlobalPosition.y() - globalPos.y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
 
 			if (newHeight < MinimumHeight)
 			{
 				newHeight = MinimumHeight;
 				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
 			} else {
-				newY = pe->globalPos().y() - mousePressPosition.y();
+				newY = globalPos.y() - mousePressPosition.y();
 			}
 			break;
 
 		case RESIZE_LEFT_DOWN:
-			newHeight = pe->y() + mousePressDiffFromBorder.height();
+			newHeight = eventPosition.y() + mousePressDiffFromBorder.height();
 			if (newHeight < MinimumHeight) newHeight = MinimumHeight;
 			newY = pos().y();
 
-			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+			newWidth = mousePressGlobalPosition.x() - globalPos.x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
 
 			if (newWidth < MinimumWidth)
 			{
 				newWidth = MinimumWidth;
 				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
 			} else {
-				newX = pe->globalPos().x() - mousePressPosition.x();
+				newX = globalPos.x() - mousePressPosition.x();
 			}
 			break;
 
 		case RESIZE_LEFT_UP:
-			newWidth = mousePressGlobalPosition.x() - pe->globalPos().x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
+			newWidth = mousePressGlobalPosition.x() - globalPos.x() + mousePressPosition.x() + mousePressDiffFromBorder.width();
 
 			if (newWidth < MinimumWidth)
 			{
 				newWidth = MinimumWidth;
 				newX = mousePressGlobalPosition.x() + mousePressDiffFromBorder.width() - MinimumWidth;
 			} else {
-				newX = pe->globalPos().x() - mousePressPosition.x();
+				newX = globalPos.x() - mousePressPosition.x();
 			}
 
-			newHeight = mousePressGlobalPosition.y() - pe->globalPos().y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
+			newHeight = mousePressGlobalPosition.y() - globalPos.y() + mousePressPosition.y() + mousePressDiffFromBorder.height();
 
 			if (newHeight < MinimumHeight)
 			{
 				newHeight = MinimumHeight;
 				newY = mousePressGlobalPosition.y() + mousePressDiffFromBorder.height() - MinimumHeight;
 			} else {
-				newY = pe->globalPos().y() - mousePressPosition.y();
+				newY = globalPos.y() - mousePressPosition.y();
 			}
 			break;
 		default:
@@ -394,11 +408,17 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 
 	QRect screen = QApplication::desktop()->screenGeometry(this);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	const QPoint globalPos = pe->globalPosistion().toPoint();
+#else
+	const QPoint globalPos = pe->globalPos();
+#endif
+
 	if (cmd == NOP ){
 		checkAndSetCursors(pe);
 	} else if (cmd == MOVE) {
 		QPoint moveHere;
-		moveHere = pe->globalPos() - mousePressPosition;
+		moveHere = globalPos - mousePressPosition;
 		QRect newRect = QRect(moveHere, geometry().size());
 		bool snapped;
 
@@ -628,36 +648,43 @@ void GrabWidget::fillBackground(int index)
 void GrabWidget::checkAndSetCursors(QMouseEvent *pe)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	const QPoint eventPosition = pe->position().toPoint();
+#else
+	const QPoint eventPosition(pe->x(), pe->y());
+#endif
+
 	const bool resizable = m_features & AllowResize;
-	if (resizable && pe->x() < BorderWidth && pe->y() < BorderWidth)
+	if (resizable && eventPosition.x() < BorderWidth && eventPosition.y() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeFDiagCursor);
 	}
-	else if (resizable && pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
+	else if (resizable && eventPosition.x() < BorderWidth && (height() - eventPosition.y()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeBDiagCursor);
 	}
-	else if (resizable && pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
+	else if (resizable && eventPosition.y() < BorderWidth && (width() - eventPosition.x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeBDiagCursor);
 	}
-	else if (resizable && (height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
+	else if (resizable && (height() - eventPosition.y()) < BorderWidth && (width() - eventPosition.x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeFDiagCursor);
 	}
-	else if (resizable && pe->x() < BorderWidth)
+	else if (resizable && eventPosition.x() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeHorCursor);
 	}
-	else if (resizable && (width() - pe->x()) < BorderWidth)
+	else if (resizable && (width() - eventPosition.x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeHorCursor);
 	}
-	else if (resizable && pe->y() < BorderWidth)
+	else if (resizable && eventPosition.y() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeVerCursor);
 	}
-	else if (resizable && (height() - pe->y()) < BorderWidth)
+	else if (resizable && (height() - eventPosition.y()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeVerCursor);
 	}

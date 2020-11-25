@@ -628,40 +628,40 @@ void GrabWidget::fillBackground(int index)
 void GrabWidget::checkAndSetCursors(QMouseEvent *pe)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO;
-
-	if (pe->x() < BorderWidth && pe->y() < BorderWidth)
+	const bool resizable = m_features & AllowResize;
+	if (resizable && pe->x() < BorderWidth && pe->y() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeFDiagCursor);
 	}
-	else if (pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
+	else if (resizable && pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeBDiagCursor);
 	}
-	else if (pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
+	else if (resizable && pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeBDiagCursor);
 	}
-	else if ((height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
+	else if (resizable && (height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeFDiagCursor);
 	}
-	else if (pe->x() < BorderWidth)
+	else if (resizable && pe->x() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeHorCursor);
 	}
-	else if ((width() - pe->x()) < BorderWidth)
+	else if (resizable && (width() - pe->x()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeHorCursor);
 	}
-	else if (pe->y() < BorderWidth)
+	else if (resizable && pe->y() < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeVerCursor);
 	}
-	else if ((height() - pe->y()) < BorderWidth)
+	else if (resizable && (height() - pe->y()) < BorderWidth)
 	{
 		setCursorOnAll(Qt::SizeVerCursor);
 	}
-	else
+	else if (m_features & AllowMove)
 	{
 		if (pe->buttons() & Qt::LeftButton)
 			setCursorOnAll(Qt::ClosedHandCursor);

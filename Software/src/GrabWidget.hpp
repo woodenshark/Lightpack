@@ -38,7 +38,9 @@ enum GrabWidgetFeature : int {
 	AllowCoefConfig = 1 << 1,
 	AllowEnableConfig = 1 << 2,
 	AllowColorCycle = 1 << 3,
-	DimUntilInteractedWith = 1 << 4
+	DimUntilInteractedWith = 1 << 4,
+	AllowMove = 1 << 5,
+	AllowResize = 1 << 6
 };
 
 class GrabWidget : public QWidget

@@ -71,7 +71,9 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	m_selfId = id;
 	m_selfIdString = QString::number(m_selfId + 1);
 
-	setCursorOnAll(Qt::OpenHandCursor);
+	if (m_features & AllowMove)
+		setCursorOnAll(Qt::OpenHandCursor);
+
 	setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip);
 	setFocusPolicy(Qt::NoFocus);
 
@@ -173,50 +175,51 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
 	}
 	else if (pe->buttons() == Qt::LeftButton)
 	{
+		const bool resizable = m_features & AllowResize;
 		// First check corners
-		if (pe->x() < BorderWidth && pe->y() < BorderWidth)
+		if (resizable && pe->x() < BorderWidth && pe->y() < BorderWidth)
 		{
 			cmd = RESIZE_LEFT_UP;
 			setCursorOnAll(Qt::SizeFDiagCursor);
 		}
-		else if (pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
+		else if (resizable && pe->x() < BorderWidth && (height() - pe->y()) < BorderWidth)
 		{
 			cmd = RESIZE_LEFT_DOWN;
 			setCursorOnAll(Qt::SizeBDiagCursor);
 		}
-		else if (pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
+		else if (resizable && pe->y() < BorderWidth && (width() - pe->x()) < BorderWidth)
 		{
 			cmd = RESIZE_RIGHT_UP;
 			setCursorOnAll(Qt::SizeBDiagCursor);
 		}
-		else if ((height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
+		else if (resizable && (height() - pe->y()) < BorderWidth && (width() - pe->x()) < BorderWidth)
 		{
 			cmd = RESIZE_RIGHT_DOWN;
 			setCursorOnAll(Qt::SizeFDiagCursor);
 		}
 		// Next check sides
-		else if (pe->x() < BorderWidth)
+		else if (resizable && pe->x() < BorderWidth)
 		{
 			cmd = RESIZE_HOR_LEFT;
 			setCursorOnAll(Qt::SizeHorCursor);
 		}
-		else if ((width() - pe->x()) < BorderWidth)
+		else if (resizable && (width() - pe->x()) < BorderWidth)
 		{
 			cmd = RESIZE_HOR_RIGHT;
 			setCursorOnAll(Qt::SizeHorCursor);
 		}
-		else if (pe->y() < BorderWidth)
+		else if (resizable && pe->y() < BorderWidth)
 		{
 			cmd = RESIZE_VER_UP;
 			setCursorOnAll(Qt::SizeVerCursor);
 		}
-		else if ((height() - pe->y()) < BorderWidth)
+		else if (resizable && (height() - pe->y()) < BorderWidth)
 		{
 			cmd = RESIZE_VER_DOWN;
 			setCursorOnAll(Qt::SizeVerCursor);
 		}
 		// Click on center, just move it
-		else
+		else if (m_features & AllowMove)
 		{
 			cmd = MOVE;
 			setCursorOnAll(Qt::ClosedHandCursor);

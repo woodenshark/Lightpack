@@ -741,7 +741,7 @@ void GrabManager::initLedWidgets(int numberOfLeds)
 		qWarning() << Q_FUNC_INFO << "Grabbing 0 LEDs!";
 	}
 
-	const int widgetFlags = SyncSettings | AllowCoefConfig | AllowEnableConfig | AllowColorCycle;
+	const int widgetFlags = SyncSettings | AllowCoefConfig | AllowEnableConfig | AllowColorCycle | AllowMove | AllowResize;
 
 	if (m_ledWidgets.size() == 0)
 	{

@@ -269,7 +269,7 @@ void ApiServer::incomingConnection(qintptr socketDescriptor)
 	ClientInfo cs;
 	cs.isAuthorized = !m_isAuthEnabled;
 	// set default sessionkey (disable lock priority)
-	cs.sessionKey = QStringLiteral("API")+lightpack->GetSessionKey(QStringLiteral("API"))+QString(m_clients.count());
+	cs.sessionKey = QStringLiteral("API%1%2").arg(lightpack->GetSessionKey(QStringLiteral("API")), QString::number(m_clients.count()));
 
 	m_clients.insert(client, cs);
 

@@ -448,27 +448,27 @@ void Settings::loadOrCreateProfile(const QString & profileName)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << profileName;
 
-
 	QMutexLocker locker(&m_mutex);
-	QString currentProfileFileName = m_currentProfile != NULL ? m_currentProfile->fileName() : NULL;
+	QString currentProfileFileName;
+	if (m_currentProfile != NULL)
+		currentProfileFileName = m_currentProfile->fileName();
 
-	if (currentProfileFileName != NULL
-		&& currentProfileFileName.compare(getProfilesPath() + profileName + QStringLiteral(".ini")) == 0)
+	const QString profileNewPath = QStringLiteral("%1%2.ini").arg(getProfilesPath(), profileName);
+
+	if (!currentProfileFileName.isEmpty()
+		&& currentProfileFileName.compare(profileNewPath) == 0)
 		return; //nothing to change, profile is already loaded
 
-	if (currentProfileFileName != NULL)
+	if (!currentProfileFileName.isEmpty())
 	{
 		// Copy current settings to new one
-		QString profileNewPath = getProfilesPath() + profileName + QStringLiteral(".ini");
-
 		if (currentProfileFileName != profileNewPath)
 			QFile::copy(currentProfileFileName, profileNewPath);
 
 		delete m_currentProfile;
 	}
 
-
-	m_currentProfile = new QSettings(getProfilesPath() + profileName + QStringLiteral(".ini"), QSettings::IniFormat );
+	m_currentProfile = new QSettings(profileNewPath, QSettings::IniFormat);
 	m_currentProfile->setIniCodec("UTF-8");
 
 	locker.unlock();

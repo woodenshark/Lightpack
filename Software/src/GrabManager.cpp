@@ -24,8 +24,8 @@
  *
  */
 
-#include <QtCore/qmath.h>
-#include <QtWidgets/QApplication>
+#include <QtMath>
+#include <QApplication>
 
 #include "debug.h"
 #include "PrismatikMath.hpp"

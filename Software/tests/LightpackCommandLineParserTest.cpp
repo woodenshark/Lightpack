@@ -1,6 +1,6 @@
 #include "LightpackCommandLineParserTest.hpp"
 #include "LightpackCommandLineParser.hpp"
-#include <QtTest/QtTest>
+#include <QtTest>
 
 LightpackCommandLineParserTest::LightpackCommandLineParserTest(QObject *parent)
 	: QObject(parent)

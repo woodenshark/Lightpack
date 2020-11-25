@@ -27,8 +27,8 @@
 #include "LightpackApplication.hpp"
 #include "LedDeviceLightpack.hpp"
 #include "version.h"
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QHBoxLayout>
+#include <QMessageBox>
+#include <QHBoxLayout>
 #include "ApiServer.hpp"
 #include "LightpackPluginInterface.hpp"
 #include "PluginsManager.hpp"

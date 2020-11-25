@@ -1,5 +1,5 @@
 #include <QtGui>
-#include <QtWidgets/QApplication>
+#include <QApplication>
 #include "LightpackPluginInterface.hpp"
 #include "Plugin.hpp"
 #include "Settings.hpp"

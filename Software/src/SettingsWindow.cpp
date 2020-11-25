@@ -25,8 +25,8 @@
  */
 
 #include <QtAlgorithms>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QMenu>
+#include <QStatusBar>
+#include <QMenu>
 #include "LightpackApplication.hpp"
 
 #include "SettingsWindow.hpp"

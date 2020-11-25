@@ -24,8 +24,8 @@
  */
 
 
-#include <QtCore/QString>
-#include <QtTest/QtTest>
+#include <QString>
+#include <QtTest>
 #include <QRgb>
 #include <QRect>
 #include "enums.hpp"

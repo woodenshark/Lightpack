@@ -33,7 +33,7 @@
 #include "Settings.hpp"
 #include "TimeEvaluations.hpp"
 #include "version.h"
-#include <QtWidgets/QApplication>
+#include <QApplication>
 
 using namespace SettingsScope;
 

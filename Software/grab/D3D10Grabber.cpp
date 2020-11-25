@@ -33,8 +33,8 @@
 
 #include <QObject>
 #include <QThread>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QMessageBox>
 #include <cstdlib>
 #include <stdio.h>
@@ -652,8 +652,8 @@ void D3D10Grabber::init() {
 	connect(m_impl.data(), &D3D10GrabberImpl::frameGrabbed, this, &D3D10Grabber::grab);
 	_screensWithWidgets.clear();
 	GrabbedScreen grabbedScreen;
-	grabbedScreen.screenInfo.handle = IntToPtr(QApplication::desktop()->primaryScreen());
-	grabbedScreen.screenInfo.rect = QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen());
+	grabbedScreen.screenInfo.handle = QGuiApplication::primaryScreen();// unused?
+	grabbedScreen.screenInfo.rect = QGuiApplication::primaryScreen()->geometry();
 	_screensWithWidgets.append(grabbedScreen);
 
 	if (!WinUtils::IsUserAdmin()) {

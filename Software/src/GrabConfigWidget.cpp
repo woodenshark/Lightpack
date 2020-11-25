@@ -27,7 +27,9 @@
 #include "ui_GrabConfigWidget.h"
 #include <QPainter>
 #include <QBitmap>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
 #include <QDesktopWidget>
+#endif
 #include <QScreen>
 #include <QPainterPath>
 #include "debug.h"

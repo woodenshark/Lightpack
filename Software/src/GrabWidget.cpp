@@ -26,7 +26,9 @@
 
 
 #include <QtGui>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
 #include <QDesktopWidget>
+#endif
 #include <QTextItem>
 #include "GrabWidget.hpp"
 #include "ui_GrabWidget.h"
@@ -383,8 +385,11 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "pe->pos() =" << pe->pos();
 
+	#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+	QRect screen = QGuiApplication::screenAt(this->geometry().center())->geometry();
+	#else
 	QRect screen = QApplication::desktop()->screenGeometry(this);
-
+	#endif
 
 	if (cmd == NOP ){
 		checkAndSetCursors(pe);

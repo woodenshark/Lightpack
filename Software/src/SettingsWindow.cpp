@@ -92,10 +92,15 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 #endif
 
 	// Check windows reserved symbols in profile input name
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	QRegularExpressionValidator *validatorProfileName = new QRegularExpressionValidator(QRegularExpression("[^<>:\"/\\|?*]*"), this);
+	QRegularExpressionValidator *validatorApiKey = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9{}_-]*"), this);
+	#else
 	QRegExpValidator *validatorProfileName = new QRegExpValidator(QRegExp("[^<>:\"/\\|?*]*"), this);
-	ui->comboBox_Profiles->lineEdit()->setValidator(validatorProfileName);
-
 	QRegExpValidator *validatorApiKey = new QRegExpValidator(QRegExp("[a-zA-Z0-9{}_-]*"), this);
+	#endif
+
+	ui->comboBox_Profiles->lineEdit()->setValidator(validatorProfileName);
 	ui->lineEdit_ApiKey->setValidator(validatorApiKey);
 
 	// hide main tabbar

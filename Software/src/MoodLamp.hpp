@@ -58,5 +58,6 @@ public:
 protected:
 	size_t m_frames{ 0 };
 private:
+	Q_DISABLE_COPY(MoodLampBase)
 	const std::chrono::milliseconds DefaultInterval = 33ms;
 };

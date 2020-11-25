@@ -61,6 +61,7 @@ inline int cmp(T x, T y, double e) {
 }
 
 class AreaDistributor {
+	Q_DISABLE_COPY(AreaDistributor)
 public:
 	AreaDistributor(QRect screen, int areaCount) :
 		_areaCount(areaCount),

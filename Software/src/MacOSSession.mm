@@ -88,7 +88,11 @@ namespace SystemSession
         _wrapper = nullptr;
     }
 
+    #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    bool MacOSEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result)
+    #else
     bool MacOSEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
+    #endif
     {
         Q_UNUSED(result);
         if (eventType != NSNotificationEventType)

@@ -28,7 +28,7 @@
 #include "PrismatikMath.hpp"
 
 int roundDown(int n) {
-	int rounded = (n % 2 == 0) ? n : (n - 1);
+	const int rounded = (n % 2 == 0) ? n : (n - 1);
 	return rounded ? rounded : 2;
 }
 
@@ -121,7 +121,7 @@ void CustomDistributor::startBottomRight2() {
 		cleanCurrentArea();
 		_dx = 1;
 		_dy = 0;
-		_ledCount = roundDown(_bottomLeds) / 2;
+		_ledCount = _bottomLeds - roundDown(_bottomLeds) / 2;
 		const int bLeds = _bottomLeds + _skipCorners * 2;
 		const int hLeds = _ledCount + _skipCorners;
 		if (_standWidth == 0.0) {
@@ -130,7 +130,7 @@ void CustomDistributor::startBottomRight2() {
 		}
 		else {
 			const int halfWidth = _screen.width() * (1.0 - _standWidth) / 2;
-			_width = halfWidth / (bLeds - hLeds);
+			_width = halfWidth / hLeds;
 		}
 		_height = _screen.height() * _thickness;
 		_x = _screen.left() + _skipCorners * _width;

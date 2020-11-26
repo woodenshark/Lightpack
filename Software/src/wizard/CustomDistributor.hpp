@@ -53,11 +53,11 @@ protected:
 	bool _skipCorners;
 	int _ledCount{ 0 };
 
-	void startBottomRight();
-	void startRightUp();
-	void startTopLeft();
-	void startLeftDown();
-	void startBottomRight2();
+	void startBottomMiddleToRight();
+	void startBottomRightToTop();
+	void startTopRightToLeft();
+	void startTopLeftToBottom();
+	void startBottomRightToMiddle();
 
 	virtual int areaCountOnSideEdge() const;
 	virtual int areaCountOnTopEdge() const;

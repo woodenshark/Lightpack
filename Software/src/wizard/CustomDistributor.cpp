@@ -38,7 +38,7 @@ CustomDistributor::~CustomDistributor() {
 		cleanCurrentArea();
 }
 
-void CustomDistributor::startBottomRight() {
+void CustomDistributor::startBottomMiddleToRight() {
 	_sizeBudget = 0;
 	_ledCount = 0;
 	if (_bottomLeds) {
@@ -60,10 +60,10 @@ void CustomDistributor::startBottomRight() {
 		_height = _screen.height() * _thickness;
 		_x = _screen.left() + _screen.width() - (hLeds * _width) - _sizeBudget;
 		_y = _screen.top() + _screen.height() - _height;
-	} else startRightUp();
+	} else startBottomRightToTop();
 }
 
-void CustomDistributor::startRightUp() {
+void CustomDistributor::startBottomRightToTop() {
 	_sizeBudget = 0;
 	_ledCount = 0;
 	if (_sideLeds) {
@@ -77,10 +77,10 @@ void CustomDistributor::startRightUp() {
 		_sizeBudget = _screen.height() % leds;
 		_x = _screen.left() + _screen.width() - _width;
 		_y = _screen.top() + _screen.height() - _height - _height * _skipCorners;
-	} else startTopLeft();
+	} else startTopRightToLeft();
 }
 
-void CustomDistributor::startTopLeft() {
+void CustomDistributor::startTopRightToLeft() {
 	_sizeBudget = 0;
 	_ledCount = 0;
 	if (_topLeds) {
@@ -94,10 +94,10 @@ void CustomDistributor::startTopLeft() {
 		_sizeBudget = _screen.width() % leds;
 		_x = _screen.left() + _screen.width() - _width - _width * _skipCorners;
 		_y = _screen.top();
-	} else startLeftDown();
+	} else startTopLeftToBottom();
 }
 
-void CustomDistributor::startLeftDown() {
+void CustomDistributor::startTopLeftToBottom() {
 	_sizeBudget = 0;
 	_ledCount = 0;
 	if (_sideLeds) {
@@ -111,10 +111,10 @@ void CustomDistributor::startLeftDown() {
 		_sizeBudget = _screen.height() % leds;
 		_x = _screen.left();
 		_y = _screen.top() + _height * _skipCorners;
-	} else startBottomRight2();
+	} else startBottomRightToMiddle();
 }
 
-void CustomDistributor::startBottomRight2() {
+void CustomDistributor::startBottomRightToMiddle() {
 	_sizeBudget = 0;
 	_ledCount = 0;
 	if (_bottomLeds) {
@@ -141,15 +141,15 @@ void CustomDistributor::startBottomRight2() {
 
 ScreenArea * CustomDistributor::next() {
 	if (_dx == 0 && _dy == 0) {
-		startBottomRight();
+		startBottomMiddleToRight();
 	} else if (_dx > 0 && _ledCount == 0) {
-		startRightUp();
+		startBottomRightToTop();
 	} else if (_dy < 0 && _ledCount == 0) {
-		startTopLeft();
+		startTopRightToLeft();
 	} else if (_dx < 0 && _ledCount == 0) {
-		startLeftDown();
+		startTopLeftToBottom();
 	} else if (_dy > 0 && _ledCount == 0) {
-		startBottomRight2();
+		startBottomRightToMiddle();
 	}
 
 	int wAdjust = 0;

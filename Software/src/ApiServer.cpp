@@ -407,14 +407,14 @@ void ApiServer::clientProcessCommands()
 			result = ApiServer::CmdResultProfiles;
 
 			for (int i = 0; i < profiles.count(); i++)
-				result += profiles[i] + QStringLiteral(";");
+				result += QStringLiteral("%1;").arg(profiles[i]);
 			result += QStringLiteral("\r\n");
 		}
 		else if (cmdBuffer == CmdGetProfile)
 		{
 			API_DEBUG_OUT << CmdGetProfile;
 
-			result = CmdResultProfile + lightpack->GetProfile() + QStringLiteral("\r\n");
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultProfile, lightpack->GetProfile());
 		}
 		else if (cmdBuffer == CmdGetDevices)
 		{
@@ -424,15 +424,13 @@ void ApiServer::clientProcessCommands()
 
 			result = ApiServer::CmdResultDevices;
 			for (int i = 0; i < devices.count(); i++)
-				result += devices[i] + QStringLiteral(";");
+				result += QStringLiteral("%1;").arg(devices[i]);
 			result += QStringLiteral("\r\n");
 		}
 		else if (cmdBuffer == CmdGetDevice)
 		{
 			API_DEBUG_OUT << CmdGetDevice;
-			result = ApiServer::CmdResultDevice;
-			result += Settings::getConnectedDeviceName();
-			result += QStringLiteral("\r\n");
+			result = QStringLiteral("%1%2\r\n").arg(ApiServer::CmdResultDevice, Settings::getConnectedDeviceName());
 		}
 		else if (cmdBuffer == CmdGetMaxLeds)
 		{

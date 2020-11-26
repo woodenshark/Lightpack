@@ -814,7 +814,7 @@ void SettingsWindow::updateTrayAndActionStates()
 	case Backlight::StatusOff:
 		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("off16")]);
 		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("on16")]));
-		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	") + tr("Turn lights ON"));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	%1").arg(tr("Turn lights ON")));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusOff);
 		break;
@@ -822,7 +822,7 @@ void SettingsWindow::updateTrayAndActionStates()
 	case Backlight::StatusDeviceError:
 		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("error16")]);
 		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("off16")]));
-		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	") + tr("Turn lights OFF"));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	%1").arg(tr("Turn lights OFF")));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusError);
 		break;
@@ -1134,10 +1134,7 @@ void SettingsWindow::ledDeviceFirmwareVersionResult(const QString & fwVersion)
 	{
 		if (m_deviceFirmwareVersion == QStringLiteral("5.0") || m_deviceFirmwareVersion == QStringLiteral("4.3"))
 		{
-			aboutDialogFirmwareString += QStringLiteral(" ") +
-					QStringLiteral("(<a href=\"") + LightpackDownloadsPageUrl + QStringLiteral("\">") +
-					tr("update firmware") +
-					QStringLiteral("</a>)");
+			aboutDialogFirmwareString += QStringLiteral(" (<a href=\"%1\">%2</a>").arg(LightpackDownloadsPageUrl, tr("update firmware"));
 
 			if (Settings::isUpdateFirmwareMessageShown() == false)
 			{
@@ -1172,7 +1169,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 	QString fpsText = QString::number(hz, 'f', 0);
 	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
 		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
-		fpsText += QStringLiteral(" / ") + QString::number(maxHz, 'f', 0);
+		fpsText += QStringLiteral(" / %1").arg(QString::number(maxHz, 'f', 0));
 	}
 	ui->label_GrabFrequency_value->setText(fpsText);
 
@@ -1691,7 +1688,7 @@ void SettingsWindow::profileNew()
 		while(ui->comboBox_Profiles->findText(profileName +" "+ QString::number(i)) != -1){
 			i++;
 		}
-		profileName += QStringLiteral(" ") + QString::number(i);
+		profileName += QStringLiteral(" %1").arg(QString::number(i));
 	}
 
 	ui->comboBox_Profiles->insertItem(0, profileName);

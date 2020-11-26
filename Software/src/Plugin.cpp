@@ -23,7 +23,7 @@ Plugin::Plugin(const QString& name, const QString& path, QObject *parent) :
 	_pathPlugin = path;
 	QDir pluginPath(_pathPlugin);
 
-	const QString fileName(path+QStringLiteral("/")+name+QStringLiteral(".ini"));
+	const QString fileName(QStringLiteral("%1/%2.ini").arg(path, name));
 	if (!QFile::exists(fileName)) {
 		qWarning() << Q_FUNC_INFO << name << fileName << "does not exist, generating defaults, make sure to edit the file!";
 		if (!QFile::copy(QStringLiteral(":/plugin-template.ini"), fileName))
@@ -97,23 +97,23 @@ QIcon Plugin::Icon() const {
 
 
 int Plugin::getPriority() const {
-	const QString key = _name+QStringLiteral("/Priority");
+	const QString key = QStringLiteral("%1/Priority").arg(_name);
 	return Settings::valueMain(key).toInt();
 }
 
 void Plugin::setPriority(int priority) {
-	const QString key = _name+QStringLiteral("/Priority");
+	const QString key = QStringLiteral("%1/Priority").arg(_name);
 	Settings::setValueMain(key,priority);
 }
 
 bool Plugin::isEnabled() const {
-	const QString key = _name+QStringLiteral("/Enable");
+	const QString key = QStringLiteral("%1/Enable").arg(_name);
 	return Settings::valueMain(key).toBool();
 }
 
 void Plugin::setEnabled(bool enable) {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << enable;
-	const QString key = _name+QStringLiteral("/Enable");
+	const QString key = QStringLiteral("%1/Enable").arg(_name);
 	Settings::setValueMain(key,enable);
 	if (!enable) Stop();
 	if (enable) Start();

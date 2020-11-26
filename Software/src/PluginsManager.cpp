@@ -60,7 +60,7 @@ void PluginsManager::LoadPlugins(const QString& path)
 				continue;
 			}
 
-			Plugin* p = new Plugin(plugin,path+QStringLiteral("/")+pluginDir,this);
+			Plugin* p = new Plugin(plugin, QStringLiteral("%1/%2").arg(path, pluginDir), this);
 			//DEBUG_LOW_LEVEL <<p->getName()<<	p->getAuthor() << p->getDescription() << p->getVersion();
 			//connect(p, SIGNAL(executed()), this, SIGNAL(pluginExecuted()));
 			_plugins[plugin] = p;

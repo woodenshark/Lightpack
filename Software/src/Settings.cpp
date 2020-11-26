@@ -501,7 +501,7 @@ void Settings::renameCurrentProfile(const QString & profileName)
 
 	// Copy current settings to new one
 	QString profilesDir = QFileInfo( m_currentProfile->fileName() ).absoluteDir().absolutePath();
-	QString profileNewPath = profilesDir + QStringLiteral("/") + profileName + ".ini";
+	QString profileNewPath = QStringLiteral("%1/%2.ini").arg(profilesDir, profileName);
 
 	if (m_currentProfile->fileName() != profileNewPath)
 	{
@@ -1880,31 +1880,32 @@ void Settings::setLedCoefBlue(int ledIndex, double value)
 
 QSize Settings::getLedSize(int ledIndex)
 {
-	return value(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::Size).toSize();
+	return value(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::Size)).toSize();
 }
 
 void Settings::setLedSize(int ledIndex, QSize size)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::Size, size);
+	setValue(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::Size), size);
 	emit m_this->ledSizeChanged(ledIndex, size);
 }
 
 QPoint Settings::getLedPosition(int ledIndex)
 {
-	return value(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::Position).toPoint();
+	return value(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::Position)).toPoint();
 }
 
 void Settings::setLedPosition(int ledIndex, QPoint position)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::Position, position);
+	setValue(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::Position), position);
 	emit m_this->ledPositionChanged(ledIndex, position);
 }
 
 bool Settings::isLedEnabled(int ledIndex)
 {
-	QVariant result = value(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::IsEnabled);
+
+	QVariant result = value(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::IsEnabled));
 	if (result.isNull())
 		return Profile::Led::IsEnabledDefault;
 	else
@@ -1914,7 +1915,7 @@ bool Settings::isLedEnabled(int ledIndex)
 void Settings::setLedEnabled(int ledIndex, bool isEnabled)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + Profile::Key::Led::IsEnabled, isEnabled);
+	setValue(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), Profile::Key::Led::IsEnabled), isEnabled);
 	emit m_this->ledEnabledChanged(ledIndex, isEnabled);
 }
 
@@ -2020,8 +2021,8 @@ int Settings::getValidGrabOverBrighten(int value)
 void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coef)
 {
 	if (coef < Profile::Led::CoefMin || coef > Profile::Led::CoefMax){
-		QString error = QStringLiteral("Error: outside the valid values (coef < ") +
-				QString::number(Profile::Led::CoefMin) + QStringLiteral(" || coef > ") + QString::number(Profile::Led::CoefMax) + QStringLiteral(").");
+		const QString error = QStringLiteral("Error: outside the valid values (coef < %1 || coef > %2)")
+			.arg(QString::number(Profile::Led::CoefMin), QString::number(Profile::Led::CoefMax));
 
 		qWarning() << Q_FUNC_INFO << "Settings bad value"
 					<< "[" + Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + "]"
@@ -2030,19 +2031,19 @@ void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coe
 					<< "Convert to double error. Set it to default value" << keyCoef << "=" << Profile::Led::CoefDefault;
 		coef = Profile::Led::CoefDefault;
 	}
-	Settings::setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + keyCoef, coef);
+	Settings::setValue(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), keyCoef), coef);
 }
 
 double Settings::getValidLedCoef(int ledIndex, const QString & keyCoef)
 {
 	bool ok = false;
-	double coef = Settings::value(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + keyCoef).toDouble(&ok);
+	double coef = Settings::value(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), keyCoef)).toDouble(&ok);
 	QString error;
 	if (ok == false){
 		error = QStringLiteral("Error: Convert to double.");
 	} else if (coef < Profile::Led::CoefMin || coef > Profile::Led::CoefMax){
-		error = QStringLiteral("Error: outside the valid values (coef < ") +
-				QString::number(Profile::Led::CoefMin) + QStringLiteral(" || coef > ") + QString::number(Profile::Led::CoefMax) + ").";
+		error = QStringLiteral("Error: outside the valid values (coef < %1 || coef > %2)")
+					.arg(QString::number(Profile::Led::CoefMin), QString::number(Profile::Led::CoefMax));
 	} else {
 		// OK
 		return coef;
@@ -2054,12 +2055,12 @@ double Settings::getValidLedCoef(int ledIndex, const QString & keyCoef)
 				<< error
 				<< "Set it to default value" << keyCoef << "=" << Profile::Led::CoefDefault;
 	coef = Profile::Led::CoefDefault;
-	Settings::setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + QStringLiteral("/") + keyCoef, coef);
+	Settings::setValue(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(ledIndex + 1), keyCoef), coef);
 	return coef;
 }
 
 QString Settings::getProfilesPath() {
-	return m_applicationDirPath + QStringLiteral("Profiles/");
+	return QStringLiteral("%1Profiles/").arg(m_applicationDirPath);
 }
 
 bool Settings::isCheckForUpdatesEnabled() {
@@ -2144,18 +2145,18 @@ void Settings::initCurrentProfile(bool isResetDefault)
 		ledPosition = getDefaultPosition(i);
 
 
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::IsEnabled,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::IsEnabled),
 						Profile::Led::IsEnabledDefault, isResetDefault);
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::Position,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::Position),
 						ledPosition, isResetDefault);
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::Size,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::Size),
 						Profile::Led::SizeDefault, isResetDefault);
 
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::CoefRed,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::CoefRed),
 						Profile::Led::CoefDefault, isResetDefault);
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::CoefGreen,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::CoefGreen),
 						Profile::Led::CoefDefault, isResetDefault);
-		setNewOption(Profile::Key::Led::Prefix + QString::number(i + 1) + QStringLiteral("/") + Profile::Key::Led::CoefBlue,
+		setNewOption(QStringLiteral("%1%2/%3").arg(Profile::Key::Led::Prefix, QString::number(i + 1), Profile::Key::Led::CoefBlue),
 						Profile::Led::CoefDefault, isResetDefault);
 	}
 

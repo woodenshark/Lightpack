@@ -73,6 +73,7 @@ signals:
 	void updateSlowdown(int value);
 	void updateGamma(double value);
 	void updateBrightness(int percent);
+	void updateBrightnessCap(int percent);
 	void requestFirmwareVersion();
 #ifdef SOUNDVIZ_SUPPORT
 	void requestSoundVizDevices();
@@ -151,7 +152,6 @@ private slots:
 #endif
 	void showAbout(); /* using in actions */
 	void onPostInit();
-	void checkOutdatedGrabber();
 
 	void scrollThanks();
 
@@ -179,9 +179,11 @@ private slots:
 	void onDisableUsbPowerLed_toggled(bool state);
 	void onDeviceSmooth_valueChanged(int value);
 	void onDeviceBrightness_valueChanged(int value);
+	void onDeviceBrightnessCap_valueChanged(int value);
 	void onDeviceColorDepth_valueChanged(int value);
 	void onDeviceGammaCorrection_valueChanged(double value);
 	void onSliderDeviceGammaCorrection_valueChanged(int value);
+	void onDeviceDitheringEnabled_toggled(bool state);
 	void onDeviceSendDataOnlyIfColorsChanged_toggled(bool state);
 	void onDx1011CaptureEnabledChanged(bool isEnabled);
 	void onDx9CaptureEnabledChanged(bool isEnabled);
@@ -201,19 +203,21 @@ private slots:
 
 	void loadTranslation(const QString & language);
 
-	void onExpertModeEnabled_Toggled(bool isEnabled);
 	void onEnableApi_Toggled(bool isEnabled);
 	void onListenOnlyOnLoInterface_Toggled(bool localOnly);
 	void onApiKey_EditingFinished();
 	void onGenerateNewApiKey_Clicked();
 	void onSetApiPort_Clicked();
 	void onLoggingLevel_valueChanged(int value);
+	void onOpenLogs_clicked();
 
 	void on_pushButton_LightpackSmoothnessHelp_clicked();
 	void on_pushButton_LightpackColorDepthHelp_clicked();
 	void on_pushButton_LightpackRefreshDelayHelp_clicked();
 
 	void on_pushButton_GammaCorrectionHelp_clicked();
+	void on_pushButton_DitheringHelp_clicked();
+	void on_pushButton_BrightnessCapHelp_clicked();
 
 	void on_pushButton_lumosityThresholdHelp_clicked();
 
@@ -243,7 +247,6 @@ private slots:
 	void clearBaudrateWarning();
 
 private:
-	void updateExpertModeWidgetsVisibility();
 	void updateDeviceTabWidgetsVisibility();
 	void setDeviceTabWidgetsVisibility(DeviceTab::Options options);
 	void syncLedDeviceWithSettingsWindow();

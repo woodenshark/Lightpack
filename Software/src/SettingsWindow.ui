@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>649</height>
+    <width>485</width>
+    <height>668</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -174,7 +174,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Experimental</string>
+        <string>Expert</string>
        </property>
        <property name="textAlignment">
         <set>AlignHCenter|AlignTop</set>
@@ -213,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -1293,79 +1293,26 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
        <attribute name="title">
         <string>Device</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_12">
+       <layout class="QGridLayout" name="gridLayout_12" columnstretch="0,0,0,0,0,0">
         <property name="leftMargin">
          <number>20</number>
         </property>
         <property name="rightMargin">
          <number>20</number>
         </property>
-        <item row="13" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <property name="bottomMargin">
-           <number>13</number>
-          </property>
-          <item>
-           <widget class="QPushButton" name="pbRunConfigurationWizard">
-            <property name="text">
-             <string>Run configuration wizard</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_15">
-          <property name="styleSheet">
-           <string notr="true">margin:0px;</string>
-          </property>
-          <property name="text">
-           <string>%</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="pageStep">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="pushButton_GammaCorrectionHelp">
+        <item row="7" column="4">
+         <widget class="QPushButton" name="pushButton_DitheringHelp">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="styleSheet">
            <string notr="true">margin:0px;</string>
@@ -1382,7 +1329,70 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Brightness cap:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QSlider" name="horizontalSlider_GammaCorrection">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;h4&gt;Gamma correction&lt;/h4&gt; It controls the level of saturation. The effect is clearly detectable in a video in screen grabbing mode&lt;br/&gt;Recommended value: 2.00</string>
+          </property>
+          <property name="minimum">
+           <number>5</number>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+          <property name="singleStep">
+           <number>5</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::NoTicks</enum>
+          </property>
+          <property name="tickInterval">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QSlider" name="horizontalSlider_DeviceBrightnessCap">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Brightness Cap&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lowers the brightness limit of LEDs (as opposed to overall brightness). Can be used to limit the power draw and the heat output. Defaults to 100% (no limit).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
          <widget class="QDoubleSpinBox" name="doubleSpinBox_DeviceGamma">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1416,10 +1426,269 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </property>
          </widget>
         </item>
-        <item row="14" column="0" colspan="3">
+        <item row="25" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="2">
+         <widget class="QSpinBox" name="spinBox_DeviceBrightnessCap">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>29</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="21" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterScreenOff">
+          <property name="text">
+           <string>Keep lights ON after display sleep</string>
+          </property>
+         </widget>
+        </item>
+        <item row="22" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
+          <property name="text">
+           <string>Keep lights ON after lock computer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_GammaCorrection">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Gamma correction:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="bottomMargin">
+           <number>13</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="pbRunConfigurationWizard">
+            <property name="text">
+             <string>Run configuration wizard</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="0" colspan="6">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Keep lights ON after exit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="23" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
+          <property name="text">
+           <string>Keep lights ON after system suspend</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4">
+         <widget class="QPushButton" name="pushButton_GammaCorrectionHelp">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">margin:0px;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/LightpackResources.qrc">
+            <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QPushButton" name="pushButton_BrightnessCapHelp">
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/LightpackResources.qrc">
+            <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Overall brightness:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QCheckBox" name="checkBox_EnableDithering">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h4 style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:medium; font-weight:600;&quot;&gt;Dithering&lt;/span&gt;&lt;/h4&gt;&lt;p&gt;Increases color accuracy with some devices, but may introduce flickering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Enable Dithering</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>45</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>9</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="0" colspan="6">
          <widget class="QTabWidget" name="tabDevices">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -1431,14 +1700,14 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="documentMode">
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="tabDeviceLightpack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -1459,72 +1728,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <property name="rightMargin">
              <number>0</number>
             </property>
-            <item row="8" column="1">
-             <widget class="QSpinBox" name="spinBox_DeviceRefreshDelay">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>60</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="minimum">
-               <number>64</number>
-              </property>
-              <property name="maximum">
-               <number>1023</number>
-              </property>
-              <property name="value">
-               <number>64</number>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0">
-             <spacer name="verticalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="8" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceRefreshDelay">
-              <property name="whatsThis">
-               <string>&lt;h4&gt;Refresh delay&lt;/h4&gt; This setting’s values are inversely proportional to the PWM’s frequency. It's affects to performance.</string>
-              </property>
-              <property name="minimum">
-               <number>64</number>
-              </property>
-              <property name="maximum">
-               <number>1023</number>
-              </property>
-              <property name="pageStep">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>64</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
             <item row="5" column="0">
              <widget class="QLabel" name="label_9">
               <property name="sizePolicy">
@@ -1538,8 +1741,65 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </property>
              </widget>
             </item>
-            <item row="6" column="2">
-             <widget class="QPushButton" name="pushButton_LightpackSmoothnessHelp">
+            <item row="4" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceColorDepth">
+              <property name="whatsThis">
+               <string>&lt;h4&gt;Color depth&lt;/h4&gt; Number of colors per channel, one RGB LED uses 3 channels (value in power of 3).</string>
+              </property>
+              <property name="minimum">
+               <number>32</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_DeviceColorDepth">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Color depth (Lightpack 5 and below):</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceSmooth">
+              <property name="whatsThis">
+               <string>&lt;h4&gt;Smoothness&lt;/h4&gt; It defines how many steps will be color changed in</string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QPushButton" name="pushButton_LightpackColorDepthHelp">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1558,19 +1818,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </property>
               <property name="flat">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="label_DeviceRefreshDelay">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Refresh delay (Lightpack 5 and below):</string>
               </property>
              </widget>
             </item>
@@ -1605,47 +1852,109 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceColorDepth">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBox_DisableUsbPowerLed">
+              <property name="text">
+               <string>Disable USB Power LED</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceRefreshDelay">
               <property name="whatsThis">
-               <string>&lt;h4&gt;Color depth&lt;/h4&gt; Number of colors per channel, one RGB LED uses 3 channels (value in power of 3).</string>
+               <string>&lt;h4&gt;Refresh delay&lt;/h4&gt; This setting’s values are inversely proportional to the PWM’s frequency. It's affects to performance.</string>
               </property>
               <property name="minimum">
-               <number>32</number>
+               <number>64</number>
               </property>
               <property name="maximum">
-               <number>255</number>
+               <number>1023</number>
               </property>
               <property name="pageStep">
                <number>1</number>
               </property>
               <property name="value">
-               <number>100</number>
+               <number>64</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceSmooth">
-              <property name="whatsThis">
-               <string>&lt;h4&gt;Smoothness&lt;/h4&gt; It defines how many steps will be color changed in</string>
+            <item row="6" column="2">
+             <widget class="QPushButton" name="pushButton_LightpackSmoothnessHelp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">margin:0px;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QSpinBox" name="spinBox_DeviceRefreshDelay">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
               </property>
               <property name="minimum">
-               <number>0</number>
+               <number>64</number>
               </property>
               <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="pageStep">
-               <number>1</number>
+               <number>1023</number>
               </property>
               <property name="value">
-               <number>100</number>
+               <number>64</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             </widget>
+            </item>
+            <item row="8" column="2">
+             <widget class="QPushButton" name="pushButton_LightpackRefreshDelayHelp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">margin:0px;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1680,54 +1989,8 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </property>
              </widget>
             </item>
-            <item row="8" column="2">
-             <widget class="QPushButton" name="pushButton_LightpackRefreshDelayHelp">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">margin:0px;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../res/LightpackResources.qrc">
-                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QPushButton" name="pushButton_LightpackColorDepthHelp">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">margin:0px;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../res/LightpackResources.qrc">
-                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_DeviceColorDepth">
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_DeviceRefreshDelay">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1735,41 +1998,24 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Color depth (Lightpack 5 and below):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="checkBox_DisableUsbPowerLed">
-              <property name="text">
-               <string>Disable USB Power LED</string>
+               <string>Refresh delay (Lightpack 5 and below):</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
           <widget class="QWidget" name="tabDeviceVirtual">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <attribute name="title">
             <string>Virtual</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <property name="horizontalSpacing">
-             <number>12</number>
-            </property>
-            <item row="1" column="0">
-             <spacer name="verticalSpacer_15">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="0" colspan="2">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
              <widget class="QFrame" name="frame_VirtualLeds">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
@@ -1784,143 +2030,15 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </layout>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="3">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
-          <property name="text">
-           <string>Keep lights ON after lock computer</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QSlider" name="horizontalSlider_GammaCorrection">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="whatsThis">
-           <string>&lt;h4&gt;Gamma correction&lt;/h4&gt; It controls the level of saturation. The effect is clearly detectable in a video in screen grabbing mode&lt;br/&gt;Recommended value: 2.00</string>
-          </property>
-          <property name="minimum">
-           <number>5</number>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="singleStep">
-           <number>5</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
-          </property>
-          <property name="tickInterval">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="0">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_GammaCorrection">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Gamma correction:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>60</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Overall brightness:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="3">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
-          <property name="text">
-           <string>Keep lights ON after system suspend</string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0" colspan="3">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Keep lights ON after exit</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterScreenOff">
-          <property name="text">
-           <string>Keep lights ON after display sleep</string>
-          </property>
          </widget>
         </item>
        </layout>
@@ -2122,19 +2240,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_ExpertModeEnabled">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Expert mode</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -2452,7 +2557,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabExperimental">
+      <widget class="QWidget" name="tabExpert">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -2460,7 +2565,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Experimental</string>
+        <string>Expert</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
         <property name="spacing">
@@ -2490,6 +2595,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enables TCP socket server.&lt;/p&gt;&lt;p&gt;You can connect via &amp;quot;telnet &amp;lt;ip&amp;gt; &amp;lt;port&amp;gt;&amp;quot; for example and manually execute available commands.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -2505,6 +2613,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
             <widget class="QCheckBox" name="checkBox_listenOnlyOnLoInterface">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, you can connect ONLY from the same computer through 127.0.0.1/localhost address.&lt;/p&gt;&lt;p&gt;Disable this if you want to connect from anywhere else.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Listen only on local interface (127.0.0.1)</string>
              </property>
@@ -2518,10 +2629,16 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_ApiPort">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top: .1em</string>
              </property>
@@ -2535,6 +2652,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </item>
            <item row="5" column="2">
             <widget class="QPushButton" name="pushButton_GenerateNewApiKey">
+             <property name="toolTip">
+              <string>Generate a random one</string>
+             </property>
              <property name="text">
               <string>Generate</string>
              </property>
@@ -2555,7 +2675,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
               </size>
              </property>
              <property name="toolTip">
-              <string>Copy and paste this key into the application using the API, for authorization on the server</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="styleSheet">
               <string notr="true"/>
@@ -2570,6 +2690,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="label_ApiKey">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top:0</string>
              </property>
@@ -2727,8 +2850,28 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_LoggingLevel">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log verbosity: %1-%2 where %1 = no logs.&lt;/p&gt;&lt;p&gt;After enabling logs you need to restart the program.&lt;/p&gt;&lt;p&gt;When enabled you can use the &lt;img src=&quot;:/buttons/arrow_right_dark_24px.png&quot; width=&quot;12&quot;&gt; button to open the log directory.&lt;/p&gt;&lt;p&gt;Default: %3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="maximum">
              <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButton_OpenLogs">
+            <property name="toolTip">
+             <string>open Log folder</string>
+            </property>
+            <property name="whatsThis">
+             <string>open Log folder</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/LightpackResources.qrc">
+              <normaloff>:/buttons/arrow_right_dark_24px.png</normaloff>:/buttons/arrow_right_dark_24px.png</iconset>
             </property>
            </widget>
           </item>
@@ -2756,6 +2899,9 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
         </item>
         <item>
          <widget class="QCheckBox" name="checkBox_SendDataOnlyIfColorsChanges">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When disabled every frame will be sent to the device. This is recommended for devices with inactivity timers built into firmwares (some custom Adalight sketches for example) or configured via Prismatik (UDP devices with a &amp;lt; 255 timeout value).&lt;/p&gt;&lt;p&gt;When enabled every new frame will be compared with the previous one, and will be sent only if differences are detected (can be useful in low bandwidth situations).&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Send data only if colors changed</string>
           </property>
@@ -3074,6 +3220,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>comboBox_LightpackModes</tabstop>
   <tabstop>spinBox_GrabSlowdown</tabstop>
   <tabstop>checkBox_GrabIsAvgColors</tabstop>
+  <tabstop>checkBox_GrabApplyBlueLightReduction</tabstop>
   <tabstop>checkBox_GrabApplyColorTemperature</tabstop>
   <tabstop>pushButton_grabApplyColorTemperatureHelp</tabstop>
   <tabstop>horizontalSlider_GrabColorTemperature</tabstop>
@@ -3087,15 +3234,6 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>radioButton_GrabWidgetsDontShow</tabstop>
   <tabstop>radioButton_Colored</tabstop>
   <tabstop>radioButton_White</tabstop>
-  <tabstop>radioButton_ConstantColorMoodLampMode</tabstop>
-  <tabstop>pushButton_SelectColorMoodLamp</tabstop>
-  <tabstop>radioButton_LiquidColorMoodLampMode</tabstop>
-  <tabstop>horizontalSlider_MoodLampSpeed</tabstop>
-  <tabstop>radioButton_SoundVizConstantMode</tabstop>
-  <tabstop>pushButton_SelectColorSoundVizMin</tabstop>
-  <tabstop>pushButton_SelectColorSoundVizMax</tabstop>
-  <tabstop>radioButton_SoundVizLiquidMode</tabstop>
-  <tabstop>horizontalSlider_SoundVizLiquidSpeed</tabstop>
   <tabstop>horizontalSlider_LuminosityThreshold</tabstop>
   <tabstop>spinBox_LuminosityThreshold</tabstop>
   <tabstop>pushButton_lumosityThresholdHelp</tabstop>
@@ -3104,13 +3242,14 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>pushButton_EnableDisableDevice</tabstop>
   <tabstop>horizontalSlider_DeviceBrightness</tabstop>
   <tabstop>spinBox_DeviceBrightness</tabstop>
+  <tabstop>horizontalSlider_DeviceBrightnessCap</tabstop>
+  <tabstop>spinBox_DeviceBrightnessCap</tabstop>
+  <tabstop>pushButton_BrightnessCapHelp</tabstop>
   <tabstop>horizontalSlider_GammaCorrection</tabstop>
   <tabstop>doubleSpinBox_DeviceGamma</tabstop>
   <tabstop>pushButton_GammaCorrectionHelp</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterLockComputer</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterScreenOff</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterSuspend</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
+  <tabstop>checkBox_EnableDithering</tabstop>
+  <tabstop>pushButton_DitheringHelp</tabstop>
   <tabstop>pbRunConfigurationWizard</tabstop>
   <tabstop>tabDevices</tabstop>
   <tabstop>checkBox_DisableUsbPowerLed</tabstop>
@@ -3123,13 +3262,16 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>horizontalSlider_DeviceRefreshDelay</tabstop>
   <tabstop>spinBox_DeviceRefreshDelay</tabstop>
   <tabstop>pushButton_LightpackRefreshDelayHelp</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterScreenOff</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterLockComputer</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterSuspend</tabstop>
   <tabstop>comboBox_Profiles</tabstop>
   <tabstop>pushButton_ProfileNew</tabstop>
   <tabstop>pushButton_ProfileResetToDefault</tabstop>
   <tabstop>pushButton_DeleteProfile</tabstop>
   <tabstop>commandLinkButton_OpenSettings</tabstop>
   <tabstop>comboBox_Language</tabstop>
-  <tabstop>checkBox_ExpertModeEnabled</tabstop>
   <tabstop>pushButton_AllPluginsHelp</tabstop>
   <tabstop>list_Plugins</tabstop>
   <tabstop>pushButton_UpPriority</tabstop>
@@ -3144,16 +3286,31 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
   <tabstop>pushButton_GenerateNewApiKey</tabstop>
   <tabstop>radioButton_GrabX11</tabstop>
   <tabstop>radioButton_GrabMacCoreGraphics</tabstop>
+  <tabstop>radioButton_GrabMacAVFoundation</tabstop>
   <tabstop>radioButton_GrabWinAPI</tabstop>
   <tabstop>radioButton_GrabDDupl</tabstop>
   <tabstop>checkBox_EnableDx1011Capture</tabstop>
   <tabstop>checkBox_EnableDx9Capture</tabstop>
   <tabstop>spinBox_LoggingLevel</tabstop>
+  <tabstop>toolButton_OpenLogs</tabstop>
   <tabstop>checkBox_PingDeviceEverySecond</tabstop>
   <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
   <tabstop>checkBox_checkForUpdates</tabstop>
   <tabstop>checkBox_installUpdates</tabstop>
   <tabstop>textBrowser</tabstop>
+  <tabstop>comboBox_SoundVizVisualizer</tabstop>
+  <tabstop>pushButton_SoundVizDeviceHelp</tabstop>
+  <tabstop>radioButton_SoundVizConstantMode</tabstop>
+  <tabstop>radioButton_ConstantColorMoodLampMode</tabstop>
+  <tabstop>horizontalSlider_MoodLampSpeed</tabstop>
+  <tabstop>comboBox_SoundVizDevice</tabstop>
+  <tabstop>pushButton_SelectColorMoodLamp</tabstop>
+  <tabstop>radioButton_LiquidColorMoodLampMode</tabstop>
+  <tabstop>horizontalSlider_SoundVizLiquidSpeed</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMax</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMin</tabstop>
+  <tabstop>comboBox_MoodLampLamp</tabstop>
+  <tabstop>radioButton_SoundVizLiquidMode</tabstop>
  </tabstops>
  <resources>
   <include location="../res/LightpackResources.qrc"/>
@@ -3444,6 +3601,38 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
     <hint type="destinationlabel">
      <x>422</x>
      <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_DeviceBrightnessCap</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_DeviceBrightnessCap</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>116</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_DeviceBrightnessCap</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_DeviceBrightnessCap</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>390</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>

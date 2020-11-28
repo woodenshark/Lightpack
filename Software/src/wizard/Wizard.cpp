@@ -33,6 +33,7 @@
 #include "SelectDevicePage.hpp"
 #include "ConfigureDevicePage.hpp"
 #include "ConfigureUdpDevicePage.hpp"
+#include "ConfigureDevicePowerPage.hpp"
 #include "GlobalColorCoefPage.hpp"
 #include "AbstractLedDevice.hpp"
 
@@ -47,10 +48,11 @@ Wizard::Wizard(bool isInitFromSettings, QWidget *parent) :
 	this->setPage(Page_LightpackDiscovery, new LightpackDiscoveryPage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ChooseDevice, new SelectDevicePage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ConfigureDevice, new ConfigureDevicePage(_isInitFromSettings, _transSettings) );
-    this->setPage(Page_ConfigureUdpDevice, new ConfigureUdpDevicePage(_isInitFromSettings, _transSettings));
+	this->setPage(Page_ConfigureUdpDevice, new ConfigureUdpDevicePage(_isInitFromSettings, _transSettings));
 	this->setPage(Page_MonitorConfiguration, new MonitorConfigurationPage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ChooseProfile, new SelectProfilePage(_isInitFromSettings, _transSettings));
 	this->setPage(Page_ZonePlacement, new ZonePlacementPage(_isInitFromSettings, _transSettings));
+	this->setPage(Page_ConfigureDevicePower, new ConfigureDevicePowerPage(_isInitFromSettings, _transSettings));
 	this->setPage(Page_GlobalColorCoef, new GlobalColorCoefPage(_isInitFromSettings, _transSettings));
 }
 

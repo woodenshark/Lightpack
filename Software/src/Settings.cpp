@@ -67,7 +67,6 @@ static const QString MainConfigVersion = "MainConfigVersion";
 static const QString ProfileLast = "ProfileLast";
 static const QString Language = "Language";
 static const QString DebugLevel = "DebugLevel";
-static const QString IsExpertModeEnabled = "IsExpertModeEnabled";
 static const QString IsKeepLightsOnAfterExit = "IsKeepLightsOnAfterExit";
 static const QString IsKeepLightsOnAfterLock = "IsKeepLightsOnAfterLock";
 static const QString IsKeepLightsOnAfterSuspend = "IsKeepLightsOnAfterSuspend";
@@ -100,6 +99,8 @@ static const QString NumberOfLeds = "Adalight/NumberOfLeds";
 static const QString ColorSequence = "Adalight/ColorSequence";
 static const QString Port = "Adalight/SerialPort";
 static const QString BaudRate = "Adalight/BaudRate";
+static const QString LedMilliAmps = "Adalight/LedMilliAmps";
+static const QString PowerSupplyAmps = "Adalight/PowerSupplyAmps";
 }
 namespace Ardulight
 {
@@ -107,18 +108,26 @@ static const QString NumberOfLeds = "Ardulight/NumberOfLeds";
 static const QString ColorSequence = "Ardulight/ColorSequence";
 static const QString Port = "Ardulight/SerialPort";
 static const QString BaudRate = "Ardulight/BaudRate";
+static const QString LedMilliAmps = "Ardulight/LedMilliAmps";
+static const QString PowerSupplyAmps = "Ardulight/PowerSupplyAmps";
 }
 namespace AlienFx
 {
 static const QString NumberOfLeds = "AlienFx/NumberOfLeds";
+static const QString LedMilliAmps = "AlienFx/LedMilliAmps";
+static const QString PowerSupplyAmps = "AlienFx/PowerSupplyAmps";
 }
 namespace Lightpack
 {
 static const QString NumberOfLeds = "Lightpack/NumberOfLeds";
+static const QString LedMilliAmps = "Lightpack/LedMilliAmps";
+static const QString PowerSupplyAmps = "Lightpack/PowerSupplyAmps";
 }
 namespace Virtual
 {
 static const QString NumberOfLeds = "Virtual/NumberOfLeds";
+static const QString LedMilliAmps = "Virtual/LedMilliAmps";
+static const QString PowerSupplyAmps = "Virtual/PowerSupplyAmps";
 }
 namespace Drgb
 {
@@ -126,6 +135,8 @@ static const QString NumberOfLeds = "Drgb/NumberOfLeds";
 static const QString Address = "Drgb/Address";
 static const QString Port = "Drgb/Port";
 static const QString Timeout = "Drgb/Timeout";
+static const QString LedMilliAmps = "Drgb/LedMilliAmps";
+static const QString PowerSupplyAmps = "Drgb/PowerSupplyAmps";
 }
 namespace Dnrgb
 {
@@ -133,6 +144,8 @@ static const QString NumberOfLeds = "Dnrgb/NumberOfLeds";
 static const QString Address = "Dnrgb/Address";
 static const QString Port = "Dnrgb/Port";
 static const QString Timeout = "Dnrgb/Timeout";
+static const QString LedMilliAmps = "Dnrgb/LedMilliAmps";
+static const QString PowerSupplyAmps = "Dnrgb/PowerSupplyAmps";
 }
 namespace Warls
 {
@@ -140,6 +153,8 @@ static const QString NumberOfLeds = "Warls/NumberOfLeds";
 static const QString Address = "Warls/Address";
 static const QString Port = "Warls/Port";
 static const QString Timeout = "Warls/Timeout";
+static const QString LedMilliAmps = "Warls/LedMilliAmps";
+static const QString PowerSupplyAmps = "Warls/PowerSupplyAmps";
 }
 } /*Key*/
 
@@ -211,8 +226,10 @@ static const QString RefreshDelay = "Device/RefreshDelay";
 static const QString IsUsbPowerLedDisabled = "Device/IsUsbPowerLedDisabled";
 static const QString Smooth = "Device/Smooth";
 static const QString Brightness = "Device/Brightness";
+static const QString BrightnessCap = "Device/BrightnessCap";
 static const QString ColorDepth = "Device/ColorDepth";
 static const QString Gamma = "Device/Gamma";
+static const QString IsDitheringEnabled = "Device/IsDitheringEnabled";
 }
 // [LED_i]
 namespace Led
@@ -265,13 +282,14 @@ QString Settings::m_applicationDirPath = "";
 
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToNameMap;
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyNumberOfLedsMap;
+QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyLedMilliAmpsMap;
+QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyPowerSupplyAmpsMap;
 
 Settings::Settings() : QObject(NULL) {
 	qRegisterMetaType<Grab::GrabberType>("Grab::GrabberType");
 	qRegisterMetaType<QColor>("QColor");
 	qRegisterMetaType<SupportedDevices::DeviceType>("SupportedDevices::DeviceType");
 	qRegisterMetaType<Lightpack::Mode>("Lightpack::Mode");
-
 }
 
 // Desktop should be initialized before call Settings::Initialize()
@@ -298,7 +316,6 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::ProfileLast,			Main::ProfileNameDefault);
 	setNewOptionMain(Main::Key::Language,				Main::LanguageDefault);
 	setNewOptionMain(Main::Key::DebugLevel,				Main::DebugLevelDefault);
-	setNewOptionMain(Main::Key::IsExpertModeEnabled,	Main::IsExpertModeEnabledDefault);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterExit, Main::IsKeepLightsOnAfterExit);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterLock, Main::IsKeepLightsOnAfterLock);
 	setNewOptionMain(Main::Key::IsKeepLightsOnAfterSuspend, Main::IsKeepLightsOnAfterSuspend);
@@ -327,9 +344,27 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 	setNewOptionMain(Main::Key::AlienFx::NumberOfLeds,		Main::AlienFx::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Lightpack::NumberOfLeds,	Main::Lightpack::NumberOfLedsDefault);
 	setNewOptionMain(Main::Key::Virtual::NumberOfLeds,		Main::Virtual::NumberOfLedsDefault);
-	setNewOptionMain(Main::Key::Drgb::NumberOfLeds,         Main::Drgb::NumberOfLedsDefault);
-	setNewOptionMain(Main::Key::Dnrgb::NumberOfLeds,        Main::Dnrgb::NumberOfLedsDefault);
-	setNewOptionMain(Main::Key::Warls::NumberOfLeds,        Main::Warls::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Drgb::NumberOfLeds,			Main::Drgb::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Dnrgb::NumberOfLeds,		Main::Dnrgb::NumberOfLedsDefault);
+	setNewOptionMain(Main::Key::Warls::NumberOfLeds,		Main::Warls::NumberOfLedsDefault);
+
+	setNewOptionMain(Main::Key::Adalight::LedMilliAmps,		Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Ardulight::LedMilliAmps,	Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::AlienFx::LedMilliAmps,		Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Lightpack::LedMilliAmps,	Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Virtual::LedMilliAmps,		Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Drgb::LedMilliAmps,			Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Dnrgb::LedMilliAmps,		Main::Device::LedMilliAmpsDefault);
+	setNewOptionMain(Main::Key::Warls::LedMilliAmps,		Main::Device::LedMilliAmpsDefault);
+
+	setNewOptionMain(Main::Key::Adalight::PowerSupplyAmps,	Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Ardulight::PowerSupplyAmps,	Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::AlienFx::PowerSupplyAmps,	Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Lightpack::PowerSupplyAmps,	Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Virtual::PowerSupplyAmps,	Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Drgb::PowerSupplyAmps,		Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Dnrgb::PowerSupplyAmps,		Main::Device::PowerSupplyAmpsDefault);
+	setNewOptionMain(Main::Key::Warls::PowerSupplyAmps,		Main::Device::PowerSupplyAmpsDefault);
 
 	setNewOptionMain(Main::Key::Drgb::Address,              Main::Drgb::AddressDefault);
 	setNewOptionMain(Main::Key::Drgb::Port,                 Main::Drgb::PortDefault);
@@ -661,18 +696,6 @@ void Settings::setApiKey(const QString & apiKey)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	setValueMain(Main::Key::Api::AuthKey, apiKey);
 	m_this->apiKeyChanged(apiKey);
-}
-
-bool Settings::isExpertModeEnabled()
-{	
-	return valueMain(Main::Key::IsExpertModeEnabled).toBool();
-}
-
-void Settings::setExpertModeEnabled(bool isEnabled)
-{
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	setValueMain(Main::Key::IsExpertModeEnabled, isEnabled);
-	m_this->expertModeEnabledChanged(isEnabled);
 }
 
 bool Settings::isKeepLightsOnAfterExit()
@@ -1084,6 +1107,141 @@ int Settings::getNumberOfLeds(SupportedDevices::DeviceType device)
 	return valueMain(key).toInt();
 }
 
+void Settings::setDeviceLedMilliAmps(const SupportedDevices::DeviceType device, const int mAmps)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+
+	if(getDeviceLedMilliAmps(device) == mAmps)
+		//nothing to do
+		return;
+
+	const QString& key = m_devicesTypeToKeyLedMilliAmpsMap.value(device);
+
+	if (key == "")
+	{
+		qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "LedMilliAmps ==" << mAmps;
+		return;
+	}
+
+	setValueMain(key, mAmps);
+	{
+		using namespace SupportedDevices;
+		switch(device) {
+			case DeviceTypeLightpack:
+			m_this->lightpackLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeAdalight:
+			m_this->adalightLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeArdulight:
+			m_this->ardulightLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeVirtual:
+			m_this->virtualLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeDrgb:
+			m_this->drgbLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeDnrgb:
+			m_this->dnrgbLedMilliAmpsChanged(mAmps);
+			break;
+
+			case DeviceTypeWarls:
+			m_this->warlsLedMilliAmpsChanged(mAmps);
+			break;
+		default:
+			qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "LedMilliAmps ==" << mAmps;
+		}
+	}
+}
+
+int Settings::getDeviceLedMilliAmps(const SupportedDevices::DeviceType device)
+{
+	const QString& key = m_devicesTypeToKeyLedMilliAmpsMap.value(device);
+
+	if (key == "")
+	{
+		qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device;
+		return Main::Device::LedMilliAmpsDefault;
+	}
+
+	// TODO: validator on maximum number of leds for current 'device'
+	return valueMain(key).toInt();
+}
+
+
+void Settings::setDevicePowerSupplyAmps(const SupportedDevices::DeviceType device, const double amps)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+
+	if(getDevicePowerSupplyAmps(device) == amps)
+		//nothing to do
+		return;
+
+	const QString& key = m_devicesTypeToKeyPowerSupplyAmpsMap.value(device);
+
+	if (key == "")
+	{
+		qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "PowerSupplyAmps ==" << amps;
+		return;
+	}
+
+	setValueMain(key, amps);
+	{
+		using namespace SupportedDevices;
+		switch(device) {
+			case DeviceTypeLightpack:
+			m_this->lightpackPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeAdalight:
+			m_this->adalightPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeArdulight:
+			m_this->ardulightPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeVirtual:
+			m_this->virtualPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeDrgb:
+			m_this->drgbPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeDnrgb:
+			m_this->dnrgbPowerSupplyAmpsChanged(amps);
+			break;
+
+			case DeviceTypeWarls:
+			m_this->warlsPowerSupplyAmpsChanged(amps);
+			break;
+		default:
+			qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device << "PowerSupplyAmps ==" << amps;
+		}
+	}
+}
+
+double Settings::getDevicePowerSupplyAmps(const SupportedDevices::DeviceType device)
+{
+	const QString& key = m_devicesTypeToKeyPowerSupplyAmpsMap.value(device);
+
+	if (key == "")
+	{
+		qCritical() << Q_FUNC_INFO << "Device type not recognized, device ==" << device;
+		return Main::Device::PowerSupplyAmpsDefault;
+	}
+
+	// TODO: validator on maximum number of leds for current 'device'
+	return valueMain(key).toDouble();
+}
+
 void Settings::setColorSequence(SupportedDevices::DeviceType device, QString colorSequence)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << device << colorSequence;
@@ -1282,6 +1440,18 @@ void Settings::setDeviceBrightness(int value)
 	m_this->deviceBrightnessChanged(value);
 }
 
+int Settings::getDeviceBrightnessCap()
+{
+	return getValidDeviceBrightnessCap(value(Profile::Key::Device::BrightnessCap).toInt());
+}
+
+void Settings::setDeviceBrightnessCap(int value)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Device::BrightnessCap, getValidDeviceBrightnessCap(value));
+	m_this->deviceBrightnessCapChanged(value);
+}
+
 int Settings::getDeviceSmooth()
 {
 	return getValidDeviceSmooth(value(Profile::Key::Device::Smooth).toInt());
@@ -1316,6 +1486,18 @@ void Settings::setDeviceGamma(double gamma)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	setValue(Profile::Key::Device::Gamma, getValidDeviceGamma(gamma));
 	m_this->deviceGammaChanged(gamma);
+}
+
+bool Settings::isDeviceDitheringEnabled()
+{
+	return value(Profile::Key::Device::IsDitheringEnabled).toBool();
+}
+
+void Settings::setDeviceDitheringEnabled(bool isEnabled)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	setValue(Profile::Key::Device::IsDitheringEnabled, isEnabled);
+	m_this->deviceDitheringEnabledChanged(isEnabled);
 }
 
 Grab::GrabberType Settings::getGrabberType()
@@ -1743,6 +1925,15 @@ int Settings::getValidDeviceBrightness(int value)
 	return value;
 }
 
+int Settings::getValidDeviceBrightnessCap(int value)
+{
+	if (value < Profile::Device::BrightnessCapMin)
+		value = Profile::Device::BrightnessCapMin;
+	else if (value > Profile::Device::BrightnessCapMax)
+		value = Profile::Device::BrightnessCapMax;
+	return value;
+}
+
 int Settings::getValidDeviceSmooth(int value)
 {
 	if (value < Profile::Device::SmoothMin)
@@ -1826,7 +2017,7 @@ void Settings::setValidLedCoef(int ledIndex, const QString & keyCoef, double coe
 					<< keyCoef
 					<< error
 					<< "Convert to double error. Set it to default value" << keyCoef << "=" << Profile::Led::CoefDefault;
-		coef = Profile::Led::CoefDefault;		
+		coef = Profile::Led::CoefDefault;
 	}
 	Settings::setValue(Profile::Key::Led::Prefix + QString::number(ledIndex + 1) + "/" + keyCoef, coef);
 }
@@ -1926,11 +2117,13 @@ void Settings::initCurrentProfile(bool isResetDefault)
 #endif
 	// [Device]
 	setNewOption(Profile::Key::Device::RefreshDelay,				Profile::Device::RefreshDelayDefault, isResetDefault);
-	setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,		Profile::Device::IsUsbPowerLedDisabled, isResetDefault);
+	setNewOption(Profile::Key::Device::IsUsbPowerLedDisabled,		Profile::Device::IsUsbPowerLedDisabledDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Brightness,					Profile::Device::BrightnessDefault, isResetDefault);
+	setNewOption(Profile::Key::Device::BrightnessCap,				Profile::Device::BrightnessCapDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Smooth,						Profile::Device::SmoothDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::Gamma,						Profile::Device::GammaDefault, isResetDefault);
 	setNewOption(Profile::Key::Device::ColorDepth,					Profile::Device::ColorDepthDefault, isResetDefault);
+	setNewOption(Profile::Key::Device::IsDitheringEnabled,			Profile::Device::IsDitheringEnabledDefault, isResetDefault);
 
 
 	QPoint ledPosition;
@@ -2054,25 +2247,42 @@ void Settings::initDevicesMap()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAdalight]	= Main::Value::ConnectedDevice::AdalightDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAdalight] = Main::Value::ConnectedDevice::AdalightDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeArdulight] = Main::Value::ConnectedDevice::ArdulightDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeLightpack] = Main::Value::ConnectedDevice::LightpackDevice;
-	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeVirtual]	= Main::Value::ConnectedDevice::VirtualDevice;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeVirtual] = Main::Value::ConnectedDevice::VirtualDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeDrgb] = Main::Value::ConnectedDevice::DrgbDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeDnrgb] = Main::Value::ConnectedDevice::DnrgbDevice;
 	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeWarls] = Main::Value::ConnectedDevice::WarlsDevice;
 
-	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAdalight]	= Main::Key::Adalight::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAdalight] = Main::Key::Adalight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::NumberOfLeds;
-	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeVirtual]	= Main::Key::Virtual::NumberOfLeds;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeVirtual] = Main::Key::Virtual::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeDrgb] = Main::Key::Drgb::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeDnrgb] = Main::Key::Dnrgb::NumberOfLeds;
 	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeWarls] = Main::Key::Warls::NumberOfLeds;
 
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeAdalight] = Main::Key::Adalight::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeVirtual] = Main::Key::Virtual::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeDrgb] = Main::Key::Drgb::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeDnrgb] = Main::Key::Dnrgb::LedMilliAmps;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeWarls] = Main::Key::Warls::LedMilliAmps;
+
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeAdalight] = Main::Key::Adalight::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeArdulight] = Main::Key::Ardulight::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeLightpack] = Main::Key::Lightpack::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeVirtual] = Main::Key::Virtual::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeDrgb] = Main::Key::Drgb::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeDnrgb] = Main::Key::Dnrgb::PowerSupplyAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeWarls] = Main::Key::Warls::PowerSupplyAmps;
 #ifdef ALIEN_FX_SUPPORTED
-	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAlienFx]	= Main::Value::ConnectedDevice::AlienFxDevice;
-	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAlienFx]	= Main::Key::AlienFx::NumberOfLeds;
+	m_devicesTypeToNameMap[SupportedDevices::DeviceTypeAlienFx] = Main::Value::ConnectedDevice::AlienFxDevice;
+	m_devicesTypeToKeyNumberOfLedsMap[SupportedDevices::DeviceTypeAlienFx] = Main::Key::AlienFx::NumberOfLeds;
+	m_devicesTypeToKeyLedMilliAmpsMap[SupportedDevices::DeviceTypeAlienFx] = Main::Key::AlienFx::LedMilliAmps;
+	m_devicesTypeToKeyPowerSupplyAmpsMap[SupportedDevices::DeviceTypeAlienFx] = Main::Key::AlienFx::PowerSupplyAmps;
 #endif
 }
 

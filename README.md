@@ -14,6 +14,7 @@ Lightpack project with Prismatik flavour
 &nbsp;&nbsp;[Short Description](#lightpack-project-with-prismatik-flavour) <br />
 &nbsp;&nbsp;[Main Features](#main-features) <br />
 &nbsp;&nbsp;[Supported Devices and Protocols](#supported-devices-and-protocols) <br />
+&nbsp;&nbsp;[Making Plugins](#making-plugins) <br />
 &nbsp;&nbsp;[Useful URLs](#useful-urls) <br />
 &nbsp;&nbsp;[Build Prismatik with Windows](#prismatik-build-instructions-for-windows) <br />
 &nbsp;&nbsp;[Build with Linux](#build-instructions-for-linux) <br />
@@ -66,6 +67,11 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
   * DRGB
   * DNRGB
   * ESP8266/ESP32 ([WLED](https://github.com/Aircoookie/WLED) firmware highly recommended)
+
+
+##### Making Plugins:
+* [template](Software/res/plugin-template.ini)
+* [code samples](Software/apiexamples)
 
 
 ##### Useful URLs:

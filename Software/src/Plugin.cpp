@@ -1,8 +1,8 @@
 #include "Plugin.hpp"
 #include <QSettings>
-#include <QIcon>
-#include <QFileInfo>
+#include <QFile>
 #include <QDir>
+#include <QImageReader>
 #include "Settings.hpp"
 #include "../common/defs.h"
 
@@ -23,24 +23,46 @@ Plugin::Plugin(QString name, QString path, QObject *parent) :
 	_pathPlugin = path;
 	QDir pluginPath(_pathPlugin);
 
-	QString fileName = path+"/"+name+".ini";
-	QSettings settings( fileName, QSettings::IniFormat );
-	settings.beginGroup("Main");
-	this->_name = settings.value( "Name", "Error").toString();
-	if (settings.contains(kOsSpecificExecuteKey)) {
-		this->_exec = settings.value( kOsSpecificExecuteKey, "").toString();
-	} else {
-		this->_exec = settings.value( "Execute", "").toString();
+	const QString fileName(path+"/"+name+".ini");
+	if (!QFile::exists(fileName)) {
+		qWarning() << Q_FUNC_INFO << name << fileName << "does not exist, generating defaults, make sure to edit the file!";
+		if (!QFile::copy(":/plugin-template.ini", fileName))
+			qWarning() << Q_FUNC_INFO << name << "failed to generate" << fileName;
+		else if (!QFile::setPermissions(fileName, QFile::permissions(fileName) | QFileDevice::WriteOwner))
+			qWarning() << Q_FUNC_INFO << name << "could not set write permissions to" << fileName;
 	}
-	this->_guid = settings.value( "Guid", "").toString();
-	this->_author = settings.value( "Author", "").toString();
-	this->_description = settings.value( "Description", "").toString();
-	this->_version = settings.value( "Version", "").toString();
-	this->_icon = pluginPath.absoluteFilePath(settings.value( "Icon", "").toString());
+	QSettings settings(fileName, QSettings::IniFormat);
+	settings.beginGroup("Main");
+	_name = settings.value("Name", "").toString();
+	if (_name.isEmpty())
+		_name = name;
+
+	if (settings.contains(kOsSpecificExecuteKey))
+		_arguments = settings.value(kOsSpecificExecuteKey, "").toString().split(' ');
+	else
+		_arguments = settings.value("Execute", "").toString().split(' ');
+
+	if (!_arguments.isEmpty())
+		_exec = _arguments.takeFirst();
+
+	if (_exec.isEmpty())
+		qWarning() << Q_FUNC_INFO << name << "no executable, check" << fileName;
+
+	_guid = settings.value("Guid", "").toString();
+	_author = settings.value("Author", "").toString();
+	_description = settings.value("Description", "").toString();
+	_version = settings.value("Version", "").toString();
+
+	const QString iconName = settings.value("Icon", "").toString();
+	const QString iconPath = pluginPath.absoluteFilePath(iconName);
+	if (!iconName.isEmpty() && QFile::exists(iconPath) && !QImageReader::imageFormat(iconPath).isEmpty())
+		_icon = QIcon(iconPath);
+	if (_icon.isNull())
+		_icon = QIcon(":/icons/plugins.png");
+
 	settings.endGroup();
 
 	process = new QProcess(this);
-
 }
 
 Plugin::~Plugin()
@@ -48,17 +70,15 @@ Plugin::~Plugin()
 	Stop();
 }
 
-QString Plugin::Name() const
-{
+QString Plugin::Name() const {
 	return _name;
 }
 
-QString Plugin::Guid() const
-{
+QString Plugin::Guid() const {
 	return _guid;
 }
 
-QString Plugin::Author() const	{
+QString Plugin::Author() const {
 	return _author;
 }
 
@@ -71,54 +91,56 @@ QString Plugin::Version() const	{
 }
 
 
-QIcon Plugin::Icon() const	{
-	QFileInfo f(_icon);
-	if (f.exists())
-		return QIcon(_icon);
-	return QIcon(":/icons/plugins.png");
+QIcon Plugin::Icon() const {
+	return _icon;
 }
 
 
 int Plugin::getPriority() const {
-	QString key = this->_name+"/Priority";
+	const QString key = _name+"/Priority";
 	return Settings::valueMain(key).toInt();
 }
 
 void Plugin::setPriority(int priority) {
-	QString key = this->_name+"/Priority";
+	const QString key = _name+"/Priority";
 	Settings::setValueMain(key,priority);
 }
 
 bool Plugin::isEnabled() const {
-	QString key = this->_name+"/Enable";
+	const QString key = _name+"/Enable";
 	return Settings::valueMain(key).toBool();
 }
 
-void Plugin::setEnabled(bool enable){
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << enable;
-	QString key = this->_name+"/Enable";
+void Plugin::setEnabled(bool enable) {
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << enable;
+	const QString key = _name+"/Enable";
 	Settings::setValueMain(key,enable);
-	if (!enable) this->Stop();
-	if (enable) this->Start();
+	if (!enable) Stop();
+	if (enable) Start();
 }
 
 
 void Plugin::Start()
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _exec;
-
-	//QStringList arguments;
-	//arguments << "-style" << "fusion";
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << "starting" << _exec << _arguments;
 
 	QDir dir(_pathPlugin);
 	QDir::setCurrent(dir.absolutePath());
 
 	process->disconnect();
-	connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SIGNAL(stateChanged(QProcess::ProcessState)));
+
+	connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(stateChanged(QProcess::ProcessState)));
+	connect(process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(errorOccurred(QProcess::ProcessError)));
+
+	connect(process, SIGNAL(started()), this, SLOT(started()));
+	connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int, QProcess::ExitStatus)));
+
+	connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readyReadStandardError()));
+	connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
 
 	process->setEnvironment(QProcess::systemEnvironment());
-//	process->setProcessChannelMode(QProcess::ForwardedChannels);
 	process->setProgram(_exec);
+	process->setArguments(_arguments);
 	process->start();
 }
 
@@ -132,3 +154,34 @@ QProcess::ProcessState Plugin::state() const
 	return process->state();
 }
 
+// QProcess slots
+void Plugin::stateChanged(QProcess::ProcessState newState)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << newState;
+	emit pluginStateChanged(newState);
+}
+
+void Plugin::errorOccurred(QProcess::ProcessError error)
+{
+	qWarning() << Q_FUNC_INFO << _name << error << _exec << _arguments;
+}
+
+void Plugin::started()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name;
+}
+
+void Plugin::finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << "exitCode=" << exitCode << exitStatus;
+}
+
+void Plugin::readyReadStandardError()
+{
+	qWarning() << Q_FUNC_INFO << _name << process->readAllStandardError();
+}
+
+void Plugin::readyReadStandardOutput()
+{
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << process->readAllStandardOutput();
+}

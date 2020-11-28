@@ -40,5 +40,6 @@
         <file>icons/Prismatik-pixmap.png</file>
         <file>text/cast.html</file>
         <file>icons/persist.png</file>
+        <file>plugin-template.ini</file>
     </qresource>
 </RCC>

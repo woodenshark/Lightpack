@@ -32,8 +32,8 @@ LedDeviceDnrgb::LedDeviceDnrgb(const QString& address, const QString& port, cons
 }
 
 const QString LedDeviceDnrgb::name() const
-{ 
-	return "dnrgb"; 
+{
+	return "dnrgb";
 }
 
 int LedDeviceDnrgb::maxLedsCount()
@@ -44,52 +44,62 @@ int LedDeviceDnrgb::maxLedsCount()
 void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 {
 	bool ok = true;
-
-	m_colorsSaved = colors;
+	bool sentPackets = false;
 
 	resizeColorsBuffer(colors.count());
 
 	applyColorModifications(colors, m_colorsBuffer);
+	applyDithering(m_colorsBuffer, 8);
 
 	// Send multiple buffers
-	uint16_t remainingColors = colors.count();
+	const int totalColors = colors.count();
 	uint16_t startIndex = 0;
-	uint16_t colorsToSend = 0;
-		
-	while (remainingColors > 0)
+
+	while (startIndex < totalColors)
 	{
+		// skip equals
+		while (startIndex < totalColors &&
+			m_colorsSaved[startIndex] == colors[startIndex])
+			startIndex++;
+
+		// get diffs
+		QByteArray colorPacket;
+		uint16_t colorPacketLen = 0;
+		while (colorPacketLen < LedsPerPacket &&
+			startIndex + colorPacketLen < totalColors &&
+			m_colorsSaved[startIndex + colorPacketLen] != colors[startIndex + colorPacketLen])
+		{
+			StructRgb color = m_colorsBuffer[startIndex + colorPacketLen];
+
+			colorPacket.append(color.r);
+			colorPacket.append(color.g);
+			colorPacket.append(color.b);
+
+			colorPacketLen++;
+		}
+
+		if (colorPacketLen > 0) {
+			m_writeBuffer.clear();
+			m_writeBuffer.append(m_writeBufferHeader);
+			m_writeBuffer.append((char)(startIndex >> 8));  //High byte
+			m_writeBuffer.append((char)startIndex);         //Low byte
+			m_writeBuffer.append(colorPacket);
+			startIndex += colorPacketLen;
+			ok &= writeBuffer(m_writeBuffer);
+			sentPackets = true;
+		}
+	}
+
+	// if no packets are sent, send empty packet to not timeout
+	if (!sentPackets && m_timeout != InfiniteTimeout) {
 		m_writeBuffer.clear();
 		m_writeBuffer.append(m_writeBufferHeader);
-		m_writeBuffer.append((char)(startIndex >> 8));  //High byte
-		m_writeBuffer.append((char)startIndex);         //Low byte
-
-		if (remainingColors > LEDS_PER_PACKET)
-		{
-			colorsToSend = LEDS_PER_PACKET;
-		}
-		else
-		{
-			colorsToSend = remainingColors;
-		}
-
-		for (uint16_t i = startIndex; i < startIndex + colorsToSend; i++)
-		{
-			StructRgb color = m_colorsBuffer[i];
-
-			// Reduce 12-bit colour information
-			color.r = color.r >> 4;
-			color.g = color.g >> 4;
-			color.b = color.b >> 4;
-
-			m_writeBuffer.append(color.r);
-			m_writeBuffer.append(color.g);
-			m_writeBuffer.append(color.b);
-		}
-
-		startIndex += colorsToSend;
-		remainingColors -= colorsToSend;
+		m_writeBuffer.append((char)0);
+		m_writeBuffer.append((char)0);
 		ok &= writeBuffer(m_writeBuffer);
 	}
+
+	m_colorsSaved = colors;
 
 	emit commandCompleted(ok);
 }
@@ -116,9 +126,9 @@ void LedDeviceDnrgb::switchOffLeds()
 		m_writeBuffer.append((char)startIndex >> 8);  //High byte
 		m_writeBuffer.append((char)startIndex);       //Low byte
 
-		if (remainingColors > LEDS_PER_PACKET)
+		if (remainingColors > LedsPerPacket)
 		{
-			colorsToSend = LEDS_PER_PACKET;
+			colorsToSend = LedsPerPacket;
 		}
 		else
 		{

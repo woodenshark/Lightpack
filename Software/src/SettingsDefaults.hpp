@@ -76,7 +76,6 @@ namespace Main
 static const QString ProfileNameDefault = "Lightpack";
 static const QString LanguageDefault = "<System>";
 static const Debug::DebugLevels DebugLevelDefault = Debug::ZeroLevel;
-static const bool IsExpertModeEnabledDefault = false;
 static const bool IsKeepLightsOnAfterExit = false;
 static const bool IsKeepLightsOnAfterLock = true;
 static const bool IsKeepLightsOnAfterSuspend = false;
@@ -97,11 +96,16 @@ static const QString HotkeyDefault = "Undefined";
 // [API]
 namespace Api
 {
-static const bool IsEnabledDefault = true;
+static const bool IsEnabledDefault = false;
 static const bool ListenOnlyOnLoInterfaceDefault = true;
 static const int PortDefault = 3636;
 static const QString AuthKey = "";
 // See ApiKey generation in Settings initialization
+}
+namespace Device
+{
+static const int LedMilliAmpsDefault = 50;
+static const double PowerSupplyAmpsDefault = 0.0;
 }
 namespace Adalight
 {
@@ -165,7 +169,7 @@ namespace Grab
 static const ::Grab::GrabberType GrabberDefault = GRABMODE_DEFAULT;
 static const QString GrabberDefaultString = GRABMODE_DEFAULT_STR;
 static const bool IsAvgColorsEnabledDefault = false;
-static const bool IsSendDataOnlyIfColorsChangesDefault = true;
+static const bool IsSendDataOnlyIfColorsChangesDefault = false;
 static const bool IsMinimumLuminosityEnabledDefault = true;
 static const bool IsDx1011GrabberEnabledDefault = false;
 static const bool IsDx9GrabbingEnabledDefault = false;
@@ -216,11 +220,15 @@ static const int RefreshDelayMin = 64;
 static const int RefreshDelayDefault = 100;
 static const int RefreshDelayMax = 1023;
 
-static const bool IsUsbPowerLedDisabled = false;
+static const bool IsUsbPowerLedDisabledDefault = false;
 
 static const int BrightnessMin = 0;
 static const int BrightnessDefault = 100;
 static const int BrightnessMax = 100;
+
+static const int BrightnessCapMin = 1;
+static const int BrightnessCapDefault = 100;
+static const int BrightnessCapMax = 100;
 
 static const int SmoothMin = 0;
 static const int SmoothDefault = 100;
@@ -233,6 +241,8 @@ static const int ColorDepthMax = 255;
 static const double GammaMin = 0.01;
 static const double GammaDefault = 2.0;
 static const double GammaMax = 10.0;
+
+static const bool IsDitheringEnabledDefault = false;
 }
 // [LED_i]
 namespace Led

@@ -270,8 +270,8 @@ You still will be able to place capturing zones manually.</source>
     <message>
         <location filename="../../src/SettingsWindow.ui" line="177"/>
         <location filename="../../src/SettingsWindow.ui" line="2228"/>
-        <source>Experimental</source>
-        <translation>Експериментальні</translation>
+        <source>Expert</source>
+        <translation>Експерт</translation>
     </message>
     <message>
         <location filename="../../src/SettingsWindow.ui" line="192"/>

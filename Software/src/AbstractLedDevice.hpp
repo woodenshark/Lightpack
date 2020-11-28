@@ -71,6 +71,10 @@ public slots:
 	virtual void setSmoothSlowdown(int value) = 0;
 	virtual void setGamma(double value, bool updateColors = true);
 	virtual void setBrightness(int value, bool updateColors = true);
+	virtual void setBrightnessCap(int value, bool updateColors = true);
+	virtual void setDitheringEnabled(bool value, bool updateColors = true);
+	virtual void setLedMilliAmps(const int value, const bool updateColors = true);
+	virtual void setPowerSupplyAmps(const double value, const bool updateColors = true);
 	virtual void setColorSequence(QString value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
@@ -93,13 +97,18 @@ public slots:
 
 protected:
 	virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors);
+	virtual void applyDithering(QList<StructRgb>& colors, int colorDepth);
 
 protected:
 	QString m_colorSequence;
 	double m_gamma;
 	int m_brightness;
+	int m_brightnessCap;
+	int m_ledMilliAmps{0};
+	double m_powerSupplyAmps{0.0};
 	int m_luminosityThreshold;
 	bool m_isMinimumLuminosityEnabled;
+	bool m_isDitheringEnabled;
 
 	QList<WBAdjustment> m_wbAdjustments;
 

@@ -93,7 +93,7 @@ void PluginsManager::StartPlugins()
 			p->disconnect();
 			if (p->isEnabled())
 				p->Start();
-			connect(p, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(onPluginStateChangedHandler()));
+			connect(p, SIGNAL(pluginStateChanged(QProcess::ProcessState)), this, SLOT(onPluginStateChangedHandler()));
 		}
 
 }

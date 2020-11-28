@@ -58,6 +58,10 @@ DEFINES += $${SUPPORTED_GRABBERS}
 
 LIBS    += -L../lib -lgrab -lprismatik-math
 
+QMAKE_CFLAGS = $$(CFLAGS)
+QMAKE_CXXFLAGS = $$(CXXFLAGS)
+QMAKE_LFLAGS = $$(LDFLAGS)
+
 CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
 CONFIG(clang) {
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
@@ -299,6 +303,7 @@ SOURCES += \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/ConfigureUdpDevicePage.cpp \
+    wizard/ConfigureDevicePowerPage.cpp \
     wizard/SelectDevicePage.cpp \
     wizard/GlobalColorCoefPage.cpp \
     wizard/CustomDistributor.cpp \
@@ -355,6 +360,7 @@ HEADERS += \
     wizard/LightpackDiscoveryPage.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/ConfigureUdpDevicePage.hpp \
+    wizard/ConfigureDevicePowerPage.hpp \
     wizard/SelectDevicePage.hpp \
     wizard/GlobalColorCoefPage.hpp \
     types.h \
@@ -400,6 +406,7 @@ FORMS += SettingsWindow.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/ConfigureUdpDevicePage.ui \
+    wizard/ConfigureDevicePowerPage.ui \
     wizard/SelectDevicePage.ui \
     wizard/GlobalColorCoefPage.ui
 

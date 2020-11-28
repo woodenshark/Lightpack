@@ -89,7 +89,10 @@ void WizardPageUsingDevice::turnLightsOn(QRgb color)
 	lights.reserve(_transSettings->ledCount);
 	for (int i = 0; i < _transSettings->ledCount; i++)
 	{
-		lights.append(color);
+		if (_transSettings->zoneEnabled[i])
+			lights.append(color);
+		else
+			lights.append(0);
 	}
 	device()->setColors(lights);
 }

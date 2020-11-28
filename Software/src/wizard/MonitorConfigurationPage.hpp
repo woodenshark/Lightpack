@@ -50,7 +50,6 @@ protected:
 	virtual bool validatePage();
 
 private:
-	void addMonitor(int id);
 	void cleanupMonitors();
 
 	Ui::MonitorsConfigurationPage *_ui;

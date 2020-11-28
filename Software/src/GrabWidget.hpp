@@ -27,6 +27,7 @@
 #pragma once
 
 #include "GrabConfigWidget.hpp"
+#include "types.h"
 #include <functional>
 
 namespace Ui {
@@ -52,11 +53,17 @@ public:
 
 	void saveSizeAndPosition();
 
-	int getId();
-	double getCoefRed();
-	double getCoefGreen();
-	double getCoefBlue();
-	bool isAreaEnabled();
+	int getId() const;
+	double getCoefRed() const;
+	double getCoefGreen() const;
+	double getCoefBlue() const;
+	WBAdjustment getCoefs() const;
+	void setCoefRed(const double);
+	void setCoefGreen(const double);
+	void setCoefBlue(const double);
+	void setCoefs(const WBAdjustment);
+	bool isAreaEnabled() const;
+	void setAreaEanled(const bool);
 	void fillBackgroundWhite();
 	void fillBackgroundColored();
 
@@ -127,9 +134,7 @@ private:
 
 	int m_selfId; // ID of this object
 
-	double m_coefRed;
-	double m_coefGreen;
-	double m_coefBlue;
+	WBAdjustment m_coefs;
 
 	Ui::GrabWidget *ui;
 

@@ -62,14 +62,15 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	// Button image size 24x24 px, but it makes it impossible to resize widgets to less than that
 	// Setting minimumSize instead does not respect the aspect ratio, leaving at 16 for now
 	ui->button_OpenConfig->setFixedSize(16, 16);
-	ui->button_OpenConfig->setStyleSheet(QStringLiteral(
-		"QPushButton		{ border-image: url(:/buttons/settings_24px.png) }\
-		QPushButton:hover	{ border-image: url(:/buttons/settings_24px.png) }\
-		QPushButton:pressed { border-image: url(:/buttons/settings_24px.png) }"
-	));
 
 	m_selfId = id;
 	m_selfIdString = QString::number(m_selfId + 1);
+	cmd = NOP;
+	m_features = features;
+	m_fellows = fellows;
+	m_backgroundColor = Qt::white;
+
+	setOpenConfigButtonBackground(m_backgroundColor);
 
 	if (m_features & AllowMove)
 		setCursorOnAll(Qt::OpenHandCursor);
@@ -79,11 +80,6 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 
 	setMouseTracking(true);
 
-	cmd = NOP;
-	m_features = features;
-	m_fellows = fellows;
-	m_backgroundColor = Qt::white;
-
 	//fillBackgroundColored(); ??
 
 	if (features & (AllowCoefConfig | AllowEnableConfig)) {
@@ -92,6 +88,7 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 			connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
 		}
 		if (features & AllowCoefConfig) {
+			m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
 			connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
 			connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
 			connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
@@ -136,12 +133,12 @@ void GrabWidget::settingsProfileChanged()
 	if (m_features & SyncSettings) {
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << m_selfId;
 
-		m_coefRed = Settings::getLedCoefRed(m_selfId);
-		m_coefGreen = Settings::getLedCoefGreen(m_selfId);
-		m_coefBlue = Settings::getLedCoefBlue(m_selfId);
+		m_coefs.red = Settings::getLedCoefRed(m_selfId);
+		m_coefs.green = Settings::getLedCoefGreen(m_selfId);
+		m_coefs.blue = Settings::getLedCoefBlue(m_selfId);
 
 		m_configWidget->setIsAreaEnabled(Settings::isLedEnabled(m_selfId));
-		m_configWidget->setCoefs(m_coefRed, m_coefGreen, m_coefBlue);
+		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
 
 		move(Settings::getLedPosition(m_selfId));
 		resize(Settings::getLedSize(m_selfId));
@@ -546,12 +543,12 @@ void GrabWidget::paintEvent(QPaintEvent *)
 	QPainter painter(this);
 	painter.setPen(QColor(0x77, 0x77, 0x77));
 	if ((m_features & DimUntilInteractedWith) && isAreaEnabled()) {
-		painter.setBrush(QBrush(cmd == NOP ? QColor(m_backgroundColor.darker(150)) : QColor(m_backgroundColor)));
+		painter.setBrush(QBrush(cmd == NOP ? m_backgroundColor.darker(150) : m_backgroundColor));
 	}
 	painter.drawRect(0, 0, width() - 1, height() - 1);
 
 //	// Icon 'resize' opacity
-	painter.setOpacity(0.4);
+	painter.setOpacity((m_features & AllowResize) ? 0.4 : 0.0);
 
 	// Draw icon 12x12px with 3px padding from the bottom right corner
 	if (getTextColor() == Qt::white)
@@ -582,42 +579,89 @@ void GrabWidget::paintEvent(QPaintEvent *)
 	painter.drawText(rectWidthHeight, m_widthHeight, QTextOption(Qt::AlignHCenter | Qt::AlignBottom));
 }
 
-int GrabWidget::getId() {
+int GrabWidget::getId() const {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
 	return m_selfId;
 }
 
-double GrabWidget::getCoefRed()
+double GrabWidget::getCoefRed() const
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-	return m_coefRed;
+	return m_coefs.red;
 }
 
-double GrabWidget::getCoefGreen()
+double GrabWidget::getCoefGreen() const
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-	return m_coefGreen;
+	return m_coefs.green;
 }
 
-double GrabWidget::getCoefBlue()
+double GrabWidget::getCoefBlue() const
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-	return m_coefBlue;
+	return m_coefs.blue;
 }
 
-bool GrabWidget::isAreaEnabled()
+WBAdjustment GrabWidget::getCoefs() const
+{
+	return m_coefs;
+}
+
+void GrabWidget::setCoefRed(const double coef)
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
-	if (m_features & AllowEnableConfig) {
+	m_coefs.red = coef;
+	if (m_features & AllowCoefConfig)
+		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+void GrabWidget::setCoefGreen(const double coef)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_coefs.green = coef;
+	if (m_features & AllowCoefConfig)
+		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+void GrabWidget::setCoefBlue(const double coef)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_coefs.blue = coef;
+	if (m_features & AllowCoefConfig)
+		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+void GrabWidget::setCoefs(const WBAdjustment coefs)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_coefs = coefs;
+	if (m_features & AllowCoefConfig)
+		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+bool GrabWidget::isAreaEnabled() const
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	if (m_configWidget)
 		return m_configWidget->isAreaEnabled();
-	} else {
-		return true;
-	}
+	return true;
+}
+
+void GrabWidget::setAreaEanled(const bool enabled)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	if (m_configWidget)
+		m_configWidget->setIsAreaEnabled(enabled);
 }
 
 void GrabWidget::fillBackgroundWhite()
@@ -721,22 +765,27 @@ void GrabWidget::onOpenConfigButton_Clicked()
 void GrabWidget::onRedCoef_ValueChanged(double value)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
-	Settings::setLedCoefRed(m_selfId, value);
-	m_coefRed = Settings::getLedCoefRed(m_selfId);
+	if (m_features & SyncSettings)
+		Settings::setLedCoefRed(m_selfId, value);
+	m_coefs.red = value;
 }
 
 void GrabWidget::onGreenCoef_ValueChanged(double value)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
-	Settings::setLedCoefGreen(m_selfId, value);
-	m_coefGreen = Settings::getLedCoefGreen(m_selfId);
+
+	if (m_features & SyncSettings)
+		Settings::setLedCoefGreen(m_selfId, value);
+	m_coefs.green = value;
 }
 
 void GrabWidget::onBlueCoef_ValueChanged(double value)
 {
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << value;
-	Settings::setLedCoefBlue(m_selfId, value);
-	m_coefBlue = Settings::getLedCoefBlue(m_selfId);
+
+	if (m_features & SyncSettings)
+		Settings::setLedCoefBlue(m_selfId, value);
+	m_coefs.blue = value;
 }
 
 void GrabWidget::setBackgroundColor(const QColor& color)
@@ -748,6 +797,7 @@ void GrabWidget::setBackgroundColor(const QColor& color)
 #endif
 
 	m_backgroundColor = color;
+	setOpenConfigButtonBackground(getBackgroundColor());
 
 	QPalette pal = palette();
 	pal.setBrush(backgroundRole(), QBrush(getBackgroundColor()));
@@ -762,7 +812,6 @@ void GrabWidget::setTextColor(const QColor& color)
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << hex << color.rgb();
 #endif
 
-	setOpenConfigButtonBackground(color);
 	m_textColor = color;
 
 	QPalette pal = palette();
@@ -782,7 +831,7 @@ QColor GrabWidget::getBackgroundColor()
 
 void GrabWidget::setOpenConfigButtonBackground(const QColor &color)
 {
-	QString image = (color == Qt::white && isAreaEnabled()) ? QStringLiteral("dark") : QStringLiteral("light");
+	const QString image = (m_features & DimUntilInteractedWith) && color != Qt::black ? QStringLiteral("dark") : QStringLiteral("light");
 	ui->button_OpenConfig->setStyleSheet(QStringLiteral(
 		"QPushButton		{ border-image: url(:/buttons/settings_%1_24px.png) }\
 		QPushButton:hover	{ border-image: url(:/buttons/settings_%1_24px_hover.png) }\

@@ -33,16 +33,13 @@
 #include "Settings.hpp"
 #include "debug.h"
 #include "PrismatikMath.hpp"
+#include "GrabWidget.hpp"
 
 GlobalColorCoefPage::GlobalColorCoefPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
 	WizardPageUsingDevice(isInitFromSettings, ts, parent),
 	_ui(new Ui::GlobalColorCoefPage)
 {
 	_ui->setupUi(this);
-	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->hsColorTemperature, SIGNAL(valueChanged(int)), this, SLOT(onColorTemperatureValueChanged()));
 }
 
 GlobalColorCoefPage::~GlobalColorCoefPage()
@@ -77,21 +74,36 @@ void GlobalColorCoefPage::initializePage()
 	}
 	this->activateWindow();
 
-	if (_isInitFromSettings) {
-		_ui->sbRed->setValue(SettingsScope::Settings::getLedCoefRed(1) * _ui->sbRed->maximum());
-		_ui->sbGreen->setValue(SettingsScope::Settings::getLedCoefGreen(1) * _ui->sbGreen->maximum());
-		_ui->sbBlue->setValue(SettingsScope::Settings::getLedCoefBlue(1) * _ui->sbBlue->maximum());
-	}
-
+	// RESETS WBA
 	resetDeviceSettings();
-	onCoefValueChanged();
+
+	if (_isInitFromSettings) {
+		_grabAreas.reserve(_transSettings->ledCount);
+		for (int i = 0; i < _transSettings->ledCount; i++)
+			addGrabArea(i);
+		const GrabWidget* const firstWidget = _grabAreas.first();
+		_ui->sbRed->setValue(firstWidget->getCoefRed() * _ui->sbRed->maximum());
+		_ui->sbGreen->setValue(firstWidget->getCoefGreen() * _ui->sbGreen->maximum());
+		_ui->sbBlue->setValue(firstWidget->getCoefBlue() * _ui->sbBlue->maximum());
+	}
+	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->hsColorTemperature, &QSlider::valueChanged, this, &GlobalColorCoefPage::onColorTemperatureValueChanged);
+
 	turnLightsOn(qRgb(255, 255, 255));
+
+	// prevent some firmwares/devices from timing out during this phase
+	// also avoids tracking widget coef signals
+	connect(&_keepAlive, &QTimer::timeout, this, &GlobalColorCoefPage::updateDevice);
+	using namespace std::chrono_literals;
+	_keepAlive.start(200ms);
 }
 
 bool GlobalColorCoefPage::validatePage()
 {
 	using namespace SettingsScope;
-	QString deviceName = device()->name();
+	const QString deviceName = device()->name();
 	SupportedDevices::DeviceType devType;
 	if (deviceName.compare(QStringLiteral("lightpack"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeLightpack;
@@ -134,42 +146,53 @@ bool GlobalColorCoefPage::validatePage()
 	Settings::setConnectedDevice(devType);
 	Settings::setNumberOfLeds(devType, _transSettings->zonePositions.size());
 
-	for (int id : _transSettings->zonePositions.keys()) {
+	for (const int id : _transSettings->zonePositions.keys()) {
 		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
 		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
-		Settings::setLedCoefRed(id, _ui->sbRed->value() / (double)_ui->sbRed->maximum());
-		Settings::setLedCoefGreen(id, _ui->sbGreen->value() / (double)_ui->sbGreen->maximum());
-		Settings::setLedCoefBlue(id, _ui->sbBlue->value() / (double)_ui->sbBlue->maximum());
+		Settings::setLedCoefRed(id, _grabAreas[id]->getCoefRed());
+		Settings::setLedCoefGreen(id, _grabAreas[id]->getCoefGreen());
+		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
 	}
 
 	cleanupMonitors();
+	cleanupGrabAreas();
 	return true;
 }
 
 void GlobalColorCoefPage::cleanupPage()
 {
 	cleanupMonitors();
+	cleanupGrabAreas();
 }
 
-void GlobalColorCoefPage::onCoefValueChanged()
+void GlobalColorCoefPage::updateDevice()
 {
-	QList<WBAdjustment> adjustments;
+	QList<WBAdjustment> wblist;
+	wblist.reserve(_grabAreas.size());
 
-	for (int led = 0; led < _transSettings->ledCount; ++led) {
-		WBAdjustment wba;
-		wba.red = _ui->sbRed->value() / (double)_ui->sbRed->maximum();
-		wba.green = _ui->sbGreen->value() / (double)_ui->sbGreen->maximum();
-		wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
-		adjustments.append(wba);
-	}
+	for (const GrabWidget * const widget : _grabAreas)
+		wblist.append(widget->getCoefs());
 
-	device()->updateWBAdjustments(adjustments);
+	device()->updateWBAdjustments(wblist, true);
 }
 
-void GlobalColorCoefPage::onColorTemperatureValueChanged()
+void GlobalColorCoefPage::onCoefValueChanged(int value)
 {
-	StructRgb whitePoint = PrismatikMath::whitePoint(_ui->hsColorTemperature->value());
+	Q_UNUSED(value);
+
+	WBAdjustment wba;
+	wba.red = _ui->sbRed->value() / (double)_ui->sbRed->maximum();
+	wba.green = _ui->sbGreen->value() / (double)_ui->sbGreen->maximum();
+	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
+
+	for (GrabWidget* const widget : _grabAreas)
+		widget->setCoefs(wba);
+}
+
+void GlobalColorCoefPage::onColorTemperatureValueChanged(int value)
+{
+	const StructRgb whitePoint = PrismatikMath::whitePoint(value);
 	_ui->sbRed->setValue(whitePoint.r / 2.55);
 	_ui->sbGreen->setValue(whitePoint.g / 2.55);
 	_ui->sbBlue->setValue(whitePoint.b / 2.55);
@@ -177,8 +200,29 @@ void GlobalColorCoefPage::onColorTemperatureValueChanged()
 
 void GlobalColorCoefPage::cleanupMonitors()
 {
-	foreach ( MonitorIdForm *monitorIdForm, _monitorForms ) {
+	foreach (MonitorIdForm *monitorIdForm, _monitorForms)
 		delete monitorIdForm;
-	}
 	_monitorForms.clear();
+}
+
+void GlobalColorCoefPage::addGrabArea(const int id)
+{
+	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig, &_grabAreas);
+
+	zone->move(_transSettings->zonePositions[id]);
+	zone->resize(_transSettings->zoneSizes[id]);
+	zone->setCoefRed(SettingsScope::Settings::getLedCoefRed(id));
+	zone->setCoefGreen(SettingsScope::Settings::getLedCoefGreen(id));
+	zone->setCoefBlue(SettingsScope::Settings::getLedCoefBlue(id));
+	zone->setAreaEanled(_transSettings->zoneEnabled[id]);
+	zone->fillBackgroundWhite();
+	zone->show();
+	_grabAreas.append(zone);
+}
+
+void GlobalColorCoefPage::cleanupGrabAreas()
+{
+	for (int i = 0; i < _grabAreas.size(); i++)
+		delete _grabAreas[i];
+	_grabAreas.clear();
 }

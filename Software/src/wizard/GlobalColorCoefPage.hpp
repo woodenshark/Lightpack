@@ -28,6 +28,7 @@
 #define GLOBALCOLORCOEFPAGE_HPP
 
 #include <QList>
+#include <QTimer>
 #include "WizardPageUsingDevice.hpp"
 #include "SettingsAwareTrait.hpp"
 
@@ -50,16 +51,20 @@ protected:
 	virtual bool validatePage();
 
 private slots:
-	void onCoefValueChanged();
-	void onColorTemperatureValueChanged();
+	void onCoefValueChanged(int value);
+	void updateDevice();
+	void onColorTemperatureValueChanged(int value);
 
 private:
-	void addMonitor(int id);
 	void cleanupMonitors();
+	void addGrabArea(const int id);
+	void cleanupGrabAreas();
 
 	Ui::GlobalColorCoefPage *_ui;
 	int _screenId;
 	QList<MonitorIdForm*> _monitorForms;
+	QList<GrabWidget*> _grabAreas;
+	QTimer _keepAlive;
 };
 
 #endif // GLOBALCOLORCOEFPAGE_HPP

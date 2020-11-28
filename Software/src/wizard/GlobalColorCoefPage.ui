@@ -872,13 +872,18 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1" rowspan="2">
+   <item row="2" column="1">
     <widget class="QLabel" name="label">
      <property name="autoFillBackground">
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the color channels until your wall has the same color as your screen.&lt;br/&gt;To do so you can use individual color sliders or the Color Temperature (CT) slider that adjusts all 3 channels at once.&lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;p&gt;You can adjust the colors for each zone individually later on using the gear icon of the corresponding grab widget.&lt;br/&gt;Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustment&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;p&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot; width=&quot;16&quot;/&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the color channels until your wall has the same color as your screen.&lt;br/&gt;
+You can do it either via the gear icon of the each zone OR via the global color sliders / Color Temperature (CT) slider that adjusts all 3 channels at once.&lt;br/&gt;
+&lt;b&gt;Warning:&lt;/b&gt; the global sliders will override manually set values for individual zones! So do global first, then adjust each zone if needed.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;You can also adjust the colors for each zone individually later on using the gear icon of the corresponding grab widget.&lt;br/&gt;Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustment&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot; width=&quot;16&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

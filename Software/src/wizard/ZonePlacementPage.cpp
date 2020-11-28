@@ -39,7 +39,7 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 {
 	_ui->setupUi(this);
 
-	QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
+	const QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
 
 	_x0 = screen.left() + 150;
 	_y0 = screen.top() + 150;
@@ -77,12 +77,11 @@ void ZonePlacementPage::initializePage()
 		const int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_ui->sbNumberOfLeds->setValue(ledCount);
 		_transSettings->ledCount = ledCount;
-
+		_grabAreas.reserve(ledCount);
 		for (int i = 0; i < ledCount; i++) {
-			QPoint topLeft = Settings::getLedPosition(i);
-			QSize size = Settings::getLedSize(i);
-			QRect r(topLeft, size);
-			addGrabArea(i, r);
+			const QPoint topLeft = Settings::getLedPosition(i);
+			const QSize size = Settings::getLedSize(i);
+			addGrabArea(i, QRect(topLeft, size), Settings::isLedEnabled(i));
 		}
 	} else {
 		_ui->sbNumberOfLeds->setValue(device()->defaultLedsCount());
@@ -112,7 +111,7 @@ bool ZonePlacementPage::validatePage()
 	_transSettings->zonePositions.clear();
 	_transSettings->zoneSizes.clear();
 	_transSettings->zoneEnabled.clear();
-	for (GrabWidget* const grabArea : _grabAreas) {
+	for (const GrabWidget* const grabArea : _grabAreas) {
 		_transSettings->zonePositions.insert(grabArea->getId(), grabArea->geometry().topLeft());
 		_transSettings->zoneSizes.insert(grabArea->getId(), grabArea->geometry().size());
 		_transSettings->zoneEnabled.insert(grabArea->getId(), grabArea->isAreaEnabled());
@@ -135,10 +134,10 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	cleanupGrabAreas();
 	_grabAreas.reserve(_transSettings->ledCount);
 	for(int i = 0; i < distributor->areaCount(); i++) {
-		ScreenArea *sf = distributor->next();
+		const ScreenArea * const sf = distributor->next();
 		qDebug() << sf->hScanStart() << sf->vScanStart();
 
-		QRect r(sf->hScanStart(),
+		const QRect r(sf->hScanStart(),
 				sf->vScanStart(),
 				(sf->hScanEnd() - sf->hScanStart()),
 				(sf->vScanEnd() - sf->vScanStart()));
@@ -151,12 +150,13 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	resetNewAreaRect();
 }
 
-void ZonePlacementPage::addGrabArea(int id, const QRect &r)
+void ZonePlacementPage::addGrabArea(int id, const QRect &r, const bool enabled)
 {
-	GrabWidget *zone = new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &_grabAreas);
+	GrabWidget * const zone = new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &_grabAreas);
 
 	zone->move(r.topLeft());
 	zone->resize(r.size());
+	zone->setAreaEanled(enabled);
 	connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
 	connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
 	zone->show();
@@ -182,7 +182,7 @@ QRect ZonePlacementPage::screenRect() const
 
 void ZonePlacementPage::onAndromeda_clicked()
 {
-	QRect screen = screenRect();
+	const QRect screen = screenRect();
 	const int bottomWidth = screen.width() * (1.0 - _ui->sbStandWidth->value() / 100.0);
 	const int perimeter = screen.width() + screen.height() * 2 + bottomWidth;
 	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
@@ -208,7 +208,7 @@ void ZonePlacementPage::onAndromeda_clicked()
 
 void ZonePlacementPage::onCassiopeia_clicked()
 {
-	QRect screen = screenRect();
+	const QRect screen = screenRect();
 	const int perimeter = screen.width() + screen.height() * 2;
 	const int ledSize = perimeter / _ui->sbNumberOfLeds->value();
 	const int sideLeds = screen.height() / ledSize;
@@ -231,7 +231,7 @@ void ZonePlacementPage::onCassiopeia_clicked()
 
 void ZonePlacementPage::onPegasus_clicked()
 {
-	QRect screen = screenRect();
+	const QRect screen = screenRect();
 	const int sideLeds = _ui->sbNumberOfLeds->value() / 2;
 	CustomDistributor custom(
 		screen,
@@ -252,7 +252,7 @@ void ZonePlacementPage::onPegasus_clicked()
 
 void ZonePlacementPage::onApply_clicked()
 {
-	QRect screen = screenRect();
+	const QRect screen = screenRect();
 	CustomDistributor custom(
 		screen,
 		_ui->sbTopLeds->value(),
@@ -274,7 +274,7 @@ void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 	while (numOfLed < _grabAreas.size()) {
 		removeLastGrabArea();
 	}
-	QRect screen = screenRect();
+	const QRect screen = screenRect();
 
 	const int dx = 10;
 	const int dy = 10;

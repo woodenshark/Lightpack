@@ -62,7 +62,7 @@ private slots:
 	void onSideLeds_valueChanged(int arg1);
 
 private:
-	void addGrabArea(int id, const QRect &rect);
+	void addGrabArea(int id, const QRect &rect, const bool enabled = true);
 	void removeLastGrabArea();
 	void cleanupGrabAreas();
 	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);

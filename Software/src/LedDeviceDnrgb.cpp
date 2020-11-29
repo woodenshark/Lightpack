@@ -52,28 +52,39 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 	applyDithering(m_colorsBuffer, 8);
 
 	// Send multiple buffers
-	const int totalColorsSaved = m_colorsSaved.count();
+	const int totalColorsSaved = m_processedColorsSaved.count();
 	const int totalColors = colors.count();
 	uint16_t startIndex = 0;
+	QList<QRgb> newColors;
+	newColors.reserve(colors.count());
 
 	while (startIndex < totalColors)
 	{
 		// skip equals
-		while (startIndex < totalColors &&
-			startIndex < totalColorsSaved &&
-			m_colorsSaved[startIndex] == colors[startIndex])
+		while (startIndex < totalColors
+			&& startIndex < totalColorsSaved)
+		{
+			const StructRgb color = m_colorsBuffer[startIndex];
+			const QRgb newColor = qRgb(color.r, color.g, color.b);
+			if (m_processedColorsSaved[startIndex] != newColor)
+				break;
+			newColors << newColor;
 			startIndex++;
+		}
 
 		// get diffs
 		QByteArray colorPacket;
 		uint16_t colorPacketLen = 0;
-		while (colorPacketLen < LedsPerPacket &&
-			startIndex + colorPacketLen < totalColors &&
-			(startIndex + colorPacketLen >= totalColorsSaved ||
-			m_colorsSaved[startIndex + colorPacketLen] != colors[startIndex + colorPacketLen]))
+		while (colorPacketLen < LedsPerPacket
+			&& startIndex + colorPacketLen < totalColors)
 		{
 			const StructRgb color = m_colorsBuffer[startIndex + colorPacketLen];
+			const QRgb newColor = qRgb(color.r, color.g, color.b);
+			if (startIndex + colorPacketLen < totalColorsSaved
+				&& m_processedColorsSaved[startIndex + colorPacketLen] == newColor)
+				break;
 
+			newColors << newColor;
 			colorPacket.append(color.r);
 			colorPacket.append(color.g);
 			colorPacket.append(color.b);
@@ -103,6 +114,7 @@ void LedDeviceDnrgb::setColors(const QList<QRgb> & colors)
 	}
 
 	m_colorsSaved = colors;
+	m_processedColorsSaved = newColors;
 
 	emit commandCompleted(ok);
 }

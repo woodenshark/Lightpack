@@ -41,4 +41,6 @@ public slots:
 
 protected:
 	virtual void reinitBufferHeader();
+
+	QList<QRgb> m_processedColorsSaved;
 };

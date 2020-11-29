@@ -42,6 +42,6 @@ public slots:
 protected:
 	virtual void reinitBufferHeader();
 
-private:
 	constexpr static const int LedsPerPacket = 489;
+	QList<QRgb> m_processedColorsSaved;
 };

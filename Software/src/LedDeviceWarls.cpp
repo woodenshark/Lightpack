@@ -48,24 +48,29 @@ void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 	applyColorModifications(colors, m_colorsBuffer);
 	applyDithering(m_colorsBuffer, 8);
 
-	const int totalColorsSaved = m_colorsSaved.count();
+	const int totalColorsSaved = m_processedColorsSaved.count();
 	m_writeBuffer.clear();
 	m_writeBuffer.append(m_writeBufferHeader);
+	QList<QRgb> newColors;
+	newColors.reserve(colors.count());
 
 	for (int i = 0; i < m_colorsBuffer.count(); i++)
 	{
-		if (i >= totalColorsSaved || colors[i] != m_colorsSaved[i])
+		const StructRgb color = m_colorsBuffer[i];
+		const QRgb newColor = qRgb(color.r, color.g, color.b);
+		if (i >= totalColorsSaved || newColor != m_processedColorsSaved[i])
 		{
-			const StructRgb color = m_colorsBuffer[i];
 
 			m_writeBuffer.append(i);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.b);
 		}
+		newColors << newColor;
 	}
 
 	m_colorsSaved = colors;
+	m_processedColorsSaved = newColors;
 
 	// This may send the header only
 	const bool ok = writeBuffer(m_writeBuffer);

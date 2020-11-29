@@ -96,8 +96,7 @@ void GlobalColorCoefPage::initializePage()
 	// prevent some firmwares/devices from timing out during this phase
 	// also avoids tracking widget coef signals
 	connect(&_keepAlive, &QTimer::timeout, this, &GlobalColorCoefPage::updateDevice);
-	using namespace std::chrono_literals;
-	_keepAlive.start(200ms);
+	_keepAlive.start(200);
 }
 
 bool GlobalColorCoefPage::validatePage()

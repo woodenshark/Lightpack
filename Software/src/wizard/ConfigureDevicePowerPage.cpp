@@ -47,21 +47,21 @@ ConfigureDevicePowerPage::ConfigureDevicePowerPage(bool isInitFromSettings, Tran
 void ConfigureDevicePowerPage::initializePage()
 {
 	SupportedDevices::DeviceType device = SupportedDevices::DefaultDeviceType;
-	if (field("isDrgb").toBool())
+	if (field(QStringLiteral("isDrgb")).toBool())
 		device = SupportedDevices::DeviceTypeDrgb;
-	else if (field("isDnrgb").toBool())
+	else if (field(QStringLiteral("isDnrgb")).toBool())
 		device = SupportedDevices::DeviceTypeDnrgb;
-	else if (field("isWarls").toBool())
+	else if (field(QStringLiteral("isWarls")).toBool())
 		device = SupportedDevices::DeviceTypeWarls;
-	else if (field("isLightpack").toBool())
+	else if (field(QStringLiteral("isLightpack")).toBool())
 		device = SupportedDevices::DeviceTypeLightpack;
-	else if (field("isAdalight").toBool())
+	else if (field(QStringLiteral("isAdalight")).toBool())
 		device = SupportedDevices::DeviceTypeAdalight;
-	else if (field("isArdulight").toBool())
+	else if (field(QStringLiteral("isArdulight")).toBool())
 		device = SupportedDevices::DeviceTypeArdulight;
-	else if (field("isVirtual").toBool())
+	else if (field(QStringLiteral("isVirtual")).toBool())
 		device = SupportedDevices::DeviceTypeVirtual;
-	else if (field("isAlienFx").toBool())
+	else if (field(QStringLiteral("isAlienFx")).toBool())
 		device = SupportedDevices::DeviceTypeAlienFx;
 
 	ui->sbLedMilliAmps->setValue(Settings::getDeviceLedMilliAmps(device));
@@ -72,21 +72,21 @@ void ConfigureDevicePowerPage::initializePage()
 bool ConfigureDevicePowerPage::validatePage()
 {
 	SupportedDevices::DeviceType device = SupportedDevices::DefaultDeviceType;
-	if (field("isDrgb").toBool())
+	if (field(QStringLiteral("isDrgb")).toBool())
 		device = SupportedDevices::DeviceTypeDrgb;
-	else if (field("isDnrgb").toBool())
+	else if (field(QStringLiteral("isDnrgb")).toBool())
 		device = SupportedDevices::DeviceTypeDnrgb;
-	else if (field("isWarls").toBool())
+	else if (field(QStringLiteral("isWarls")).toBool())
 		device = SupportedDevices::DeviceTypeWarls;
-	else if (field("isLightpack").toBool())
+	else if (field(QStringLiteral("isLightpack")).toBool())
 		device = SupportedDevices::DeviceTypeLightpack;
-	else if (field("isAdalight").toBool())
+	else if (field(QStringLiteral("isAdalight")).toBool())
 		device = SupportedDevices::DeviceTypeAdalight;
-	else if (field("isArdulight").toBool())
+	else if (field(QStringLiteral("isArdulight")).toBool())
 		device = SupportedDevices::DeviceTypeArdulight;
-	else if (field("isVirtual").toBool())
+	else if (field(QStringLiteral("isVirtual")).toBool())
 		device = SupportedDevices::DeviceTypeVirtual;
-	else if (field("isAlienFx").toBool())
+	else if (field(QStringLiteral("isAlienFx")).toBool())
 		device = SupportedDevices::DeviceTypeAlienFx;
 
 	const int ledMilliAmps = ui->sbLedMilliAmps->value();

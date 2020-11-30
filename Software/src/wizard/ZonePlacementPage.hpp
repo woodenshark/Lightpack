@@ -73,9 +73,6 @@ private:
 	int _screenId;
 	QList<GrabWidget*> _grabAreas;
 	QRect _newAreaRect;
-	int _x0;
-	int _y0;
-
 };
 
 #endif // ZONECONFIGURATION_HPP

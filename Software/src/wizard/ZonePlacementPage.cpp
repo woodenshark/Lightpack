@@ -38,13 +38,6 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 	_ui(new Ui::ZonePlacementPage)
 {
 	_ui->setupUi(this);
-
-	const QRect screen = QGuiApplication::screens().value(_screenId, QGuiApplication::primaryScreen())->geometry();
-
-	_x0 = screen.left() + 150;
-	_y0 = screen.top() + 150;
-
-	resetNewAreaRect();
 }
 
 ZonePlacementPage::~ZonePlacementPage()
@@ -57,6 +50,7 @@ void ZonePlacementPage::initializePage()
 	using namespace SettingsScope;
 
 	_screenId = field(QStringLiteral("screenId")).toInt();
+	resetNewAreaRect();
 	registerField(QStringLiteral("numberOfLeds"), _ui->sbNumberOfLeds);
 
 	device()->setSmoothSlowdown(70);
@@ -123,8 +117,9 @@ bool ZonePlacementPage::validatePage()
 
 void ZonePlacementPage::resetNewAreaRect()
 {
-	_newAreaRect.setX(_x0);
-	_newAreaRect.setY(_y0);
+	const QRect screen = screenRect();
+	_newAreaRect.setX(screen.left() + 150);
+	_newAreaRect.setY(screen.top() + 150);
 	_newAreaRect.setWidth(100);
 	_newAreaRect.setHeight(100);
 }
@@ -284,9 +279,9 @@ void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 		if (_newAreaRect.right() + dx < screen.right()) {
 			_newAreaRect.moveTo(_newAreaRect.x() + dx, _newAreaRect.y());
 		} else if (_newAreaRect.bottom() + dy < screen.bottom()) {
-			_newAreaRect.moveTo(_x0, _newAreaRect.y() + dy);
+			_newAreaRect.moveTo(screen.left() + 150, _newAreaRect.y() + dy);
 		} else {
-			_newAreaRect.moveTo(_x0,_y0);
+			_newAreaRect.moveTo(screen.left() + 150, screen.top() + 150);
 		}
 	}
 

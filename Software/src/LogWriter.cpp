@@ -22,19 +22,14 @@ LogWriter::~LogWriter()
 	Q_ASSERT(g_logWriter == NULL);
 }
 
-int LogWriter::initWith(const QString& logsDirPath)
+int LogWriter::initEnabled(const QString& logsDirPath)
 {
 	// Using locale codec for console output in messageHandler(..) function ( cout << qstring.toStdString() )
 	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
 
-	m_logsDir.setPath(logsDirPath);
-	if (m_logsDir.exists() == false) {
-		std::cout << "mkdir " << logsDirPath.toStdString() << std::endl;
-		if (m_logsDir.mkdir(logsDirPath) == false) {
-			std::cerr << "Failed mkdir '" << logsDirPath.toStdString() << "' for logs. Exit." << std::endl;
-			return LightpackApplication::LogsDirecroryCreationFail_ErrorCode;
-		}
-	}
+	const int setDirResult = setLogsDir(logsDirPath, true);
+	if (setDirResult != LightpackApplication::OK_ErrorCode)
+		return setDirResult;
 
 	if (rotateLogFiles(m_logsDir) == false)
 		std::cerr << "Failed to rotate old log files." << std::endl;
@@ -73,11 +68,12 @@ int LogWriter::initWith(const QString& logsDirPath)
 	return LightpackApplication::OK_ErrorCode;
 }
 
-void LogWriter::initDisabled()
+int LogWriter::initDisabled(const QString& logsDir)
 {
 	QMutexLocker locker(&m_mutex);
 	m_startupLogStore.clear();
 	m_disabled = true;
+	return setLogsDir(logsDir, false);
 }
 
 void LogWriter::writeMessage(const QString& msg, Level level)
@@ -102,6 +98,18 @@ QDir LogWriter::logsDir() const {
 
 QDir LogWriter::getLogsDir() {
 	return g_logWriter->logsDir();
+}
+
+int LogWriter::setLogsDir(const QString& logsDirPath, const bool create) {
+	m_logsDir.setPath(logsDirPath);
+	if (create && m_logsDir.exists() == false) {
+		std::cout << "mkdir " << logsDirPath.toStdString() << std::endl;
+		if (m_logsDir.mkdir(logsDirPath) == false) {
+			std::cerr << "Failed mkdir '" << logsDirPath.toStdString() << "' for logs. Exit." << std::endl;
+			return LightpackApplication::LogsDirecroryCreationFail_ErrorCode;
+		}
+	}
+	return LightpackApplication::OK_ErrorCode;
 }
 
 void LogWriter::messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)

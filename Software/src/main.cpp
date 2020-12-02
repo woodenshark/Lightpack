@@ -55,7 +55,7 @@ using namespace std;
 unsigned g_debugLevel = SettingsScope::Main::DebugLevelDefault;
 
 QString getApplicationDirectoryPath(const char * firstCmdArgument)
-{	
+{
 	QFileInfo fileInfo(firstCmdArgument);
 	QString appDirPath = fileInfo.absoluteDir().absolutePath();
 
@@ -141,16 +141,12 @@ int main(int argc, char **argv)
 	LightpackApplication lightpackApp(argc, argv);
 	lightpackApp.setLibraryPaths(QStringList(appDirPath + "/plugins"));
 	lightpackApp.initializeAll(appDirPath);
-	
+
 	// init the logger after initializeAll to know the configured debugLevel
-	if (g_debugLevel > 0) {
-		const int logInitResult = logWriter.initWith(appDirPath + "/Logs");
-		if (logInitResult != LightpackApplication::OK_ErrorCode) {
-			exit(logInitResult);
-		}
-	} else {
-		logWriter.initDisabled();
-	}
+
+	const int logInitResult = g_debugLevel > 0 ? logWriter.initEnabled(appDirPath + "/Logs") : logWriter.initDisabled(appDirPath + "/Logs");
+	if (logInitResult != LightpackApplication::OK_ErrorCode)
+		exit(logInitResult);
 
 	if (lightpackApp.isRunning())
 	{

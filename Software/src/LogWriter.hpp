@@ -33,11 +33,12 @@ public:
 	LogWriter();
 	~LogWriter();
 
-	int initWith(const QString& logsDirPath);
-	void initDisabled();
+	int initEnabled(const QString& logsDirPath);
+	int initDisabled(const QString& logsDirPath);
 	void writeMessage(const QString& msg, Level level = Debug);
 	QDir logsDir() const;
 	static QDir getLogsDir();
+	int setLogsDir(const QString& logsDirPath, const bool create);
 
 	struct ScopedMessageHandler
 	{

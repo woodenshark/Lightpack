@@ -70,6 +70,7 @@ signals:
 public slots:
 	void setStatusChanged(Backlight::Status);
 	void setBacklightChanged(Lightpack::Mode);
+	void processMessageWithNoGui(const QString &message);
 
 private slots:
 	void requestBacklightStatus();

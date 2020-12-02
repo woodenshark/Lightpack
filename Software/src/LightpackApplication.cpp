@@ -142,7 +142,9 @@ void LightpackApplication::initializeAll(const QString & appDirPath)
 		// Process messages from another instances in SettingsWindow
 		connect(this, SIGNAL(messageReceived(QString)), m_settingsWindow, SLOT(processMessage(QString)));
 		connect(this, SIGNAL(focusChanged(QWidget*,QWidget*)), this, SLOT(onFocusChanged(QWidget*,QWidget*)));
-	}
+	} else
+		connect(this, SIGNAL(messageReceived(QString)), this, SLOT(processMessageWithNoGui(QString)));
+
 	// Register QMetaType for Qt::QueuedConnection
 	qRegisterMetaType< QList<QRgb> >("QList<QRgb>");
 	qRegisterMetaType< QList<QString> >("QList<QString>");
@@ -329,6 +331,11 @@ void LightpackApplication::onFocusChanged(QWidget *old, QWidget *now)
 			m_isSettingsWindowActive = false;
 		}
 	}
+}
+
+void LightpackApplication::processMessageWithNoGui(const QString& message)
+{
+	qWarning() << Q_FUNC_INFO << "Cannot process " << message << " with --nogui. Use the network API as an alternative.";
 }
 
 void LightpackApplication::quitFromWizard(int result)

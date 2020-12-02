@@ -63,7 +63,7 @@ public:
 	void setCoefBlue(const double);
 	void setCoefs(const WBAdjustment);
 	bool isAreaEnabled() const;
-	void setAreaEanled(const bool);
+	void setAreaEnabled(const bool);
 	void fillBackgroundWhite();
 	void fillBackgroundColored();
 

@@ -213,7 +213,7 @@ void GlobalColorCoefPage::addGrabArea(const int id)
 	zone->setCoefRed(SettingsScope::Settings::getLedCoefRed(id));
 	zone->setCoefGreen(SettingsScope::Settings::getLedCoefGreen(id));
 	zone->setCoefBlue(SettingsScope::Settings::getLedCoefBlue(id));
-	zone->setAreaEanled(_transSettings->zoneEnabled[id]);
+	zone->setAreaEnabled(_transSettings->zoneEnabled[id]);
 	zone->fillBackgroundWhite();
 	zone->show();
 	_grabAreas.append(zone);

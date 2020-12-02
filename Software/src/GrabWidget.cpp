@@ -656,7 +656,7 @@ bool GrabWidget::isAreaEnabled() const
 	return true;
 }
 
-void GrabWidget::setAreaEanled(const bool enabled)
+void GrabWidget::setAreaEnabled(const bool enabled)
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 

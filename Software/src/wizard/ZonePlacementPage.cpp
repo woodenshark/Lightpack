@@ -151,7 +151,7 @@ void ZonePlacementPage::addGrabArea(int id, const QRect &r, const bool enabled)
 
 	zone->move(r.topLeft());
 	zone->resize(r.size());
-	zone->setAreaEanled(enabled);
+	zone->setAreaEnabled(enabled);
 	connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
 	connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
 	zone->show();

@@ -150,7 +150,7 @@ void ZonePlacementPage::onClearDisplay_clicked()
 
 bool ZonePlacementPage::checkZoneIssues()
 {
-	QMultiMap<int, nullptr_t> ids;
+	QMultiMap<int, std::nullptr_t> ids;
 	QMap<int, MonitorSettings>::const_iterator it = _screens.cbegin();
 	// get all IDs (even repeating ones)
 	while (it != _screens.cend()) {

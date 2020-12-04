@@ -234,7 +234,7 @@ void GlobalColorCoefPage::cleanupMonitors()
 
 void GlobalColorCoefPage::addGrabArea(const int id)
 {
-	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig, &_grabAreas.values());
+	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig);
 
 	zone->move(_transSettings->zonePositions[id]);
 	zone->resize(_transSettings->zoneSizes[id]);

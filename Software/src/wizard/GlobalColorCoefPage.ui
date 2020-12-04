@@ -17,15 +17,15 @@
    <string>White balance</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,3,1">
-   <item row="3" column="2">
-    <spacer name="horizontalSpacer_2">
+   <item row="5" column="1">
+    <spacer name="verticalSpacer_2">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>59</width>
-       <height>20</height>
+       <width>20</width>
+       <height>63</height>
       </size>
      </property>
     </spacer>
@@ -43,7 +43,25 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="1">
+   <item row="2" column="1">
+    <widget class="QLabel" name="label">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the color channels until your wall has the same color as your screen.&lt;br/&gt;
+You can do it either via the gear icon of the each zone OR via the global color sliders / Color Temperature (CT) slider that adjusts all 3 channels at once.&lt;br/&gt;
+&lt;b&gt;Warning:&lt;/b&gt; the global sliders will override manually set values for individual zones! So do global first, then adjust each zone if needed.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;You can also adjust the colors for each zone individually later on using the gear icon of the corresponding grab widget.&lt;br/&gt;Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustment&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot; width=&quot;16&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0,0,0,0">
      <item row="2" column="3">
       <widget class="QLabel" name="label_3">
@@ -846,7 +864,7 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -859,39 +877,30 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1">
-    <spacer name="verticalSpacer_2">
+   <item row="4" column="2">
+    <spacer name="horizontalSpacer_2">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>63</height>
+       <width>59</width>
+       <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label">
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the color channels until your wall has the same color as your screen.&lt;br/&gt;
-You can do it either via the gear icon of the each zone OR via the global color sliders / Color Temperature (CT) slider that adjusts all 3 channels at once.&lt;br/&gt;
-&lt;b&gt;Warning:&lt;/b&gt; the global sliders will override manually set values for individual zones! So do global first, then adjust each zone if needed.
-&lt;/p&gt;
-&lt;p&gt;
-&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;You can also adjust the colors for each zone individually later on using the gear icon of the corresponding grab widget.&lt;br/&gt;Mode tab &gt; Screen grabbing mode &gt; Grab widget adjustment&lt;/td&gt;&lt;td style=&quot; padding-left:2;&quot;&gt;&lt;img src=&quot;:/buttons/settings_24px.png&quot; width=&quot;16&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="cbMonitorSelect"/>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cbMonitorSelect</tabstop>
+  <tabstop>sbRed</tabstop>
+  <tabstop>sbGreen</tabstop>
+  <tabstop>sbBlue</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

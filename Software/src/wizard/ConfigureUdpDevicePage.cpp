@@ -111,14 +111,6 @@ bool ConfigureUdpDevicePage::validatePage()
 	return true;
 }
 
-int ConfigureUdpDevicePage::nextId() const {
-	if (QGuiApplication::screens().count() == 1) {
-		return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
-	} else {
-		return Page_MonitorConfiguration;
-	}
-}
-
 ConfigureUdpDevicePage::~ConfigureUdpDevicePage()
 {
 	delete ui;

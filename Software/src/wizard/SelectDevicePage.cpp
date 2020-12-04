@@ -88,13 +88,9 @@ bool SelectDevicePage::validatePage()
 
 int SelectDevicePage::nextId() const
 {
-	if (ui->rbVirtual->isChecked()) {
-		if (QGuiApplication::screens().count() == 1)
-			return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
-		else
-			return Page_MonitorConfiguration;
-	}
-    if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
+	if (ui->rbVirtual->isChecked())
+		return Page_ChooseProfile;
+    else if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
         return Page_ConfigureUdpDevice;
 	else
 		return Page_ConfigureDevice;

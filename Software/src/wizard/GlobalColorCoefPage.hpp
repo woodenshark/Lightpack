@@ -54,17 +54,27 @@ private slots:
 	void onCoefValueChanged(int value);
 	void updateDevice();
 	void onColorTemperatureValueChanged(int value);
+	void onMonitor_currentIndexChanged(int idx);
 
 private:
 	void cleanupMonitors();
 	void addGrabArea(const int id);
 	void cleanupGrabAreas();
 
+	struct MonitorSettings {
+		int red{ 100 };
+		int green{ 100 };
+		int blue{ 100 };
+		int colorTemp{ 6500 };
+
+		const QScreen* screen;
+	};
+
 	Ui::GlobalColorCoefPage *_ui;
-	int _screenId;
 	QList<MonitorIdForm*> _monitorForms;
-	QList<GrabWidget*> _grabAreas;
+	QMap<int, GrabWidget*> _grabAreas;
 	QTimer _keepAlive;
+	QMap<int, MonitorSettings> _screens;
 };
 
 #endif // GLOBALCOLORCOEFPAGE_HPP

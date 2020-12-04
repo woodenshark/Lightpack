@@ -299,7 +299,6 @@ SOURCES += \
     wizard/WizardPageUsingDevice.cpp \
     wizard/SelectProfilePage.cpp \
     wizard/MonitorIdForm.cpp \
-    wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
     wizard/ConfigureDevicePage.cpp \
     wizard/ConfigureUdpDevicePage.cpp \
@@ -356,7 +355,6 @@ HEADERS += \
     wizard/SettingsAwareTrait.hpp \
     wizard/SelectProfilePage.hpp \
     wizard/MonitorIdForm.hpp \
-    wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
     wizard/ConfigureDevicePage.hpp \
     wizard/ConfigureUdpDevicePage.hpp \
@@ -402,7 +400,6 @@ FORMS += SettingsWindow.ui \
     wizard/Wizard.ui \
     wizard/SelectProfilePage.ui \
     wizard/MonitorIdForm.ui \
-    wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
     wizard/ConfigureDevicePage.ui \
     wizard/ConfigureUdpDevicePage.ui \

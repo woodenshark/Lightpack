@@ -38,13 +38,13 @@ class MonitorIdForm : public QWidget
 	Q_OBJECT
 
 public:
-	explicit MonitorIdForm(QWidget *parent = 0);
+	explicit MonitorIdForm(const QString& idStr, const QRect geometry, const QColor& fgColor = Qt::gray, const QColor& bgColor = Qt::white, QWidget *parent = 0);
 	~MonitorIdForm();
-
-	void setId(int id);
+	void setActive(const bool);
 
 private:
 	Ui::MonitorIdForm *_ui;
+	QColor _fgColor;
 };
 
 #endif // MONITORIDFORM_HPP

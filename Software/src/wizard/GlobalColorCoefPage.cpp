@@ -51,45 +51,57 @@ void GlobalColorCoefPage::initializePage()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	_screenId = field(QStringLiteral("screenId")).toInt();
-
-	QList<QScreen*> screenList = QGuiApplication::screens();
 	int i = 0;
-	foreach(QScreen* screen, screenList) {
-		QRect geom = screen->geometry();
-		MonitorIdForm *monitorIdForm = new MonitorIdForm();
-
-		monitorIdForm->setWindowFlags(Qt::FramelessWindowHint);
-		monitorIdForm->setStyleSheet(QStringLiteral("background: #fff"));
-
-		monitorIdForm->move(geom.topLeft());
-		monitorIdForm->resize(geom.width(), geom.height());
-
-		monitorIdForm->setId(i+1);
-
+	for (const QScreen* const screen : QGuiApplication::screens()) {
+		const QString& displayName = QStringLiteral("Display %1").arg(QString::number(i + 1));
+		MonitorIdForm* const monitorIdForm = new MonitorIdForm(displayName, screen->geometry());
 		monitorIdForm->show();
-
 		_monitorForms.append(monitorIdForm);
-		i++;
+
+		_ui->cbMonitorSelect->addItem(displayName, i);
+		MonitorSettings settings;
+		settings.screen = screen;
+		settings.red = _ui->sbRed->value();
+		settings.green = _ui->sbGreen->value();
+		settings.blue = _ui->sbBlue->value();
+		settings.colorTemp = _ui->hsColorTemperature->value();
+		_screens.insert(i, settings);
+		++i;
 	}
 	this->activateWindow();
 
 	// RESETS WBA
 	resetDeviceSettings();
 
-	if (_isInitFromSettings) {
-		_grabAreas.reserve(_transSettings->ledCount);
-		for (int i = 0; i < _transSettings->ledCount; i++)
-			addGrabArea(i);
-		const GrabWidget* const firstWidget = _grabAreas.first();
-		_ui->sbRed->setValue(firstWidget->getCoefRed() * _ui->sbRed->maximum());
-		_ui->sbGreen->setValue(firstWidget->getCoefGreen() * _ui->sbGreen->maximum());
-		_ui->sbBlue->setValue(firstWidget->getCoefBlue() * _ui->sbBlue->maximum());
+
+	QMap<int, MonitorSettings>::iterator it = _screens.begin();
+	for (; it != _screens.end(); it++) {
+		int firstId = -1;
+		for (int i = 0; i < _transSettings->ledCount; i++) {
+			if (_transSettings->zonePositions.contains(i)) {
+				// grab first ID for each screen to use as base setting
+				if (it.value().screen->geometry().contains(_transSettings->zonePositions[i]))
+					firstId = firstId < 0 ? i : std::min(firstId, i);
+				// add areas only on first pass
+				if (it == _screens.begin())
+					addGrabArea(i);
+			}
+		}
+		if (firstId > -1) {
+			const GrabWidget* const firstWidget = _grabAreas[firstId];
+			it.value().red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
+			it.value().green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
+			it.value().blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
+		}
 	}
+
+	onMonitor_currentIndexChanged(_ui->cbMonitorSelect->currentIndex());
+
 	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
 	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
 	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
 	connect(_ui->hsColorTemperature, &QSlider::valueChanged, this, &GlobalColorCoefPage::onColorTemperatureValueChanged);
+	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
 
 	turnLightsOn(qRgb(255, 255, 255));
 
@@ -154,8 +166,7 @@ bool GlobalColorCoefPage::validatePage()
 		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
 	}
 
-	cleanupMonitors();
-	cleanupGrabAreas();
+	cleanupPage();
 	return true;
 }
 
@@ -168,10 +179,15 @@ void GlobalColorCoefPage::cleanupPage()
 void GlobalColorCoefPage::updateDevice()
 {
 	QList<WBAdjustment> wblist;
-	wblist.reserve(_grabAreas.size());
+	wblist.reserve(_transSettings->ledCount);
 
-	for (const GrabWidget * const widget : _grabAreas)
-		wblist.append(widget->getCoefs());
+	constexpr const WBAdjustment defaultWB;
+	for (int i = 0; i < _transSettings->ledCount; ++i) {
+		if (_grabAreas.contains(i))
+			wblist.append(_grabAreas[i]->getCoefs());
+		else
+			wblist.append(defaultWB);
+	}
 
 	device()->updateWBAdjustments(wblist, true);
 }
@@ -185,8 +201,15 @@ void GlobalColorCoefPage::onCoefValueChanged(int value)
 	wba.green = _ui->sbGreen->value() / (double)_ui->sbGreen->maximum();
 	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
 
-	for (GrabWidget* const widget : _grabAreas)
-		widget->setCoefs(wba);
+	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
+	for (GrabWidget* const widget : _grabAreas.values())
+		if (settings.screen->geometry().contains(widget->geometry().center()))
+			widget->setCoefs(wba);
+
+	settings.red = _ui->sbRed->value();
+	settings.green = _ui->sbGreen->value();
+	settings.blue = _ui->sbBlue->value();
+	settings.colorTemp = _ui->hsColorTemperature->value();
 }
 
 void GlobalColorCoefPage::onColorTemperatureValueChanged(int value)
@@ -195,33 +218,63 @@ void GlobalColorCoefPage::onColorTemperatureValueChanged(int value)
 	_ui->sbRed->setValue(whitePoint.r / 2.55);
 	_ui->sbGreen->setValue(whitePoint.g / 2.55);
 	_ui->sbBlue->setValue(whitePoint.b / 2.55);
+
+	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
+	settings.red = _ui->sbRed->value();
+	settings.green = _ui->sbGreen->value();
+	settings.blue = _ui->sbBlue->value();
+	settings.colorTemp = value;
 }
 
 void GlobalColorCoefPage::cleanupMonitors()
 {
-	foreach (MonitorIdForm *monitorIdForm, _monitorForms)
-		delete monitorIdForm;
+	qDeleteAll(_monitorForms);
 	_monitorForms.clear();
 }
 
 void GlobalColorCoefPage::addGrabArea(const int id)
 {
-	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig, &_grabAreas);
+	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig, &_grabAreas.values());
 
 	zone->move(_transSettings->zonePositions[id]);
 	zone->resize(_transSettings->zoneSizes[id]);
-	zone->setCoefRed(SettingsScope::Settings::getLedCoefRed(id));
-	zone->setCoefGreen(SettingsScope::Settings::getLedCoefGreen(id));
-	zone->setCoefBlue(SettingsScope::Settings::getLedCoefBlue(id));
+	if (_isInitFromSettings) {
+		zone->setCoefRed(SettingsScope::Settings::getLedCoefRed(id));
+		zone->setCoefGreen(SettingsScope::Settings::getLedCoefGreen(id));
+		zone->setCoefBlue(SettingsScope::Settings::getLedCoefBlue(id));
+	}
 	zone->setAreaEnabled(_transSettings->zoneEnabled[id]);
 	zone->fillBackgroundWhite();
 	zone->show();
-	_grabAreas.append(zone);
+	_grabAreas.insert(id, zone);
 }
 
 void GlobalColorCoefPage::cleanupGrabAreas()
 {
-	for (int i = 0; i < _grabAreas.size(); i++)
-		delete _grabAreas[i];
+	qDeleteAll(_grabAreas);
 	_grabAreas.clear();
+}
+
+void GlobalColorCoefPage::onMonitor_currentIndexChanged(int idx)
+{
+	int i = 0;
+	for (MonitorIdForm* const monitorId : _monitorForms)
+		monitorId->setActive(idx == i++);
+
+	const MonitorSettings& settings = _screens[idx];
+	_ui->sbRed->blockSignals(true);
+	_ui->hsRed->setValue(settings.red);
+	_ui->sbRed->blockSignals(false);
+
+	_ui->sbGreen->blockSignals(true);
+	_ui->hsGreen->setValue(settings.green);
+	_ui->sbGreen->blockSignals(false);
+
+	_ui->sbBlue->blockSignals(true);
+	_ui->hsBlue->setValue(settings.blue);
+	_ui->sbBlue->blockSignals(false);
+
+	_ui->hsColorTemperature->blockSignals(true);
+	_ui->hsColorTemperature->setValue(settings.colorTemp);
+	_ui->hsColorTemperature->blockSignals(false);
 }

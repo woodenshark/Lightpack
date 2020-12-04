@@ -20,10 +20,9 @@ PluginsManager::~PluginsManager()
 
 void PluginsManager::dropPlugins(){
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	//cleanAll();
+
 	for(QMap<QString, Plugin*>::iterator it = _plugins.begin(); it != _plugins.end(); ++it){
 		Plugin* p = it.value();
-		// QString name = p->Name();
 		p->Stop();
 		delete p;
 	}

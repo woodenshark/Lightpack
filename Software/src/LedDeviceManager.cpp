@@ -575,32 +575,6 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 	}
 	m_ledDevice->disconnect(this, nullptr, nullptr, nullptr);
 	disconnect(m_ledDevice, nullptr, nullptr, nullptr);
-/*
-    disconnect(m_ledDevice, &AbstractLedDevice::commandCompleted,		this, &LedDeviceManager::ledDeviceCommandCompleted);
-	disconnect(m_ledDevice, &AbstractLedDevice::ioDeviceSuccess,		this, &LedDeviceManager::ledDeviceIoDeviceSuccess);
-	disconnect(m_ledDevice, &AbstractLedDevice::openDeviceSuccess,	this, &LedDeviceManager::ledDeviceOpenDeviceSuccess);
-
-	disconnect(m_ledDevice, &AbstractLedDevice::firmwareVersion,		this, &LedDeviceManager::firmwareVersion);
-	disconnect(m_ledDevice, &AbstractLedDevice::firmwareVersionUnofficial, this, &LedDeviceManager::firmwareVersionUnofficial);
-	disconnect(m_ledDevice, &AbstractLedDevice::colorsUpdated,		this, &LedDeviceManager::setColors_VirtualDeviceCallback);
-
-	disconnect(this, &LedDeviceManager::ledDeviceOpen,								m_ledDevice, &AbstractLedDevice::open);
-	disconnect(this, &LedDeviceManager::ledDeviceSetColors,				m_ledDevice, &AbstractLedDevice::setColors);
-	disconnect(this, &LedDeviceManager::ledDeviceOffLeds,							m_ledDevice, &AbstractLedDevice::switchOffLeds);
-	disconnect(this, &LedDeviceManager::ledDeviceSetUsbPowerLedDisabled,			m_ledDevice, &AbstractLedDevice::setUsbPowerLedDisabled);
-	disconnect(this, &LedDeviceManager::ledDeviceSetRefreshDelay,					m_ledDevice, &AbstractLedDevice::setRefreshDelay);
-	disconnect(this, &LedDeviceManager::ledDeviceSetColorDepth,					m_ledDevice, &AbstractLedDevice::setColorDepth);
-	disconnect(this, &LedDeviceManager::ledDeviceSetSmoothSlowdown,				m_ledDevice, &AbstractLedDevice::setSmoothSlowdown);
-	disconnect(this, &LedDeviceManager::ledDeviceSetGamma,				m_ledDevice, &AbstractLedDevice::setGamma);
-	disconnect(this, &LedDeviceManager::ledDeviceSetBrightness,				m_ledDevice, &AbstractLedDevice::setBrightness);
-	disconnect(this, &LedDeviceManager::ledDeviceSetBrightnessCap,			m_ledDevice, &AbstractLedDevice::setBrightnessCap);
-	disconnect(this, &LedDeviceManager::ledDeviceSetColorSequence,			m_ledDevice, &AbstractLedDevice::setColorSequence);
-	disconnect(this, &LedDeviceManager::ledDeviceSetLuminosityThreshold,	m_ledDevice, &AbstractLedDevice::setLuminosityThreshold);
-	disconnect(this, &LedDeviceManager::ledDeviceSetMinimumLuminosityEnabled,	m_ledDevice, &AbstractLedDevice::setMinimumLuminosityThresholdEnabled);
-	disconnect(this, &LedDeviceManager::ledDeviceRequestFirmwareVersion,				m_ledDevice, &AbstractLedDevice::requestFirmwareVersion);
-	disconnect(this, &LedDeviceManager::ledDeviceUpdateWBAdjustments,				m_ledDevice, qOverload<>(&AbstractLedDevice::updateWBAdjustments));
-	disconnect(this, &LedDeviceManager::ledDeviceUpdateDeviceSettings,				m_ledDevice, &AbstractLedDevice::updateDeviceSettings);
-*/
 }
 
 void LedDeviceManager::cmdQueueAppend(LedDeviceCommands::Cmd cmd)

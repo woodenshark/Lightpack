@@ -1,13 +1,11 @@
-name: build-ubuntu
+name: Ubuntu
 on: [push, pull_request]
 jobs:
-  build-ubuntu:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
       - run: sudo apt-get install qt5-default libqt5serialport5-dev build-essential libgtk2.0-dev libusb-1.0-0-dev libudev-dev libnotify-dev qttools5-dev-tools libappindicator-dev openssl libpulse-dev libfftw3-dev hashdeep
-      - run: qmake -v
       - run: qmake -r && make
         working-directory: ./Software
       - run: scripts/linux/prepare_installer.sh
@@ -19,7 +17,7 @@ jobs:
         with:
           name: package
           path: Software/dist_linux/*.deb
-  build-fw-ubuntu:
+  build-fw:
     runs-on: ubuntu-latest
     steps:   
       - uses: actions/checkout@v2

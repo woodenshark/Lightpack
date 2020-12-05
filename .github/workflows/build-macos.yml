@@ -1,0 +1,21 @@
+name: macOS
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew update && brew install qt5
+      - run: |
+          export QTDIR=/usr/local/opt/qt
+          export PATH=$PATH:$QTDIR/bin
+          export VERSION=`cat Software/VERSION`
+          cd Software
+          qmake -r
+          make
+          macdeployqt bin/Prismatik.app -dmg 
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: Software/bin/*.dmg

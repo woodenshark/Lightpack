@@ -1,10 +1,10 @@
-name: build-windows
+name: Windows
 on: [push, pull_request]
 defaults:
   run:
     working-directory: ./Software
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -73,8 +73,6 @@ jobs:
       - name: Prepare Installer
         shell: bash
         run: |
-          INCLUDE="$INCLUDE;C:\Program Files\OpenSSL-Win64\include"
-          LIB="$LIB;C:\Program Files\OpenSSL-Win64\lib"
           scripts/win32/prepare_installer.sh
       - name: Build Installer
         shell: cmd

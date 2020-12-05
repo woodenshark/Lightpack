@@ -87,7 +87,9 @@ void LedDeviceManager::init()
 	if (!m_cmdTimeoutTimer) {
 		m_cmdTimeoutTimer = new QTimer();
 
-		m_cmdTimeoutTimer->setInterval(100);
+		// for some reason at 100ms this times out when ajusting white balance from settings (not the wizard) with UDP
+		// also seems to depend on grab interval: the longer the more chances of timing out
+		m_cmdTimeoutTimer->setInterval(500);
 		connect(m_cmdTimeoutTimer, SIGNAL(timeout()), this, SLOT(ledDeviceCommandTimedOut()));
 	}
 

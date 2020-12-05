@@ -30,6 +30,7 @@
 #include "LedDeviceVirtual.hpp"
 #include "LedDeviceDrgb.hpp"
 #include "QDesktopWidget"
+#include "Settings.hpp"
 
 SelectDevicePage::SelectDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):
 	QWizardPage(parent),
@@ -46,27 +47,40 @@ SelectDevicePage::~SelectDevicePage()
 
 void SelectDevicePage::initializePage()
 {
-	registerField("isAdalight", ui->rbAdalight);
-	registerField("isArdulight", ui->rbArdulight);
-	registerField("isVirtual", ui->rbVirtual);
-    registerField("isDrgb", ui->rbDrgb);
-    registerField("isDnrgb", ui->rbDnrgb);
-    registerField("isWarls", ui->rbWarls);
+	const SupportedDevices::DeviceType deviceType = SettingsScope::Settings::getConnectedDevice();
+	registerField(QStringLiteral("isAdalight"), ui->rbAdalight);
+	if (deviceType == SupportedDevices::DeviceTypeAdalight)
+		ui->rbAdalight->setChecked(true);
+	registerField(QStringLiteral("isArdulight"), ui->rbArdulight);
+	if (deviceType == SupportedDevices::DeviceTypeArdulight)
+		ui->rbArdulight->setChecked(true);
+	registerField(QStringLiteral("isVirtual"), ui->rbVirtual);
+	if (deviceType == SupportedDevices::DeviceTypeVirtual)
+		ui->rbVirtual->setChecked(true);
+    registerField(QStringLiteral("isDrgb"), ui->rbDrgb);
+	if (deviceType == SupportedDevices::DeviceTypeDrgb)
+		ui->rbDrgb->setChecked(true);
+    registerField(QStringLiteral("isDnrgb"), ui->rbDnrgb);
+	if (deviceType == SupportedDevices::DeviceTypeDnrgb)
+		ui->rbDnrgb->setChecked(true);
+    registerField(QStringLiteral("isWarls"), ui->rbWarls);
+	if (deviceType == SupportedDevices::DeviceTypeWarls)
+		ui->rbWarls->setChecked(true);
 }
 
 void SelectDevicePage::cleanupPage()
 {
-	setField("isAdalight", false);
-	setField("isArdulight", false);
-	setField("isVirtual", false);
-    setField("isDrgb", false);
-    setField("isDnrgb", false);
-    setField("isWarls", false);
+	setField(QStringLiteral("isAdalight"), false);
+	setField(QStringLiteral("isArdulight"), false);
+	setField(QStringLiteral("isVirtual"), false);
+    setField(QStringLiteral("isDrgb"), false);
+    setField(QStringLiteral("isDnrgb"), false);
+    setField(QStringLiteral("isWarls"), false);
 }
 
 bool SelectDevicePage::validatePage()
 {
-	if (field("isVirtual").toBool()) {
+	if (field(QStringLiteral("isVirtual")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceVirtual());
 	}
 	return true;
@@ -75,12 +89,8 @@ bool SelectDevicePage::validatePage()
 int SelectDevicePage::nextId() const
 {
 	if (ui->rbVirtual->isChecked())
-		if (QGuiApplication::screens().count() == 1) {
-			return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
-		} else {
-			return Page_MonitorConfiguration;
-		}
-    if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
+		return Page_ChooseProfile;
+    else if (ui->rbDrgb->isChecked() || ui->rbDnrgb->isChecked() || ui->rbWarls->isChecked())
         return Page_ConfigureUdpDevice;
 	else
 		return Page_ConfigureDevice;

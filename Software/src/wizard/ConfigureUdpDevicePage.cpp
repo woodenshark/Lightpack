@@ -47,76 +47,68 @@ ConfigureUdpDevicePage::ConfigureUdpDevicePage(bool isInitFromSettings, Transien
 
 void ConfigureUdpDevicePage::initializePage()
 {
-	QString currentAddress = NULL;
-	QString currentPort = NULL;
-	int currentTimeout = NULL;
+	QString currentAddress;
+	QString currentPort;
+	int currentTimeout = 0;
 
-	if (field("isDrgb").toBool()) {
+	if (field(QStringLiteral("isDrgb")).toBool()) {
 		currentAddress = Settings::getDrgbAddress();
 		currentPort = Settings::getDrgbPort();
 		currentTimeout = Settings::getDrgbTimeout();
 	}
-	else if (field("isDnrgb").toBool()) {
+	else if (field(QStringLiteral("isDnrgb")).toBool()) {
 		currentAddress = Settings::getDnrgbAddress();
 		currentPort = Settings::getDnrgbPort();
 		currentTimeout = Settings::getDnrgbTimeout();
 	}
-	else if (field("isWarls").toBool()) {
+	else if (field(QStringLiteral("isWarls")).toBool()) {
 		currentAddress = Settings::getWarlsAddress();
 		currentPort = Settings::getWarlsPort();
 		currentTimeout = Settings::getWarlsTimeout();
 	}
 
-	if (currentAddress != NULL && currentAddress.isEmpty() == false)
+	if (!currentAddress.isEmpty())
 		ui->leAddress->setText(currentAddress);
-	if (currentPort != NULL && currentPort.isEmpty() == false)
+	if (!currentPort.isEmpty())
 		ui->lePort->setText(currentPort);
-	if (currentTimeout != NULL)
+	if (currentTimeout != 0)
 		ui->sbTimeout->setValue(currentTimeout);
 
-	registerField("address", ui->leAddress);
-	registerField("port", ui->lePort);
-	registerField("timeout", ui->sbTimeout);
+	registerField(QStringLiteral("address"), ui->leAddress);
+	registerField(QStringLiteral("port"), ui->lePort);
+	registerField(QStringLiteral("timeout"), ui->sbTimeout);
 }
 
 void ConfigureUdpDevicePage::cleanupPage()
 {
-	setField("address", "");
-	setField("port", "");
-	setField("timeout", "");
+	setField(QStringLiteral("address"), "");
+	setField(QStringLiteral("port"), "");
+	setField(QStringLiteral("timeout"), "");
 }
 
 bool ConfigureUdpDevicePage::validatePage()
 {
-	QString address = field("address").toString();
-	QString port = field("port").toString();
-	int timeout = field("timeout").toInt();
+	QString address = field(QStringLiteral("address")).toString();
+	QString port = field(QStringLiteral("port")).toString();
+	int timeout = field(QStringLiteral("timeout")).toInt();
 
-	if (field("isDrgb").toBool()) {
+	if (field(QStringLiteral("isDrgb")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port, timeout));
 	} 
-	else if (field("isDnrgb").toBool()) {
+	else if (field(QStringLiteral("isDnrgb")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port, timeout));
 	}
-	else if (field("isWarls").toBool()) {
+	else if (field(QStringLiteral("isWarls")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceWarls(address, port, timeout));
 	}
 	else {
-		QMessageBox::information(NULL, "Wrong device", "Try to restart the wizard");
+		QMessageBox::information(NULL, QStringLiteral("Wrong device"), QStringLiteral("Try to restart the wizard"));
 		qCritical() << "couldn't create LedDevice, unexpected state, device is not selected or device is not configurable";
 		return false;
 	}
 	_transSettings->ledDevice->open();
 
 	return true;
-}
-
-int ConfigureUdpDevicePage::nextId() const {
-	if (QGuiApplication::screens().count() == 1) {
-		return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
-	} else {
-		return Page_MonitorConfiguration;
-	}
 }
 
 ConfigureUdpDevicePage::~ConfigureUdpDevicePage()

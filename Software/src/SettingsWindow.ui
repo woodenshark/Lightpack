@@ -676,13 +676,13 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
-               <string>Appearance of grab widgets</string>
+               <string>Grab widget adjustment</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabWidgetsDontShow">
                  <property name="text">
-                  <string>Do not show</string>
+                  <string>Hidden</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -702,7 +702,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                <item>
                 <widget class="QRadioButton" name="radioButton_White">
                  <property name="text">
-                  <string>White</string>
+                  <string>All white</string>
                  </property>
                 </widget>
                </item>

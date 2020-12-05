@@ -27,7 +27,6 @@
 #include "Wizard.hpp"
 #include "ui_Wizard.h"
 #include "LightpackDiscoveryPage.hpp"
-#include "MonitorConfigurationPage.hpp"
 #include "ZonePlacementPage.hpp"
 #include "SelectProfilePage.hpp"
 #include "SelectDevicePage.hpp"
@@ -49,7 +48,6 @@ Wizard::Wizard(bool isInitFromSettings, QWidget *parent) :
 	this->setPage(Page_ChooseDevice, new SelectDevicePage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ConfigureDevice, new ConfigureDevicePage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ConfigureUdpDevice, new ConfigureUdpDevicePage(_isInitFromSettings, _transSettings));
-	this->setPage(Page_MonitorConfiguration, new MonitorConfigurationPage(_isInitFromSettings, _transSettings) );
 	this->setPage(Page_ChooseProfile, new SelectProfilePage(_isInitFromSettings, _transSettings));
 	this->setPage(Page_ZonePlacement, new ZonePlacementPage(_isInitFromSettings, _transSettings));
 	this->setPage(Page_ConfigureDevicePower, new ConfigureDevicePowerPage(_isInitFromSettings, _transSettings));

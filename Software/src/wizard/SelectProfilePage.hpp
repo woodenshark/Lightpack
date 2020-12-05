@@ -47,7 +47,7 @@ protected:
 	bool validatePage();
 
 private slots:
-	void on_pbAddProfile_clicked();
+	void onAddProfile_clicked();
 	void profileRename();
 
 private:

@@ -51,66 +51,58 @@ void ConfigureDevicePage::initializePage()
 	// NOTE: This line emit's signal currentIndex_Changed()
 	ui->cbBaudRate->addItems(Settings::getSupportedSerialPortBaudRates());
 	int currentBaudRate = 0;
-	QString currentSerialPort = NULL;
-	QString currentColorSequence = NULL;
-	if (field("isAdalight").toBool()) {
+	QString currentSerialPort;
+	QString currentColorSequence;
+	if (field(QStringLiteral("isAdalight")).toBool()) {
 		currentBaudRate = Settings::getAdalightSerialPortBaudRate();
 		currentSerialPort = Settings::getAdalightSerialPortName();
 		currentColorSequence = Settings::getColorSequence(SupportedDevices::DeviceTypeAdalight);
 	}
-	else if (field("isArdulight").toBool()) {
+	else if (field(QStringLiteral("isArdulight")).toBool()) {
 		currentBaudRate = Settings::getArdulightSerialPortBaudRate();
 		currentSerialPort = Settings::getArdulightSerialPortName();
 		currentColorSequence = Settings::getColorSequence(SupportedDevices::DeviceTypeArdulight);
 	}
 	else
-		currentSerialPort = SERIAL_PORT_DEFAULT;
+		currentSerialPort = QStringLiteral(SERIAL_PORT_DEFAULT);
 
 	if (currentBaudRate > 0)
 		ui->cbBaudRate->setCurrentText(QString::number(currentBaudRate));
-	if (currentSerialPort != NULL && currentSerialPort.isEmpty() == false)
+	if (!currentSerialPort.isEmpty())
 		ui->leSerialPortName->setText(currentSerialPort);
-	if (currentColorSequence != NULL && currentColorSequence.isEmpty() == false)
+	if (!currentColorSequence.isEmpty())
 		ui->cbColorFormat->setCurrentText(currentColorSequence);
 
-	registerField("serialPort", ui->leSerialPortName);
-	registerField("baudRate", ui->cbBaudRate, "currentText");
-	registerField("colorFormat", ui->cbColorFormat, "currentText");
+	registerField(QStringLiteral("serialPort"), ui->leSerialPortName);
+	registerField(QStringLiteral("baudRate"), ui->cbBaudRate, "currentText");
+	registerField(QStringLiteral("colorFormat"), ui->cbColorFormat, "currentText");
 
 }
 
 void ConfigureDevicePage::cleanupPage()
 {
-	setField("serialPort", "");
-	setField("baudRate", 0);
-	setField("colorFormat", "RGB");
+	setField(QStringLiteral("serialPort"), "");
+	setField(QStringLiteral("baudRate"), 0);
+	setField(QStringLiteral("colorFormat"), "RGB");
 }
 
 bool ConfigureDevicePage::validatePage()
 {
-	QString portName = field("serialPort").toString();
-	int baudRate = field("baudRate").toInt();
-	if (field("isAdalight").toBool()) {
+	QString portName = field(QStringLiteral("serialPort")).toString();
+	int baudRate = field(QStringLiteral("baudRate")).toInt();
+	if (field(QStringLiteral("isAdalight")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceAdalight(portName, baudRate));
-	} else if (field("isArdulight").toBool()){
+	} else if (field(QStringLiteral("isArdulight")).toBool()){
 		_transSettings->ledDevice.reset(new LedDeviceArdulight(portName, baudRate));
 	} else {
-		QMessageBox::information(NULL, "Wrong device", "Try to restart the wizard");
+		QMessageBox::information(NULL, QStringLiteral("Wrong device"), QStringLiteral("Try to restart the wizard"));
 		qCritical() << "couldn't create LedDevice, unexpected state, device is not selected or device is not configurable";
 		return false;
 	}
-	_transSettings->ledDevice->setColorSequence(field("colorFormat").toString());
+	_transSettings->ledDevice->setColorSequence(field(QStringLiteral("colorFormat")).toString());
 	_transSettings->ledDevice->open();
 
 	return true;
-}
-
-int ConfigureDevicePage::nextId() const {
-	if (QGuiApplication::screens().count() == 1) {
-		return reinterpret_cast<Wizard *>(wizard())->skipMonitorConfigurationPage();
-	} else {
-		return Page_MonitorConfiguration;
-	}
 }
 
 ConfigureDevicePage::~ConfigureDevicePage()

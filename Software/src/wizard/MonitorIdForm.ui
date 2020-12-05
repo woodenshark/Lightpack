@@ -23,7 +23,7 @@
    <double>1.000000000000000</double>
   </property>
   <property name="styleSheet">
-   <string notr="true">background: #aaa</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
@@ -49,7 +49,7 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: #fff</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>1</string>

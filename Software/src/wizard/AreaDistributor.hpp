@@ -40,10 +40,10 @@ public:
 		_vScanStart(vScanStart),
 		_vScanEnd(vScanEnd){}
 
-	int hScanStart() { return _hScanStart; }
-	int hScanEnd() { return _hScanEnd; }
-	int vScanStart() { return _vScanStart; }
-	int vScanEnd() { return _vScanEnd; }
+	int hScanStart() const { return _hScanStart; }
+	int hScanEnd() const { return _hScanEnd; }
+	int vScanStart() const { return _vScanStart; }
+	int vScanEnd() const { return _vScanEnd; }
 protected:
 	int _hScanStart;
 	int _hScanEnd;

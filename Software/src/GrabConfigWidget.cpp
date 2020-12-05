@@ -59,8 +59,17 @@ GrabConfigWidget::~GrabConfigWidget()
 	delete ui;
 }
 
-void GrabConfigWidget::showConfigFor(QRect widgetGeometry, int buttonCenter)
+void GrabConfigWidget::showConfigFor(QRect widgetGeometry, int buttonCenter, const bool showEnable = true, const bool showCoefs = true)
 {
+	ui->checkBox_IsAreaEnabled->setVisible(showEnable);
+	ui->label_Red->setVisible(showCoefs);
+	ui->label_Green->setVisible(showCoefs);
+	ui->label_Blue->setVisible(showCoefs);
+	ui->spinBox_Red->setVisible(showCoefs);
+	ui->spinBox_Green->setVisible(showCoefs);
+	ui->spinBox_Blue->setVisible(showCoefs);
+	adjustSize();
+
 	#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	QRect screen = QGuiApplication::screenAt(widgetGeometry.center())->geometry();
 	#else

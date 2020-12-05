@@ -38,6 +38,8 @@ class ZoneWidget;
 class AbstractLedDevice;
 class AreaDistributor;
 class GrabWidget;
+class QScreen;
+class MonitorIdForm;
 
 class ZonePlacementPage : public WizardPageUsingDevice
 {
@@ -53,27 +55,53 @@ protected:
 	bool validatePage();
 
 private slots:
-	void on_pbAndromeda_clicked();
-	void on_pbCassiopeia_clicked();
-	void on_pbPegasus_clicked();
-	void on_pbCustom_clicked();
-
-	void on_numberOfLeds_valueChanged(int arg1);
+	void onAndromeda_clicked();
+	void onCassiopeia_clicked();
+	void onPegasus_clicked();
+	void onApply_clicked();
+	void onNumberOfLeds_valueChanged(int arg1);
+	void onTopLeds_valueChanged(int arg1);
+	void onSideLeds_valueChanged(int arg1);
+	void onMonitor_currentIndexChanged(int idx);
+	void onClearDisplay_clicked();
 
 private:
-	void addGrabArea(int id, const QRect &rect);
+	void addGrabArea(QList<GrabWidget*>& list, int id, const QRect &rect, const bool enabled = true);
 	void removeLastGrabArea();
-	void cleanupGrabAreas();
+	void cleanupGrabAreas(int idx = -1);
+	void cleanupMonitors();
 	void distributeAreas(AreaDistributor *distributor, bool invertIds = false, int idOffset = 0);
 	void resetNewAreaRect();
+	bool checkZoneIssues();
+	QRect screenRect() const;
 
 	Ui::ZonePlacementPage *_ui;
-	int _screenId;
-	QList<GrabWidget*> _grabAreas;
 	QRect _newAreaRect;
-	int _x0;
-	int _y0;
+	QList<MonitorIdForm*> _monitorForms;
 
+	struct MonitorSettings {
+		int topLeds{ 0 };
+		int sideLeds{ 0 };
+
+		int offset{ 0 };
+		int standWidth{ 0 };
+		int thickness{ 0 };
+
+		double topMargin{ 0.0 };
+		double sideMargin{ 0.0 };
+		double bottomMargin{ 0.0 };
+
+		bool skipCorners{ false };
+		bool invertOrder{ false };
+
+		QList<GrabWidget*> grabAreas;
+		const QScreen* screen;
+
+		int startingLed{ 0 };
+	};
+	void saveMonitorSettings(MonitorSettings& settings);
+
+	QMap<int, MonitorSettings> _screens;
 };
 
 #endif // ZONECONFIGURATION_HPP

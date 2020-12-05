@@ -29,7 +29,7 @@
 #include <QtGui>
 #include "colorspace_types.h"
 #include "types.h"
-
+#include "SettingsDefaults.hpp"
 /*!
 	Abstract class representing any LED device.
 	\a LedDeviceManager
@@ -101,14 +101,14 @@ protected:
 
 protected:
 	QString m_colorSequence;
-	double m_gamma;
-	int m_brightness;
-	int m_brightnessCap;
-	int m_ledMilliAmps{0};
-	double m_powerSupplyAmps{0.0};
-	int m_luminosityThreshold;
-	bool m_isMinimumLuminosityEnabled;
-	bool m_isDitheringEnabled;
+	double m_gamma{ SettingsScope::Profile::Device::GammaDefault };
+	int m_brightness{ SettingsScope::Profile::Device::BrightnessDefault };
+	int m_brightnessCap{ SettingsScope::Profile::Device::BrightnessCapDefault };
+	int m_ledMilliAmps{ SettingsScope::Main::Device::LedMilliAmpsDefault };
+	double m_powerSupplyAmps{ SettingsScope::Main::Device::PowerSupplyAmpsDefault };
+	int m_luminosityThreshold{ SettingsScope::Profile::Grab::LuminosityThresholdDefault };
+	bool m_isMinimumLuminosityEnabled{ SettingsScope::Profile::Grab::IsMinimumLuminosityEnabledDefault };
+	bool m_isDitheringEnabled{ SettingsScope::Profile::Device::IsDitheringEnabledDefault };
 
 	QList<WBAdjustment> m_wbAdjustments;
 

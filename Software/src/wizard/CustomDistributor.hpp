@@ -31,12 +31,12 @@
 class CustomDistributor : public AreaDistributor
 {
 public:
-	CustomDistributor(QRect screen, int top, int side, int bottom, double thickness = 0.15, double standWidth = 0.0) :
+	CustomDistributor(QRect screen, int top, int side, int bottom, double thickness = 0.15, double standWidth = 0.0, bool skipCorners = false) :
 		AreaDistributor(screen, top + 2 * side + bottom),
 		_dx(0), _dy(0), _sizeBudget(0),
 		_topLeds(top), _sideLeds(side), _bottomLeds(bottom),
-		_thickness(thickness), _standWidth(standWidth)
-
+		_thickness(thickness), _standWidth(standWidth),
+		_skipCorners(skipCorners)
 	{}
 	virtual ~CustomDistributor();
 
@@ -50,12 +50,14 @@ protected:
 	int _topLeds, _sideLeds, _bottomLeds;
 	double _thickness;
 	double _standWidth;
+	bool _skipCorners;
+	int _ledCount{ 0 };
 
-	void startBottomRight();
-	void startRightUp();
-	void startTopLeft();
-	void startLeftDown();
-	void startBottomRight2();
+	void startBottomMiddleToRight();
+	void startBottomRightToTop();
+	void startTopRightToLeft();
+	void startTopLeftToBottom();
+	void startBottomRightToMiddle();
 
 	virtual int areaCountOnSideEdge() const;
 	virtual int areaCountOnTopEdge() const;

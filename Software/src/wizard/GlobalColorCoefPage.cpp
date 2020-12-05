@@ -33,16 +33,13 @@
 #include "Settings.hpp"
 #include "debug.h"
 #include "PrismatikMath.hpp"
+#include "GrabWidget.hpp"
 
 GlobalColorCoefPage::GlobalColorCoefPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
 	WizardPageUsingDevice(isInitFromSettings, ts, parent),
 	_ui(new Ui::GlobalColorCoefPage)
 {
 	_ui->setupUi(this);
-	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged()));
-	connect(_ui->hsColorTemperature, SIGNAL(valueChanged(int)), this, SLOT(onColorTemperatureValueChanged()));
 }
 
 GlobalColorCoefPage::~GlobalColorCoefPage()
@@ -54,79 +51,105 @@ void GlobalColorCoefPage::initializePage()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	_screenId = field("screenId").toInt();
-
-	QList<QScreen*> screenList = QGuiApplication::screens();
 	int i = 0;
-	foreach(QScreen* screen, screenList) {
-		QRect geom = screen->geometry();
-		MonitorIdForm *monitorIdForm = new MonitorIdForm();
-
-		monitorIdForm->setWindowFlags(Qt::FramelessWindowHint);
-		monitorIdForm->setStyleSheet("background: #fff");
-
-		monitorIdForm->move(geom.topLeft());
-		monitorIdForm->resize(geom.width(), geom.height());
-
-		monitorIdForm->setId(i+1);
-
+	for (const QScreen* const screen : QGuiApplication::screens()) {
+		const QString& displayName = QStringLiteral("Display %1").arg(QString::number(i + 1));
+		MonitorIdForm* const monitorIdForm = new MonitorIdForm(displayName, screen->geometry());
 		monitorIdForm->show();
-
 		_monitorForms.append(monitorIdForm);
-		i++;
+
+		_ui->cbMonitorSelect->addItem(displayName, i);
+		MonitorSettings settings;
+		settings.screen = screen;
+		settings.red = _ui->sbRed->value();
+		settings.green = _ui->sbGreen->value();
+		settings.blue = _ui->sbBlue->value();
+		settings.colorTemp = _ui->hsColorTemperature->value();
+		_screens.insert(i, settings);
+		++i;
 	}
 	this->activateWindow();
 
-	if (_isInitFromSettings) {
-		_ui->sbRed->setValue(SettingsScope::Settings::getLedCoefRed(1) * _ui->sbRed->maximum());
-		_ui->sbGreen->setValue(SettingsScope::Settings::getLedCoefGreen(1) * _ui->sbGreen->maximum());
-		_ui->sbBlue->setValue(SettingsScope::Settings::getLedCoefBlue(1) * _ui->sbBlue->maximum());
+	// RESETS WBA
+	resetDeviceSettings();
+
+
+	QMap<int, MonitorSettings>::iterator it = _screens.begin();
+	for (; it != _screens.end(); it++) {
+		int firstId = -1;
+		for (int i = 0; i < _transSettings->ledCount; i++) {
+			if (_transSettings->zonePositions.contains(i)) {
+				// grab first ID for each screen to use as base setting
+				if (it.value().screen->geometry().contains(_transSettings->zonePositions[i]))
+					firstId = firstId < 0 ? i : std::min(firstId, i);
+				// add areas only on first pass
+				if (it == _screens.begin())
+					addGrabArea(i);
+			}
+		}
+		if (firstId > -1) {
+			const GrabWidget* const firstWidget = _grabAreas[firstId];
+			it.value().red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
+			it.value().green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
+			it.value().blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
+		}
 	}
 
-	resetDeviceSettings();
-	onCoefValueChanged();
+	onMonitor_currentIndexChanged(_ui->cbMonitorSelect->currentIndex());
+
+	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->hsColorTemperature, &QSlider::valueChanged, this, &GlobalColorCoefPage::onColorTemperatureValueChanged);
+	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
+
 	turnLightsOn(qRgb(255, 255, 255));
+
+	// prevent some firmwares/devices from timing out during this phase
+	// also avoids tracking widget coef signals
+	connect(&_keepAlive, &QTimer::timeout, this, &GlobalColorCoefPage::updateDevice);
+	_keepAlive.start(200);
 }
 
 bool GlobalColorCoefPage::validatePage()
 {
 	using namespace SettingsScope;
-	QString deviceName = device()->name();
+	const QString deviceName = device()->name();
 	SupportedDevices::DeviceType devType;
-	if (deviceName.compare("lightpack", Qt::CaseInsensitive) == 0) {
+	if (deviceName.compare(QStringLiteral("lightpack"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeLightpack;
 	}
-	else if (deviceName.compare("adalight", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("adalight"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeAdalight;
-		Settings::setAdalightSerialPortName(field("serialPort").toString());
-		Settings::setAdalightSerialPortBaudRate(field("baudRate").toString());
-		Settings::setColorSequence(devType, field("colorFormat").toString());
+		Settings::setAdalightSerialPortName(field(QStringLiteral("serialPort")).toString());
+		Settings::setAdalightSerialPortBaudRate(field(QStringLiteral("baudRate")).toString());
+		Settings::setColorSequence(devType, field(QStringLiteral("colorFormat")).toString());
 
 	}
-	else if (deviceName.compare("ardulight", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("ardulight"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeArdulight;
-		Settings::setArdulightSerialPortName(field("serialPort").toString());
-		Settings::setArdulightSerialPortBaudRate(field("baudRate").toString());
-		Settings::setColorSequence(devType, field("colorFormat").toString());
+		Settings::setArdulightSerialPortName(field(QStringLiteral("serialPort")).toString());
+		Settings::setArdulightSerialPortBaudRate(field(QStringLiteral("baudRate")).toString());
+		Settings::setColorSequence(devType, field(QStringLiteral("colorFormat")).toString());
 
 	}
-	else if (deviceName.compare("drgb", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("drgb"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeDrgb;
-		Settings::setDrgbAddress(field("address").toString());
-		Settings::setDrgbPort(field("port").toString());
-		Settings::setDrgbTimeout(field("timeout").toInt());
+		Settings::setDrgbAddress(field(QStringLiteral("address")).toString());
+		Settings::setDrgbPort(field(QStringLiteral("port")).toString());
+		Settings::setDrgbTimeout(field(QStringLiteral("timeout")).toInt());
 	}
-	else if (deviceName.compare("dnrgb", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("dnrgb"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeDnrgb;
-		Settings::setDnrgbAddress(field("address").toString());
-		Settings::setDnrgbPort(field("port").toString());
-		Settings::setDnrgbTimeout(field("timeout").toInt());
+		Settings::setDnrgbAddress(field(QStringLiteral("address")).toString());
+		Settings::setDnrgbPort(field(QStringLiteral("port")).toString());
+		Settings::setDnrgbTimeout(field(QStringLiteral("timeout")).toInt());
 	}
-	else if (deviceName.compare("warls", Qt::CaseInsensitive) == 0) {
+	else if (deviceName.compare(QStringLiteral("warls"), Qt::CaseInsensitive) == 0) {
 		devType = SupportedDevices::DeviceTypeWarls;
-		Settings::setWarlsAddress(field("address").toString());
-		Settings::setWarlsPort(field("port").toString());
-		Settings::setWarlsTimeout(field("timeout").toInt());
+		Settings::setWarlsAddress(field(QStringLiteral("address")).toString());
+		Settings::setWarlsPort(field(QStringLiteral("port")).toString());
+		Settings::setWarlsTimeout(field(QStringLiteral("timeout")).toInt());
 	}
 	else {
 		devType = SupportedDevices::DeviceTypeVirtual;
@@ -134,50 +157,124 @@ bool GlobalColorCoefPage::validatePage()
 	Settings::setConnectedDevice(devType);
 	Settings::setNumberOfLeds(devType, _transSettings->zonePositions.size());
 
-	for (int id : _transSettings->zonePositions.keys()) {
+	for (const int id : _transSettings->zonePositions.keys()) {
 		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
-		Settings::setLedCoefRed(id, _ui->sbRed->value() / (double)_ui->sbRed->maximum());
-		Settings::setLedCoefGreen(id, _ui->sbGreen->value() / (double)_ui->sbGreen->maximum());
-		Settings::setLedCoefBlue(id, _ui->sbBlue->value() / (double)_ui->sbBlue->maximum());
+		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
+		Settings::setLedCoefRed(id, _grabAreas[id]->getCoefRed());
+		Settings::setLedCoefGreen(id, _grabAreas[id]->getCoefGreen());
+		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
 	}
 
-	cleanupMonitors();
+	cleanupPage();
 	return true;
 }
 
 void GlobalColorCoefPage::cleanupPage()
 {
 	cleanupMonitors();
+	cleanupGrabAreas();
 }
 
-void GlobalColorCoefPage::onCoefValueChanged()
+void GlobalColorCoefPage::updateDevice()
 {
-	QList<WBAdjustment> adjustments;
+	QList<WBAdjustment> wblist;
+	wblist.reserve(_transSettings->ledCount);
 
-	for (int led = 0; led < _transSettings->ledCount; ++led) {
-		WBAdjustment wba;
-		wba.red = _ui->sbRed->value() / (double)_ui->sbRed->maximum();
-		wba.green = _ui->sbGreen->value() / (double)_ui->sbGreen->maximum();
-		wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
-		adjustments.append(wba);
+	constexpr const WBAdjustment defaultWB;
+	for (int i = 0; i < _transSettings->ledCount; ++i) {
+		if (_grabAreas.contains(i))
+			wblist.append(_grabAreas[i]->getCoefs());
+		else
+			wblist.append(defaultWB);
 	}
 
-	device()->updateWBAdjustments(adjustments);
+	device()->updateWBAdjustments(wblist, true);
 }
 
-void GlobalColorCoefPage::onColorTemperatureValueChanged()
+void GlobalColorCoefPage::onCoefValueChanged(int value)
 {
-	StructRgb whitePoint = PrismatikMath::whitePoint(_ui->hsColorTemperature->value());
+	Q_UNUSED(value);
+
+	WBAdjustment wba;
+	wba.red = _ui->sbRed->value() / (double)_ui->sbRed->maximum();
+	wba.green = _ui->sbGreen->value() / (double)_ui->sbGreen->maximum();
+	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
+
+	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
+	for (GrabWidget* const widget : _grabAreas.values())
+		if (settings.screen->geometry().contains(widget->geometry().center()))
+			widget->setCoefs(wba);
+
+	settings.red = _ui->sbRed->value();
+	settings.green = _ui->sbGreen->value();
+	settings.blue = _ui->sbBlue->value();
+	settings.colorTemp = _ui->hsColorTemperature->value();
+}
+
+void GlobalColorCoefPage::onColorTemperatureValueChanged(int value)
+{
+	const StructRgb whitePoint = PrismatikMath::whitePoint(value);
 	_ui->sbRed->setValue(whitePoint.r / 2.55);
 	_ui->sbGreen->setValue(whitePoint.g / 2.55);
 	_ui->sbBlue->setValue(whitePoint.b / 2.55);
+
+	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
+	settings.red = _ui->sbRed->value();
+	settings.green = _ui->sbGreen->value();
+	settings.blue = _ui->sbBlue->value();
+	settings.colorTemp = value;
 }
 
 void GlobalColorCoefPage::cleanupMonitors()
 {
-	foreach ( MonitorIdForm *monitorIdForm, _monitorForms ) {
-		delete monitorIdForm;
-	}
+	qDeleteAll(_monitorForms);
 	_monitorForms.clear();
+}
+
+void GlobalColorCoefPage::addGrabArea(const int id)
+{
+	GrabWidget* const zone = new GrabWidget(id, AllowCoefConfig);
+
+	zone->move(_transSettings->zonePositions[id]);
+	zone->resize(_transSettings->zoneSizes[id]);
+	if (_isInitFromSettings) {
+		zone->setCoefRed(SettingsScope::Settings::getLedCoefRed(id));
+		zone->setCoefGreen(SettingsScope::Settings::getLedCoefGreen(id));
+		zone->setCoefBlue(SettingsScope::Settings::getLedCoefBlue(id));
+	}
+	zone->setAreaEnabled(_transSettings->zoneEnabled[id]);
+	zone->fillBackgroundWhite();
+	zone->show();
+	_grabAreas.insert(id, zone);
+}
+
+void GlobalColorCoefPage::cleanupGrabAreas()
+{
+	qDeleteAll(_grabAreas);
+	_grabAreas.clear();
+}
+
+void GlobalColorCoefPage::onMonitor_currentIndexChanged(int idx)
+{
+	int i = 0;
+	for (MonitorIdForm* const monitorId : _monitorForms)
+		monitorId->setActive(idx == i++);
+
+	const MonitorSettings& settings = _screens[idx];
+	_ui->sbRed->blockSignals(true);
+	_ui->hsRed->setValue(settings.red);
+	_ui->sbRed->blockSignals(false);
+
+	_ui->sbGreen->blockSignals(true);
+	_ui->hsGreen->setValue(settings.green);
+	_ui->sbGreen->blockSignals(false);
+
+	_ui->sbBlue->blockSignals(true);
+	_ui->hsBlue->setValue(settings.blue);
+	_ui->sbBlue->blockSignals(false);
+
+	_ui->hsColorTemperature->blockSignals(true);
+	_ui->hsColorTemperature->setValue(settings.colorTemp);
+	_ui->hsColorTemperature->blockSignals(false);
 }

@@ -27,6 +27,7 @@
 #pragma once
 
 #include "GrabConfigWidget.hpp"
+#include "types.h"
 #include <functional>
 
 namespace Ui {
@@ -34,10 +35,13 @@ namespace Ui {
 }
 
 enum GrabWidgetFeature : int {
-	SyncSettings = 0x1,
-	AllowCoefAndEnableConfig = 0x10,
-	AllowColorCycle = 0x100,
-	DimUntilInteractedWith = 0x1000
+	SyncSettings = 1 << 0,
+	AllowCoefConfig = 1 << 1,
+	AllowEnableConfig = 1 << 2,
+	AllowColorCycle = 1 << 3,
+	DimUntilInteractedWith = 1 << 4,
+	AllowMove = 1 << 5,
+	AllowResize = 1 << 6
 };
 
 class GrabWidget : public QWidget
@@ -49,11 +53,17 @@ public:
 
 	void saveSizeAndPosition();
 
-	int getId();
-	double getCoefRed();
-	double getCoefGreen();
-	double getCoefBlue();
-	bool isAreaEnabled();
+	int getId() const;
+	double getCoefRed() const;
+	double getCoefGreen() const;
+	double getCoefBlue() const;
+	WBAdjustment getCoefs() const;
+	void setCoefRed(const double);
+	void setCoefGreen(const double);
+	void setCoefBlue(const double);
+	void setCoefs(const WBAdjustment);
+	bool isAreaEnabled() const;
+	void setAreaEnabled(const bool);
 	void fillBackgroundWhite();
 	void fillBackgroundColored();
 
@@ -80,8 +90,10 @@ private:
 	virtual void closeEvent(QCloseEvent *event);
 	void setCursorOnAll(Qt::CursorShape cursor);
 	void checkAndSetCursors(QMouseEvent *pe);
-	void setBackgroundColor(QColor color);
-	void setTextColor(QColor color);
+	void setBackgroundColor(const QColor& color);
+	void setTextColor(const QColor& color);
+	QColor getBackgroundColor();
+	QColor getTextColor();
 	void setOpenConfigButtonBackground(const QColor &color);
 
 	QRect resizeAccordingly(QMouseEvent *pe);
@@ -91,9 +103,6 @@ private:
 		std::function<void(QRect&,int)> setter,
 		std::function<int(const QRect&)> getter,
 		std::function<int(const QRect&)> oppositeGetter);
-
-public:
-	static const int ColorIndexWhite = 11;
 
 private:
 	enum {
@@ -125,9 +134,7 @@ private:
 
 	int m_selfId; // ID of this object
 
-	double m_coefRed;
-	double m_coefGreen;
-	double m_coefBlue;
+	WBAdjustment m_coefs;
 
 	Ui::GrabWidget *ui;
 

@@ -69,6 +69,10 @@ CONFIG(clang) {
 }
 
 unix:!macx{
+	PKGCONFIG_BIN = $$system(which pkg-config)
+	isEmpty(PKGCONFIG_BIN) {
+		error("pkg-config not found")
+	}
 	CONFIG    += link_pkgconfig
 	PKGCONFIG += libusb-1.0
 

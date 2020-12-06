@@ -73,8 +73,8 @@ namespace SettingsScope
 namespace Main
 {
 // [General]
-static const QString ProfileNameDefault = "Lightpack";
-static const QString LanguageDefault = "<System>";
+static const QString ProfileNameDefault = QStringLiteral("Lightpack");
+static const QString LanguageDefault = QStringLiteral("<System>");
 static const Debug::DebugLevels DebugLevelDefault = Debug::ZeroLevel;
 static const bool IsKeepLightsOnAfterExit = false;
 static const bool IsKeepLightsOnAfterLock = true;
@@ -82,15 +82,15 @@ static const bool IsKeepLightsOnAfterSuspend = false;
 static const bool IsKeepLightsOnAfterScreenOff = true;
 static const bool IsPingDeviceEverySecond = true;
 static const bool IsUpdateFirmwareMessageShown = false;
-static const QString ConnectedDeviceDefault = "Lightpack";
-static const QString SupportedDevices = SUPPORTED_DEVICES; /* comma separated values! */
+static const QString ConnectedDeviceDefault = QStringLiteral("Lightpack");
+static const QString SupportedDevices = QStringLiteral(SUPPORTED_DEVICES); /* comma separated values! */
 static const bool CheckForUpdates = true;
 static const bool InstallUpdates = true;
 
 // [HotKeys]
 namespace HotKeys
 {
-static const QString HotkeyDefault = "Undefined";
+static const QString HotkeyDefault = QStringLiteral("Undefined");
 }
 
 // [API]
@@ -99,7 +99,7 @@ namespace Api
 static const bool IsEnabledDefault = false;
 static const bool ListenOnlyOnLoInterfaceDefault = true;
 static const int PortDefault = 3636;
-static const QString AuthKey = "";
+static const QString AuthKey = QLatin1String("");
 // See ApiKey generation in Settings initialization
 }
 namespace Device
@@ -110,16 +110,16 @@ static const double PowerSupplyAmpsDefault = 0.0;
 namespace Adalight
 {
 static const int NumberOfLedsDefault = 25;
-static const QString ColorSequence = "RGB";
-static const QString PortDefault = SERIAL_PORT_DEFAULT;
-static const QString BaudRateDefault = "115200";
+static const QString ColorSequence = QStringLiteral("RGB");
+static const QString PortDefault = QStringLiteral(SERIAL_PORT_DEFAULT);
+static const QString BaudRateDefault = QStringLiteral("115200");
 }
 namespace Ardulight
 {
 static const int NumberOfLedsDefault = 10;
-static const QString ColorSequence = "RGB";
-static const QString PortDefault = SERIAL_PORT_DEFAULT;
-static const QString BaudRateDefault = "115200";
+static const QString ColorSequence = QStringLiteral("RGB");
+static const QString PortDefault = QStringLiteral(SERIAL_PORT_DEFAULT);
+static const QString BaudRateDefault = QStringLiteral("115200");
 }
 namespace AlienFx
 {
@@ -136,22 +136,22 @@ static const int NumberOfLedsDefault = 10;
 namespace Drgb
 {
 static const int NumberOfLedsDefault = 10;
-static const QString AddressDefault = "127.0.0.1";
-static const QString PortDefault = "21324";
+static const QString AddressDefault = QStringLiteral("127.0.0.1");
+static const QString PortDefault = QStringLiteral("21324");
 static const int TimeoutDefault = 255;
 }
 namespace Dnrgb
 {
 static const int NumberOfLedsDefault = 10;
-static const QString AddressDefault = "127.0.0.1";
-static const QString PortDefault = "21324";
+static const QString AddressDefault = QStringLiteral("127.0.0.1");
+static const QString PortDefault = QStringLiteral("21324");
 static const int TimeoutDefault = 255;
 }
 namespace Warls
 {
 static const int NumberOfLedsDefault = 10;
-static const QString AddressDefault = "127.0.0.1";
-static const QString PortDefault = "21324";
+static const QString AddressDefault = QStringLiteral("127.0.0.1");
+static const QString PortDefault = QStringLiteral("21324");
 static const int TimeoutDefault = 255;
 }
 }
@@ -161,13 +161,13 @@ namespace Profile
 {
 // [General]
 static const bool IsBacklightEnabledDefault = true;
-static const QString LightpackModeDefault = "Ambilight";
+static const QString LightpackModeDefault = QStringLiteral("Ambilight");
 
 // [Grab]
 namespace Grab
 {
 static const ::Grab::GrabberType GrabberDefault = GRABMODE_DEFAULT;
-static const QString GrabberDefaultString = GRABMODE_DEFAULT_STR;
+static const QString GrabberDefaultString = QStringLiteral(GRABMODE_DEFAULT_STR);
 static const bool IsAvgColorsEnabledDefault = false;
 static const bool IsSendDataOnlyIfColorsChangesDefault = false;
 static const bool IsMinimumLuminosityEnabledDefault = true;
@@ -198,7 +198,7 @@ static const int LampDefault = 0;
 static const int SpeedMin = 1;
 static const int SpeedDefault = 50;
 static const int SpeedMax = 100;
-static const QString ColorDefault = "#00FF00";
+static const QString ColorDefault = QStringLiteral("#00FF00");
 static const bool IsLiquidModeDefault = true;
 }
 // [SoundVisualizer]
@@ -206,8 +206,8 @@ namespace SoundVisualizer
 {
 static const int DeviceDefault = -1;
 static const int VisualizerDefault = 0;
-static const QString MinColorDefault = "#301000";
-static const QString MaxColorDefault = "#0000FF";
+static const QString MinColorDefault = QStringLiteral("#301000");
+static const QString MaxColorDefault = QStringLiteral("#0000FF");
 static const bool IsLiquidModeDefault = true;
 static const int LiquidSpeedMin = 1;
 static const int LiquidSpeedDefault = 10;

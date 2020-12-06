@@ -2,7 +2,7 @@
 #include "ProxyFuncVFTable.hpp"
 #include "HooksTest.h"
 #include "hooksutils.h"
-#include <QtTest/QtTest>
+#include <QtTest>
 
 HooksTest::HooksTest(QObject *parent) :
 	QObject(parent)

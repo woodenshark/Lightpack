@@ -28,7 +28,7 @@
 #define AREADISTRIBUTOR_HPP
 #include <QList>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QRect>
 #include <math.h>
 
 class ScreenArea {
@@ -61,6 +61,7 @@ inline int cmp(T x, T y, double e) {
 }
 
 class AreaDistributor {
+	Q_DISABLE_COPY(AreaDistributor)
 public:
 	AreaDistributor(QRect screen, int areaCount) :
 		_areaCount(areaCount),

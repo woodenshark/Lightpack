@@ -146,7 +146,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
 
 #ifndef NO_QT
 	char buf[100];
-	sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
+	sprintf(buf, "presentFuncPtr=%llx", presentFuncPtr);
 	DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -227,7 +227,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
 		uintptr_t presentFuncPtr = pvtbl[D3D9_PRESENT_FUNC_ORD];
 #ifndef NO_QT
 		char buf[100];
-		sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
+		sprintf(buf, "presentFuncPtr=%llx", presentFuncPtr);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -306,7 +306,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
 		uintptr_t presentFuncPtr = pvtbl[D3D9_SCPRESENT_FUNC_ORD];
 #ifndef NO_QT
 		char buf[100];
-		sprintf(buf, "presentFuncPtr=%x", presentFuncPtr);
+		sprintf(buf, "presentFuncPtr=%llx", presentFuncPtr);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 
@@ -387,7 +387,7 @@ UINT GetD3D9ResetOffset(HWND hWnd){
 		uintptr_t resetFuncPtr = pvtbl[D3D9_RESET_FUNC_ORD];
 #ifndef NO_QT
 		char buf[100];
-		sprintf(buf, "resetFuncPtr=%x", resetFuncPtr);
+		sprintf(buf, "resetFuncPtr=%llx", resetFuncPtr);
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << buf;
 #endif
 

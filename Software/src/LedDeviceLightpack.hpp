@@ -48,9 +48,12 @@ class LedDeviceLightpack : public AbstractLedDevice
 public:
 	LedDeviceLightpack(QObject *parent = 0);
 	virtual ~LedDeviceLightpack();
+	QString name() const { return QStringLiteral("lightpack"); }
+	virtual int defaultLedsCount() { return maxLedsCount(); }
+	int lightpacksFound() { return m_devices.size(); }
+	virtual int maxLedsCount();
 
 public slots:
-	virtual const QString name() const { return "lightpack"; }
 	virtual void open();
 	virtual void close();
 	virtual void setColors(const QList<QRgb> & colors);
@@ -59,14 +62,11 @@ public slots:
 	virtual void setRefreshDelay(int value);
 	virtual void setColorDepth(int value);
 	virtual void setSmoothSlowdown(int value);
-	virtual void setColorSequence(QString /*value*/);
+	virtual void setColorSequence(const QString& /*value*/);
 	virtual void requestFirmwareVersion();
 	virtual void updateDeviceSettings();
-	virtual int maxLedsCount();
-	virtual int defaultLedsCount() { return maxLedsCount(); }
-	int lightpacksFound() { return m_devices.size(); }
 
-private: 
+private:
 	bool readDataFromDevice();
 	bool writeBufferToDevice(int command, hid_device *phid_device);
 	bool tryToReopenDevice();
@@ -76,7 +76,7 @@ private:
 	void closeDevices();
 
 private slots:
-	void restartPingDevice(bool isSuccess);
+	void restartPingDevice();
 	void timerPingDeviceTimeout();
 
 private:

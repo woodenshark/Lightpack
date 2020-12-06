@@ -29,6 +29,11 @@
 #include "PrismatikMath.hpp"
 #include "Settings.hpp"
 
+void AbstractLedDevice::setUsbPowerLedDisabled(bool isDisabled) {
+	Q_UNUSED(isDisabled);
+	emit commandCompleted(true);
+}
+
 void AbstractLedDevice::setGamma(double value, bool updateColors) {
 	m_gamma = value;
 	if (updateColors)

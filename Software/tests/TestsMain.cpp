@@ -1,4 +1,4 @@
-#include <QtTest/QtTest>
+#include <QtTest>
 #include "LightpackApiTest.hpp"
 #include "GrabCalculationTest.hpp"
 #include "lightpackmathtest.hpp"

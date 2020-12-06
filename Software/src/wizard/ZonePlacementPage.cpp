@@ -26,7 +26,6 @@
 
 #include "ZonePlacementPage.hpp"
 #include "ui_ZonePlacementPage.h"
-#include "QDesktopWidget"
 #include "AbstractLedDevice.hpp"
 #include "Settings.hpp"
 #include "CustomDistributor.hpp"

@@ -9,7 +9,7 @@ class Plugin : public QObject
 {
 	Q_OBJECT
 public:
-	Plugin(QString name, QString path,QObject *parent = 0);
+	Plugin(const QString& name, const QString& path, QObject *parent = 0);
 	~Plugin();
 
 	void Start();

@@ -59,7 +59,7 @@ QString getApplicationDirectoryPath(const char * firstCmdArgument)
 	QFileInfo fileInfo(firstCmdArgument);
 	QString appDirPath = fileInfo.absoluteDir().absolutePath();
 
-	QString lightpackMainConfPath = appDirPath + "/main.conf";
+	QString lightpackMainConfPath = appDirPath + QStringLiteral("/main.conf");
 
 	cout << lightpackMainConfPath.toStdString() << endl;
 
@@ -78,12 +78,12 @@ QString getApplicationDirectoryPath(const char * firstCmdArgument)
 		cout << "Unportable version" << endl;
 
 		QString home = QDir::homePath();
-		QString normalizedHome = home.endsWith("/") ? home.left(home.size() - 1) : home;
+		QString normalizedHome = home.endsWith(QStringLiteral("/")) ? home.left(home.size() - 1) : home;
 
 #		ifdef Q_OS_WIN
-		appDirPath = normalizedHome	+ "/Prismatik";
+		appDirPath = normalizedHome	+ QStringLiteral("/Prismatik");
 #		else
-		appDirPath = normalizedHome + "/.Prismatik";
+		appDirPath = normalizedHome + QStringLiteral("/.Prismatik");
 #		endif
 
 		QDir dir(appDirPath);
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 	Q_UNUSED(messageHandlerGuard);
 
 	LightpackApplication lightpackApp(argc, argv);
-	lightpackApp.setLibraryPaths(QStringList(appDirPath + "/plugins"));
+	lightpackApp.setLibraryPaths(QStringList(appDirPath + QStringLiteral("/plugins")));
 	lightpackApp.initializeAll(appDirPath);
 
 	// init the logger after initializeAll to know the configured debugLevel
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
 	if (lightpackApp.isRunning())
 	{
-		lightpackApp.sendMessage("alreadyRunning");
+		lightpackApp.sendMessage(QStringLiteral("alreadyRunning"));
 
 		qWarning() << "Application already running";
 		exit(0);

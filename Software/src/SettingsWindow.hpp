@@ -39,14 +39,13 @@
 #endif
 #include "ColorButton.hpp"
 #include "enums.hpp"
-
+#include "Plugin.hpp"
 
 namespace Ui {
 	class SettingsWindow;
 }
 
 class GrabManager; // forward declaration
-class Plugin;
 class SysTrayIcon;
 
 class SettingsWindow : public QMainWindow {
@@ -98,7 +97,7 @@ public slots:
 	void refreshAmbilightEvaluated(double updateResultMs);
 	void updateUiFromSettings();
 
-	void setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status,	QList<QString> modules);
+	void setDeviceLockViaAPI(const DeviceLocked::DeviceLockStatus status, const QList<QString>& modules);
 	void setBacklightStatus(Backlight::Status);
 	void setModeChanged(Lightpack::Mode);
 	void backlightOn(); /* using in actions */
@@ -106,10 +105,10 @@ public slots:
 	void profilesLoadAll();
 	void profileSwitch(const QString & configName);
 	void handleProfileLoaded(const QString & configName);
-	void profileSwitchCombobox(QString profile);
+	void profileSwitchCombobox(const QString& profile);
 	void updateVirtualLedsColors(const QList<QRgb> & colors);
 	void requestBacklightStatus();
-	void onApiServer_ErrorOnStartListening(QString errorMessage);
+	void onApiServer_ErrorOnStartListening(const QString& errorMessage);
 	void onPingDeviceEverySecond_Toggled(bool state);
 	void processMessage(const QString &message);
 
@@ -119,7 +118,7 @@ public slots:
 	void updateAvailableSoundVizVisualizers(const QList<SoundManagerVisualizerInfo> & visualizers, int recommended);
 #endif
 
-	void updatePlugin(QList<Plugin*> plugins);
+	void updatePlugin(const QList<Plugin*>& plugins);
 
 	void onFocus();
 	void onBlur();
@@ -127,6 +126,7 @@ public slots:
 	void showSettings(); /* using in actions */
 	void hideSettings(); /* used in closeEvent(..) */
 	void toggleSettings(); /* using in iconActivated(..) */
+	void onPostInit();
 
 protected:
 	virtual void changeEvent(QEvent *e);
@@ -147,11 +147,10 @@ private slots:
 	void onSoundVizLiquidMode_Toggled(bool isLiquidMode);
 	void onSoundVizLiquidSpeed_valueChanged(int value);
 #ifdef Q_OS_MACOS
-	void on_pushButton_SoundVizDeviceHelp_clicked();
+	void onSoundVizDeviceHelp_clicked();
 #endif
 #endif
 	void showAbout(); /* using in actions */
-	void onPostInit();
 
 	void scrollThanks();
 
@@ -239,7 +238,7 @@ private slots:
 	void onKeepLightsAfterSuspend_Toggled(bool isEnabled);
 	void onKeepLightsAfterScreenOff_Toggled(bool isEnabled);
 
-	void on_pbRunConfigurationWizard_clicked();
+	void onRunConfigurationWizard_clicked();
 
 	void onCheckBox_checkForUpdates_Toggled(bool isEnabled);
 	void onCheckBox_installUpdates_Toggled(bool isEnabled);

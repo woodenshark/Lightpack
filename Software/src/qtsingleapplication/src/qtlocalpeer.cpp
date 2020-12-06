@@ -43,6 +43,9 @@
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QTime>
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QRegularExpression>
+#endif
 
 #if defined(Q_OS_WIN)
 #include <QLibrary>
@@ -78,11 +81,19 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
 #endif
 		prefix = id.section(QLatin1Char('/'), -1);
 	}
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	prefix.remove(QRegularExpression("[^a-zA-Z]"));
+	#else
 	prefix.remove(QRegExp("[^a-zA-Z]"));
+	#endif
 	prefix.truncate(6);
 
 	QByteArray idc = id.toUtf8();
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	quint16 idNum = qChecksum(QByteArrayView(idc));
+	#else
 	quint16 idNum = qChecksum(idc.constData(), idc.size());
+	#endif
 	socketName = QLatin1String("qtsingleapp-") + prefix
 					+ QLatin1Char('-') + QString::number(idNum, 16);
 
@@ -128,7 +139,7 @@ bool QtLocalPeer::isClient()
 #endif
 	if (!res)
 		qWarning("QtSingleCoreApplication: listen on local socket failed, %s", qPrintable(server->errorString()));
-	QObject::connect(server, SIGNAL(newConnection()), SLOT(receiveConnection()));
+	QObject::connect(server, &QLocalServer::newConnection, this, &QtLocalPeer::receiveConnection);
 	return false;
 }
 

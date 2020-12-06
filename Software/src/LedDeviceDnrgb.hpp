@@ -32,19 +32,16 @@ class LedDeviceDnrgb : public AbstractLedDeviceUdp
 {
 	Q_OBJECT
 public:
-    LedDeviceDnrgb(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
+	LedDeviceDnrgb(const QString& address, const QString& port, const uint8_t timeout, QObject * parent = 0);
+	QString name() const;
+	int maxLedsCount();
 
 public slots:
-    const QString name() const;
 	void setColors(const QList<QRgb> & colors);
-	void switchOffLeds();
-    void requestFirmwareVersion();
-    int maxLedsCount();
 
 protected:
-    void resizeColorsBuffer(int buffSize);
-    void reinitBufferHeader();
+	virtual void reinitBufferHeader();
 
-private:
-    constexpr static const int LedsPerPacket = 489;
+	constexpr static const int LedsPerPacket = 489;
+	QList<QRgb> m_processedColorsSaved;
 };

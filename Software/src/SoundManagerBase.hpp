@@ -31,8 +31,8 @@
 #include "SoundVisualizer.hpp"
 
 struct SoundManagerDeviceInfo {
-	SoundManagerDeviceInfo(){ this->name = ""; this->id = -1; }
-	SoundManagerDeviceInfo(QString name, int id){ this->name = name; this->id = id; }
+	SoundManagerDeviceInfo(){ this->name = QLatin1String(""); this->id = -1; }
+	SoundManagerDeviceInfo(const QString& name, int id){ this->name = name; this->id = id; }
 	QString name;
 	int id;
 };
@@ -54,7 +54,7 @@ signals:
 	void visualizerFrametime(const double);
 
 public:
-	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT(("Not implemented", false)); };
+	virtual void start(bool isEnabled) { Q_UNUSED(isEnabled); Q_ASSERT_X(false, "SoundManagerBase::start()", "not implemented"); };
 
 	// Common options
 	void reset();
@@ -91,9 +91,9 @@ protected:
 	bool	m_isInited{false};
 	int		m_device{-1};
 	bool	m_isSendDataOnlyIfColorsChanged{false};
-	
+
 	float*	m_fft{nullptr};
-	
+
 	QElapsedTimer m_elapsedTimer;
 	size_t m_frames{ 1 };
 };

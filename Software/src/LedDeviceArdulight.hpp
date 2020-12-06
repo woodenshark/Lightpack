@@ -36,9 +36,11 @@ class LedDeviceArdulight : public AbstractLedDevice
 public:
 	LedDeviceArdulight(const QString &portName, const int baudRate, QObject * parent = 0);
 	virtual ~LedDeviceArdulight();
+	QString name() const { return QStringLiteral("ardulight"); }
+	int maxLedsCount();
+	virtual int defaultLedsCount() { return 25; }
 
 public slots:
-	const QString name() const { return "ardulight"; }
 	void open();
 	void close();
 	void setColors(const QList<QRgb> & /*colors*/);
@@ -46,12 +48,11 @@ public slots:
 	void setRefreshDelay(int /*value*/);
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString value);
+	void setColorSequence(const QString& value);
 	void requestFirmwareVersion();
 	void updateDeviceSettings();
-	int maxLedsCount(){ return 255; }
-	virtual int defaultLedsCount() { return 25; }
-	void writeLastWill(const bool force = false);
+	void writeLastWill();
+	void writeLastWill(const bool force);
 
 private:
 	bool writeBuffer(const QByteArray & buff);

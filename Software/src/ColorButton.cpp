@@ -8,8 +8,8 @@
 
 ColorButton::ColorButton(QWidget * parent) : QPushButton(parent)
 {
-	this->setText("");
-	connect(this, SIGNAL(clicked()), this, SLOT(click()));
+	this->setText(QLatin1String(""));
+	connect(this, &ColorButton::clicked, this, qOverload<>(&ColorButton::click));
 }
 
 ColorButton::~ColorButton()
@@ -51,7 +51,7 @@ void ColorButton::click()
 							| Qt::WindowCloseButtonHint);
 
 	QColor savedColor = getColor();
-	connect(dialog, SIGNAL(currentColorChanged(QColor)), this, SLOT(currentColorChanged(QColor)));
+	connect(dialog, &QColorDialog::currentColorChanged, this, &ColorButton::currentColorChanged);
 	dialog->setCurrentColor(getColor());
 	if (dialog->exec() != QDialog::Accepted)
 		setColor(savedColor);

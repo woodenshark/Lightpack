@@ -46,7 +46,7 @@ LedDeviceAdalight::LedDeviceAdalight(const QString &portName, const int baudRate
 	m_AdalightDevice = NULL;
 	m_lastWillTimer = new QTimer(this);
 	m_lastWillTimer->setTimerType(Qt::PreciseTimer);
-	connect(m_lastWillTimer, SIGNAL(timeout()), this, SLOT(writeLastWill()));
+	connect(m_lastWillTimer, &QTimer::timeout, this, qOverload<>(&LedDeviceAdalight::writeLastWill));
 	// TODO: think about init m_savedColors in all ILedDevices
 
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "initialized";
@@ -56,6 +56,11 @@ LedDeviceAdalight::~LedDeviceAdalight()
 {
 	close();
 	delete m_lastWillTimer;
+}
+
+int LedDeviceAdalight::maxLedsCount()
+{
+	return MaximumNumberOfLeds::Adalight;
 }
 
 void LedDeviceAdalight::close()
@@ -90,31 +95,31 @@ void LedDeviceAdalight::setColors(const QList<QRgb> & colors)
 	{
 		StructRgb color = m_colorsBuffer[i];
 
-		if (m_colorSequence == "RBG")
+		if (m_colorSequence == QStringLiteral("RBG"))
 		{
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.g);
 		}
-		else if (m_colorSequence == "BRG")
+		else if (m_colorSequence == QStringLiteral("BRG"))
 		{
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.g);
 		}
-		else if (m_colorSequence == "BGR")
+		else if (m_colorSequence == QStringLiteral("BGR"))
 		{
 			m_writeBuffer.append(color.b);
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.r);
 		}
-		else if (m_colorSequence == "GRB")
+		else if (m_colorSequence == QStringLiteral("GRB"))
 		{
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.b);
 		}
-		else if (m_colorSequence == "GBR")
+		else if (m_colorSequence == QStringLiteral("GBR"))
 		{
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.b);
@@ -169,7 +174,7 @@ void LedDeviceAdalight::setSmoothSlowdown(int /*value*/)
 	emit commandCompleted(true);
 }
 
-void LedDeviceAdalight::setColorSequence(QString value)
+void LedDeviceAdalight::setColorSequence(const QString& value)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << value;
 
@@ -179,7 +184,7 @@ void LedDeviceAdalight::setColorSequence(QString value)
 
 void LedDeviceAdalight::requestFirmwareVersion()
 {
-	emit firmwareVersion("unknown (adalight device)");
+	emit firmwareVersion(QStringLiteral("unknown (adalight device)"));
 	emit commandCompleted(true);
 }
 
@@ -250,6 +255,11 @@ void LedDeviceAdalight::open()
 	emit openDeviceSuccess(ok);
 }
 
+void LedDeviceAdalight::writeLastWill()
+{
+	writeLastWill(false);
+}
+
 void LedDeviceAdalight::writeLastWill(const bool force)
 {
 	if (force || m_AdalightDevice->bytesToWrite() == 0) {
@@ -269,7 +279,8 @@ bool LedDeviceAdalight::writeBuffer(const QByteArray & buff)
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Serial bytesToWrite:" << m_AdalightDevice->bytesToWrite() << ", skipping current frame";
 		// If no more writes will be done ("Send data only of colors changed")
 		// re-schedule last skipped frame in case it's important (for ex a black frame to turn off)
-		m_lastWillTimer->start(100);
+		using namespace std::chrono_literals;
+		m_lastWillTimer->start(100ms);
 		return true;
 	}
 	m_lastWillTimer->stop();

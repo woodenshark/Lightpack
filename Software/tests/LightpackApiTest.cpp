@@ -24,7 +24,7 @@
  */
 
 #include <QString>
-#include <QtWidgets/QApplication>
+#include <QApplication>
 #include <QTest>
 
 #include "debug.h"

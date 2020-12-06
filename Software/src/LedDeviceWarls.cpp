@@ -27,13 +27,13 @@
 #include "LedDeviceWarls.hpp"
 #include "enums.hpp"
 
-LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, const int timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
+LedDeviceWarls::LedDeviceWarls(const QString& address, const QString& port, const uint8_t timeout, QObject * parent) : AbstractLedDeviceUdp(address, port, timeout, parent)
 {
 }
 
-const QString LedDeviceWarls::name() const
-{ 
-	return "warls"; 
+QString LedDeviceWarls::name() const
+{
+	return QStringLiteral("warls");
 }
 
 int LedDeviceWarls::maxLedsCount()
@@ -48,80 +48,33 @@ void LedDeviceWarls::setColors(const QList<QRgb> & colors)
 	applyColorModifications(colors, m_colorsBuffer);
 	applyDithering(m_colorsBuffer, 8);
 
+	const int totalColorsSaved = m_processedColorsSaved.count();
 	m_writeBuffer.clear();
 	m_writeBuffer.append(m_writeBufferHeader);
+	QList<QRgb> newColors;
+	newColors.reserve(colors.count());
 
 	for (int i = 0; i < m_colorsBuffer.count(); i++)
 	{
-		if (colors[i] != m_colorsSaved[i])
+		const StructRgb color = m_colorsBuffer[i];
+		const QRgb newColor = qRgb(color.r, color.g, color.b);
+		if (i >= totalColorsSaved || newColor != m_processedColorsSaved[i])
 		{
-			StructRgb color = m_colorsBuffer[i];
 
 			m_writeBuffer.append(i);
 			m_writeBuffer.append(color.r);
 			m_writeBuffer.append(color.g);
 			m_writeBuffer.append(color.b);
 		}
+		newColors << newColor;
 	}
 
 	m_colorsSaved = colors;
+	m_processedColorsSaved = newColors;
 
 	// This may send the header only
-	bool ok = writeBuffer(m_writeBuffer);
+	const bool ok = writeBuffer(m_writeBuffer);
 	emit commandCompleted(ok);
-}
-
-void LedDeviceWarls::switchOffLeds()
-{
-	int count = m_colorsSaved.count();
-	m_colorsSaved.clear();
-
-	for (int i = 0; i < count; i++) {
-		m_colorsSaved << 0;
-	}
-
-	m_writeBuffer.clear();
-	m_writeBuffer.append(m_writeBufferHeader);
-
-	for (int i = 0; i < count; i++) {
-		m_writeBuffer.append((char)i)
-			.append((char)0)
-			.append((char)0)
-			.append((char)0);
-	}
-
-	bool ok = writeBuffer(m_writeBuffer);
-	emit commandCompleted(ok);
-}
-
-void LedDeviceWarls::requestFirmwareVersion()
-{
-	emit firmwareVersion("1.0 (warls device)");
-	emit commandCompleted(true);
-}
-
-void LedDeviceWarls::resizeColorsBuffer(int buffSize)
-{
-	if (m_colorsBuffer.count() == buffSize)
-		return;
-
-	m_colorsBuffer.clear();
-	m_colorsSaved.clear();
-
-	if (buffSize > MaximumNumberOfLeds::Warls)
-	{
-		qCritical() << Q_FUNC_INFO << "buffSize > MaximumNumberOfLeds::Warls" << buffSize << ">" << MaximumNumberOfLeds::Warls;
-
-		buffSize = MaximumNumberOfLeds::Warls;
-	}
-
-	for (int i = 0; i < buffSize; i++)
-	{
-		m_colorsBuffer << StructRgb();
-		m_colorsSaved << 0;
-	}
-
-	reinitBufferHeader();
 }
 
 void LedDeviceWarls::reinitBufferHeader()

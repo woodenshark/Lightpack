@@ -38,9 +38,11 @@ class LedDeviceAlienFx : public AbstractLedDevice
 public:
 	LedDeviceAlienFx(QObject *parent = 0);
 	virtual ~LedDeviceAlienFx();
+	QString name() const { return QStringLiteral("lightfx"); }
+	int maxLedsCount();
+	int defaultLedsCount() { return 1; }
 
 public slots:
-	const QString name() const { return "lightfx"; }
 	void open();
 	void close(){};
 	void setColors(const QList<QRgb> & colors);
@@ -48,10 +50,8 @@ public slots:
 	void setRefreshDelay(int /*value*/);
 	void setColorDepth(int /*value*/);
 	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString /*value*/);
+	void setColorSequence(const QString& /*value*/);
 	void requestFirmwareVersion();
-	int maxLedsCount() { return 1; }
-	int defaultLedsCount() { return 1; }
 
 
 private:

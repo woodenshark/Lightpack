@@ -24,7 +24,6 @@
  *
  */
 
-#include <QDesktopWidget>
 #include <QMessageBox>
 
 #include "ConfigureDevicePage.hpp"

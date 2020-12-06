@@ -34,34 +34,34 @@ class AbstractLedDeviceUdp : public AbstractLedDevice
 {
 	Q_OBJECT
 public:
-    AbstractLedDeviceUdp(const QString& address, const QString& port, const int timeout, QObject * parent = 0);
-    virtual ~AbstractLedDeviceUdp();
+	AbstractLedDeviceUdp(const QString& address, const QString& port, const uint8_t timeout, QObject * parent = 0);
+	virtual ~AbstractLedDeviceUdp();
+	int defaultLedsCount() { return 10; }
 
 public slots:
 	void open();
-    void close();
-	void setRefreshDelay(int /*value*/);
-	void setColorDepth(int /*value*/);
-	void setSmoothSlowdown(int /*value*/);
-	void setColorSequence(QString /*value*/);
-	void setGamma(double value);
-	void setBrightness(int value);
-	int defaultLedsCount() { return 10; }
+	void close();
+	virtual void setRefreshDelay(int value);
+	virtual void setSmoothSlowdown(int value);
+	virtual void setColorSequence(const QString& value);
+	virtual void setColorDepth(int value);
+	virtual void requestFirmwareVersion();
+	void switchOffLeds();
 
 protected:
-    QByteArray m_writeBufferHeader;
-    QByteArray m_writeBuffer;
+	QByteArray m_writeBufferHeader;
+	QByteArray m_writeBuffer;
 
-    virtual void resizeColorsBuffer(int buffSize) = 0;
-    virtual void reinitBufferHeader() = 0;
-    bool writeBuffer(const QByteArray& buff);
+	void resizeColorsBuffer(int buffSize);
+	virtual void reinitBufferHeader() = 0;
+	bool writeBuffer(const QByteArray& buff);
 
-    int m_timeout;
-    constexpr static const char InfiniteTimeout = 255;
+	uint8_t m_timeout;
+	constexpr static const uint8_t InfiniteTimeout = (uint8_t)255;
 
 private:
-    QUdpSocket* m_Socket;
+	QUdpSocket* m_Socket;
 
-    QString m_address;
-    int m_port;
+	QString m_address;
+	uint16_t m_port {21324};
 };

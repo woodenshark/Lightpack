@@ -63,8 +63,12 @@ void UpdatesProcessor::requestUpdates()
 	QNetworkRequest request(QUrl(UPDATE_CHECK_URL));
 	request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
 	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SIGNAL(readyRead()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+	connect(_reply, &QNetworkReply::finished, this, &UpdatesProcessor::readyRead);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+	connect(_reply, &QNetworkReply::errorOccurred, this, &UpdatesProcessor::error);
+#else
+	connect(_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error), this, &UpdatesProcessor::error);
+#endif
 }
 
 QList<UpdateInfo> UpdatesProcessor::readUpdates()
@@ -118,8 +122,13 @@ void UpdatesProcessor::loadUpdate(UpdateInfo& info)
 #endif
 
 	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SLOT(updatePgkLoaded()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+	connect(_reply, &QNetworkReply::finished, this, &UpdatesProcessor::updatePgkLoaded);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+	connect(_reply, &QNetworkReply::errorOccurred, this, &UpdatesProcessor::error);
+#else
+	connect(_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error), this, &UpdatesProcessor::error);
+#endif
+
 #else
 	qWarning() << Q_FUNC_INFO << "Trying to load update on non-windows platform -- ignored";
 #endif
@@ -154,8 +163,12 @@ void UpdatesProcessor::updatePgkLoaded()
 #endif
 
 	_reply = _networkMan.get(request);
-	connect(_reply, SIGNAL(finished()), this, SLOT(updateSigLoaded()));
-	connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
+	connect(_reply, &QNetworkReply::finished, this, &UpdatesProcessor::updateSigLoaded);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+	connect(_reply, &QNetworkReply::errorOccurred, this, &UpdatesProcessor::error);
+#else
+	connect(_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error), this, &UpdatesProcessor::error);
+#endif
 }
 
 void UpdatesProcessor::updateSigLoaded()

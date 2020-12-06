@@ -37,7 +37,11 @@ namespace SystemSession
 		DEBUG_MID_LEVEL << Q_FUNC_INFO << "Event Filter is set up";
 	}
 
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	bool WindowsEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result)
+	#else
 	bool WindowsEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
+	#endif
 	{
 		Q_UNUSED(result);
 		Q_UNUSED(eventType);

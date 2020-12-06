@@ -48,6 +48,7 @@ enum w_type
 
 class PulseAudioSoundManager : public SoundManagerBase
 {
+	Q_OBJECT
 public:
 	PulseAudioSoundManager(QObject *parent = 0);
 	virtual ~PulseAudioSoundManager();

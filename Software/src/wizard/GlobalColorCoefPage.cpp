@@ -24,7 +24,6 @@
  *
  */
 
-#include <QDesktopWidget>
 #include <QRadioButton>
 #include "GlobalColorCoefPage.hpp"
 #include "ui_GlobalColorCoefPage.h"

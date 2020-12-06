@@ -49,7 +49,11 @@ void SelectProfilePage::initializePage()
 	QStringList profiles = Settings::findAllProfiles();
 	ui->cbProfile->addItems(profiles);
 
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	QRegularExpressionValidator *validatorProfileName = new QRegularExpressionValidator(QRegularExpression("[^<>:\"/\\|?*]*"), this);
+	#else
 	QRegExpValidator *validatorProfileName = new QRegExpValidator(QRegExp("[^<>:\"/\\|?*]*"), this);
+	#endif
 	ui->cbProfile->lineEdit()->setValidator(validatorProfileName);
 	connect(ui->cbProfile->lineEdit(), &QLineEdit::editingFinished /* or returnPressed() */, this, &SelectProfilePage::profileRename);
 	ui->cbProfile->setCurrentText(Settings::getCurrentProfileName());

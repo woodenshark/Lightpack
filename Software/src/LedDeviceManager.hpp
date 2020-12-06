@@ -63,7 +63,7 @@ signals:
 	void ledDeviceSetBrightnessCap(int value, bool);
 	void ledDeviceSetLuminosityThreshold(int value, bool);
 	void ledDeviceSetMinimumLuminosityEnabled(bool, bool);
-	void ledDeviceSetDitheringEnabled(bool isEnabled);
+	void ledDeviceSetDitheringEnabled(bool isEnabled, bool);
 	void ledDeviceSetColorSequence(QString value);
 	void ledDeviceRequestFirmwareVersion();
 	void ledDeviceUpdateWBAdjustments();
@@ -88,7 +88,7 @@ public slots:
 	void setLuminosityThreshold(int value);
 	void setMinimumLuminosityEnabled(bool value);
 	void setDitheringEnabled(bool isEnabled);
-	void setColorSequence(QString value);
+	void setColorSequence(const QString& value);
 	void requestFirmwareVersion();
 	void updateWBAdjustments();
 	void updateDeviceSettings();
@@ -99,7 +99,7 @@ private slots:
 	void ledDeviceOpenDeviceSuccess(bool isSuccess);
 	void ledDeviceIoDeviceSuccess(bool isSuccess);
 
-private:	
+private:
 	void initLedDevice();
 	AbstractLedDevice * createLedDevice(SupportedDevices::DeviceType deviceType);
 	void connectSignalSlotsLedDevice();

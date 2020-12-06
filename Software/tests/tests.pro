@@ -9,14 +9,13 @@ QT         += widgets network testlib
 TARGET      = LightpackTests
 DESTDIR     = bin
 
-CONFIG     += console
+CONFIG     += console c++17
 CONFIG     -= app_bundle
 
 include(../build-config.prf)
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
 CONFIG(clang) {
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    QMAKE_CXXFLAGS += -stdlib=libc++
     LIBS += -stdlib=libc++
 }
 

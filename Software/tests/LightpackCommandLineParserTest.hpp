@@ -26,7 +26,7 @@
 #ifndef LIGHTPACKCOMMANDLINEPARSERTEST_H
 #define LIGHTPACKCOMMANDLINEPARSERTEST_H
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 class LightpackCommandLineParserTest : public QObject
 {

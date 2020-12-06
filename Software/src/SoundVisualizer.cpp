@@ -40,10 +40,10 @@ public:\
 _OBJ_NAME_ ## SoundVisualizer() = default;\
 ~_OBJ_NAME_ ## SoundVisualizer() = default;\
 \
-static const char* const name() { return _LABEL_; };\
+static const char* name() { return _LABEL_; };\
 static SoundVisualizerBase* create() { return new _OBJ_NAME_ ## SoundVisualizer(); };\
 \
-const bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);\
+bool visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors);\
 _BODY_\
 };\
 struct _OBJ_NAME_ ## Register {\
@@ -63,8 +63,8 @@ namespace {
 
 SoundVisualizerBase* SoundVisualizerBase::createWithID(const int id)
 {
-	QMap<int, SoundManagerVisualizerInfo>::const_iterator i = visualizerMap.find(id);
-	if (i != visualizerMap.end())
+	QMap<int, SoundManagerVisualizerInfo>::const_iterator i = visualizerMap.constFind(id);
+	if (i != visualizerMap.cend())
 		return i.value().factory();
 	qWarning() << Q_FUNC_INFO << "failed to find visualizer ID: " << id;
 	return nullptr;
@@ -87,7 +87,7 @@ private:
 	const int SpecHeight = 1000;
 );
 
-const bool PrismatikSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
+bool PrismatikSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	size_t b0 = 0;
 	bool changed = false;
@@ -137,20 +137,20 @@ DECLARE_VISUALIZER(TwinPeaks, "Twin Peaks",
 public:
 private:
 	float m_previousPeak{ 0.0f };
-	size_t m_prevThresholdLed{ 0 };
+	unsigned int m_prevThresholdLed{ 0 };
 	double m_speedCoef = 1.0;
 	const uint8_t FadeOutSpeed = 12;
 );
 
-const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
+bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const size_t fftSize, QList<QRgb>& colors)
 {
 	bool changed = false;
-	const size_t middleLed = std::floor(colors.size() / 2);
+	const unsigned int middleLed = std::floor(colors.size() / 2);
 
 	// most sensitive Hz range for humans
 	// this assumes 44100Hz sample rate
-	const size_t optimalHzMin = 1950 / (44100 / 2 / fftSize); // 2kHz
-	const size_t optimalHzMax = 5050 / (44100 / 2 / fftSize); // 5kHz
+	const unsigned int optimalHzMin = 1950 / (44100 / 2 / (unsigned int)fftSize); // 2kHz
+	const unsigned int optimalHzMax = 5050 / (44100 / 2 / (unsigned int)fftSize); // 5kHz
 
 	float currentPeak = 0.0f;
 	for (size_t i = 0; i < fftSize; ++i) {
@@ -165,7 +165,7 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 	else
 		m_previousPeak = std::max(0.0f, m_previousPeak - (fftSize * 0.000005f)); // lower the stale peak so it doesn't persist forever
 
-	const size_t thresholdLed = m_previousPeak != 0.0f ? middleLed * (currentPeak / m_previousPeak) : 0;
+	const unsigned int thresholdLed = m_previousPeak != 0.0f ? middleLed * (currentPeak / m_previousPeak) : 0;
 
 	// if leds move a lot with x% amplitude, increase fade speed
 	if (std::abs((int)(thresholdLed - m_prevThresholdLed)) > middleLed * 0.2)
@@ -173,8 +173,8 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 	else // reset on slow down
 		m_speedCoef = 1.0;// std::max(1.0, speedCoef - 2.0);
 
-	for (size_t idxA = 0; idxA < middleLed; ++idxA) {
-		const size_t idxB = colors.size() - 1 - idxA;
+	for (unsigned int idxA = 0; idxA < middleLed; ++idxA) {
+		const unsigned int idxB = colors.size() - 1 - idxA;
 		QRgb color = 0;
 		if (idxA < thresholdLed) {
 			QColor from = m_isLiquidMode ? m_generator.current() : m_minColor;
@@ -191,7 +191,7 @@ const bool TwinPeaksSoundVisualizer::visualize(const float* const fftData, const
 			oldColor.setHsl(oldColor.hue(), oldColor.saturation(), luminosity);
 			color = oldColor.rgb();
 		}
-			
+
 		// peak A
 		QRgb colorA = Settings::isLedEnabled(idxA) ? color : 0;
 		changed = changed || (colors[idxA] != colorA);

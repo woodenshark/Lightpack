@@ -20,10 +20,9 @@ PluginsManager::~PluginsManager()
 
 void PluginsManager::dropPlugins(){
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
-	//cleanAll();
+
 	for(QMap<QString, Plugin*>::iterator it = _plugins.begin(); it != _plugins.end(); ++it){
 		Plugin* p = it.value();
-		QString name = p->Name();
 		p->Stop();
 		delete p;
 	}
@@ -33,18 +32,18 @@ void PluginsManager::dropPlugins(){
 void PluginsManager::reloadPlugins(){
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	dropPlugins();
-	LoadPlugins(QString(Settings::getApplicationDirPath() + "Plugins"));
+	LoadPlugins(Settings::getApplicationDirPath() + QStringLiteral("Plugins"));
 	StartPlugins();
 }
 
-void PluginsManager::LoadPlugins(QString path)
+void PluginsManager::LoadPlugins(const QString& path)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << path;
 
 	QDir dir(path);
 
 	if (!dir.exists()) {
-		dir.mkpath(".");
+		dir.mkpath(QStringLiteral("."));
 	}
 
 	QStringList lstDirs = dir.entryList(QDir::Dirs |
@@ -60,7 +59,7 @@ void PluginsManager::LoadPlugins(QString path)
 				continue;
 			}
 
-			Plugin* p = new Plugin(plugin,path+"/"+pluginDir,this);
+			Plugin* p = new Plugin(plugin, QStringLiteral("%1/%2").arg(path, pluginDir), this);
 			//DEBUG_LOW_LEVEL <<p->getName()<<	p->getAuthor() << p->getDescription() << p->getVersion();
 			//connect(p, SIGNAL(executed()), this, SIGNAL(pluginExecuted()));
 			_plugins[plugin] = p;
@@ -93,7 +92,7 @@ void PluginsManager::StartPlugins()
 			p->disconnect();
 			if (p->isEnabled())
 				p->Start();
-			connect(p, SIGNAL(pluginStateChanged(QProcess::ProcessState)), this, SLOT(onPluginStateChangedHandler()));
+			connect(p, &Plugin::pluginStateChanged, this, &PluginsManager::onPluginStateChangedHandler);
 		}
 
 }
@@ -109,9 +108,10 @@ void PluginsManager::StopPlugins()
 
 }
 
-void PluginsManager::onPluginStateChangedHandler()
+void PluginsManager::onPluginStateChangedHandler(QProcess::ProcessState state)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	Q_UNUSED(state)
 
 	emit updatePlugin(_plugins.values());
 }

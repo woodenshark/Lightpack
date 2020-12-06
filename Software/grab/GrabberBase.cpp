@@ -60,7 +60,7 @@ GrabberBase::GrabberBase(QObject *parent, GrabberContext *grabberContext) : QObj
 		m_timer->stop();
 	m_timer.reset(new QTimer(this));
 	m_timer->setTimerType(Qt::PreciseTimer);
-	connect(m_timer.data(), SIGNAL(timeout()), this, SLOT(grab()));
+	connect(m_timer.data(), &QTimer::timeout, this, &GrabberBase::grab);
 }
 
 void GrabberBase::setGrabInterval(int msec)

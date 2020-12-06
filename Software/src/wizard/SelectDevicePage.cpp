@@ -29,7 +29,6 @@
 #include "Wizard.hpp"
 #include "LedDeviceVirtual.hpp"
 #include "LedDeviceDrgb.hpp"
-#include "QDesktopWidget"
 #include "Settings.hpp"
 
 SelectDevicePage::SelectDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent):

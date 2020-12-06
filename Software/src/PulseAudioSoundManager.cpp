@@ -105,7 +105,7 @@ static void pa_context_state_cb(pa_context *c, void *userdata)
 PulseAudioSoundManager::PulseAudioSoundManager(QObject *parent) : SoundManagerBase(parent)
 {
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	connect(&m_timer, &QTimer::timeout, this, &PulseAudioSoundManager::updateColors);
 
 	m_pa_alive_timer.setTimerType(Qt::PreciseTimer);
 	connect(&m_pa_alive_timer, &QTimer::timeout, this, &PulseAudioSoundManager::checkPulse);
@@ -217,7 +217,7 @@ void PulseAudioSoundManager::addDevice(const pa_source_info *l, int eol)
 void PulseAudioSoundManager::populatePulseaudioDeviceList()
 {
 	m_devices.clear();
-	m_devices.push_back({"Default device", ""});
+	m_devices.push_back({QStringLiteral("Default device"), QLatin1String("")});
 
 	pa_operation *pa_op;
 	pa_op = pa_context_get_source_info_list(m_context,
@@ -310,10 +310,10 @@ void PulseAudioSoundManager::start(bool isEnabled)
 				qInfo() << "Pulseaudio device: Default device";
 			}
 
-			ret = pa_stream_connect_record(m_stream, dev.length() ? dev.toUtf8().constData() : nullptr, &buffer_attr, PA_STREAM_ADJUST_LATENCY);
+			ret = pa_stream_connect_record(m_stream, !dev.isEmpty() ? dev.toUtf8().constData() : nullptr, &buffer_attr, PA_STREAM_ADJUST_LATENCY);
 
 			if (ret != PA_OK) {
-				qCritical() << "Pulseaudio failed to connect to device" << (dev.length() ? dev : "Default device");
+				qCritical() << "Pulseaudio failed to connect to device" << (!dev.isEmpty() ? dev : QStringLiteral("Default device"));
 				goto unlock_and_fail;
 			}
 
@@ -346,8 +346,9 @@ void PulseAudioSoundManager::start(bool isEnabled)
 		}
 
 		// setup update timer (40hz)
-		m_timer.start(25);
-		m_pa_alive_timer.start(1000);
+		using namespace std::chrono_literals;
+		m_timer.start(25ms);
+		m_pa_alive_timer.start(1s);
 	}
 	else
 	{

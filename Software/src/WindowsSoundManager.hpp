@@ -30,6 +30,7 @@
 
 class WindowsSoundManager : public SoundManagerBase
 {
+	Q_OBJECT
 public:
 	WindowsSoundManager(int hWnd, QObject *parent = 0);
 	virtual ~WindowsSoundManager();

@@ -18,6 +18,7 @@ LIBS += -lshlwapi -ladvapi32 -luser32
 QMAKE_LFLAGS_EXCEPTIONS_ON -= -mthreads
 QMAKE_CXXFLAGS_EXCEPTIONS_ON -= -mthreads
 
+CONFIG += c++17
 CONFIG -= rtti
 
 DEFINES += HOOKSDLL_EXPORTS UNICODE
@@ -30,7 +31,6 @@ CONFIG(msvc) {
     # Place *.lib and *.exp files in ../lib
     QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
 } else {
-    QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
 }
 

@@ -49,13 +49,13 @@ public:
 
 public slots:
 	void setSpeed(int value);
-	
+
 private:
 	int generateDelay();
 	QColor generateColor();
 
 private slots:
-	void updateColor();
+	void doColorUpdate();
 
 private:
 	bool m_isEnabled;

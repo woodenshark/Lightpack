@@ -79,7 +79,7 @@ public:
 	}
 
 	void releaseAllBufs() {
-		for (QList<AllocatedBuf*>::const_iterator iter = _allocatedBufs.cbegin(); iter != _allocatedBufs.end(); ++iter) {
+		for (QList<AllocatedBuf*>::const_iterator iter = _allocatedBufs.cbegin(); iter != _allocatedBufs.cend(); ++iter) {
 			(*iter)->isAvail = true;
 		}
 	}

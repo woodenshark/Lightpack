@@ -75,7 +75,7 @@ class _OBJ_NAME_ ## MoodLamp : public MoodLampBase \
 public:\
 _OBJ_NAME_ ## MoodLamp() : MoodLampBase() {};\
 ~_OBJ_NAME_ ## MoodLamp() = default;\
-static const char* const name() { return _LABEL_; };\
+static const char* name() { return _LABEL_; };\
 static MoodLampBase* create() { return new _OBJ_NAME_ ## MoodLamp(); };\
 \
 _BODY_\
@@ -96,8 +96,8 @@ namespace {
 }
 
 MoodLampBase* MoodLampBase::createWithID(const int id) {
-	QMap<int, MoodLampLampInfo>::const_iterator i = g_moodLampMap.find(id);
-	if (i != g_moodLampMap.end())
+	QMap<int, MoodLampLampInfo>::const_iterator i = g_moodLampMap.constFind(id);
+	if (i != g_moodLampMap.cend())
 		return i.value().factory();
 	qWarning() << Q_FUNC_INFO << "failed to find mood lamp ID: " << id;
 	return nullptr;
@@ -113,7 +113,7 @@ void MoodLampBase::populateNameList(QList<MoodLampLampInfo>& list, int& recommen
 
 DECLARE_LAMP(Static, "Static (default)",
 public:
-	int interval() const { return 50; };
+	std::chrono::milliseconds interval() const { return 50ms; };
 
 	bool shine(const QColor& newColor, QList<QRgb>& colors)
 	{
@@ -139,9 +139,9 @@ public:
 			return false;
 
 		if (colors.size() > m_lightness.size()) {
-			const size_t oldSize = m_lightness.size();
+			const int oldSize = m_lightness.size();
 			m_lightness.reserve(colors.size());
-			for (size_t i = oldSize; i < colors.size(); ++i)
+			for (int i = oldSize; i < colors.size(); ++i)
 				m_lightness << 0;
 		}
 

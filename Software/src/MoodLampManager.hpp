@@ -62,7 +62,8 @@ public slots:
 	void setSendDataOnlyIfColorsChanged(bool state);
 
 private slots:
-	void updateColors(const bool forceUpdate = false);
+	void updateColors(const bool forceUpdate);
+	void updateColors() { updateColors(false); };
 
 private:
 	void initColors(int numberOfLeds);

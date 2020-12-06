@@ -33,151 +33,151 @@
 #include "Settings.hpp"
 #include "TimeEvaluations.hpp"
 #include "version.h"
-#include <QtWidgets/QApplication>
+#include <QApplication>
 
 using namespace SettingsScope;
 
 // Immediatly after successful connection server sends to client -- ApiVersion
-const char * ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
-const char * ApiServer::CmdUnknown = "unknown command\r\n";
-const char * ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
-const char * ApiServer::CmdExit = "exit";
-const char * ApiServer::CmdHelp = "help";
-const char * ApiServer::CmdHelpShort = "?";
+const char * const ApiServer::ApiVersion = "Lightpack API v1.4 - Prismatik API v" API_VERSION " (type \"help\" for more info)\r\n";
+const char * const ApiServer::CmdUnknown = "unknown command\r\n";
+const char * const ApiServer::CmdDeprecated = "deprecated command, not supported\r\n";
+const char * const ApiServer::CmdExit = "exit";
+const char * const ApiServer::CmdHelp = "help";
+const char * const ApiServer::CmdHelpShort = "?";
 
-const char * ApiServer::CmdApiKey = "apikey:";
-const char * ApiServer::CmdApiKeyResult_Ok = "ok\r\n";
-const char * ApiServer::CmdApiKeyResult_Fail = "fail\r\n";
-const char * ApiServer::CmdApiCheck_AuthRequired = "authorization required\r\n";
+const char * const ApiServer::CmdApiKey = "apikey:";
+const char * const ApiServer::CmdApiKeyResult_Ok = "ok\r\n";
+const char * const ApiServer::CmdApiKeyResult_Fail = "fail\r\n";
+const char * const ApiServer::CmdApiCheck_AuthRequired = "authorization required\r\n";
 
-const char * ApiServer::CmdGetStatus = "getstatus";
-const char * ApiServer::CmdResultStatus_On = "status:on\r\n";
-const char * ApiServer::CmdResultStatus_Off = "status:off\r\n";
-const char * ApiServer::CmdResultStatus_DeviceError = "status:device error\r\n";
-const char * ApiServer::CmdResultStatus_Unknown = "status:unknown\r\n";
+const char * const ApiServer::CmdGetStatus = "getstatus";
+const char * const ApiServer::CmdResultStatus_On = "status:on\r\n";
+const char * const ApiServer::CmdResultStatus_Off = "status:off\r\n";
+const char * const ApiServer::CmdResultStatus_DeviceError = "status:device error\r\n";
+const char * const ApiServer::CmdResultStatus_Unknown = "status:unknown\r\n";
 
-const char * ApiServer::CmdGetStatusAPI = "getstatusapi";
-const char * ApiServer::CmdResultStatusAPI_Busy = "statusapi:busy\r\n";
-const char * ApiServer::CmdResultStatusAPI_Idle = "statusapi:idle\r\n";
+const char * const ApiServer::CmdGetStatusAPI = "getstatusapi";
+const char * const ApiServer::CmdResultStatusAPI_Busy = "statusapi:busy\r\n";
+const char * const ApiServer::CmdResultStatusAPI_Idle = "statusapi:idle\r\n";
 
-const char * ApiServer::CmdGetProfiles = "getprofiles";
+const char * const ApiServer::CmdGetProfiles = "getprofiles";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultProfiles = "profiles:";
+const char * const ApiServer::CmdResultProfiles = "profiles:";
 
-const char * ApiServer::CmdGetProfile = "getprofile";
+const char * const ApiServer::CmdGetProfile = "getprofile";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultProfile = "profile:";
+const char * const ApiServer::CmdResultProfile = "profile:";
 
-const char * ApiServer::CmdGetDevices = "getdevices";
-const char * ApiServer::CmdResultDevices = "devices:";
-const char * ApiServer::CmdGetDevice = "getdevice";
-const char * ApiServer::CmdResultDevice = "device:";
+const char * const ApiServer::CmdGetDevices = "getdevices";
+const char * const ApiServer::CmdResultDevices = "devices:";
+const char * const ApiServer::CmdGetDevice = "getdevice";
+const char * const ApiServer::CmdResultDevice = "device:";
 
-const char * ApiServer::CmdGetMaxLeds = "getmaxleds";
-const char * ApiServer::CmdResultMaxLeds = "maxleds:";
+const char * const ApiServer::CmdGetMaxLeds = "getmaxleds";
+const char * const ApiServer::CmdResultMaxLeds = "maxleds:";
 
-const char * ApiServer::CmdGetCountLeds = "getcountleds";
+const char * const ApiServer::CmdGetCountLeds = "getcountleds";
 // Necessary to add a new line after filling results!
-const char * ApiServer::CmdResultCountLeds = "countleds:";
+const char * const ApiServer::CmdResultCountLeds = "countleds:";
 
-const char * ApiServer::CmdGetLeds = "getleds";
-const char * ApiServer::CmdResultLeds = "leds:";
+const char * const ApiServer::CmdGetLeds = "getleds";
+const char * const ApiServer::CmdResultLeds = "leds:";
 
-const char * ApiServer::CmdGetColors = "getcolors";
-const char * ApiServer::CmdResultGetColors = "colors:";
+const char * const ApiServer::CmdGetColors = "getcolors";
+const char * const ApiServer::CmdResultGetColors = "colors:";
 
-const char * ApiServer::CmdGetFPS = "getfps";
-const char * ApiServer::CmdResultFPS = "fps:";
+const char * const ApiServer::CmdGetFPS = "getfps";
+const char * const ApiServer::CmdResultFPS = "fps:";
 
-const char * ApiServer::CmdGetScreenSize = "getscreensize";
-const char * ApiServer::CmdResultScreenSize = "screensize:";
+const char * const ApiServer::CmdGetScreenSize = "getscreensize";
+const char * const ApiServer::CmdResultScreenSize = "screensize:";
 
-const char * ApiServer::CmdGetCountMonitor = "getcountmonitors";
-const char * ApiServer::CmdResultCountMonitor = "countmonitors:";
+const char * const ApiServer::CmdGetCountMonitor = "getcountmonitors";
+const char * const ApiServer::CmdResultCountMonitor = "countmonitors:";
 
-const char * ApiServer::CmdGetSizeMonitor = "getsizemonitor:";
-const char * ApiServer::CmdResultSizeMonitor = "sizemonitor:";
+const char * const ApiServer::CmdGetSizeMonitor = "getsizemonitor:";
+const char * const ApiServer::CmdResultSizeMonitor = "sizemonitor:";
 
-const char * ApiServer::CmdGetBacklight = "getmode";
-const char * ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
-const char * ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
+const char * const ApiServer::CmdGetBacklight = "getmode";
+const char * const ApiServer::CmdResultBacklight_Ambilight = "mode:ambilight\r\n";
+const char * const ApiServer::CmdResultBacklight_Moodlamp = "mode:moodlamp\r\n";
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
+const char * const ApiServer::CmdResultBacklight_SoundViz = "mode:soundviz\r\n";
 #endif
 
-const char * ApiServer::CmdGetGamma = "getgamma";
-const char * ApiServer::CmdResultGamma = "gamma:";
+const char * const ApiServer::CmdGetGamma = "getgamma";
+const char * const ApiServer::CmdResultGamma = "gamma:";
 
-const char * ApiServer::CmdGetBrightness = "getbrightness";
-const char * ApiServer::CmdResultBrightness = "brightness:";
+const char * const ApiServer::CmdGetBrightness = "getbrightness";
+const char * const ApiServer::CmdResultBrightness = "brightness:";
 
-const char * ApiServer::CmdGetSmooth = "getsmooth";
-const char * ApiServer::CmdResultSmooth = "smooth:";
+const char * const ApiServer::CmdGetSmooth = "getsmooth";
+const char * const ApiServer::CmdResultSmooth = "smooth:";
 
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
-const char * ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
+const char * const ApiServer::CmdGetSoundVizColors = "getsoundvizcolors";
+const char * const ApiServer::CmdResultSoundVizColors = "soundvizcolors:";
 
-const char * ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
-const char * ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
+const char * const ApiServer::CmdGetSoundVizLiquid = "getsoundvizliquid";
+const char * const ApiServer::CmdResultSoundVizLiquid = "soundvizliquid:";
 #endif
-const char * ApiServer::CmdGetPersistOnUnlock = "getpersistonunlock";
-const char * ApiServer::CmdGetPersistOnUnlock_On = "persistonunlock:on\r\n";
-const char * ApiServer::CmdGetPersistOnUnlock_Off = "persistonunlock:off\r\n";
+const char * const ApiServer::CmdGetPersistOnUnlock = "getpersistonunlock";
+const char * const ApiServer::CmdGetPersistOnUnlock_On = "persistonunlock:on\r\n";
+const char * const ApiServer::CmdGetPersistOnUnlock_Off = "persistonunlock:off\r\n";
 
-const char * ApiServer::CmdGuid = "guid:";
+const char * const ApiServer::CmdGuid = "guid:";
 
-const char * ApiServer::CmdLockStatus = "getlockstatus";
+const char * const ApiServer::CmdLockStatus = "getlockstatus";
 
-const char * ApiServer::CmdLock = "lock";
-const char * ApiServer::CmdResultLock_Success = "lock:success\r\n";
-const char * ApiServer::CmdResultLock_Busy = "lock:busy\r\n";
+const char * const ApiServer::CmdLock = "lock";
+const char * const ApiServer::CmdResultLock_Success = "lock:success\r\n";
+const char * const ApiServer::CmdResultLock_Busy = "lock:busy\r\n";
 
-const char * ApiServer::CmdUnlock = "unlock";
-const char * ApiServer::CmdResultUnlock_Success = "unlock:success\r\n";
-const char * ApiServer::CmdResultUnlock_NotLocked = "unlock:not locked\r\n";
+const char * const ApiServer::CmdUnlock = "unlock";
+const char * const ApiServer::CmdResultUnlock_Success = "unlock:success\r\n";
+const char * const ApiServer::CmdResultUnlock_NotLocked = "unlock:not locked\r\n";
 
 // Set-commands works only after success lock
 // Set-commands can return, after self-name, only this results:
-const char * ApiServer::CmdSetResult_Ok = "ok\r\n";
-const char * ApiServer::CmdSetResult_Error = "error\r\n";
-const char * ApiServer::CmdSetResult_Busy = "busy\r\n";
-const char * ApiServer::CmdSetResult_NotLocked = "not locked\r\n";
+const char * const ApiServer::CmdSetResult_Ok = "ok\r\n";
+const char * const ApiServer::CmdSetResult_Error = "error\r\n";
+const char * const ApiServer::CmdSetResult_Busy = "busy\r\n";
+const char * const ApiServer::CmdSetResult_NotLocked = "not locked\r\n";
 
 // Set-commands contains at end semicolon!!!
-const char * ApiServer::CmdSetColor = "setcolor:";
-const char * ApiServer::CmdSetGamma = "setgamma:";
-const char * ApiServer::CmdSetBrightness = "setbrightness:";
-const char * ApiServer::CmdSetSmooth = "setsmooth:";
-const char * ApiServer::CmdSetProfile = "setprofile:";
+const char * const ApiServer::CmdSetColor = "setcolor:";
+const char * const ApiServer::CmdSetGamma = "setgamma:";
+const char * const ApiServer::CmdSetBrightness = "setbrightness:";
+const char * const ApiServer::CmdSetSmooth = "setsmooth:";
+const char * const ApiServer::CmdSetProfile = "setprofile:";
 
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
-const char * ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
+const char * const ApiServer::CmdSetSoundVizColors = "setsoundvizcolors:";
+const char * const ApiServer::CmdSetSoundVizLiquid = "setsoundvizliquid:";
 #endif
 
-const char * ApiServer::CmdSetDevice = "setdevice:";
+const char * const ApiServer::CmdSetDevice = "setdevice:";
 
-const char * ApiServer::CmdSetCountLeds = "setcountleds:";
-const char * ApiServer::CmdSetLeds = "setleds:";
+const char * const ApiServer::CmdSetCountLeds = "setcountleds:";
+const char * const ApiServer::CmdSetLeds = "setleds:";
 
-const char * ApiServer::CmdNewProfile = "newprofile:";
-const char * ApiServer::CmdDeleteProfile = "deleteprofile:";
+const char * const ApiServer::CmdNewProfile = "newprofile:";
+const char * const ApiServer::CmdDeleteProfile = "deleteprofile:";
 
-const char * ApiServer::CmdSetStatus = "setstatus:";
-const char * ApiServer::CmdSetStatus_On = "on";
-const char * ApiServer::CmdSetStatus_Off = "off";
+const char * const ApiServer::CmdSetStatus = "setstatus:";
+const char * const ApiServer::CmdSetStatus_On = "on";
+const char * const ApiServer::CmdSetStatus_Off = "off";
 
-const char * ApiServer::CmdSetBacklight = "setmode:";
-const char * ApiServer::CmdSetBacklight_Ambilight = "ambilight";
-const char * ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
+const char * const ApiServer::CmdSetBacklight = "setmode:";
+const char * const ApiServer::CmdSetBacklight_Ambilight = "ambilight";
+const char * const ApiServer::CmdSetBacklight_Moodlamp = "moodlamp";
 #ifdef SOUNDVIZ_SUPPORT
-const char * ApiServer::CmdSetBacklight_SoundViz = "soundviz";
+const char * const ApiServer::CmdSetBacklight_SoundViz = "soundviz";
 #endif
 
-const char * ApiServer::CmdSetPersistOnUnlock = "setpersistonunlock:";
-const char * ApiServer::CmdSetPersistOnUnlock_On = "on";
-const char * ApiServer::CmdSetPersistOnUnlock_Off = "off";
+const char * const ApiServer::CmdSetPersistOnUnlock = "setpersistonunlock:";
+const char * const ApiServer::CmdSetPersistOnUnlock_On = "on";
+const char * const ApiServer::CmdSetPersistOnUnlock_Off = "off";
 
 const int ApiServer::SignalWaitTimeoutMs = 1000; // 1 second
 
@@ -219,8 +219,8 @@ void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
 	QString test = lightpack->Version();
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << test;
 	lightpack = lightpackInterface;
-	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(QList<QRgb>)), lightpack, SIGNAL(updateLedsColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(const QList<QRgb> &)), lightpack, SLOT(updateColorsCache(const QList<QRgb> &)), Qt::QueuedConnection);
+	connect(m_apiSetColorTask, &ApiServerSetColorTask::taskParseSetColorDone, lightpack, &LightpackPluginInterface::updateLedsColors, Qt::QueuedConnection);
+	connect(m_apiSetColorTask, &ApiServerSetColorTask::taskParseSetColorDone, lightpack, &LightpackPluginInterface::updateColorsCache, Qt::QueuedConnection);
 
 }
 
@@ -255,7 +255,7 @@ void ApiServer::updateApiKey(const QString &key)
 
 	m_apiAuthKey = key;
 
-	if (key == "")
+	if (key.isEmpty())
 		m_isAuthEnabled = false;
 	else
 		m_isAuthEnabled = true;
@@ -269,7 +269,7 @@ void ApiServer::incomingConnection(qintptr socketDescriptor)
 	ClientInfo cs;
 	cs.isAuthorized = !m_isAuthEnabled;
 	// set default sessionkey (disable lock priority)
-	cs.sessionKey = "API"+lightpack->GetSessionKey("API")+QString(m_clients.count());
+	cs.sessionKey = QStringLiteral("API%1%2").arg(lightpack->GetSessionKey(QStringLiteral("API")), QString::number(m_clients.count()));
 
 	m_clients.insert(client, cs);
 
@@ -277,13 +277,13 @@ void ApiServer::incomingConnection(qintptr socketDescriptor)
 
 	DEBUG_LOW_LEVEL << "Incoming connection from:" << client->peerAddress().toString();
 
-	connect(client, SIGNAL(readyRead()), this, SLOT(clientProcessCommands()));
-	connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+	connect(client, &QTcpSocket::readyRead, this, &ApiServer::clientProcessCommands);
+	connect(client, &QTcpSocket::disconnected, this, &ApiServer::clientDisconnected);
 }
 
 void ApiServer::clientDisconnected()
 {
-	QTcpSocket *client = dynamic_cast<QTcpSocket*>(sender());
+	QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
 
 	DEBUG_LOW_LEVEL << "Client disconnected:" << client->peerAddress().toString();
 
@@ -293,8 +293,8 @@ void ApiServer::clientDisconnected()
 
 	m_clients.remove(client);
 
-	disconnect(client, SIGNAL(readyRead()), this, SLOT(clientProcessCommands()));
-	disconnect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+	disconnect(client, &QTcpSocket::readyRead, this, &ApiServer::clientProcessCommands);
+	disconnect(client, &QTcpSocket::disconnected, this, &ApiServer::clientDisconnected);
 
 	client->deleteLater();
 }
@@ -303,7 +303,7 @@ void ApiServer::clientProcessCommands()
 {
 	API_DEBUG_OUT << Q_FUNC_INFO << "ApiServer thread id:" << this->thread()->currentThreadId();
 
-	QTcpSocket *client = dynamic_cast<QTcpSocket*>(sender());
+	QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
 
 	while (m_clients.contains(client) && client->canReadLine())
 	{
@@ -322,7 +322,7 @@ void ApiServer::clientProcessCommands()
 		}
 		else if (cmdBuffer == CmdExit)
 		{
-			writeData(client, "Goodbye!\r\n");
+			writeData(client, QStringLiteral("Goodbye!\r\n"));
 			if (m_clients.contains(client))
 				client->close();
 			return;
@@ -407,14 +407,14 @@ void ApiServer::clientProcessCommands()
 			result = ApiServer::CmdResultProfiles;
 
 			for (int i = 0; i < profiles.count(); i++)
-				result += profiles[i] + ";";
-			result += "\r\n";
+				result += QStringLiteral("%1;").arg(profiles[i]);
+			result += QStringLiteral("\r\n");
 		}
 		else if (cmdBuffer == CmdGetProfile)
 		{
 			API_DEBUG_OUT << CmdGetProfile;
 
-			result = CmdResultProfile + lightpack->GetProfile() + "\r\n";
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultProfile, lightpack->GetProfile());
 		}
 		else if (cmdBuffer == CmdGetDevices)
 		{
@@ -424,15 +424,13 @@ void ApiServer::clientProcessCommands()
 
 			result = ApiServer::CmdResultDevices;
 			for (int i = 0; i < devices.count(); i++)
-				result += devices[i] + ";";
-			result += "\r\n";
+				result += QStringLiteral("%1;").arg(devices[i]);
+			result += QStringLiteral("\r\n");
 		}
 		else if (cmdBuffer == CmdGetDevice)
 		{
 			API_DEBUG_OUT << CmdGetDevice;
-			result = ApiServer::CmdResultDevice;
-			result += Settings::getConnectedDeviceName();
-			result += "\r\n";
+			result = QStringLiteral("%1%2\r\n").arg(ApiServer::CmdResultDevice, Settings::getConnectedDeviceName());
 		}
 		else if (cmdBuffer == CmdGetMaxLeds)
 		{
@@ -468,13 +466,13 @@ void ApiServer::clientProcessCommands()
 			default:
 				max = MaximumNumberOfLeds::Default;
 			}
-			result = QString("%1%2\r\n").arg(CmdResultMaxLeds).arg(max);
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultMaxLeds, max);
 		}
 		else if (cmdBuffer == CmdGetCountLeds)
 		{
 			API_DEBUG_OUT << CmdGetCountLeds;
 
-			result = QString("%1%2\r\n").arg(CmdResultCountLeds).arg(lightpack->GetCountLeds());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultCountLeds, lightpack->GetCountLeds());
 		}
 		else if (cmdBuffer == CmdGetLeds)
 		{
@@ -486,9 +484,9 @@ void ApiServer::clientProcessCommands()
 			{
 				QSize size = Settings::getLedSize(i);
 				QPoint pos = Settings::getLedPosition(i);
-				result += QString("%1-%2,%3,%4,%5;").arg(i).arg(pos.x()).arg(pos.y()).arg(size.width()).arg(size.height());
+				result += QStringLiteral("%1-%2,%3,%4,%5;").arg(i).arg(pos.x()).arg(pos.y()).arg(size.width()).arg(size.height());
 			}
-			result += "\r\n";
+			result += QStringLiteral("\r\n");
 
 		}
 		else if (cmdBuffer == CmdGetColors)
@@ -501,15 +499,15 @@ void ApiServer::clientProcessCommands()
 			for (int i = 0; i < curentColors.count(); i++)
 			{
 				QColor color(curentColors[i]);
-				result += QString("%1-%2,%3,%4;").arg(i).arg(color.red()).arg(color.green()).arg(color.blue());
+				result += QStringLiteral("%1-%2,%3,%4;").arg(i).arg(color.red()).arg(color.green()).arg(color.blue());
 			}
-			result += "\r\n";
+			result += QStringLiteral("\r\n");
 		}
 		else if (cmdBuffer == CmdGetFPS)
 		{
 			API_DEBUG_OUT << CmdGetFPS;
 
-			result = QString("%1%2\r\n").arg(CmdResultFPS).arg(lightpack->GetFPS());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultFPS).arg(lightpack->GetFPS());
 		}
 		else if (cmdBuffer == CmdGetScreenSize)
 		{
@@ -517,7 +515,7 @@ void ApiServer::clientProcessCommands()
 
 			QRect screen = lightpack->GetScreenSize();
 
-			result = QString("%1%2,%3,%4,%5\r\n").arg(CmdResultScreenSize).arg(screen.x()).arg(screen.y()).arg(screen.width()).arg(screen.height());
+			result = QStringLiteral("%1%2,%3,%4,%5\r\n").arg(CmdResultScreenSize).arg(screen.x()).arg(screen.y()).arg(screen.width()).arg(screen.height());
 		}
 		else if (cmdBuffer == CmdGetCountMonitor)
 		{
@@ -525,7 +523,7 @@ void ApiServer::clientProcessCommands()
 
 			int count = QGuiApplication::screens().count();
 
-			result = QString("%1%2\r\n").arg(CmdResultCountMonitor).arg(count);
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultCountMonitor).arg(count);
 		}
 		else if (cmdBuffer.startsWith(CmdGetSizeMonitor))
 		{
@@ -547,7 +545,7 @@ void ApiServer::clientProcessCommands()
 					{
 						QRect geom = screen->geometry();
 
-						result = QString("%1%2,%3,%4,%5\r\n").arg(CmdResultSizeMonitor).arg(geom.x()).arg(geom.y()).arg(geom.width()).arg(geom.height());
+						result = QStringLiteral("%1%2,%3,%4,%5\r\n").arg(CmdResultSizeMonitor).arg(geom.x()).arg(geom.y()).arg(geom.width()).arg(geom.height());
 					}
 					else
 					{
@@ -588,19 +586,19 @@ void ApiServer::clientProcessCommands()
 		{
 			API_DEBUG_OUT << CmdGetGamma;
 
-			result = QString("%1%2\r\n").arg(CmdResultGamma).arg(lightpack->GetGamma());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultGamma).arg(lightpack->GetGamma());
 		}
 		else if (cmdBuffer == CmdGetBrightness)
 		{
 			API_DEBUG_OUT << CmdGetBrightness;
 
-			result = QString("%1%2\r\n").arg(CmdResultBrightness).arg(lightpack->GetBrightness());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultBrightness).arg(lightpack->GetBrightness());
 		}
 		else if (cmdBuffer == CmdGetSmooth)
 		{
 			API_DEBUG_OUT << CmdGetSmooth;
 
-			result = QString("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultSmooth).arg(lightpack->GetSmooth());
 		}
 #ifdef SOUNDVIZ_SUPPORT
 		else if (cmdBuffer == CmdGetSoundVizColors)
@@ -608,7 +606,7 @@ void ApiServer::clientProcessCommands()
 			API_DEBUG_OUT << CmdGetSoundVizColors;
 
 			QPair<QColor, QColor> colors = lightpack->GetSoundVizColors();
-			result = QString("%1%2,%3,%4;%5,%6,%7\r\n").arg(CmdResultSoundVizColors)
+			result = QStringLiteral("%1%2,%3,%4;%5,%6,%7\r\n").arg(CmdResultSoundVizColors)
 				.arg(colors.first.red()).arg(colors.first.green()).arg(colors.first.blue())
 				.arg(colors.second.red()).arg(colors.second.green()).arg(colors.second.blue());
 		}
@@ -616,7 +614,7 @@ void ApiServer::clientProcessCommands()
 		{
 			API_DEBUG_OUT << CmdGetSoundVizColors;
 
-			result = QString("%1%2\r\n").arg(CmdResultSoundVizLiquid).arg(lightpack->GetSoundVizLiquidMode() ? 1 : 0);
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultSoundVizLiquid).arg(lightpack->GetSoundVizLiquidMode() ? 1 : 0);
 		}
 #endif
 		else if (cmdBuffer == CmdGetPersistOnUnlock)
@@ -648,13 +646,13 @@ void ApiServer::clientProcessCommands()
 			API_DEBUG_OUT << CmdLockStatus;
 
 			int res = lightpack->CheckLock(sessionKey);
-			QString status = "no";
+			QString status = QStringLiteral("no");
 			if (res == -1)
-				status = "busy";
+				status = QStringLiteral("busy");
 			if (res == 1)
-				status = "ok";
+				status = QStringLiteral("ok");
 
-			result = QString("lockstatus:%1\r\n").arg(status);
+			result = QStringLiteral("lockstatus:%1\r\n").arg(status);
 		}
 		else if (cmdBuffer == CmdLock)
 		{
@@ -883,10 +881,10 @@ void ApiServer::clientProcessCommands()
 				QString s = QString(cmdBuffer);
 				API_DEBUG_OUT << s;
 
-				QStringList colors = s.split(";");
+				QStringList colors = s.split(';');
 				if (colors.size() == 2) {
-					QStringList colorMin = colors.at(0).split(",");
-					QStringList colorMax = colors.at(1).split(",");
+					QStringList colorMin = colors.at(0).split(',');
+					QStringList colorMax = colors.at(1).split(',');
 
 					if (colorMin.size() == 3 && colorMax.size() == 3) {
 						bool ok;
@@ -1058,21 +1056,21 @@ void ApiServer::clientProcessCommands()
 				API_DEBUG_OUT << QString(cmdBuffer);
 				int countleds = lightpack->GetCountLeds();
 				QList<QRect> rectLeds;
-				QStringList leds = ((QString)cmdBuffer).split(";");
+				QStringList leds = ((QString)cmdBuffer).split(';');
 				for (int i = 0; i < leds.size(); ++i)
 				{
 					bool ok;
 					QString led = leds.at(i);
-					if (led!="")
+					if (!led.isEmpty())
 					{
 						qDebug() << "led:" << led;
 						int num=0,x=0,y=0,w=0, h=0;
-						if (led.indexOf("-")>0)
+						if (led.indexOf('-')>0)
 						{
-								num= led.split("-")[0].toInt(&ok);
+								num= led.split('-')[0].toInt(&ok);
 								if (ok)
 								{
-									QStringList xywh = led.split("-")[1].split(",");
+									QStringList xywh = led.split('-')[1].split(',');
 									if (xywh.count()>0) x = xywh[0].toInt(&ok);
 									if (xywh.count()>1) y = xywh[1].toInt(&ok);
 									if (xywh.count()>2) w = xywh[2].toInt(&ok);
@@ -1228,7 +1226,7 @@ void ApiServer::clientProcessCommands()
 				result = CmdSetResult_Busy;
 			}
 		}
-		else			
+		else
 		{
 			qWarning() << Q_FUNC_INFO << CmdUnknown << cmdBuffer;
 		}
@@ -1259,12 +1257,12 @@ void ApiServer::initApiSetColorTask()
 	m_apiSetColorTask = new ApiServerSetColorTask();
 	m_apiSetColorTask->setApiDeviceNumberOfLeds(Settings::getNumberOfLeds(Settings::getConnectedDevice()));
 
-	//connect(m_apiSetColorTask, SIGNAL(taskParseSetColorDone(QList<QRgb>)), this, SIGNAL(updateLedsColors(QList<QRgb>)), Qt::QueuedConnection);
-	connect(m_apiSetColorTask, SIGNAL(taskParseSetColorIsSuccess(bool)), this, SLOT(taskSetColorIsSuccess(bool)), Qt::QueuedConnection);
+	//connect(m_apiSetColorTask, &ApiServerSetColorTask::taskParseSetColorDone(QList<QRgb>)), this, &ApiServer::updateLedsColors(QList<QRgb>)), Qt::QueuedConnection);
+	connect(m_apiSetColorTask, &ApiServerSetColorTask::taskParseSetColorIsSuccess, this, &ApiServer::taskSetColorIsSuccess, Qt::QueuedConnection);
 
-	connect(this, SIGNAL(startParseSetColorTask(QByteArray)), m_apiSetColorTask, SLOT(startParseSetColorTask(QByteArray)), Qt::QueuedConnection);
-	connect(this, SIGNAL(updateApiDeviceNumberOfLeds(int)),	m_apiSetColorTask, SLOT(setApiDeviceNumberOfLeds(int)), Qt::QueuedConnection);
-	connect(this, SIGNAL(clearColorBuffers()),				m_apiSetColorTask, SLOT(reinitColorBuffers()));
+	connect(this, &ApiServer::startParseSetColorTask, m_apiSetColorTask, &ApiServerSetColorTask::startParseSetColorTask, Qt::QueuedConnection);
+	connect(this, &ApiServer::updateApiDeviceNumberOfLeds,	m_apiSetColorTask, &ApiServerSetColorTask::setApiDeviceNumberOfLeds, Qt::QueuedConnection);
+	connect(this, &ApiServer::clearColorBuffers,				m_apiSetColorTask, &ApiServerSetColorTask::reinitColorBuffers);
 
 
 	m_apiSetColorTask->moveToThread(m_apiSetColorTaskThread);
@@ -1300,14 +1298,14 @@ void ApiServer::stopListening()
 	for (i = m_clients.begin(); i != m_clients.end(); ++i)
 	{
 
-		QTcpSocket * client = dynamic_cast<QTcpSocket*>(i.key());
+		QTcpSocket * client = i.key();
 
 		QString sessionKey = m_clients[client].sessionKey;
 		if (lightpack->CheckLock(sessionKey)==1)
 			lightpack->UnLock(sessionKey);
 
-		disconnect(client, SIGNAL(readyRead()), this, SLOT(clientProcessCommands()));
-		disconnect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+		disconnect(client, &QTcpSocket::readyRead, this, &ApiServer::clientProcessCommands);
+		disconnect(client, &QTcpSocket::disconnected, this, &ApiServer::clientDisconnected);
 
 		client->abort();
 		client->deleteLater();
@@ -1330,7 +1328,7 @@ void ApiServer::writeData(QTcpSocket* client, const QString & data)
 
 QString ApiServer::formatHelp(const QString & cmd)
 {
-	return QString("\t\t \"%1\" \r\n").arg(cmd.trimmed());
+	return QStringLiteral("\t\t \"%1\" \r\n").arg(cmd.trimmed());
 }
 
 QString ApiServer::formatHelp(const QString & cmd, const QString & description)
@@ -1339,7 +1337,7 @@ QString ApiServer::formatHelp(const QString & cmd, const QString & description)
 				QString(80,'.') + "\r\n"
 				"%1 \r\n"				// Command
 				"\t %2 \r\n"			// Description
-				).arg(cmd).arg(description);
+				).arg(cmd, description);
 }
 
 QString ApiServer::formatHelp(const QString & cmd, const QString & description, const QString & results)
@@ -1359,36 +1357,36 @@ QString ApiServer::formatHelp(const QString & cmd, const QString & description, 
 				"%1"
 				"\t Results: \r\n"	// Return values
 				"%2"
-				).arg(examples).arg(results);
+				).arg(examples, results);
 }
 
 void ApiServer::initHelpMessage()
 {
-	m_helpMessage += "\r\n";
-	m_helpMessage += "Prismatik " VERSION_STR ", API " API_VERSION "\r\n";
-	m_helpMessage += "Prismatik API is a fork of the original API\r\n";
-	m_helpMessage += "It is backwards compatible to Lightpack API 1.4\r\n";
-	m_helpMessage += "\r\n";
+	m_helpMessage += QStringLiteral("\r\n");
+	m_helpMessage += QStringLiteral("Prismatik " VERSION_STR ", API " API_VERSION "\r\n");
+	m_helpMessage += QStringLiteral("Prismatik API is a fork of the original API\r\n");
+	m_helpMessage += QStringLiteral("It is backwards compatible to Lightpack API 1.4\r\n");
+	m_helpMessage += QStringLiteral("\r\n");
 
 	m_helpMessage += formatHelp(
 				CmdApiKey,
-				"Command for enter an authorization key (see key in GUI)",
-				formatHelp(CmdApiKey + QString("{1ccf5dca-119d-45a0-a683-7d90a00c418f}")) +
-				formatHelp(CmdApiKey + QString("IDDQD")),
+				QStringLiteral("Command for enter an authorization key (see key in GUI)"),
+				formatHelp(CmdApiKey + QStringLiteral("{1ccf5dca-119d-45a0-a683-7d90a00c418f}")) +
+				formatHelp(CmdApiKey + QStringLiteral("IDDQD")),
 				formatHelp(CmdApiKeyResult_Ok) +
 				formatHelp(CmdApiKeyResult_Fail)
 				);
 
 	m_helpMessage += formatHelp(
 				CmdLock,
-				"Opens access to set-commands, If success - suspends capture and blocking access for other clients to set-commands.",
+				QStringLiteral("Opens access to set-commands, If success - suspends capture and blocking access for other clients to set-commands."),
 				formatHelp(CmdResultLock_Success) +
 				formatHelp(CmdResultLock_Busy)
 				);
 
 	m_helpMessage += formatHelp(
 				CmdUnlock,
-				"Closes access to set-commands. Restores device settings from the current profile, and continues the normal execution of the application.",
+				QStringLiteral("Closes access to set-commands. Restores device settings from the current profile, and continues the normal execution of the application."),
 				formatHelp(CmdResultUnlock_Success) +
 				formatHelp(CmdResultUnlock_NotLocked)
 				);
@@ -1396,7 +1394,7 @@ void ApiServer::initHelpMessage()
 	// Get-commands
 	m_helpMessage += formatHelp(
 				CmdGetStatus,
-				"Get status of the backlight",
+				QStringLiteral("Get status of the backlight"),
 				formatHelp(CmdResultStatus_On) +
 				formatHelp(CmdResultStatus_Off) +
 				formatHelp(CmdResultStatus_DeviceError) +
@@ -1404,48 +1402,48 @@ void ApiServer::initHelpMessage()
 				);
 	m_helpMessage += formatHelp(
 				CmdGetStatusAPI,
-				"Get status of the lightpack API",
+				QStringLiteral("Get status of the lightpack API"),
 				formatHelp(CmdResultStatusAPI_Busy) +
 				formatHelp(CmdResultStatusAPI_Idle)
 				);
 	m_helpMessage += formatHelp(
 				CmdGetProfile,
-				"Get the name of the current profile",
-				formatHelp(CmdResultProfile + QString("SampleProfileName"))
+				QStringLiteral("Get the name of the current profile"),
+				formatHelp(CmdResultProfile + QStringLiteral("SampleProfileName"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetProfiles,
-				"Get names of the all available profiles",
-				formatHelp(CmdResultProfiles + QString("Lightpack;New profile 1;New profile 2;"))
+				QStringLiteral("Get names of the all available profiles"),
+				formatHelp(CmdResultProfiles + QStringLiteral("Lightpack;New profile 1;New profile 2;"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetCountLeds,
-				"Get count leds of the current profile",
-				formatHelp(CmdResultCountLeds + QString("10"))
+				QStringLiteral("Get count leds of the current profile"),
+				formatHelp(CmdResultCountLeds + QStringLiteral("10"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetLeds,
-				"Get curent rect areas. Format: \"N-X,Y,W,H;\", where N - number of area, X,Y - position, H,W-size.",
-				formatHelp(CmdResultLeds + QString("1-0,0,100,100;2-0,200,100,100;"))
+				QStringLiteral("Get curent rect areas. Format: \"N-X,Y,W,H;\", where N - number of area, X,Y - position, H,W-size."),
+				formatHelp(CmdResultLeds + QStringLiteral("1-0,0,100,100;2-0,200,100,100;"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetColors,
-				"Get curent color leds. Format: \"N-R,G,B;\", where N - number of led, R, G, B - red, green and blue color components.",
-				formatHelp(CmdResultGetColors + QString("1-0,120,200;2-0,234,23;"))
+				QStringLiteral("Get curent color leds. Format: \"N-R,G,B;\", where N - number of led, R, G, B - red, green and blue color components."),
+				formatHelp(CmdResultGetColors + QStringLiteral("1-0,120,200;2-0,234,23;"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetFPS,
-				"Get FPS grabing",
-				formatHelp(CmdResultFPS + QString("25.57"))
+				QStringLiteral("Get FPS grabing"),
+				formatHelp(CmdResultFPS + QStringLiteral("25.57"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetScreenSize,
-				"Get size screen",
-				formatHelp(CmdResultScreenSize + QString("0,0,1024,768"))
+				QStringLiteral("Get size screen"),
+				formatHelp(CmdResultScreenSize + QStringLiteral("0,0,1024,768"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetBacklight,
-				"Get mode of the current profile",
+				QStringLiteral("Get mode of the current profile"),
 				formatHelp(CmdResultBacklight_Ambilight) +
 				formatHelp(CmdResultBacklight_Moodlamp)
 #ifdef SOUNDVIZ_SUPPORT
@@ -1454,34 +1452,34 @@ void ApiServer::initHelpMessage()
 				);
 	m_helpMessage += formatHelp(
 				CmdGetGamma,
-				"Get the current gamma correction value",
-				formatHelp(CmdResultGamma + QString("2.004"))
+				QStringLiteral("Get the current gamma correction value"),
+				formatHelp(CmdResultGamma + QStringLiteral("2.004"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetBrightness,
-				"Get the current brightness value",
-				formatHelp(CmdResultBrightness + QString("100"))
+				QStringLiteral("Get the current brightness value"),
+				formatHelp(CmdResultBrightness + QStringLiteral("100"))
 				);
 	m_helpMessage += formatHelp(
 				CmdGetSmooth,
-				"Get the current smooth value",
-				formatHelp(CmdResultSmooth + QString("1"))
+				QStringLiteral("Get the current smooth value"),
+				formatHelp(CmdResultSmooth + QStringLiteral("1"))
 				);
 #ifdef SOUNDVIZ_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdGetSoundVizColors,
-		"Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
-		formatHelp(CmdResultSoundVizColors + QString("0,0,0;255,255,255"))
+		QStringLiteral("Get min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1"),
+		formatHelp(CmdResultSoundVizColors + QStringLiteral("0,0,0;255,255,255"))
 		);
 	m_helpMessage += formatHelp(
 		CmdGetSoundVizLiquid,
-		"Get wether or not sound visualization is in liquid color mode. Since API 2.1",
-		formatHelp(CmdResultSoundVizLiquid + QString("1"))
+		QStringLiteral("Get wether or not sound visualization is in liquid color mode. Since API 2.1"),
+		formatHelp(CmdResultSoundVizLiquid + QStringLiteral("1"))
 		);
 #endif
 	m_helpMessage += formatHelp(
 		CmdGetPersistOnUnlock,
-		"Get wether or not the last set colors should persist when unlocking",
+		QStringLiteral("Get wether or not the last set colors should persist when unlocking"),
 		formatHelp(CmdGetPersistOnUnlock_On)
 		);
 
@@ -1495,73 +1493,70 @@ void ApiServer::initHelpMessage()
 
 	m_helpMessage += formatHelp(
 				CmdSetColor,
-				"Set colors on several LEDs. Format: \"N-R,G,B;\", where N - number of led, R, G, B - red, green and blue color components. Works only on locking time (see lock).",
-				formatHelp(CmdSetColor + QString("1-255,255,30;")) +
-				formatHelp(CmdSetColor + QString("1-255,255,30;2-12,12,12;3-1,2,3;")),
+				QStringLiteral("Set colors on several LEDs. Format: \"N-R,G,B;\", where N - number of led, R, G, B - red, green and blue color components. Works only on locking time (see lock)."),
+				formatHelp(CmdSetColor + QStringLiteral("1-255,255,30;")) +
+				formatHelp(CmdSetColor + QStringLiteral("1-255,255,30;2-12,12,12;3-1,2,3;")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetLeds,
-				"Set areas on several LEDs. Format: \"N-X,Y,W,H;\", where N - number of led, X,Y - position, H,W-size. Works only on locking time (see lock).",
-				formatHelp(CmdSetLeds + QString("1-0,0,100,100;")) +
-				formatHelp(CmdSetLeds + QString("1-0,0,100,100;2-0,100,100,100;3-100,0,100,100;")),
+				QStringLiteral("Set areas on several LEDs. Format: \"N-X,Y,W,H;\", where N - number of led, X,Y - position, H,W-size. Works only on locking time (see lock)."),
+				formatHelp(CmdSetLeds + QStringLiteral("1-0,0,100,100;")) +
+				formatHelp(CmdSetLeds + QStringLiteral("1-0,0,100,100;2-0,100,100,100;3-100,0,100,100;")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetGamma,
-				QString("Set device gamma correction value [%1 - %2]. Works only on locking time (see lock).")
-				.arg(SettingsScope::Profile::Device::GammaMin)
-				.arg(SettingsScope::Profile::Device::GammaMax),
-				formatHelp(CmdSetGamma + QString("2.5")),
+				QStringLiteral("Set device gamma correction value [%1 - %2]. Works only on locking time (see lock).")
+				.arg(SettingsScope::Profile::Device::GammaMin, SettingsScope::Profile::Device::GammaMax),
+				formatHelp(CmdSetGamma + QStringLiteral("2.5")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetBrightness,
-				QString("Set device brightness value [%1 - %2]. Works only on locking time (see lock).")
-				.arg(SettingsScope::Profile::Device::BrightnessMin)
-				.arg(SettingsScope::Profile::Device::BrightnessMax),
-				formatHelp(CmdSetBrightness + QString("0")) +
-				formatHelp(CmdSetBrightness + QString("93")),
+				QStringLiteral("Set device brightness value [%1 - %2]. Works only on locking time (see lock).")
+				.arg(SettingsScope::Profile::Device::BrightnessMin, SettingsScope::Profile::Device::BrightnessMax),
+				formatHelp(CmdSetBrightness + QStringLiteral("0")) +
+				formatHelp(CmdSetBrightness + QStringLiteral("93")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetSmooth,
-				QString("Set device smooth value [%1 - %2]. Works only on locking time (see lock).")
-				.arg(SettingsScope::Profile::Device::SmoothMin)
-				.arg(SettingsScope::Profile::Device::SmoothMax),
-				formatHelp(CmdSetSmooth + QString("10")) +
-				formatHelp(CmdSetSmooth + QString("128")),
+				QStringLiteral("Set device smooth value [%1 - %2]. Works only on locking time (see lock).")
+				.arg(SettingsScope::Profile::Device::SmoothMin, SettingsScope::Profile::Device::SmoothMax),
+				formatHelp(CmdSetSmooth + QStringLiteral("10")) +
+				formatHelp(CmdSetSmooth + QStringLiteral("128")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetProfile,
-				QString("Set current profile. Works only on locking time (see lock)."),
-				formatHelp(CmdSetProfile + QString("Lightpack")) +
-				formatHelp(CmdSetProfile + QString("16x9")),
+				QStringLiteral("Set current profile. Works only on locking time (see lock)."),
+				formatHelp(CmdSetProfile + QStringLiteral("Lightpack")) +
+				formatHelp(CmdSetProfile + QStringLiteral("16x9")),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdNewProfile,
-				QString("Create new profile. Works only on locking time (see lock)."),
-				formatHelp(CmdNewProfile + QString("16x9")) +
+				QStringLiteral("Create new profile. Works only on locking time (see lock)."),
+				formatHelp(CmdNewProfile + QStringLiteral("16x9")) +
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdDeleteProfile,
-				QString("Delete profile. Works only on locking time (see lock)."),
-				formatHelp(CmdDeleteProfile + QString("16x9")) +
+				QStringLiteral("Delete profile. Works only on locking time (see lock)."),
+				formatHelp(CmdDeleteProfile + QStringLiteral("16x9")) +
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetStatus,
-				QString("Set backlight status. Works only on locking time (see lock)."),
+				QStringLiteral("Set backlight status. Works only on locking time (see lock)."),
 				formatHelp(CmdSetStatus + QString(CmdSetStatus_On)) +
 				formatHelp(CmdSetStatus + QString(CmdSetStatus_Off)),
 				helpCmdSetResults);
 
 	m_helpMessage += formatHelp(
 				CmdSetBacklight,
-				QString("Set backlight mode. Works only on locking time (see lock)."),
+				QStringLiteral("Set backlight mode. Works only on locking time (see lock)."),
 				formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Ambilight)) +
 				formatHelp(CmdSetBacklight + QString(CmdSetBacklight_Moodlamp))
 #ifdef SOUNDVIZ_SUPPORT
@@ -1573,33 +1568,33 @@ void ApiServer::initHelpMessage()
 #ifdef SOUNDVIZ_SUPPORT
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizColors,
-		"Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1",
-		formatHelp(CmdSetSoundVizColors + QString("0,0,0;255,255,255")),
+		QStringLiteral("Set min and max color for sound visualization. Format: \"R,G,B;R,G,B\". Since API 2.1"),
+		formatHelp(CmdSetSoundVizColors + QStringLiteral("0,0,0;255,255,255")),
 		helpCmdSetResults);
 	m_helpMessage += formatHelp(
 		CmdSetSoundVizLiquid,
-		"Set wether or not sound visualization is in liquid color mode. Since API 2.1",
-		formatHelp(CmdSetSoundVizLiquid + QString("0")),
+		QStringLiteral("Set wether or not sound visualization is in liquid color mode. Since API 2.1"),
+		formatHelp(CmdSetSoundVizLiquid + QStringLiteral("0")),
 		helpCmdSetResults);
 #endif
 	m_helpMessage += formatHelp(
 		CmdSetPersistOnUnlock,
-		"Set wether or not the last set colors should persist when unlocking. Since API 2.2",
+		QStringLiteral("Set wether or not the last set colors should persist when unlocking. Since API 2.2"),
 		formatHelp(CmdSetPersistOnUnlock + QString(CmdSetPersistOnUnlock_On)),
 		helpCmdSetResults);
 
 
-	m_helpMessage += formatHelp(CmdHelpShort, "Short version of this help");
+	m_helpMessage += formatHelp(CmdHelpShort, QStringLiteral("Short version of this help"));
 
-	m_helpMessage += formatHelp(CmdExit, "Closes connection");
+	m_helpMessage += formatHelp(CmdExit, QStringLiteral("Closes connection"));
 
-	m_helpMessage += "\r\n";
+	m_helpMessage += QStringLiteral("\r\n");
 }
 
 void ApiServer::initShortHelpMessage()
 {
-	m_shortHelpMessage += "\r\n";
-	m_shortHelpMessage += "List of available commands:\r\n";
+	m_shortHelpMessage += QStringLiteral("\r\n");
+	m_shortHelpMessage += QStringLiteral("List of available commands:\r\n");
 
 	QList<QString> cmds;
 	cmds << CmdApiKey << CmdLock << CmdUnlock
@@ -1622,7 +1617,7 @@ void ApiServer::initShortHelpMessage()
 			<< CmdSetPersistOnUnlock
 			<< CmdExit << CmdHelp << CmdHelpShort;
 
-	QString line = "	";
+	QString line = QStringLiteral("	");
 
 	for (int i = 0; i < cmds.count(); i++)
 	{
@@ -1630,17 +1625,17 @@ void ApiServer::initShortHelpMessage()
 		{
 			line += cmds[i].remove(':');
 		} else {
-			m_shortHelpMessage += line + "\r\n";
-			line = "	" + cmds[i].remove(':');
+			m_shortHelpMessage += line + QStringLiteral("\r\n");
+			line = QStringLiteral("	") + cmds[i].remove(':');
 		}
 
 		if (i != cmds.count() - 1)
-				line += ", ";
+				line += QStringLiteral(", ");
 	}
 
-	m_shortHelpMessage += line + "\r\n";
+	m_shortHelpMessage += line + QStringLiteral("\r\n");
 
-	m_shortHelpMessage += "\r\n";
-	m_shortHelpMessage += "Detailed version is available by \"help\" command. \r\n";
-	m_shortHelpMessage += "\r\n";
+	m_shortHelpMessage += QStringLiteral("\r\n");
+	m_shortHelpMessage += QStringLiteral("Detailed version is available by \"help\" command. \r\n");
+	m_shortHelpMessage += QStringLiteral("\r\n");
 }

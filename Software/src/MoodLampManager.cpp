@@ -37,7 +37,7 @@ MoodLampManager::MoodLampManager(QObject *parent) : QObject(parent)
 	m_isMoodLampEnabled = false;
 
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColors()));
+	connect(&m_timer, &QTimer::timeout, this, qOverload<>(&MoodLampManager::updateColors));
 	initFromSettings();
 }
 

@@ -15,6 +15,7 @@ CONFIG(msvc) {
 DESTDIR     = ../bin
 TEMPLATE    = app
 QT         += network widgets
+CONFIG += c++17
 win32 {
     QT += serialport
 }
@@ -62,13 +63,16 @@ QMAKE_CFLAGS = $$(CFLAGS)
 QMAKE_CXXFLAGS = $$(CXXFLAGS)
 QMAKE_LFLAGS = $$(LDFLAGS)
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
 CONFIG(clang) {
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    QMAKE_CXXFLAGS += -stdlib=libc++
     LIBS += -stdlib=libc++
 }
 
 unix:!macx{
+    PKGCONFIG_BIN = $$system(which pkg-config)
+    isEmpty(PKGCONFIG_BIN) {
+        error("pkg-config not found")
+    }
     CONFIG    += link_pkgconfig
     PKGCONFIG += libusb-1.0
 
@@ -125,54 +129,54 @@ win32 {
             if $(PlatformToolsetVersion) EQU 140 copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\vcruntime$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
             if $(PlatformToolsetVersion) GTR 140 copy /y \"$(VcInstallDir)Redist\\MSVC\\$(VCToolsRedistVersion)\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\vcruntime*.dll\" .\ $$escape_expand(\r\n)
         !contains(DEFINES, NO_OPENSSL) {
-			# QT switched to OpenSSL 1.1 in 5.12.4, which has different binary names
-			versionAtLeast(QT_VERSION, "5.12.4") {
-				QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\libcrypto-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
-					copy /y \"$${OPENSSL_DIR}\\libssl-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
-					IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
-			} else {
-				QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\ssleay32.dll\" .\ $$escape_expand(\r\n)\
-					copy /y \"$${OPENSSL_DIR}\\libeay32.dll\" .\ $$escape_expand(\r\n)\
-					IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
-			}
+            # QT switched to OpenSSL 1.1 in 5.12.4, which has different binary names
+            versionAtLeast(QT_VERSION, "5.12.4") {
+                QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\libcrypto-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
+                    copy /y \"$${OPENSSL_DIR}\\libssl-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
+                    IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
+            } else {
+                QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\ssleay32.dll\" .\ $$escape_expand(\r\n)\
+                    copy /y \"$${OPENSSL_DIR}\\libeay32.dll\" .\ $$escape_expand(\r\n)\
+                    IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
+            }
         }
 
     } else {
         warning("unsupported setup - update src.pro to copy dependencies")
     }
 
-	contains(DEFINES,BASS_SOUND_SUPPORT) {
-		INCLUDEPATH += $${BASS_DIR}/c/ \
-			$${BASSWASAPI_DIR}/c/
+    contains(DEFINES,BASS_SOUND_SUPPORT) {
+        INCLUDEPATH += $${BASS_DIR}/c/ \
+            $${BASSWASAPI_DIR}/c/
 
-		contains(QMAKE_TARGET.arch, x86_64) {
-			LIBS += -L$${BASS_DIR}/c/x64/ -L$${BASSWASAPI_DIR}/c/x64/
-		} else {
-			LIBS += -L$${BASS_DIR}/c/ -L$${BASSWASAPI_DIR}/c/
-		}
+        contains(QMAKE_TARGET.arch, x86_64) {
+            LIBS += -L$${BASS_DIR}/c/x64/ -L$${BASSWASAPI_DIR}/c/x64/
+        } else {
+            LIBS += -L$${BASS_DIR}/c/ -L$${BASSWASAPI_DIR}/c/
+        }
 
-		LIBS	+= -lbass -lbasswasapi
+        LIBS    += -lbass -lbasswasapi
 
-		contains(QMAKE_TARGET.arch, x86_64) {
-			QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
-				copy /y \"$${BASS_DIR}\\x64\\bass.dll\" .\ $$escape_expand(\r\n)\
-				copy /y \"$${BASSWASAPI_DIR}\\x64\\basswasapi.dll\" .\
-		} else {
-			QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
-				copy /y \"$${BASS_DIR}\\bass.dll\" .\ $$escape_expand(\r\n)\
-				copy /y \"$${BASSWASAPI_DIR}\\basswasapi.dll\" .\
-		}
+        contains(QMAKE_TARGET.arch, x86_64) {
+            QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+                copy /y \"$${BASS_DIR}\\x64\\bass.dll\" .\ $$escape_expand(\r\n)\
+                copy /y \"$${BASSWASAPI_DIR}\\x64\\basswasapi.dll\" .\
+        } else {
+            QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+                copy /y \"$${BASS_DIR}\\bass.dll\" .\ $$escape_expand(\r\n)\
+                copy /y \"$${BASSWASAPI_DIR}\\basswasapi.dll\" .\
+        }
 
-		DEFINES += SOUNDVIZ_SUPPORT
-	}
+        DEFINES += SOUNDVIZ_SUPPORT
+    }
 
-	contains(DEFINES,NIGHTLIGHT_SUPPORT) {
-		contains(QMAKE_TARGET.arch, x86_64) {
-			Release:LIBS += -L$${NIGHTLIGHT_DIR}/Release/
-			Debug:LIBS += -L$${NIGHTLIGHT_DIR}/Debug/
-			LIBS += -lNightLightLibrary
-		}
-	}
+    contains(DEFINES,NIGHTLIGHT_SUPPORT) {
+        contains(QMAKE_TARGET.arch, x86_64) {
+            Release:LIBS += -L$${NIGHTLIGHT_DIR}/Release/
+            Debug:LIBS += -L$${NIGHTLIGHT_DIR}/Debug/
+            LIBS += -lNightLightLibrary
+        }
+    }
 }
 
 unix:!macx{
@@ -181,25 +185,24 @@ unix:!macx{
     # For X11 grabber
     LIBS +=-lXext -lX11
 
-    QMAKE_CXXFLAGS += -std=c++11
     contains(DEFINES,PULSEAUDIO_SUPPORT) {
         INCLUDEPATH += $${PULSEAUDIO_INC_DIR} \
             $${FFTW3_INC_DIR}
 
         defined(PULSEAUDIO_LIB_DIR, var) {
             LIBS += -L$${PULSEAUDIO_LIB_DIR}
-            QMAKE_POST_LINK += $(INSTALL_PROGRAM) \"$${PULSEAUDIO_LIB_DIR}/libpulse.so.0\" $(DESTDIR) $$escape_expand(\n\t)\
-				$(INSTALL_PROGRAM) \"$${PULSEAUDIO_LIB_DIR}/libpulsecommon-13.0.so\" $(DESTDIR) $$escape_expand(\n\t)
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${PULSEAUDIO_LIB_DIR}/libpulse.so.0" $(DESTDIR)
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${PULSEAUDIO_LIB_DIR}/libpulsecommon-13.0.so" $(DESTDIR)
         }
 
         defined(PULSEAUDIO_LIB_DIR, var) {
             LIBS += -L$${FFTW3_LIB_DIR}
-            QMAKE_POST_LINK += $(INSTALL_PROGRAM) \"$${FFTW3_LIB_DIR}/libfftw3f.so.3\" $(DESTDIR) $$escape_expand(\n)
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${FFTW3_LIB_DIR}/libfftw3f.so.3" $(DESTDIR)
         }
 
         LIBS += -lpulse -lfftw3f
         DEFINES += SOUNDVIZ_SUPPORT
-	}
+    }
 }
 
 macx{
@@ -238,7 +241,7 @@ macx{
 
     QMAKE_INFO_PLIST = ./Info.plist
 
-	#see build-vars.prf
+    #see build-vars.prf
     #isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
     #    # Default value
     #    # For build universal binaries (native on Intel and PowerPC)
@@ -255,7 +258,8 @@ macx{
 
 # Generate .qm language files
 QMAKE_MAC_SDK = macosx
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+# Qt sets this to its own minimum
+# QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
 system($$[QT_INSTALL_BINS]/lrelease src.pro)
 
 INCLUDEPATH += . \
@@ -284,7 +288,7 @@ SOURCES += \
     ApiServerSetColorTask.cpp \
     MoodLampManager.cpp \
     MoodLamp.cpp \
-	LiquidColorGenerator.cpp \
+    LiquidColorGenerator.cpp \
     LedDeviceManager.cpp \
     SelectWidget.cpp \
     GrabManager.cpp \
@@ -340,7 +344,7 @@ HEADERS += \
     ../../CommonHeaders/USB_ID.h \
     MoodLampManager.hpp \
     MoodLamp.hpp \
-	LiquidColorGenerator.hpp \
+    LiquidColorGenerator.hpp \
     LedDeviceManager.hpp \
     SelectWidget.hpp \
     ../common/D3D10GrabberDefs.hpp \

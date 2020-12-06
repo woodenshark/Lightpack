@@ -29,7 +29,6 @@
 #include "LedDeviceLightpack.hpp"
 #include "Settings.hpp"
 #include "Wizard.hpp"
-#include "QDesktopWidget"
 
 LightpackDiscoveryPage::LightpackDiscoveryPage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent) :
 	QWizardPage(parent),

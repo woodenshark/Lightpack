@@ -33,8 +33,8 @@
 
 #include <QObject>
 #include <QThread>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QMessageBox>
 #include <cstdlib>
 #include <stdio.h>
@@ -77,7 +77,7 @@ namespace {
 
 	const unsigned kBytesPerPixel = 4;
 
-	D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) : 
+	D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) :
 		QObject(parent),
 		m_lpsa(lpsa)
 	{
@@ -171,7 +171,7 @@ namespace {
 		if (m_libraryInjector) {
 			m_libraryInjector->Release();
 			CoUninitialize();
-		}	
+		}
 	}
 
 	void D3D10GrabberInjector::infectCleanDxProcesses() {
@@ -366,19 +366,20 @@ public:
 		}
 		m_worker->moveToThread(m_workerThread.data());
 		m_workerThread->start();
-		connect(m_worker.data(), SIGNAL(frameGrabbed()), this, SIGNAL(frameGrabbed()), Qt::QueuedConnection);
+		connect(m_worker.data(), &D3D10GrabberWorker::frameGrabbed, this, &D3D10GrabberImpl::frameGrabbed, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(m_worker.data(), "runLoop", Qt::QueuedConnection);
 
+		using namespace std::chrono_literals;
 		m_processesScanAndInfectTimer.reset(new QTimer(this));
-		m_processesScanAndInfectTimer->setInterval(5000);
+		m_processesScanAndInfectTimer->setInterval(5s);
 		m_processesScanAndInfectTimer->setSingleShot(false);
-		connect(m_processesScanAndInfectTimer.data(), SIGNAL(timeout()), m_injector.data(), SLOT(infectCleanDxProcesses()));
+		connect(m_processesScanAndInfectTimer.data(), &QTimer::timeout, m_injector.data(), &D3D10GrabberInjector::infectCleanDxProcesses);
 		m_processesScanAndInfectTimer->start();
 
-		m_checkIfFrameGrabbedTimer.reset(new QTimer());
+		m_checkIfFrameGrabbedTimer.reset(new QTimer(this));
 		m_checkIfFrameGrabbedTimer->setSingleShot(false);
-		m_checkIfFrameGrabbedTimer->setInterval(1000);
-		connect(m_checkIfFrameGrabbedTimer.data(), SIGNAL(timeout()), SLOT(handleIfFrameGrabbed()));
+		m_checkIfFrameGrabbedTimer->setInterval(1s);
+		connect(m_checkIfFrameGrabbedTimer.data(), &QTimer::timeout, this, &D3D10GrabberImpl::handleIfFrameGrabbed);
 		m_checkIfFrameGrabbedTimer->start();
 		m_isInited = true;
 		return m_isInited;
@@ -610,7 +611,7 @@ private:
 		m_injectorThread->wait();
 
 
-		disconnect(this, SLOT(handleIfFrameGrabbed()));
+		disconnect(this, &D3D10GrabberImpl::handleIfFrameGrabbed, nullptr, nullptr);
 		freeIPC();
 		CoUninitialize();
 		m_isInited = false;
@@ -648,18 +649,18 @@ D3D10Grabber::D3D10Grabber(QObject *parent, GrabberContext *context, GetHwndCall
 
 void D3D10Grabber::init() {
 	m_impl->init();
-	connect(m_impl.data(), SIGNAL(frameGrabbed()), this, SLOT(grab()));
+	connect(m_impl.data(), &D3D10GrabberImpl::frameGrabbed, this, &D3D10Grabber::grab);
 	_screensWithWidgets.clear();
 	GrabbedScreen grabbedScreen;
-	grabbedScreen.screenInfo.handle = reinterpret_cast<void *>(QApplication::desktop()->primaryScreen());
-	grabbedScreen.screenInfo.rect = QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen());
+	grabbedScreen.screenInfo.handle = QGuiApplication::primaryScreen();// unused?
+	grabbedScreen.screenInfo.rect = QGuiApplication::primaryScreen()->geometry();
 	_screensWithWidgets.append(grabbedScreen);
 
 	if (!WinUtils::IsUserAdmin()) {
 		qWarning() << Q_FUNC_INFO << "DX hooking is enabled but application not running elevated";
 		// Do not show the message box during initialization (creating a unwanted message loop)
 		// Show as soon as the message loop is established
-		QTimer::singleShot(0, this, SLOT(showAdminMessage()));
+		QTimer::singleShot(0, this, &D3D10Grabber::showAdminMessage);
 	}
 }
 

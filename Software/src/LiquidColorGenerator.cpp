@@ -48,7 +48,7 @@ LiquidColorGenerator::LiquidColorGenerator(QObject *parent) : QObject(parent)
 
 	m_isEnabled = false;
 	m_timer.setTimerType(Qt::PreciseTimer);
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateColor()));
+	connect(&m_timer, &QTimer::timeout, this, &LiquidColorGenerator::doColorUpdate);
 }
 
 void LiquidColorGenerator::start()
@@ -58,7 +58,7 @@ void LiquidColorGenerator::start()
 	m_isEnabled = true;
 
 	reset();
-	updateColor();
+	doColorUpdate();
 }
 
 void LiquidColorGenerator::stop()
@@ -90,7 +90,7 @@ void LiquidColorGenerator::reset()
 	m_unselectedColors.clear();
 }
 
-void LiquidColorGenerator::updateColor()
+void LiquidColorGenerator::doColorUpdate()
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << m_speed;
 
@@ -131,14 +131,15 @@ QColor LiquidColorGenerator::generateColor()
 {
 	if (m_unselectedColors.empty())
 	{
+		m_unselectedColors.reserve(ColorsMoodLampCount);
 		for (int i = 0; i < ColorsMoodLampCount; i++)
 			m_unselectedColors << AvailableColors[i];
 	}
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-	int randIndex = m_rnd.bounded(std::max(1, m_unselectedColors.size()));
+	int randIndex = m_rnd.bounded(std::max((QList<QColor>::size_type)1, m_unselectedColors.size()));
 #else
-	int randIndex = qrand() % std::max(1, m_unselectedColors.size());
+	int randIndex = qrand() % std::max((QList<QColor>::size_type)1, m_unselectedColors.size());
 #endif
 
 	return m_unselectedColors.takeAt(randIndex);

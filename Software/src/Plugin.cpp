@@ -9,38 +9,38 @@
 using namespace SettingsScope;
 
 #if defined(Q_OS_WIN)
-	const QString kOsSpecificExecuteKey = "ExecuteOnWindows";
+	const QString kOsSpecificExecuteKey = QStringLiteral("ExecuteOnWindows");
 #elif defined(MAC_OS)
-	const QString kOsSpecificExecuteKey = "ExecuteOnOSX";
+	const QString kOsSpecificExecuteKey = QStringLiteral("ExecuteOnOSX");
 #elif defined(Q_OS_UNIX)
-	const QString kOsSpecificExecuteKey = "ExecuteOnNix";
+	const QString kOsSpecificExecuteKey = QStringLiteral("ExecuteOnNix");
 #endif
 
-Plugin::Plugin(QString name, QString path, QObject *parent) :
+Plugin::Plugin(const QString& name, const QString& path, QObject *parent) :
 	QObject(parent)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << name << path;
 	_pathPlugin = path;
 	QDir pluginPath(_pathPlugin);
 
-	const QString fileName(path+"/"+name+".ini");
+	const QString fileName(QStringLiteral("%1/%2.ini").arg(path, name));
 	if (!QFile::exists(fileName)) {
 		qWarning() << Q_FUNC_INFO << name << fileName << "does not exist, generating defaults, make sure to edit the file!";
-		if (!QFile::copy(":/plugin-template.ini", fileName))
+		if (!QFile::copy(QStringLiteral(":/plugin-template.ini"), fileName))
 			qWarning() << Q_FUNC_INFO << name << "failed to generate" << fileName;
 		else if (!QFile::setPermissions(fileName, QFile::permissions(fileName) | QFileDevice::WriteOwner))
 			qWarning() << Q_FUNC_INFO << name << "could not set write permissions to" << fileName;
 	}
 	QSettings settings(fileName, QSettings::IniFormat);
-	settings.beginGroup("Main");
-	_name = settings.value("Name", "").toString();
+	settings.beginGroup(QStringLiteral("Main"));
+	_name = settings.value(QStringLiteral("Name"), QLatin1String("")).toString();
 	if (_name.isEmpty())
 		_name = name;
 
 	if (settings.contains(kOsSpecificExecuteKey))
-		_arguments = settings.value(kOsSpecificExecuteKey, "").toString().split(' ');
+		_arguments = settings.value(kOsSpecificExecuteKey, QLatin1String("")).toString().split(' ');
 	else
-		_arguments = settings.value("Execute", "").toString().split(' ');
+		_arguments = settings.value(QStringLiteral("Execute"), QLatin1String("")).toString().split(' ');
 
 	if (!_arguments.isEmpty())
 		_exec = _arguments.takeFirst();
@@ -48,17 +48,17 @@ Plugin::Plugin(QString name, QString path, QObject *parent) :
 	if (_exec.isEmpty())
 		qWarning() << Q_FUNC_INFO << name << "no executable, check" << fileName;
 
-	_guid = settings.value("Guid", "").toString();
-	_author = settings.value("Author", "").toString();
-	_description = settings.value("Description", "").toString();
-	_version = settings.value("Version", "").toString();
+	_guid = settings.value(QStringLiteral("Guid"), QLatin1String("")).toString();
+	_author = settings.value(QStringLiteral("Author"), QLatin1String("")).toString();
+	_description = settings.value(QStringLiteral("Description"), QLatin1String("")).toString();
+	_version = settings.value(QStringLiteral("Version"), QLatin1String("")).toString();
 
-	const QString iconName = settings.value("Icon", "").toString();
+	const QString iconName = settings.value(QStringLiteral("Icon"), QLatin1String("")).toString();
 	const QString iconPath = pluginPath.absoluteFilePath(iconName);
 	if (!iconName.isEmpty() && QFile::exists(iconPath) && !QImageReader::imageFormat(iconPath).isEmpty())
 		_icon = QIcon(iconPath);
 	if (_icon.isNull())
-		_icon = QIcon(":/icons/plugins.png");
+		_icon = QIcon(QStringLiteral(":/icons/plugins.png"));
 
 	settings.endGroup();
 
@@ -97,23 +97,23 @@ QIcon Plugin::Icon() const {
 
 
 int Plugin::getPriority() const {
-	const QString key = _name+"/Priority";
+	const QString key = QStringLiteral("%1/Priority").arg(_name);
 	return Settings::valueMain(key).toInt();
 }
 
 void Plugin::setPriority(int priority) {
-	const QString key = _name+"/Priority";
+	const QString key = QStringLiteral("%1/Priority").arg(_name);
 	Settings::setValueMain(key,priority);
 }
 
 bool Plugin::isEnabled() const {
-	const QString key = _name+"/Enable";
+	const QString key = QStringLiteral("%1/Enable").arg(_name);
 	return Settings::valueMain(key).toBool();
 }
 
 void Plugin::setEnabled(bool enable) {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << _name << enable;
-	const QString key = _name+"/Enable";
+	const QString key = QStringLiteral("%1/Enable").arg(_name);
 	Settings::setValueMain(key,enable);
 	if (!enable) Stop();
 	if (enable) Start();
@@ -129,14 +129,14 @@ void Plugin::Start()
 
 	process->disconnect();
 
-	connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(stateChanged(QProcess::ProcessState)));
-	connect(process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(errorOccurred(QProcess::ProcessError)));
+	connect(process, &QProcess::stateChanged, this, &Plugin::stateChanged);
+	connect(process, &QProcess::errorOccurred, this, &Plugin::errorOccurred);
 
-	connect(process, SIGNAL(started()), this, SLOT(started()));
-	connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int, QProcess::ExitStatus)));
+	connect(process, &QProcess::started, this, &Plugin::started);
+	connect(process, qOverload<int,QProcess::ExitStatus>(&QProcess::finished), this, &Plugin::finished);
 
-	connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readyReadStandardError()));
-	connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
+	connect(process, &QProcess::readyReadStandardError, this, &Plugin::readyReadStandardError);
+	connect(process, &QProcess::readyReadStandardOutput, this, &Plugin::readyReadStandardOutput);
 
 	process->setEnvironment(QProcess::systemEnvironment());
 	process->setProgram(_exec);

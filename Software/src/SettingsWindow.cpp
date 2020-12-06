@@ -25,9 +25,8 @@
  */
 
 #include <QtAlgorithms>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QDesktopWidget>
+#include <QStatusBar>
+#include <QMenu>
 #include "LightpackApplication.hpp"
 
 #include "SettingsWindow.hpp"
@@ -47,7 +46,6 @@
 #include <QMessageBox>
 #include "PrismatikMath.hpp"
 
-
 using namespace SettingsScope;
 
 // ----------------------------------------------------------------------------
@@ -55,13 +53,13 @@ using namespace SettingsScope;
 // ----------------------------------------------------------------------------
 namespace {
 #ifdef Q_OS_WIN
-const QString BaudrateWarningSign = " <b>!!!</b>";
+const QString BaudrateWarningSign = QStringLiteral(" <b>!!!</b>");
 #else
-const QString BaudrateWarningSign = " ⚠️";
+const QString BaudrateWarningSign = QStringLiteral(" ⚠️");
 #endif
 }
-const QString SettingsWindow::DeviceFirmvareVersionUndef = "undef";
-const QString SettingsWindow::LightpackDownloadsPageUrl = "http://code.google.com/p/lightpack/downloads/list";
+const QString SettingsWindow::DeviceFirmvareVersionUndef = QStringLiteral("undef");
+const QString SettingsWindow::LightpackDownloadsPageUrl = QStringLiteral("http://code.google.com/p/lightpack/downloads/list");
 
 // Indexes of supported modes listed in ui->comboBox_Modes and ui->stackedWidget_Modes
 const int SettingsWindow::GrabModeIndex = 0;
@@ -94,10 +92,15 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 #endif
 
 	// Check windows reserved symbols in profile input name
+	#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	QRegularExpressionValidator *validatorProfileName = new QRegularExpressionValidator(QRegularExpression("[^<>:\"/\\|?*]*"), this);
+	QRegularExpressionValidator *validatorApiKey = new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9{}_-]*"), this);
+	#else
 	QRegExpValidator *validatorProfileName = new QRegExpValidator(QRegExp("[^<>:\"/\\|?*]*"), this);
-	ui->comboBox_Profiles->lineEdit()->setValidator(validatorProfileName);
-
 	QRegExpValidator *validatorApiKey = new QRegExpValidator(QRegExp("[a-zA-Z0-9{}_-]*"), this);
+	#endif
+
+	ui->comboBox_Profiles->lineEdit()->setValidator(validatorProfileName);
 	ui->lineEdit_ApiKey->setValidator(validatorApiKey);
 
 	// hide main tabbar
@@ -111,14 +114,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 
 	m_labelStatusIcon = new QLabel(statusBar());
-	m_labelStatusIcon->setStyleSheet("QLabel{margin-right: .5em}");
-	m_labelStatusIcon->setPixmap(Settings::isBacklightEnabled() ? *(m_pixmapCache["on16"]) : *(m_pixmapCache["off16"]));
+	m_labelStatusIcon->setStyleSheet(QStringLiteral("QLabel{margin-right: .5em}"));
+	m_labelStatusIcon->setPixmap(Settings::isBacklightEnabled() ? *(m_pixmapCache[QStringLiteral("on16")]) : *(m_pixmapCache[QStringLiteral("off16")]));
 	labelProfile = new QLabel(statusBar());
-	labelProfile->setStyleSheet("margin-left:1em");
+	labelProfile->setStyleSheet(QStringLiteral("margin-left:1em"));
 	labelDevice = new QLabel(statusBar());
 	labelFPS	= new QLabel(statusBar());
 
-	statusBar()->setStyleSheet("QStatusBar{border-top: 1px solid; border-color: palette(midlight);} QLabel{margin:0.2em}");
+	statusBar()->setStyleSheet(QStringLiteral("QStatusBar{border-top: 1px solid; border-color: palette(midlight);} QLabel{margin:0.2em}"));
 	statusBar()->setSizeGripEnabled(false);
 	statusBar()->addWidget(labelProfile, 4);
 	statusBar()->addWidget(labelDevice, 4);
@@ -203,7 +206,8 @@ void SettingsWindow::changePage(int page)
 	ui->tabWidget->setCurrentIndex(page);
 	if (page == 5) {
 		ui->textBrowser->verticalScrollBar()->setValue(0);
-		m_smoothScrollTimer.setInterval(100);
+		using namespace std::chrono_literals;
+		m_smoothScrollTimer.setInterval(100ms);
 		m_smoothScrollTimer.start();
 	} else {
 		m_smoothScrollTimer.stop();
@@ -226,129 +230,131 @@ void SettingsWindow::connectSignalsSlots()
 
 //	if (m_trayIcon!=NULL)
 //	{
-//		connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onTrayIcon_Activated(QSystemTrayIcon::ActivationReason)));
-//		connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(onTrayIcon_MessageClicked()));
+//		connect(m_trayIcon, &SysTrayIcon::activated, this, &SettingsWindow::onTrayIcon_Activated);
+//		connect(m_trayIcon, &SysTrayIcon::messageClicked, this, &SettingsWindow::onTrayIcon_MessageClicked);
 //	}
 
-	connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(changePage(int)));
-	connect(ui->spinBox_GrabSlowdown, SIGNAL(valueChanged(int)), this, SLOT(onGrabSlowdown_valueChanged(int)));
-	connect(ui->spinBox_LuminosityThreshold, SIGNAL(valueChanged(int)), this, SLOT(onLuminosityThreshold_valueChanged(int)));
-	connect(ui->radioButton_MinimumLuminosity, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
-	connect(ui->radioButton_LuminosityDeadZone, SIGNAL(toggled(bool)), this, SLOT(onMinimumLumosity_toggled(bool)));
-	connect(ui->checkBox_GrabIsAvgColors, SIGNAL(toggled(bool)), this, SLOT(onGrabIsAvgColors_toggled(bool)));
-	connect(ui->spinBox_GrabOverBrighten, SIGNAL(valueChanged(int)), this, SLOT(onGrabOverBrighten_valueChanged(int)));
-	connect(ui->checkBox_GrabApplyBlueLightReduction, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyBlueLightReduction_toggled(bool)));
-	connect(ui->checkBox_GrabApplyColorTemperature, SIGNAL(toggled(bool)), this, SLOT(onGrabApplyColorTemperature_toggled(bool)));
-	connect(ui->horizontalSlider_GrabColorTemperature, SIGNAL(valueChanged(int)), this, SLOT(onGrabColorTemperature_valueChanged(int)));
-	connect(ui->horizontalSlider_GrabGamma, SIGNAL(valueChanged(int)), this, SLOT(onSliderGrabGamma_valueChanged(int)));
-	connect(ui->doubleSpinBox_GrabGamma, SIGNAL(valueChanged(double)), this, SLOT(onGrabGamma_valueChanged(double)));
+	connect(ui->listWidget, &QListWidget::currentRowChanged, this, &SettingsWindow::changePage);
+	connect(ui->spinBox_GrabSlowdown, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onGrabSlowdown_valueChanged);
+	connect(ui->spinBox_LuminosityThreshold, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onLuminosityThreshold_valueChanged);
+	connect(ui->radioButton_MinimumLuminosity, &QRadioButton::toggled, this, &SettingsWindow::onMinimumLumosity_toggled);
+	connect(ui->radioButton_LuminosityDeadZone, &QRadioButton::toggled, this, &SettingsWindow::onMinimumLumosity_toggled);
+	connect(ui->checkBox_GrabIsAvgColors, &QCheckBox::toggled, this, &SettingsWindow::onGrabIsAvgColors_toggled);
+	connect(ui->spinBox_GrabOverBrighten, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onGrabOverBrighten_valueChanged);
+	connect(ui->checkBox_GrabApplyBlueLightReduction, &QCheckBox::toggled, this, &SettingsWindow::onGrabApplyBlueLightReduction_toggled);
+	connect(ui->checkBox_GrabApplyColorTemperature, &QCheckBox::toggled, this, &SettingsWindow::onGrabApplyColorTemperature_toggled);
+	connect(ui->horizontalSlider_GrabColorTemperature, &QSlider::valueChanged, this, &SettingsWindow::onGrabColorTemperature_valueChanged);
+	connect(ui->horizontalSlider_GrabGamma, &QSlider::valueChanged, this, &SettingsWindow::onSliderGrabGamma_valueChanged);
+	connect(ui->doubleSpinBox_GrabGamma, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::onGrabGamma_valueChanged);
 
-	connect(ui->radioButton_GrabWidgetsDontShow, SIGNAL(toggled(bool)), this, SLOT( onDontShowLedWidgets_Toggled(bool)));
-	connect(ui->radioButton_Colored, SIGNAL(toggled(bool)), this, SLOT(onSetColoredLedWidgets(bool)));
-	connect(ui->radioButton_White, SIGNAL(toggled(bool)), this, SLOT(onSetWhiteLedWidgets(bool)));
+	connect(ui->radioButton_GrabWidgetsDontShow, &QRadioButton::toggled, this, &SettingsWindow:: onDontShowLedWidgets_Toggled);
+	connect(ui->radioButton_Colored, &QRadioButton::toggled, this, &SettingsWindow::onSetColoredLedWidgets);
+	connect(ui->radioButton_White, &QRadioButton::toggled, this, &SettingsWindow::onSetWhiteLedWidgets);
 
-	connect(ui->radioButton_LiquidColorMoodLampMode, SIGNAL(toggled(bool)), this, SLOT(onMoodLampLiquidMode_Toggled(bool)));
-	connect(ui->horizontalSlider_MoodLampSpeed, SIGNAL(valueChanged(int)), this, SLOT(onMoodLampSpeed_valueChanged(int)));
-	connect(ui->comboBox_MoodLampLamp, SIGNAL(currentIndexChanged(int)), this, SLOT(onMoodLampLamp_currentIndexChanged(int)));
+	connect(ui->radioButton_LiquidColorMoodLampMode, &QRadioButton::toggled, this, &SettingsWindow::onMoodLampLiquidMode_Toggled);
+	connect(ui->horizontalSlider_MoodLampSpeed, &QSlider::valueChanged, this, &SettingsWindow::onMoodLampSpeed_valueChanged);
+	connect(ui->comboBox_MoodLampLamp, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onMoodLampLamp_currentIndexChanged);
 
 	// Main options
-	connect(ui->comboBox_LightpackModes, SIGNAL(currentIndexChanged(int)), this, SLOT(onLightpackModes_currentIndexChanged(int)));
-	connect(ui->comboBox_Language, SIGNAL(activated(QString)), this, SLOT(loadTranslation(QString)));
-	connect(ui->pushButton_EnableDisableDevice, SIGNAL(clicked()), this, SLOT(toggleBacklight()));
+	connect(ui->comboBox_LightpackModes, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onLightpackModes_currentIndexChanged);
+	connect(ui->comboBox_Language, &QComboBox::currentTextChanged, this, &SettingsWindow::loadTranslation);
+	connect(ui->pushButton_EnableDisableDevice, &QPushButton::clicked, this, &SettingsWindow::toggleBacklight);
 
 	// Device options
-	connect(ui->spinBox_DeviceRefreshDelay, SIGNAL(valueChanged(int)), this, SLOT(onDeviceRefreshDelay_valueChanged(int)));
-	connect(ui->checkBox_DisableUsbPowerLed, SIGNAL(toggled(bool)), this, SLOT(onDisableUsbPowerLed_toggled(bool)));
-	connect(ui->spinBox_DeviceSmooth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceSmooth_valueChanged(int)));
-	connect(ui->spinBox_DeviceBrightness, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightness_valueChanged(int)));
-	connect(ui->spinBox_DeviceBrightnessCap, SIGNAL(valueChanged(int)), this, SLOT(onDeviceBrightnessCap_valueChanged(int)));
-	connect(ui->spinBox_DeviceColorDepth, SIGNAL(valueChanged(int)), this, SLOT(onDeviceColorDepth_valueChanged(int)));
-	connect(ui->doubleSpinBox_DeviceGamma, SIGNAL(valueChanged(double)), this, SLOT(onDeviceGammaCorrection_valueChanged(double)));
-	connect(ui->checkBox_EnableDithering, SIGNAL(toggled(bool)), this, SLOT(onDeviceDitheringEnabled_toggled(bool)));
-	connect(ui->horizontalSlider_GammaCorrection, SIGNAL(valueChanged(int)), this, SLOT(onSliderDeviceGammaCorrection_valueChanged(int)));
-	connect(ui->checkBox_SendDataOnlyIfColorsChanges, SIGNAL(toggled(bool)), this, SLOT(onDeviceSendDataOnlyIfColorsChanged_toggled(bool)));
+	connect(ui->spinBox_DeviceRefreshDelay, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceRefreshDelay_valueChanged);
+	connect(ui->checkBox_DisableUsbPowerLed, &QCheckBox::toggled, this, &SettingsWindow::onDisableUsbPowerLed_toggled);
+	connect(ui->spinBox_DeviceSmooth, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceSmooth_valueChanged);
+	connect(ui->spinBox_DeviceBrightness, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceBrightness_valueChanged);
+	connect(ui->spinBox_DeviceBrightnessCap, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceBrightnessCap_valueChanged);
+	connect(ui->spinBox_DeviceColorDepth, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onDeviceColorDepth_valueChanged);
+	connect(ui->doubleSpinBox_DeviceGamma, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::onDeviceGammaCorrection_valueChanged);
+	connect(ui->checkBox_EnableDithering, &QCheckBox::toggled, this, &SettingsWindow::onDeviceDitheringEnabled_toggled);
+	connect(ui->horizontalSlider_GammaCorrection, &QSlider::valueChanged, this, &SettingsWindow::onSliderDeviceGammaCorrection_valueChanged);
+	connect(ui->checkBox_SendDataOnlyIfColorsChanges, &QCheckBox::toggled, this, &SettingsWindow::onDeviceSendDataOnlyIfColorsChanged_toggled);
+
+	connect(ui->pbRunConfigurationWizard, &QPushButton::clicked, this, &SettingsWindow::onRunConfigurationWizard_clicked);
 
 	// Open Settings file
-	connect(ui->commandLinkButton_OpenSettings, SIGNAL(clicked()), this, SLOT(openCurrentProfile()));
+	connect(ui->commandLinkButton_OpenSettings, &QCommandLinkButton::clicked, this, &SettingsWindow::openCurrentProfile);
 
 	// Connect profile signals to this slots
-	connect(ui->comboBox_Profiles->lineEdit(), SIGNAL(editingFinished()) /* or returnPressed() */, this, SLOT(profileRename()));
-	connect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	connect(ui->comboBox_Profiles->lineEdit(), &QLineEdit::editingFinished /* or returnPressed() */, this, &SettingsWindow::profileRename);
+	connect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 
-	connect(Settings::settingsSingleton(), SIGNAL(currentProfileInited(const QString &)), this, SLOT(handleProfileLoaded(QString)), Qt::QueuedConnection);
+	connect(Settings::settingsSingleton(), &Settings::currentProfileInited, this, &SettingsWindow::handleProfileLoaded);
 
-	// connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, SLOT(onHotkeyChanged(QString,QKeySequence,QKeySequence)));
-	connect(Settings::settingsSingleton(), SIGNAL(lightpackModeChanged(Lightpack::Mode)), this, SLOT(onLightpackModeChanged(Lightpack::Mode)));
+	// connect(Settings::settingsSingleton(), SIGNAL(hotkeyChanged(QString,QKeySequence,QKeySequence)), this, &SettingsWindow::onHotkeyChanged);
+	connect(Settings::settingsSingleton(), &Settings::lightpackModeChanged, this, &SettingsWindow::onLightpackModeChanged);
 
-	connect(ui->pushButton_ProfileNew, SIGNAL(clicked()), this, SLOT(profileNew()));
-	connect(ui->pushButton_ProfileResetToDefault, SIGNAL(clicked()), this, SLOT(profileResetToDefaultCurrent()));
-	connect(ui->pushButton_DeleteProfile, SIGNAL(clicked()), this, SLOT(profileDeleteCurrent()));
+	connect(ui->pushButton_ProfileNew, &QPushButton::clicked, this, &SettingsWindow::profileNew);
+	connect(ui->pushButton_ProfileResetToDefault, &QPushButton::clicked, this, &SettingsWindow::profileResetToDefaultCurrent);
+	connect(ui->pushButton_DeleteProfile, &QPushButton::clicked, this, &SettingsWindow::profileDeleteCurrent);
 
-	connect(ui->pushButton_SelectColorMoodLamp, SIGNAL(colorChanged(QColor)), this, SLOT(onMoodLampColor_changed(QColor)));
+	connect(ui->pushButton_SelectColorMoodLamp, &ColorButton::colorChanged, this, &SettingsWindow::onMoodLampColor_changed);
 #ifdef SOUNDVIZ_SUPPORT
-	connect(ui->comboBox_SoundVizDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizDevice_currentIndexChanged(int)));
-	connect(ui->comboBox_SoundVizVisualizer, SIGNAL(currentIndexChanged(int)), this, SLOT(onSoundVizVisualizer_currentIndexChanged(int)));
-	connect(ui->pushButton_SelectColorSoundVizMin, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMinColor_changed(QColor)));
-	connect(ui->pushButton_SelectColorSoundVizMax, SIGNAL(colorChanged(QColor)), this, SLOT(onSoundVizMaxColor_changed(QColor)));
-	connect(ui->radioButton_SoundVizLiquidMode, SIGNAL(toggled(bool)), this, SLOT(onSoundVizLiquidMode_Toggled(bool)));
-	connect(ui->horizontalSlider_SoundVizLiquidSpeed, SIGNAL(valueChanged(int)), this, SLOT(onSoundVizLiquidSpeed_valueChanged(int)));
+	connect(ui->comboBox_SoundVizDevice, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onSoundVizDevice_currentIndexChanged);
+	connect(ui->comboBox_SoundVizVisualizer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsWindow::onSoundVizVisualizer_currentIndexChanged);
+	connect(ui->pushButton_SelectColorSoundVizMin, &ColorButton::colorChanged, this, &SettingsWindow::onSoundVizMinColor_changed);
+	connect(ui->pushButton_SelectColorSoundVizMax, &ColorButton::colorChanged, this, &SettingsWindow::onSoundVizMaxColor_changed);
+	connect(ui->radioButton_SoundVizLiquidMode, &QRadioButton::toggled, this, &SettingsWindow::onSoundVizLiquidMode_Toggled);
+	connect(ui->horizontalSlider_SoundVizLiquidSpeed, &QSlider::valueChanged, this, &SettingsWindow::onSoundVizLiquidSpeed_valueChanged);
 #ifdef Q_OS_MACOS
-	connect(ui->pushButton_SoundVizDeviceHelp, SIGNAL(clicked()), this, SLOT(on_pushButton_SoundVizDeviceHelp_clicked()));
+	connect(ui->pushButton_SoundVizDeviceHelp, &QPushButton::clicked, this, &SettingsWindow::onSoundVizDeviceHelp_clicked);
 #else
 	ui->pushButton_SoundVizDeviceHelp->hide();
 #endif // Q_OS_MACOS
 
 #endif// SOUNDVIZ_SUPPORT
-	connect(ui->checkBox_KeepLightsOnAfterExit, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterExit_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterLockComputer, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterLock_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterSuspend, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterSuspend_Toggled(bool)));
-	connect(ui->checkBox_KeepLightsOnAfterScreenOff, SIGNAL(toggled(bool)), this, SLOT(onKeepLightsAfterScreenOff_Toggled(bool)));
+	connect(ui->checkBox_KeepLightsOnAfterExit, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterExit_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterLockComputer, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterLock_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterSuspend, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterSuspend_Toggled);
+	connect(ui->checkBox_KeepLightsOnAfterScreenOff, &QCheckBox::toggled, this, &SettingsWindow::onKeepLightsAfterScreenOff_Toggled);
 
 	// Dev tab
 #ifdef WINAPI_GRAB_SUPPORT
-	connect(ui->radioButton_GrabWinAPI, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabWinAPI, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef DDUPL_GRAB_SUPPORT
-	connect(ui->radioButton_GrabDDupl, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabDDupl, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef X11_GRAB_SUPPORT
-	connect(ui->radioButton_GrabX11, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabX11, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef MAC_OS_AV_GRAB_SUPPORT
-	connect(ui->radioButton_GrabMacAVFoundation, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabMacAVFoundation, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef MAC_OS_CG_GRAB_SUPPORT
-	connect(ui->radioButton_GrabMacCoreGraphics, SIGNAL(toggled(bool)), this, SLOT(onGrabberChanged()));
+	connect(ui->radioButton_GrabMacCoreGraphics, &QRadioButton::toggled, this, &SettingsWindow::onGrabberChanged);
 #endif
 #ifdef D3D10_GRAB_SUPPORT
-	connect(ui->checkBox_EnableDx1011Capture, SIGNAL(toggled(bool)), this, SLOT(onDx1011CaptureEnabledChanged(bool)));
-	connect(ui->checkBox_EnableDx9Capture, SIGNAL(toggled(bool)), this, SLOT(onDx9CaptureEnabledChanged(bool)));
+	connect(ui->checkBox_EnableDx1011Capture, &QCheckBox::toggled, this, &SettingsWindow::onDx1011CaptureEnabledChanged);
+	connect(ui->checkBox_EnableDx9Capture, &QCheckBox::toggled, this, &SettingsWindow::onDx9CaptureEnabledChanged);
 #endif
 
 
 	// Dev tab configure API (port, apikey)
-	connect(ui->groupBox_Api, SIGNAL(toggled(bool)), this, SLOT(onEnableApi_Toggled(bool)));
-	connect(ui->checkBox_listenOnlyOnLoInterface, SIGNAL(toggled(bool)), this, SLOT(onListenOnlyOnLoInterface_Toggled(bool)));
-	connect(ui->lineEdit_ApiPort, SIGNAL(editingFinished()), this, SLOT(onSetApiPort_Clicked()));
-	//connect(ui->checkBox_IsApiAuthEnabled, SIGNAL(toggled(bool)), this, SLOT(onIsApiAuthEnabled_Toggled(bool)));
-	connect(ui->pushButton_GenerateNewApiKey, SIGNAL(clicked()), this, SLOT(onGenerateNewApiKey_Clicked()));
-	connect(ui->lineEdit_ApiKey, SIGNAL(editingFinished()), this, SLOT(onApiKey_EditingFinished()));
+	connect(ui->groupBox_Api, &QGroupBox::toggled, this, &SettingsWindow::onEnableApi_Toggled);
+	connect(ui->checkBox_listenOnlyOnLoInterface, &QCheckBox::toggled, this, &SettingsWindow::onListenOnlyOnLoInterface_Toggled);
+	connect(ui->lineEdit_ApiPort, &QLineEdit::editingFinished, this, &SettingsWindow::onSetApiPort_Clicked);
+	//connect(ui->checkBox_IsApiAuthEnabled, &QCheckBox::toggled, this, &SettingsWindow::onIsApiAuthEnabled_Toggled);
+	connect(ui->pushButton_GenerateNewApiKey, &QPushButton::clicked, this, &SettingsWindow::onGenerateNewApiKey_Clicked);
+	connect(ui->lineEdit_ApiKey, &QLineEdit::editingFinished, this, &SettingsWindow::onApiKey_EditingFinished);
 
-	connect(ui->spinBox_LoggingLevel, SIGNAL(valueChanged(int)), this, SLOT(onLoggingLevel_valueChanged(int)));
-	connect(ui->toolButton_OpenLogs, SIGNAL(clicked()), this, SLOT(onOpenLogs_clicked()));
-	connect(ui->checkBox_PingDeviceEverySecond, SIGNAL(toggled(bool)), this, SLOT(onPingDeviceEverySecond_Toggled(bool)));
+	connect(ui->spinBox_LoggingLevel, qOverload<int>(&QSpinBox::valueChanged), this, &SettingsWindow::onLoggingLevel_valueChanged);
+	connect(ui->toolButton_OpenLogs, &QToolButton::clicked, this, &SettingsWindow::onOpenLogs_clicked);
+	connect(ui->checkBox_PingDeviceEverySecond, &QCheckBox::toggled, this, &SettingsWindow::onPingDeviceEverySecond_Toggled);
 
 	//Plugins
 	//	connected during setupUi by name:
 	//	connect(ui->list_Plugins,SIGNAL(currentRowChanged(int)),this,SLOT(on_list_Plugins_itemClicked(QListWidgetItem *)));
-	connect(ui->pushButton_UpPriority, SIGNAL(clicked()), this, SLOT(MoveUpPlugin()));
-	connect(ui->pushButton_DownPriority, SIGNAL(clicked()), this, SLOT(MoveDownPlugin()));
+	connect(ui->pushButton_UpPriority, &QPushButton::clicked, this, &SettingsWindow::MoveUpPlugin);
+	connect(ui->pushButton_DownPriority, &QPushButton::clicked, this, &SettingsWindow::MoveDownPlugin);
 
 	// About page
-	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
-	connect(ui->checkBox_checkForUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_checkForUpdates_Toggled(bool)));
-	connect(ui->checkBox_installUpdates, SIGNAL(toggled(bool)), this, SLOT(onCheckBox_installUpdates_Toggled(bool)));
-	connect(&m_baudrateWarningClearTimer, SIGNAL(timeout()), this, SLOT(clearBaudrateWarning()));
+	connect(&m_smoothScrollTimer, &QTimer::timeout, this, &SettingsWindow::scrollThanks);
+	connect(ui->checkBox_checkForUpdates, &QCheckBox::toggled, this, &SettingsWindow::onCheckBox_checkForUpdates_Toggled);
+	connect(ui->checkBox_installUpdates, &QCheckBox::toggled, this, &SettingsWindow::onCheckBox_installUpdates_Toggled);
+	connect(&m_baudrateWarningClearTimer, &QTimer::timeout, this, &SettingsWindow::clearBaudrateWarning);
 }
 
 // ----------------------------------------------------------------------------
@@ -374,7 +380,7 @@ void SettingsWindow::changeEvent(QEvent *e)
 
 		setWindowTitle(tr("Prismatik: %1").arg(ui->comboBox_Profiles->lineEdit()->text()));
 
-		ui->listWidget->addItem("dirty hack");
+		ui->listWidget->addItem(QStringLiteral("dirty hack"));
 		item = ui->listWidget->takeItem(ui->listWidget->count()-1);
 		delete item;
 		ui->listWidget->setCurrentRow(currentPage);
@@ -424,7 +430,7 @@ void SettingsWindow::updateStatusBar() {
 
 	this->labelProfile->setText(tr("Profile: %1").arg(Settings::getCurrentProfileName()));
 	this->labelDevice->setText(tr("Device: %1").arg(Settings::getConnectedDeviceName()));
-	this->labelFPS->setText(tr("FPS: %1").arg(""));
+	this->labelFPS->setText(tr("FPS: %1").arg(QLatin1String("")));
 }
 
 void SettingsWindow::updateDeviceTabWidgetsVisibility()
@@ -513,33 +519,35 @@ int SettingsWindow::getLigtpackFirmwareVersionMajor()
 
 void SettingsWindow::onPostInit() {
 	updateUiFromSettings();
-	this->requestFirmwareVersion();
-	this->requestMoodLampLamps();
+	emit requestFirmwareVersion();
+	emit requestMoodLampLamps();
 #ifdef SOUNDVIZ_SUPPORT
-	this->requestSoundVizDevices();
-	this->requestSoundVizVisualizers();
+	emit requestSoundVizDevices();
+	emit requestSoundVizVisualizers();
 #endif
 
 	if (m_trayIcon) {
 		bool updateJustFailed = false;
 		if (!Settings::getAutoUpdatingVersion().isEmpty()) {
-			if (Settings::getAutoUpdatingVersion() != VERSION_STR) {
-				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(VERSION_STR));
+			if (Settings::getAutoUpdatingVersion() != QStringLiteral(VERSION_STR)) {
+				m_trayIcon->showMessage(tr("Prismatik was updated"), tr("Successfully updated to version %1.").arg(QStringLiteral(VERSION_STR)));
 			} else {
 				QMessageBox::critical(
 					this,
 					tr("Prismatik automatic update failed"),
 					tr("There was a problem when trying to automatically update Prismatik to the latest version.\n")
-					+ tr("You are still on version %1.\n").arg(VERSION_STR)
+					+ tr("You are still on version %1.\n").arg(QStringLiteral(VERSION_STR))
 					+ tr("Installing updates automatically was disabled."));
 				updateJustFailed = true;
 				ui->checkBox_installUpdates->setChecked(false);
 			}
-			Settings::setAutoUpdatingVersion("");
+			Settings::setAutoUpdatingVersion(QLatin1String(""));
 		}
 
-		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed)
-			QTimer::singleShot(10000, m_trayIcon, SLOT(checkUpdate()));
+		if (Settings::isCheckForUpdatesEnabled() && !updateJustFailed) {
+			using namespace std::chrono_literals;
+			QTimer::singleShot(10s, m_trayIcon, &SysTrayIcon::checkUpdate);
+		}
 	}
 }
 
@@ -579,11 +587,11 @@ void SettingsWindow::onSetApiPort_Clicked()
 		emit updateApiPort(port);
 
 		ui->lineEdit_ApiPort->setStyleSheet(this->styleSheet());
-		ui->lineEdit_ApiPort->setToolTip("");
+		ui->lineEdit_ApiPort->setToolTip(QLatin1String(""));
 	} else {
-		QString errorMessage = "Convert to 'int' fail";
+		QString errorMessage = QStringLiteral("Convert to 'int' fail");
 
-		ui->lineEdit_ApiPort->setStyleSheet("background-color:red;");
+		ui->lineEdit_ApiPort->setStyleSheet(QStringLiteral("background-color:red;"));
 		ui->lineEdit_ApiPort->setToolTip(errorMessage);
 
 		qWarning() << Q_FUNC_INFO << errorMessage << "port:" << ui->lineEdit_ApiPort->text();
@@ -630,7 +638,7 @@ void SettingsWindow::onOpenLogs_clicked()
 	QDesktopServices::openUrl(QUrl(LogWriter::getLogsDir().absolutePath()));
 }
 
-void SettingsWindow::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status,	QList<QString> modules)
+void SettingsWindow::setDeviceLockViaAPI(const DeviceLocked::DeviceLockStatus status,	const QList<QString>& modules)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << status;
 	m_deviceLockStatus = status;
@@ -735,7 +743,7 @@ void SettingsWindow::startBacklight()
 
 
 	if (m_deviceLockKey.count()==0)
-		m_deviceLockModule = "";
+		m_deviceLockModule = QLatin1String("");
 
 	updateTrayAndActionStates();
 }
@@ -774,45 +782,45 @@ void SettingsWindow::updateTrayAndActionStates()
 	switch (m_backlightStatus)
 	{
 	case Backlight::StatusOn:
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["off16"]));
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("off16")]));
 		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights OFF"));
 
 		if (m_deviceLockStatus == DeviceLocked::Api)
 		{
-			m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
+			m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("lock16")]);
 			if (m_trayIcon)
 				m_trayIcon->setStatus(SysTrayIcon::StatusLockedByApi);
 		} else
 			if (m_deviceLockStatus == DeviceLocked::Plugin)
 			{
-				m_labelStatusIcon->setPixmap(*m_pixmapCache["lock16"]);
+				m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("lock16")]);
 				if (m_trayIcon)
 					m_trayIcon->setStatus(SysTrayIcon::StatusLockedByPlugin, &m_deviceLockModule);
 			} else
 				if (m_deviceLockStatus == DeviceLocked::ApiPersist)
 				{
-					m_labelStatusIcon->setPixmap(*m_pixmapCache["persist16"]);
+					m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("persist16")]);
 					if (m_trayIcon)
 						m_trayIcon->setStatus(SysTrayIcon::StatusApiPersist);
 				} else {
-						m_labelStatusIcon->setPixmap(*m_pixmapCache["on16"]);
+						m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("on16")]);
 						if (m_trayIcon)
 							m_trayIcon->setStatus(SysTrayIcon::StatusOn);
 				}
 		break;
 
 	case Backlight::StatusOff:
-		m_labelStatusIcon->setPixmap(*m_pixmapCache["off16"]);
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["on16"]));
-		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights ON"));
+		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("off16")]);
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("on16")]));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	%1").arg(tr("Turn lights ON")));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusOff);
 		break;
 
 	case Backlight::StatusDeviceError:
-		m_labelStatusIcon->setPixmap(*m_pixmapCache["error16"]);
-		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache["off16"]));
-		ui->pushButton_EnableDisableDevice->setText("	" + tr("Turn lights OFF"));
+		m_labelStatusIcon->setPixmap(*m_pixmapCache[QStringLiteral("error16")]);
+		ui->pushButton_EnableDisableDevice->setIcon(QIcon(*m_pixmapCache[QStringLiteral("off16")]));
+		ui->pushButton_EnableDisableDevice->setText(QStringLiteral("	%1").arg(tr("Turn lights OFF")));
 		if (m_trayIcon)
 			m_trayIcon->setStatus(SysTrayIcon::StatusError);
 		break;
@@ -926,9 +934,9 @@ void SettingsWindow::requestBacklightStatus()
 	emit resultBacklightStatus(m_backlightStatus);
 }
 
-void SettingsWindow::onApiServer_ErrorOnStartListening(QString errorMessage)
+void SettingsWindow::onApiServer_ErrorOnStartListening(const QString& errorMessage)
 {
-	ui->lineEdit_ApiPort->setStyleSheet("background-color:red;");
+	ui->lineEdit_ApiPort->setStyleSheet(QStringLiteral("background-color:red;"));
 	ui->lineEdit_ApiPort->setToolTip(errorMessage);
 }
 
@@ -947,18 +955,18 @@ void SettingsWindow::processMessage(const QString &message)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << message;
 
-	if (message == "on")
+	if (message == QStringLiteral("on"))
 		setBacklightStatus(Backlight::StatusOn);
-	else if (message == "off")
+	else if (message == QStringLiteral("off"))
 		setBacklightStatus(Backlight::StatusOff);
-	else if (message.startsWith("set-profile ")) {
+	else if (message.startsWith(QStringLiteral("set-profile "))) {
 		QString profile = message.mid(12);
 		profileSwitch(profile);
-	} else if (message == "quitForWizard") {
+	} else if (message == QStringLiteral("quitForWizard")) {
 		qWarning() << "Wizard was started, quitting!";
 		LightpackApplication::quit();
 	} else if (m_trayIcon != NULL) { // "alreadyRunning"
-		qWarning(qPrintable(message));
+		qWarning() << message;
 		m_trayIcon->showMessage(SysTrayIcon::MessageAnotherInstance);
 		this->show();
 		this->activateWindow();
@@ -1031,8 +1039,9 @@ void SettingsWindow::showAbout()
 	ui->tabWidget->setCurrentWidget(ui->tabAbout);
 	this->show();
 
-	m_smoothScrollTimer.setInterval(100);
-	connect(&m_smoothScrollTimer, SIGNAL(timeout()), this, SLOT(scrollThanks()));
+	using namespace std::chrono_literals;
+	m_smoothScrollTimer.setInterval(100ms);
+	connect(&m_smoothScrollTimer, &QTimer::timeout, this, &SettingsWindow::scrollThanks);
 	m_smoothScrollTimer.start();
 }
 
@@ -1121,12 +1130,9 @@ void SettingsWindow::ledDeviceFirmwareVersionResult(const QString & fwVersion)
 
 	if (Settings::getConnectedDevice() == SupportedDevices::DeviceTypeLightpack)
 	{
-		if (m_deviceFirmwareVersion == "5.0" || m_deviceFirmwareVersion == "4.3")
+		if (m_deviceFirmwareVersion == QStringLiteral("5.0") || m_deviceFirmwareVersion == QStringLiteral("4.3"))
 		{
-			aboutDialogFirmwareString += QString(" ") +
-					"(<a href=\"" + LightpackDownloadsPageUrl + "\">" +
-					tr("update firmware") +
-					"</a>)";
+			aboutDialogFirmwareString += QStringLiteral(" (<a href=\"%1\">%2</a>").arg(LightpackDownloadsPageUrl, tr("update firmware"));
 
 			if (Settings::isUpdateFirmwareMessageShown() == false)
 			{
@@ -1161,7 +1167,7 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 	QString fpsText = QString::number(hz, 'f', 0);
 	if (ui->comboBox_LightpackModes->currentIndex() == GrabModeIndex) {
 		const double maxHz = 1000.0 / ui->spinBox_GrabSlowdown->value(); // cap with display refresh rate?
-		fpsText += " / " + QString::number(maxHz, 'f', 0);
+		fpsText += QStringLiteral(" / %1").arg(QString::number(maxHz, 'f', 0));
 	}
 	ui->label_GrabFrequency_value->setText(fpsText);
 
@@ -1192,7 +1198,8 @@ void SettingsWindow::refreshAmbilightEvaluated(double updateResultMs)
 			.arg(PrismatikMath::theoreticalMaxFrameRate(ledCount, baudRate), 0, 'f', 0)
 			.arg(std::round(PrismatikMath::theoreticalMinBaudRate(ledCount, m_maxFPS) / 100.0) * 100.0, 0, 'f', 0);
 			this->labelFPS->setToolTip(toolTipMsg);
-			m_baudrateWarningClearTimer.start(15000);
+			using namespace std::chrono_literals;
+			m_baudrateWarningClearTimer.start(15s);
 		} else
 			palette.setColor(QPalette::WindowText, defaultPalette.color(QPalette::WindowText));
 
@@ -1211,7 +1218,7 @@ void SettingsWindow::clearBaudrateWarning()
 
 	ui->label_GrabFrequency_value->setPalette(palette);
 	this->labelFPS->setPalette(palette);
-	this->labelFPS->setToolTip("");
+	this->labelFPS->setToolTip(QLatin1String(""));
 
 	this->labelFPS->setText(this->labelFPS->text().remove(BaudrateWarningSign));
 }
@@ -1451,7 +1458,7 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
 		DEBUG_LOW_LEVEL << "LightpacckMode unsuppotred value =" << mode;
 		break;
 	}
-	backlightStatusChanged(m_backlightStatus);
+	emit backlightStatusChanged(m_backlightStatus);
 }
 
 void SettingsWindow::onMoodLampColor_changed(QColor color)
@@ -1575,10 +1582,10 @@ void SettingsWindow::openFile(const QString &filePath)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	QString filePrefix = "file://";
+	QString filePrefix = QStringLiteral("file://");
 
 #ifdef Q_OS_WIN
-	filePrefix = "file:///";
+	filePrefix = QStringLiteral("file:///");
 #endif
 
 	QDesktopServices::openUrl(QUrl(filePrefix + filePath, QUrl::TolerantMode));
@@ -1612,7 +1619,7 @@ void SettingsWindow::profileRename()
 		return;
 	}
 
-	if (configName == "")
+	if (configName.isEmpty())
 	{
 		configName = Settings::getCurrentProfileName();
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Profile name is empty, return back to" << configName;
@@ -1662,9 +1669,9 @@ void SettingsWindow::profileTraySwitch(const QString &profileName)
 	return;
 }
 
-void SettingsWindow::profileSwitchCombobox(QString profile)
+void SettingsWindow::profileSwitchCombobox(const QString& profile)
 {
-	int index = ui->comboBox_Profiles->findText(profile);
+	const int index = ui->comboBox_Profiles->findText(profile);
 	ui->comboBox_Profiles->setCurrentIndex(index);
 }
 
@@ -1679,7 +1686,7 @@ void SettingsWindow::profileNew()
 		while(ui->comboBox_Profiles->findText(profileName +" "+ QString::number(i)) != -1){
 			i++;
 		}
-		profileName += + " " + QString::number(i);
+		profileName += QStringLiteral(" %1").arg(QString::number(i));
 	}
 
 	ui->comboBox_Profiles->insertItem(0, profileName);
@@ -1724,7 +1731,7 @@ void SettingsWindow::profilesLoadAll()
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "found profiles:" << profiles;
 
 
-	disconnect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	disconnect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 
 	for (int i = 0; i < profiles.count(); i++)
 	{
@@ -1732,7 +1739,7 @@ void SettingsWindow::profilesLoadAll()
 			ui->comboBox_Profiles->addItem(profiles.at(i));
 	}
 
-	connect(ui->comboBox_Profiles, SIGNAL(currentIndexChanged(QString)), this, SLOT(profileSwitch(QString)));
+	connect(ui->comboBox_Profiles, &QComboBox::currentTextChanged, this, &SettingsWindow::profileSwitch);
 }
 
 void SettingsWindow::settingsProfileChanged_UpdateUI(const QString &profileName)
@@ -1755,11 +1762,11 @@ void SettingsWindow::settingsProfileChanged_UpdateUI(const QString &profileName)
 
 void SettingsWindow::initPixmapCache()
 {
-	m_pixmapCache.insert("lock16", new QPixmap(QPixmap(":/icons/lock.png").scaledToWidth(16, Qt::SmoothTransformation)));
-	m_pixmapCache.insert("on16", new QPixmap(QPixmap(":/icons/on.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("off16", new QPixmap(QPixmap(":/icons/off.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("error16", new QPixmap(QPixmap(":/icons/error.png").scaledToWidth(16, Qt::SmoothTransformation)) );
-	m_pixmapCache.insert("persist16", new QPixmap(QPixmap(":/icons/persist.png").scaledToWidth(16, Qt::SmoothTransformation)));
+	m_pixmapCache.insert(QStringLiteral("lock16"), new QPixmap(QPixmap(QStringLiteral(":/icons/lock.png")).scaledToWidth(16, Qt::SmoothTransformation)));
+	m_pixmapCache.insert(QStringLiteral("on16"), new QPixmap(QPixmap(QStringLiteral(":/icons/on.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("off16"), new QPixmap(QPixmap(QStringLiteral(":/icons/off.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("error16"), new QPixmap(QPixmap(QStringLiteral(":/icons/error.png")).scaledToWidth(16, Qt::SmoothTransformation)) );
+	m_pixmapCache.insert(QStringLiteral("persist16"), new QPixmap(QPixmap(QStringLiteral(":/icons/persist.png")).scaledToWidth(16, Qt::SmoothTransformation)));
 }
 
 //void SettingsWindow::handleConnectedDeviceChange(const SupportedDevices::DeviceType deviceType) {
@@ -1777,13 +1784,13 @@ void SettingsWindow::initLanguages()
 
 	ui->comboBox_Language->clear();
 	ui->comboBox_Language->addItem(tr("System default"));
-	ui->comboBox_Language->addItem("English");
-	ui->comboBox_Language->addItem("Russian");
-	ui->comboBox_Language->addItem("Ukrainian");
+	ui->comboBox_Language->addItem(QStringLiteral("English"));
+	ui->comboBox_Language->addItem(QStringLiteral("Russian"));
+	ui->comboBox_Language->addItem(QStringLiteral("Ukrainian"));
 
 	int langIndex = 0; // "System default"
 	QString langSaved = Settings::getLanguage();
-	if(langSaved != "<System>"){
+	if(langSaved != QStringLiteral("<System>")){
 		langIndex = ui->comboBox_Language->findText(langSaved);
 	}
 	ui->comboBox_Language->setCurrentIndex(langIndex);
@@ -1795,7 +1802,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << language;
 
-	Settings::setLanguage(language);
+	QString settingsLanguage = language;
 
 	QString locale = QLocale::system().name();
 
@@ -1808,21 +1815,29 @@ void SettingsWindow::loadTranslation(const QString & language)
 	// and only when all this done - append new line
 	// locale - name of translation binary file form resources: %locale%.qm
 	if(ui->comboBox_Language->currentIndex() == 0 /* System */){
+		settingsLanguage = SettingsScope::Main::LanguageDefault;
 		DEBUG_LOW_LEVEL << "System locale" << locale;
-		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
+
+		if (locale.startsWith(QStringLiteral("en_"))) locale = QStringLiteral("en_EN"); // :/translations/en_EN.qm
+		else if (locale.startsWith(QStringLiteral("ru_"))) locale = QStringLiteral("ru_RU"); // :/translations/ru_RU.qm
+		else if (locale.startsWith(QStringLiteral("uk_"))) locale = QStringLiteral("uk_UA"); // :/translations/uk_UA.qm
+
+		DEBUG_LOW_LEVEL << "System translation" << locale;
 	}
-	else if (language == "English") locale = "en_EN"; // :/translations/en_EN.qm
-	else if (language == "Russian") locale = "ru_RU"; // :/translations/ru_RU.qm
-	else if (language == "Ukrainian") locale = "uk_UA"; // :/translations/uk_UA.qm
+	else if (language == QStringLiteral("English")) locale = QStringLiteral("en_EN"); // :/translations/en_EN.qm
+	else if (language == QStringLiteral("Russian")) locale = QStringLiteral("ru_RU"); // :/translations/ru_RU.qm
+	else if (language == QStringLiteral("Ukrainian")) locale = QStringLiteral("uk_UA"); // :/translations/uk_UA.qm
 	// append line for new language/locale here
 	else {
 		qWarning() << "Language" << language << "not found. Set to default" << SettingsScope::Main::LanguageDefault;
 		DEBUG_LOW_LEVEL << "System locale" << locale;
 
-		Settings::setLanguage(SettingsScope::Main::LanguageDefault);
+		settingsLanguage = SettingsScope::Main::LanguageDefault;
 	}
 
-	QString pathToLocale = QString(":/translations/") + locale;
+	Settings::setLanguage(settingsLanguage);
+
+	const QString pathToLocale = QStringLiteral(":/translations/%1").arg(locale);
 
 	if(m_translator != NULL){
 		qApp->removeTranslator(m_translator);
@@ -1830,7 +1845,7 @@ void SettingsWindow::loadTranslation(const QString & language)
 		m_translator = NULL;
 	}
 
-	if(locale == "en_EN" /* default no need to translate */){
+	if(locale == QStringLiteral("en_EN") /* default no need to translate */){
 		DEBUG_LOW_LEVEL << "Translation removed, using default locale" << locale;
 		return;
 	}
@@ -1854,15 +1869,15 @@ void SettingsWindow::createTrayIcon()
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 	m_trayIcon = new SysTrayIcon();
-	connect(m_trayIcon, SIGNAL(quit()), this, SLOT(quit()));
-	connect(m_trayIcon, SIGNAL(showSettings()), this, SLOT(showSettings()));
-	connect(m_trayIcon, SIGNAL(toggleSettings()), this, SLOT(toggleSettings()));
-	connect(m_trayIcon, SIGNAL(backlightOn()), this, SLOT(backlightOn()));
-	connect(m_trayIcon, SIGNAL(backlightOff()), this, SLOT(backlightOff()));
-	connect(m_trayIcon, SIGNAL(profileSwitched(QString)), this, SLOT(profileTraySwitch(QString)));
+	connect(m_trayIcon, &SysTrayIcon::quit, this, &SettingsWindow::quit);
+	connect(m_trayIcon, &SysTrayIcon::showSettings, this, &SettingsWindow::showSettings);
+	connect(m_trayIcon, &SysTrayIcon::toggleSettings, this, &SettingsWindow::toggleSettings);
+	connect(m_trayIcon, &SysTrayIcon::backlightOn, this, &SettingsWindow::backlightOn);
+	connect(m_trayIcon, &SysTrayIcon::backlightOff, this, &SettingsWindow::backlightOff);
+	connect(m_trayIcon, &SysTrayIcon::profileSwitched, this, &SettingsWindow::profileTraySwitch);
 
 	m_trayIcon->init();
-	connect(this, SIGNAL(backlightStatusChanged(Backlight::Status)), this, SLOT(updateTrayAndActionStates()));
+	connect(this, &SettingsWindow::backlightStatusChanged, this, &SettingsWindow::updateTrayAndActionStates);
 }
 
 void SettingsWindow::updateUiFromSettings()
@@ -2105,7 +2120,7 @@ void SettingsWindow::showHelpOf(QObject *object)
 }
 
 #if defined(SOUNDVIZ_SUPPORT) && defined(Q_OS_MACOS)
-void SettingsWindow::on_pushButton_SoundVizDeviceHelp_clicked()
+void SettingsWindow::onSoundVizDeviceHelp_clicked()
 {
 	showHelpOf(ui->pushButton_SoundVizDeviceHelp);
 }
@@ -2171,7 +2186,7 @@ bool SettingsWindow::toPriority(Plugin* s1 ,Plugin* s2 )
 	return s1->getPriority() > s2->getPriority();
 }
 
-void SettingsWindow::updatePlugin(QList<Plugin*> plugins)
+void SettingsWindow::updatePlugin(const QList<Plugin*>& plugins)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
@@ -2223,11 +2238,11 @@ void SettingsWindow::pluginSwitch(int index)
 
 	if (index == -1)
 	{
-		ui->label_PluginName->setText("");
-		ui->label_PluginAuthor->setText("");
-		ui->label_PluginVersion->setText("");
-		ui->tb_PluginDescription->setText("");
-		ui->label_PluginIcon->setPixmap(QIcon(":/plugin/Plugin.png").pixmap(50,50));
+		ui->label_PluginName->setText(QLatin1String(""));
+		ui->label_PluginAuthor->setText(QLatin1String(""));
+		ui->label_PluginVersion->setText(QLatin1String(""));
+		ui->tb_PluginDescription->setText(QLatin1String(""));
+		ui->label_PluginIcon->setPixmap(QIcon(QStringLiteral(":/plugin/Plugin.png")).pixmap(50,50));
 		return;
 	}
 
@@ -2286,15 +2301,15 @@ void SettingsWindow::savePriorityPlugin()
 QString SettingsWindow::getPluginName(const Plugin *plugin) const
 {
 	if (plugin->state() == QProcess::Running) {
-		return plugin->Name().append(" (running)");
+		return plugin->Name().append(QStringLiteral(" (running)"));
 	} else {
-		return plugin->Name().append(" (not running)");
+		return plugin->Name().append(QStringLiteral(" (not running)"));
 	}
 }
 
-void SettingsWindow::on_pbRunConfigurationWizard_clicked()
+void SettingsWindow::onRunConfigurationWizard_clicked()
 {
-	const QStringList args("--wizard");
+	const QStringList args(QStringLiteral("--wizard"));
 	QString cmdLine(QApplication::applicationFilePath());
 #ifdef Q_OS_WIN
 	cmdLine.prepend('"');

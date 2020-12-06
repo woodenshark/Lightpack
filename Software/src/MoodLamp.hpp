@@ -28,35 +28,36 @@
 #include <QObject>
 #include <QColor>
 
+using namespace std::chrono_literals;
 class MoodLampBase;
 
 typedef MoodLampBase* (*LampFactory)();
 
 struct MoodLampLampInfo {
-	MoodLampLampInfo() { this->name = ""; this->id = -1; this->factory = nullptr; }
-	MoodLampLampInfo(QString name, LampFactory factory, int id) { this->name = name; this->id = id; this->factory = factory; }
+	MoodLampLampInfo() { this->name = QLatin1String(""); this->id = -1; this->factory = nullptr; }
+	MoodLampLampInfo(const QString& name, LampFactory factory, int id) { this->name = name; this->id = id; this->factory = factory; }
 	QString name;
 	LampFactory factory;
 	int id;
 };
 Q_DECLARE_METATYPE(MoodLampLampInfo);
-
 class MoodLampBase
 {
 public:
 	MoodLampBase() { init(); };
 	virtual ~MoodLampBase() = default;
 
-	static const char* const name() { return "NO_NAME"; };
+	static const char* name() { return "NO_NAME"; };
 	static MoodLampBase* create() { Q_ASSERT_X(false, "MoodLampBase::create()", "not implemented"); return nullptr; };
 	static MoodLampBase* createWithID(const int id);
 	static void populateNameList(QList<MoodLampLampInfo>& list, int& recommended);
 
 	virtual void init() {};
-	virtual int interval() const { return DefaultInterval; };
+	virtual std::chrono::milliseconds interval() const { return DefaultInterval; };
 	virtual bool shine(const QColor& newColor, QList<QRgb>& colors) = 0;
 protected:
 	size_t m_frames{ 0 };
 private:
-	const int DefaultInterval = 33;
+	Q_DISABLE_COPY(MoodLampBase)
+	const std::chrono::milliseconds DefaultInterval = 33ms;
 };

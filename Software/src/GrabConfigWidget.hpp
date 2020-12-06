@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QWidget>
 #include <QTimer>
 
 namespace Ui {

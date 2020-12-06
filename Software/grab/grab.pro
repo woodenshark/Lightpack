@@ -9,7 +9,7 @@ QT       += widgets
 DESTDIR = ../lib
 TARGET = grab
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib c++17
 
 include(../build-config.prf)
 
@@ -27,7 +27,6 @@ QMAKE_CFLAGS = $$(CFLAGS)
 QMAKE_CXXFLAGS = $$(CXXFLAGS)
 QMAKE_LFLAGS = $$(LDFLAGS)
 
-QMAKE_CXXFLAGS += -std=c++17
 CONFIG(clang) {
     QMAKE_CXXFLAGS += -stdlib=libc++
     LIBS += -stdlib=libc++
@@ -44,7 +43,7 @@ unix:!macx {
 
 # Mac platform
 macx {
-    contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) || contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
+    contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) | contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
         GRABBERS_HEADERS += include/MacOSGrabberBase.hpp
         GRABBERS_SOURCES += MacOSGrabberBase.mm
     }

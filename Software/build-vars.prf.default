@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------------
 # General
 #------------------------------------------------------------------------------
-win32: {
+win32 {
 	# Set this to -Win32 for 32-bit
 	OPENSSL_DIR = "C:\\OpenSSL-Win64\\bin"
 	# Set this to run without openssl. The updatecheck won't work.
@@ -47,8 +47,8 @@ macx {
 	# DEFINES += SAVE_FRAME_TO_FILE
 
 	# CONFIG += debug
-	# QMAKE_CC += clang
-	# QMAKE_CXX += clang++
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
 	# QMAKE_CFLAGS_DEBUG += -ggdb
 	# QMAKE_CFLAGS_RELEASE += -march=native
 	# QMAKE_CXXFLAGS_DEBUG += -ggdb

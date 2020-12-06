@@ -24,7 +24,6 @@
  *
  */
 
-#include <QDesktopWidget>
 #include <QMessageBox>
 
 #include "ConfigureUdpDevicePage.hpp"
@@ -47,8 +46,8 @@ ConfigureUdpDevicePage::ConfigureUdpDevicePage(bool isInitFromSettings, Transien
 
 void ConfigureUdpDevicePage::initializePage()
 {
-	QString currentAddress;
-	QString currentPort;
+	QString currentAddress = NULL;
+	QString currentPort = NULL;
 	int currentTimeout = 0;
 
 	if (field(QStringLiteral("isDrgb")).toBool()) {

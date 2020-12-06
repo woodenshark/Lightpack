@@ -40,6 +40,9 @@ class AbstractLedDevice : public QObject
 public:
 	AbstractLedDevice(QObject * parent) : QObject(parent) {}
 	virtual ~AbstractLedDevice(){}
+	virtual QString name() const = 0;
+	virtual int defaultLedsCount() = 0;
+	virtual int maxLedsCount() = 0;
 
 signals:
 	void openDeviceSuccess(bool isSuccess);
@@ -56,7 +59,6 @@ signals:
 	void colorsUpdated(QList<QRgb> colors);
 
 public slots:
-	virtual const QString name() const = 0;
 	virtual void open() = 0;
 	virtual void close() = 0;
 	virtual void setColors(const QList<QRgb> & colors) = 0;
@@ -75,7 +77,7 @@ public slots:
 	virtual void setDitheringEnabled(bool value, bool updateColors = true);
 	virtual void setLedMilliAmps(const int value, const bool updateColors = true);
 	virtual void setPowerSupplyAmps(const double value, const bool updateColors = true);
-	virtual void setColorSequence(QString value) = 0;
+	virtual void setColorSequence(const QString& value) = 0;
 	virtual void setLuminosityThreshold(int value, bool updateColors = true);
 	virtual void setMinimumLuminosityThresholdEnabled(bool value, bool updateColors = true);
 	virtual void updateWBAdjustments(); // Reads from settings
@@ -83,8 +85,6 @@ public slots:
 	virtual void requestFirmwareVersion() = 0;
 	virtual void updateDeviceSettings();
 
-	virtual int maxLedsCount() = 0;
-	virtual int defaultLedsCount() = 0;
 
 	/*!
 		\obsolete only form compatibility with Lightpack ver.<=5.5 hardware
@@ -93,7 +93,7 @@ public slots:
 	virtual void setColorDepth(int value) = 0;
 
 
-	virtual void setUsbPowerLedDisabled(bool isDisabled) { Q_UNUSED(isDisabled) emit commandCompleted(true); };
+	virtual void setUsbPowerLedDisabled(bool isDisabled);
 
 protected:
 	virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors);

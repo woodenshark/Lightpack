@@ -27,7 +27,9 @@
 #include "ui_GrabConfigWidget.h"
 #include <QPainter>
 #include <QBitmap>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
 #include <QDesktopWidget>
+#endif
 #include <QScreen>
 #include <QPainterPath>
 #include "debug.h"
@@ -199,7 +201,7 @@ void GrabConfigWidget::paintArrow(QPainter *p, ArrowSide side)
 								pathArrow.elementAt(2).x,
 								pathArrow.elementAt(2).y - 1);
 		break;
-	case RightSide:		
+	case RightSide:
 		mainRect.setRight(width() - Margin - 1);
 
 		pathArrow.moveTo(width() - Margin,	height() / 2 - Margin);

@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
   build-ubuntu:
     name: Ubuntu Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install qt5-default libqt5serialport5-dev build-essential libgtk2.0-dev libusb-1.0-0-dev libudev-dev libnotify-dev qttools5-dev-tools libappindicator-dev openssl libpulse-dev libfftw3-dev hashdeep
@@ -16,7 +16,7 @@ jobs:
       - name: Check Package
         run: |
           set -xe
-          PKG_PATH=$(ls Software/dist_linux/dpkg/prismatik*.deb)
+          PKG_PATH=$(ls Software/dist_linux/*.deb)
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package

@@ -1,9 +1,53 @@
-name: Windows
+name: CI
 on: [push, pull_request]
 defaults:
   run:
     working-directory: ./Software
 jobs:
+  build-ubuntu:
+    name: Ubuntu Build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install qt5-default libqt5serialport5-dev build-essential libgtk2.0-dev libusb-1.0-0-dev libudev-dev libnotify-dev qttools5-dev-tools libappindicator-dev openssl libpulse-dev libfftw3-dev hashdeep
+      - run: qmake -r && make
+      - run: scripts/linux/prepare_installer.sh
+      - run: ./build-deb.sh amd64
+        working-directory: ./Software/dist_linux
+      - name: Check Package
+        run: |
+          set -xe
+          PKG_PATH=$(ls Software/dist_linux/*.deb)
+          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}
+      - name: 
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: Software/dist_linux/*.deb
+          
+  build-fw:
+    name: Firmware Build
+    runs-on: ubuntu-latest
+    steps:   
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: sudo apt-get install gcc-avr avr-libc build-essential
+      - run: ./build_batch.sh
+        working-directory: ./Firmware
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: Firmware/hex/*
+          
+          name: Windows
+          
   build-win:
     name: Windows Build
     runs-on: windows-2019
@@ -83,6 +127,43 @@ jobs:
           set -xe
           PKG_PATH=$(ls Software/dist_windows/Output/Prismatik*.exe)
           PKG_NAME=$(basename "$PKG_PATH")
+          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}
+          
+  build-macos:
+    name: macOS Build
+    runs-on: macOS-11.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Select Latest Xcode
+        run: |
+          set -xe
+          sw_vers
+          ls -d /Applications/Xcode*.app
+          sudo xcode-select --switch `ls -d /Applications/Xcode*.app | sort -Vr | head -n1`
+          xcode-select -p
+          xcodebuild -version
+          xcodebuild -showsdks
+      - run: brew update && brew install qt5
+      - name: Build
+        working-directory: ./Software
+        run: |
+          export QTDIR=/usr/local/opt/qt
+          export PATH=$PATH:$QTDIR/bin
+          qmake -r
+          make
+          macdeployqt bin/Prismatik.app -dmg          
+      - name: Check Package
+        run: |
+          set -xe
+          VERSION=`cat Software/VERSION`
+          PKG_PATH="Software/bin/Prismatik.dmg"
+          PKG_NAME="Prismatik_${VERSION}.dmg"
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
       - name: Upload Package

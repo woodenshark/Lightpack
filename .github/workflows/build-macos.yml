@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
   build-macos:
     name: macOS Build
-    runs-on: macos-latest
+    runs-on: macOS-11.0
     steps:
       - uses: actions/checkout@v2
       - name: Select Latest Xcode

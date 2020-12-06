@@ -47,11 +47,10 @@ cd /Lightpack/Software/dist_linux
 EOF
 chmod +x "$indockerbuild"
 
-docker run -it \
+docker run \
 	-v "$(pwd)/../..:/Lightpack" \
 	-v "$indockerbuild:/build.sh" \
 	-v "/etc/localtime:/etc/localtime:ro" \
 	--user="$(id -u):$(id -g)" \
 	--rm \
-    --entrypoint /bin/bash \
 	--name "prismatik_builder_$pkgmgr" "prismatik/$os:$version"

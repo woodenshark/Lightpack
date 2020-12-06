@@ -162,7 +162,9 @@ bool ZonePlacementPage::checkZoneIssues()
 	QStringList gapStrs;
 	int prevId = -1;
 	QList<int> overlapIds;
-	for (const int id : ids.keys()) {
+	QMultiMap<int, std::nullptr_t>::const_iterator idIt = ids.constBegin();
+	while (idIt != ids.constEnd()) {
+		const int id = idIt.key();
 		const int delta = id - prevId;
 		if (delta == 2)
 			gapStrs << QString::number(id);
@@ -171,6 +173,7 @@ bool ZonePlacementPage::checkZoneIssues()
 		else if (delta == 0)
 			overlapIds << id;
 		prevId = id;
+		++idIt;
 	}
 
 	// condense overlapping IDs into "X-Y" ranges when possible and build the string list

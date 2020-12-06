@@ -157,13 +157,16 @@ bool GlobalColorCoefPage::validatePage()
 	Settings::setConnectedDevice(devType);
 	Settings::setNumberOfLeds(devType, _transSettings->zonePositions.size());
 
-	for (const int id : _transSettings->zonePositions.keys()) {
-		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
+	QMap<int, QPoint>::const_iterator it = _transSettings->zonePositions.constBegin();
+	while (it != _transSettings->zonePositions.constEnd()) {
+		const int id = it.key();
+		Settings::setLedPosition(id, it.value());
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
 		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
 		Settings::setLedCoefRed(id, _grabAreas[id]->getCoefRed());
 		Settings::setLedCoefGreen(id, _grabAreas[id]->getCoefGreen());
 		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
+		++it;
 	}
 
 	cleanupPage();
@@ -202,9 +205,12 @@ void GlobalColorCoefPage::onCoefValueChanged(int value)
 	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
 
 	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
-	for (GrabWidget* const widget : _grabAreas.values())
-		if (settings.screen->geometry().contains(widget->geometry().center()))
-			widget->setCoefs(wba);
+	QMap<int, GrabWidget*>::iterator it = _grabAreas.begin();
+	while (it != _grabAreas.end()) {
+		if (settings.screen->geometry().contains(it.value()->geometry().center()))
+			it.value()->setCoefs(wba);
+		++it;
+	}
 
 	settings.red = _ui->sbRed->value();
 	settings.green = _ui->sbGreen->value();

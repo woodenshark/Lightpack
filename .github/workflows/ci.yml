@@ -116,7 +116,8 @@ jobs:
           scripts/win32/prepare_installer.sh
       - name: Build Installer
         shell: cmd
-        run: "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
+        run: |
+          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
         working-directory: ./Software/dist_windows
       - name: Check Package
         run: |

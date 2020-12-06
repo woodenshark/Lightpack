@@ -107,3 +107,9 @@ void WizardPageUsingDevice::turnLightsOff()
 	}
 	device()->setColors(lights);
 }
+
+void WizardPageUsingDevice::turnLightsOff(int value)
+{
+	Q_UNUSED(value)
+	turnLightsOff();
+}

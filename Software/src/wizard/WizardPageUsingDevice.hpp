@@ -45,6 +45,7 @@ protected slots:
 	void turnLightOn(int id);
 	void turnLightsOn(QRgb color);
 	void turnLightsOff();
+	void turnLightsOff(int);
 
 
 protected:

@@ -87,13 +87,13 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	if (features & (AllowCoefConfig | AllowEnableConfig)) {
 		m_configWidget = new GrabConfigWidget();
 		if (features & AllowEnableConfig) {
-			connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
+			connect(m_configWidget, &GrabConfigWidget::isAreaEnabled_Toggled, this, &GrabWidget::onIsAreaEnabled_Toggled);
 		}
 		if (features & AllowCoefConfig) {
 			m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
-			connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
-			connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
-			connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
+			connect(m_configWidget, &GrabConfigWidget::coefRed_ValueChanged, this, &GrabWidget::onRedCoef_ValueChanged);
+			connect(m_configWidget, &GrabConfigWidget::coefGreen_ValueChanged, this, &GrabWidget::onGreenCoef_ValueChanged);
+			connect(m_configWidget, &GrabConfigWidget::coefBlue_ValueChanged, this, &GrabWidget::onBlueCoef_ValueChanged);
 		}
 	} else {
 		ui->button_OpenConfig->setVisible(false);
@@ -103,7 +103,7 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 		settingsProfileChanged();
 
 	if (features & (SyncSettings | AllowCoefConfig | AllowEnableConfig))
-		connect(ui->button_OpenConfig, SIGNAL(clicked()), this, SLOT(onOpenConfigButton_Clicked()));
+		connect(ui->button_OpenConfig, &QPushButton::clicked, this, &GrabWidget::onOpenConfigButton_Clicked);
 }
 
 GrabWidget::~GrabWidget()

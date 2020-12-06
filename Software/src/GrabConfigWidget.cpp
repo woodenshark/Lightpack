@@ -50,10 +50,10 @@ GrabConfigWidget::GrabConfigWidget(QWidget *parent) :
 
 	adjustSize();
 
-	connect(ui->checkBox_IsAreaEnabled, SIGNAL(toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
-	connect(ui->spinBox_Red,	SIGNAL(valueChanged(int)), this, SLOT(onCoefRed_ValueChanged(int)));
-	connect(ui->spinBox_Green,	SIGNAL(valueChanged(int)), this, SLOT(onCoefGreen_ValueChanged(int)));
-	connect(ui->spinBox_Blue,	SIGNAL(valueChanged(int)), this, SLOT(onCoefBlue_ValueChanged(int)));
+	connect(ui->checkBox_IsAreaEnabled, &QCheckBox::toggled, this, &GrabConfigWidget::onIsAreaEnabled_Toggled);
+	connect(ui->spinBox_Red, qOverload<int>(&QSpinBox::valueChanged), this, &GrabConfigWidget::onCoefRed_ValueChanged);
+	connect(ui->spinBox_Green, qOverload<int>(&QSpinBox::valueChanged), this, &GrabConfigWidget::onCoefGreen_ValueChanged);
+	connect(ui->spinBox_Blue, qOverload<int>(&QSpinBox::valueChanged), this, &GrabConfigWidget::onCoefBlue_ValueChanged);
 }
 
 GrabConfigWidget::~GrabConfigWidget()

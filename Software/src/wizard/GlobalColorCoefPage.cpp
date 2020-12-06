@@ -96,18 +96,19 @@ void GlobalColorCoefPage::initializePage()
 
 	onMonitor_currentIndexChanged(_ui->cbMonitorSelect->currentIndex());
 
-	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
-	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
-	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbRed, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
+	connect(_ui->sbGreen, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
+	connect(_ui->sbBlue, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
 	connect(_ui->hsColorTemperature, &QSlider::valueChanged, this, &GlobalColorCoefPage::onColorTemperatureValueChanged);
-	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
+	connect(_ui->cbMonitorSelect, qOverload<int>(&QComboBox::currentIndexChanged), this, &GlobalColorCoefPage::onMonitor_currentIndexChanged);
 
 	turnLightsOn(qRgb(255, 255, 255));
 
 	// prevent some firmwares/devices from timing out during this phase
 	// also avoids tracking widget coef signals
 	connect(&_keepAlive, &QTimer::timeout, this, &GlobalColorCoefPage::updateDevice);
-	_keepAlive.start(200);
+	using namespace std::chrono_literals;
+	_keepAlive.start(200ms);
 }
 
 bool GlobalColorCoefPage::validatePage()

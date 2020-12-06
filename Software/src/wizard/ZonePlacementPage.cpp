@@ -74,11 +74,11 @@ void ZonePlacementPage::initializePage()
 	connect(_ui->pbPegasus, &QPushButton::clicked, this, &ZonePlacementPage::onPegasus_clicked);
 	connect(_ui->pbApply, &QPushButton::clicked, this, &ZonePlacementPage::onApply_clicked);
 	connect(_ui->pbClearDisplay, &QPushButton::clicked, this, &ZonePlacementPage::onClearDisplay_clicked);
-	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
+	connect(_ui->cbMonitorSelect, qOverload<int>(&QComboBox::currentIndexChanged), this, &ZonePlacementPage::onMonitor_currentIndexChanged);
 
-	connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(onNumberOfLeds_valueChanged(int)));
-	connect(_ui->sbTopLeds, SIGNAL(valueChanged(int)), this, SLOT(onTopLeds_valueChanged(int)));
-	connect(_ui->sbSideLeds, SIGNAL(valueChanged(int)), this, SLOT(onSideLeds_valueChanged(int)));
+	connect(_ui->sbNumberOfLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onNumberOfLeds_valueChanged);
+	connect(_ui->sbTopLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onTopLeds_valueChanged);
+	connect(_ui->sbSideLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onSideLeds_valueChanged);
 
 	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 	_ui->sbStartingLed->setMaximum(device()->maxLedsCount() - 1);
@@ -279,8 +279,8 @@ void ZonePlacementPage::addGrabArea(QList<GrabWidget*>& list, int id, const QRec
 	zone->move(r.topLeft());
 	zone->resize(r.size());
 	zone->setAreaEnabled(enabled);
-	connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
-	connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
+	connect(zone, &GrabWidget::resizeOrMoveStarted, this, &ZonePlacementPage::turnLightOn);
+	connect(zone, &GrabWidget::resizeOrMoveCompleted, this, qOverload<>(&ZonePlacementPage::turnLightsOff));
 	zone->show();
 	list.append(zone);
 }

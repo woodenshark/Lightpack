@@ -1,0 +1,172 @@
+name: CI
+on: [push, pull_request]
+defaults:
+  run:
+    working-directory: ./Software
+jobs:
+  build-ubuntu:
+    name: Ubuntu Build
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install qt5-default libqt5serialport5-dev build-essential libgtk2.0-dev libusb-1.0-0-dev libudev-dev libnotify-dev qttools5-dev-tools libappindicator-dev openssl libpulse-dev libfftw3-dev hashdeep
+      - run: qmake -r && make
+      - run: scripts/linux/prepare_installer.sh
+      - run: ./build-deb.sh amd64
+        working-directory: ./Software/dist_linux
+      - name: Check Package
+        run: |
+          set -xe
+          PKG_PATH=$(ls dist_linux/*.deb)
+          echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}
+          
+  build-fw:
+    name: Firmware Build
+    runs-on: ubuntu-latest
+    steps:   
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: sudo apt-get install gcc-avr avr-libc build-essential
+      - run: ./build_batch.sh
+        working-directory: ./Firmware
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: Firmware/hex/*
+          
+  build-win:
+    name: Windows Build
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - run: choco install --no-progress openssl
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Cached Qt
+        id: cache-qt
+        uses: actions/cache@v2
+        with:
+          path: C:\Qt
+          key: ${{ runner.os }}-qt
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          dir: C:\Qt
+          modules: serialport
+      - name: Cached Bass
+        id: cache-bass
+        uses: actions/cache@v2
+        with:
+          path: C:\bass
+          key: ${{ runner.os }}-bass_24          
+      - name: Install Bass
+        if: steps.cache-bass.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          If (!(Test-Path -Path "C:\bass" )) {
+            (New-Object System.Net.WebClient).DownloadFile("https://un4seen.com/files/bass24.zip", "C:\bass.zip")
+            (New-Object System.Net.WebClient).DownloadFile("https://un4seen.com/files/basswasapi24.zip", "C:\basswasapi.zip")
+            Expand-Archive C:\bass.zip -DestinationPath C:\bass
+            Expand-Archive C:\basswasapi.zip -DestinationPath C:\bass\wasapi
+          }
+      - name: Cached NightLight
+        id: cache-nightlight
+        uses: actions/cache@v2
+        with:
+          path: C:\NightLight
+          key: ${{ runner.os }}-nightlight_1.3_1909
+      - name: Install NightLight
+        if: steps.cache-nightlight.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          If (!(Test-Path -Path "C:\NightLight" )) {
+            (New-Object System.Net.WebClient).DownloadFile("https://github.com/zomfg/NightLightLibrary/releases/download/v1.3/NightLightLibrary-x64-1.3-win1909preview.zip", "C:\NightLight.zip")
+            Expand-Archive C:\NightLight.zip -DestinationPath C:\NightLight
+          }
+      - name: Set build vars
+        shell: bash  
+        run: |
+          echo "OPENSSL_DIR = \"C:\\Program Files\\OpenSSL\\bin\"" > build-vars.prf
+          echo "DEFINES += BASS_SOUND_SUPPORT" >> build-vars.prf
+          echo "BASS_DIR = \"C:\\bass\"" >> build-vars.prf
+          echo "BASSWASAPI_DIR = \"C:\\bass\\wasapi\"" >> build-vars.prf
+          echo "DEFINES += NIGHTLIGHT_SUPPORT" >> build-vars.prf
+          echo "NIGHTLIGHT_DIR = \"C:\\NightLight\"" >> build-vars.prf
+          echo "TARGET_ARCH = x86_64" >> build-vars.prf
+      - name: Build
+        shell: cmd
+        run: |
+          set QTDIR=%Qt5_Dir%
+          call scripts\win32\generate_sln.bat
+          MSBuild.exe Lightpack.sln /p:Configuration=Release
+      - name: Prepare Installer
+        shell: bash
+        run: |
+          scripts/win32/prepare_installer.sh
+      - name: Build Installer
+        shell: cmd
+        run: |
+          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
+        working-directory: ./Software/dist_windows
+      - name: Check Package
+        shell: bash
+        run: |
+          set -xe
+          PKG_PATH=$(ls dist_windows/Output/Prismatik*.exe)
+          PKG_NAME=$(basename "$PKG_PATH")
+          echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}
+          
+  build-macos:
+    name: macOS Build
+    runs-on: macOS-11.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Select Latest Xcode
+        run: |
+          set -xe
+          sw_vers
+          ls -d /Applications/Xcode*.app
+          sudo xcode-select --switch `ls -d /Applications/Xcode*.app | sort -Vr | head -n1`
+          xcode-select -p
+          xcodebuild -version
+          xcodebuild -showsdks
+      - run: brew update && brew install qt5
+      - name: Build
+        working-directory: ./Software
+        run: |
+          export QTDIR=/usr/local/opt/qt
+          export PATH=$PATH:$QTDIR/bin
+          qmake -r
+          make
+          macdeployqt bin/Prismatik.app -dmg          
+      - name: Check Package
+        run: |
+          set -xe
+          VERSION=`cat VERSION`
+          PKG_PATH="Software/bin/Prismatik.dmg"
+          PKG_NAME="Prismatik_${VERSION}.dmg"
+          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}

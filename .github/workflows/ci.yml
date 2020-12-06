@@ -121,6 +121,7 @@ jobs:
           "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
         working-directory: ./Software/dist_windows
       - name: Check Package
+        shell: bash
         run: |
           set -xe
           PKG_PATH=$(ls dist_windows/Output/Prismatik*.exe)

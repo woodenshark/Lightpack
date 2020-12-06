@@ -108,3 +108,9 @@ ConfigureDevicePage::~ConfigureDevicePage()
 {
 	delete ui;
 }
+
+int ConfigureDevicePage::nextId() const
+{
+	// skip UDP device page
+	return Page_ChooseProfile;
+}

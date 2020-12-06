@@ -1,7 +1,8 @@
-name: Ubuntu
+name: CI
 on: [push, pull_request]
 jobs:
-  build:
+  build-ubuntu:
+    name: Ubuntu Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,12 +13,24 @@ jobs:
         working-directory: ./Software
       - run: ./build-deb.sh amd64
         working-directory: ./Software/dist_linux
-      - name: Archive artifacts
+      - name: Check Package
+        run: |
+          set -xe
+          PKG_PATH=$(ls Software/dist_linux/dpkg/prismatik*.deb)
+          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}
+      - name: 
         uses: actions/upload-artifact@v2
         with:
           name: package
           path: Software/dist_linux/*.deb
   build-fw:
+    name: Firmware Build
     runs-on: ubuntu-latest
     steps:   
       - uses: actions/checkout@v2

@@ -4,14 +4,14 @@ defaults:
   run:
     working-directory: ./Software
 jobs:
-  build:
+  build-win:
+    name: Windows Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
-      - run: choco install --no-progress openssl innosetup
       - name: Cached Qt
         id: cache-qt
         uses: actions/cache@v2
@@ -57,7 +57,7 @@ jobs:
       - name: Set build vars
         shell: bash  
         run: |
-          echo "OPENSSL_DIR = \"C:\\Program Files\\OpenSSL-Win64\\bin\"" > build-vars.prf
+          echo "OPENSSL_DIR = \"C:\\Program Files\\OpenSSL\\bin\"" > build-vars.prf
           echo "DEFINES += BASS_SOUND_SUPPORT" >> build-vars.prf
           echo "BASS_DIR = \"C:\\bass\"" >> build-vars.prf
           echo "BASSWASAPI_DIR = \"C:\\bass\\wasapi\"" >> build-vars.prf
@@ -76,11 +76,17 @@ jobs:
           scripts/win32/prepare_installer.sh
       - name: Build Installer
         shell: cmd
-        run: ISCC.exe script.iss
+        run: "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
         working-directory: ./Software/dist_windows
-          
-      - name: Archive artifacts
+      - name: Check Package
+        run: |
+          set -xe
+          PKG_PATH=$(ls Software/dist_windows/Output/Prismatik*.exe)
+          PKG_NAME=$(basename "$PKG_PATH")
+          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
+      - name: Upload Package
         uses: actions/upload-artifact@v2
         with:
-          name: package
-          path: Software/dist_windows/Output/*
+          name: ${{ env.PKG_NAME }}
+          path: ${{ env.PKG_PATH }}

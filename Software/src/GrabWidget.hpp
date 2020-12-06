@@ -61,7 +61,7 @@ public:
 	void setCoefRed(const double);
 	void setCoefGreen(const double);
 	void setCoefBlue(const double);
-	void setCoefs(const WBAdjustment);
+	void setCoefs(const WBAdjustment&);
 	bool isAreaEnabled() const;
 	void setAreaEnabled(const bool);
 	void fillBackgroundWhite();

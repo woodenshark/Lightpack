@@ -644,7 +644,7 @@ void GrabWidget::setCoefBlue(const double coef)
 		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
 }
 
-void GrabWidget::setCoefs(const WBAdjustment coefs)
+void GrabWidget::setCoefs(const WBAdjustment& coefs)
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 

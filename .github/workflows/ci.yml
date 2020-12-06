@@ -6,7 +6,10 @@ defaults:
 jobs:
   build-ubuntu:
     name: Ubuntu Build
-    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install qt5-default libqt5serialport5-dev build-essential libgtk2.0-dev libusb-1.0-0-dev libudev-dev libnotify-dev qttools5-dev-tools libappindicator-dev openssl libpulse-dev libfftw3-dev hashdeep
@@ -25,11 +28,6 @@ jobs:
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
-      - name: 
-        uses: actions/upload-artifact@v2
-        with:
-          name: package
-          path: Software/dist_linux/*.deb
           
   build-fw:
     name: Firmware Build
@@ -45,8 +43,6 @@ jobs:
         with:
           name: firmware
           path: Firmware/hex/*
-          
-          name: Windows
           
   build-win:
     name: Windows Build

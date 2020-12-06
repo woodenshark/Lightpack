@@ -20,7 +20,7 @@ jobs:
       - name: Check Package
         run: |
           set -xe
-          PKG_PATH=$(ls Software/dist_linux/*.deb)
+          PKG_PATH=$(ls dist_linux/*.deb)
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package

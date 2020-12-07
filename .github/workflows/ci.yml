@@ -5,12 +5,13 @@ defaults:
     working-directory: ./Software
 jobs:
   build-pacman:
-    if: ${{ false }}
     runs-on: ubuntu-20.04
     name: pacman Build (Arch Linux)
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.10
+        continue-on-error: true
       - name: Build
         working-directory: Software/dist_linux
         run: ./build-in-docker.sh pacman archlinux latest
@@ -96,6 +97,7 @@ jobs:
           path: Firmware/hex/*
 
   build-win:
+    if: ${{ false }}
     name: Windows Build
     runs-on: windows-2019
     steps:

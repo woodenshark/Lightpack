@@ -5,6 +5,7 @@ defaults:
     working-directory: ./Software
 jobs:
   build-pacman:
+    if: {{ never() }}
     runs-on: ubuntu-20.04
     name: pacman Build (Arch Linux)
     steps:
@@ -26,6 +27,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-flatpack:
+    if: {{ never() }}
     runs-on: ubuntu-20.04
     name: Flatpack Build
     steps:
@@ -53,6 +55,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-dpkg:
+    if: {{ never() }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -77,6 +80,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-fw:
+    if: {{ never() }}
     name: Firmware Build
     runs-on: ubuntu-latest
     steps:
@@ -96,8 +100,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - run: git submodules update --init --recursive
       - run: choco install --no-progress openssl
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Cached Qt
@@ -182,6 +185,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-macos:
+    if: {{ never() }}
     name: macOS Build
     runs-on: macOS-11.0
     steps:

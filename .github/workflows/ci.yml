@@ -19,7 +19,7 @@ jobs:
           PKG_PATH=$(ls dist_linux/pacman/prismatik*.pkg.tar*)
           # namcap $PKG_PATH
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
+          echo "PKG_NAME=Software/$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:
@@ -46,7 +46,7 @@ jobs:
           set -xe
           PKG_PATH=$(ls dist_linux/flatpak/prismatik*.flatpak)
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
+          echo "PKG_NAME=Software/$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:
@@ -70,7 +70,7 @@ jobs:
           set -xe
           PKG_PATH=$(ls dist_linux/dpkg/prismatik*.deb)
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
+          echo "PKG_NAME=Software/$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:

@@ -17,9 +17,8 @@ jobs:
         run: |
           set -xe
           PKG_PATH=$(ls dist_linux/pacman/prismatik*.pkg.tar*)
-          # namcap $PKG_PATH
-          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=Software/$(basename $PKG_PATH)" >> $GITHUB_ENV
+          echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:
@@ -30,14 +29,14 @@ jobs:
     runs-on: ubuntu-20.04
     name: Flatpack Build
     steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
       - name: Install Flatpak
         run: |
           set -xe
           sudo apt update
           sudo apt install flatpak flatpak-builder
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      - name: Checkout Source
-        uses: actions/checkout@v2
       - name: Build
         working-directory: Software/dist_linux
         run: ./build-natively.sh flatpak
@@ -45,8 +44,8 @@ jobs:
         run: |
           set -xe
           PKG_PATH=$(ls dist_linux/flatpak/prismatik*.flatpak)
-          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=Software/$(basename $PKG_PATH)" >> $GITHUB_ENV
+          echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:
@@ -69,8 +68,8 @@ jobs:
         run: |
           set -xe
           PKG_PATH=$(ls dist_linux/dpkg/prismatik*.deb)
-          echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
-          echo "PKG_NAME=Software/$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
+          echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
+          echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package
         uses: actions/upload-artifact@v2
         with:

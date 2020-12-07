@@ -28,7 +28,6 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-flatpack:
-    if: ${{ false }}
     runs-on: ubuntu-20.04
     name: Flatpack Build
     steps:
@@ -82,7 +81,6 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-fw:
-    if: ${{ false }}
     name: Firmware Build
     runs-on: ubuntu-latest
     steps:
@@ -98,7 +96,6 @@ jobs:
           path: Firmware/hex/*
 
   build-win:
-    if: ${{ false }}
     name: Windows Build
     runs-on: windows-2019
     steps:
@@ -189,7 +186,6 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-macos:
-    if: ${{ false }}
     name: macOS Build
     runs-on: macOS-11.0
     steps:

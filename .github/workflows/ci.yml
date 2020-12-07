@@ -56,7 +56,6 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-dpkg:
-    if: ${{ false }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -65,6 +64,8 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.10
+        continue-on-error: true
       - name: Build
         working-directory: Software/dist_linux
         run: ./build-in-docker.sh dpkg ${{ matrix.os }}

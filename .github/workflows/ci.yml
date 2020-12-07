@@ -5,7 +5,7 @@ defaults:
     working-directory: ./Software
 jobs:
   build-pacman:
-    if: ${{ never() }}
+    if: ${{ false }}
     runs-on: ubuntu-20.04
     name: pacman Build (Arch Linux)
     steps:
@@ -27,7 +27,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-flatpack:
-    if: ${{ never() }}
+    if: ${{ false }}
     runs-on: ubuntu-20.04
     name: Flatpack Build
     steps:
@@ -55,7 +55,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-dpkg:
-    if: ${{ never() }}
+    if: ${{ false }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -80,7 +80,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-fw:
-    if: ${{ never() }}
+    if: ${{ false }}
     name: Firmware Build
     runs-on: ubuntu-latest
     steps:
@@ -185,7 +185,7 @@ jobs:
           path: ${{ env.PKG_PATH }}
 
   build-macos:
-    if: ${{ never() }}
+    if: ${{ false }}
     name: macOS Build
     runs-on: macOS-11.0
     steps:

@@ -64,6 +64,7 @@ void ZonePlacementPage::initializePage()
 		_screens.insert(i, settings);
 		++i;
 	}
+	this->activateWindow();
 	_monitorForms[_ui->cbMonitorSelect->currentIndex()]->setActive(true);
 	resetNewAreaRect();
 

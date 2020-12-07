@@ -41,7 +41,7 @@ class ConfigureDevicePage : public QWizardPage, SettingsAwareTrait
 public:
 	explicit ConfigureDevicePage(bool isInitFromSettings, TransientSettings *ts, QWidget *parent = 0);
 	~ConfigureDevicePage();
-
+	int nextId() const;
 protected:
 	void initializePage();
 	void cleanupPage();

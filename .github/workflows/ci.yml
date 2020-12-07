@@ -100,7 +100,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
-      - run: git submodules update --init --recursive
+      - run: git submodule update --init --recursive
       - run: choco install --no-progress openssl
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Cached Qt

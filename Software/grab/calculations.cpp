@@ -240,8 +240,24 @@ enum SIMDLevel {
     SSE4_1 = 1 << 0,
     AVX2 = 1 << 1
 };
+
+#if defined(Q_OS_MACOS)
+#include <sys/sysctl.h>
+// https://developer.apple.com/documentation/apple_silicon/about_the_rosetta_translation_environment?language=objc
+static uint32_t available_simd() {
+    uint32_t level = SIMDLevel::None;
+    int ret = 0;
+    size_t size = sizeof(ret);
+    if (sysctlbyname("hw.optional.avx2_0", &ret, &size, NULL, 0) == 0 && ret == 1)
+        level |= SIMDLevel::AVX2;
+    ret = 0;
+    size = sizeof(ret);
+    if (sysctlbyname("hw.optional.sse4_1", &ret, &size, NULL, 0) == 0 && ret == 1)
+        level |= SIMDLevel::SSE4_1;
+    return level;
+}
+#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
 // https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
-#if defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
 static uint32_t available_simd() {
     uint32_t level = SIMDLevel::None;
     if (_may_i_use_cpu_feature(_FEATURE_AVX2))

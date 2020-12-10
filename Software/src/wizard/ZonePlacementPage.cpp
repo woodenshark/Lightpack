@@ -88,6 +88,7 @@ void ZonePlacementPage::initializePage()
 	if (_isInitFromSettings) {
 		const int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_transSettings->ledCount = ledCount;
+		_zonePool.reserve(_transSettings->ledCount);
 		QMap<int, MonitorSettings>::iterator it = _screens.begin();
 		while (it != _screens.end()) {
 			int startingLed = -1;
@@ -119,6 +120,7 @@ void ZonePlacementPage::initializePage()
 
 void ZonePlacementPage::cleanupPage()
 {
+	qDeleteAll(_zonePool);
 	cleanupGrabAreas();
 	cleanupMonitors();
 }
@@ -248,7 +250,10 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
 	const int startId = _ui->sbStartingLed->value() - 1;
 
-	qDeleteAll(grabAreas);
+	for (GrabWidget* const widget : grabAreas)
+		widget->hide();
+	_zonePool.append(grabAreas);
+
 	grabAreas.clear();
 	grabAreas.reserve(distributor->areaCount());
 	for(int i = 0; i < distributor->areaCount(); i++) {
@@ -277,13 +282,19 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 
 void ZonePlacementPage::addGrabArea(QList<GrabWidget*>& list, int id, const QRect &r, const bool enabled)
 {
-	GrabWidget * const zone = new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &list);
+	const bool reuse = !_zonePool.isEmpty();
+	GrabWidget * const zone = reuse ? _zonePool.takeLast() : new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &list);
 
 	zone->move(r.topLeft());
 	zone->resize(r.size());
 	zone->setAreaEnabled(enabled);
-	connect(zone, &GrabWidget::resizeOrMoveStarted, this, &ZonePlacementPage::turnLightOn);
-	connect(zone, &GrabWidget::resizeOrMoveCompleted, this, qOverload<>(&ZonePlacementPage::turnLightsOff));
+	if (reuse) {
+		zone->setId(id);
+		zone->setFellows(&list);
+	} else {
+		connect(zone, &GrabWidget::resizeOrMoveStarted, this, &ZonePlacementPage::turnLightOn);
+		connect(zone, &GrabWidget::resizeOrMoveCompleted, this, qOverload<>(&ZonePlacementPage::turnLightsOff));
+	}
 	zone->show();
 	list.append(zone);
 }
@@ -291,8 +302,8 @@ void ZonePlacementPage::addGrabArea(QList<GrabWidget*>& list, int id, const QRec
 void ZonePlacementPage::removeLastGrabArea()
 {
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
-	delete grabAreas.last();
-	grabAreas.removeLast();
+	_zonePool.append(grabAreas.takeLast());
+	_zonePool.last()->hide();
 }
 
 QRect ZonePlacementPage::screenRect() const

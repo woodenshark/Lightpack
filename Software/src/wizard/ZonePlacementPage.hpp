@@ -102,6 +102,7 @@ private:
 	void saveMonitorSettings(MonitorSettings& settings);
 
 	QMap<int, MonitorSettings> _screens;
+	QList<GrabWidget*> _zonePool;
 };
 
 #endif // ZONECONFIGURATION_HPP

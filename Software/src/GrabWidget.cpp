@@ -65,11 +65,10 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	// Setting minimumSize instead does not respect the aspect ratio, leaving at 16 for now
 	ui->button_OpenConfig->setFixedSize(16, 16);
 
-	m_selfId = id;
-	m_selfIdString = QString::number(m_selfId + 1);
+	setId(id);
 	cmd = NOP;
 	m_features = features;
-	m_fellows = fellows;
+	setFellows(fellows);
 	m_backgroundColor = Qt::white;
 
 	setOpenConfigButtonBackground(m_backgroundColor);
@@ -651,6 +650,21 @@ void GrabWidget::setCoefs(const WBAdjustment& coefs)
 	m_coefs = coefs;
 	if (m_features & AllowCoefConfig)
 		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+void GrabWidget::setId(const int id)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_selfId = id;
+	m_selfIdString = QString::number(m_selfId + 1);
+}
+
+void GrabWidget::setFellows(QList<GrabWidget*>* const fellows)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_fellows = fellows;
 }
 
 bool GrabWidget::isAreaEnabled() const

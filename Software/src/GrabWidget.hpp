@@ -62,6 +62,8 @@ public:
 	void setCoefGreen(const double);
 	void setCoefBlue(const double);
 	void setCoefs(const WBAdjustment&);
+	void setId(const int id);
+	void setFellows(QList<GrabWidget*>* const fellows);
 	bool isAreaEnabled() const;
 	void setAreaEnabled(const bool);
 	void fillBackgroundWhite();

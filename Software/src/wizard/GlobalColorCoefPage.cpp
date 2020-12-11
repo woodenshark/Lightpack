@@ -72,26 +72,26 @@ void GlobalColorCoefPage::initializePage()
 	// RESETS WBA
 	resetDeviceSettings();
 
-
-	QMap<int, MonitorSettings>::iterator it = _screens.begin();
-	for (; it != _screens.end(); it++) {
+	bool firstPass = true;
+	for (MonitorSettings& settings : _screens) {
 		int firstId = -1;
 		for (int i = 0; i < _transSettings->ledCount; i++) {
 			if (_transSettings->zonePositions.contains(i)) {
 				// grab first ID for each screen to use as base setting
-				if (it.value().screen->geometry().contains(_transSettings->zonePositions[i]))
+				if (settings.screen->geometry().contains(_transSettings->zonePositions[i]))
 					firstId = firstId < 0 ? i : std::min(firstId, i);
 				// add areas only on first pass
-				if (it == _screens.begin())
+				if (firstPass)
 					addGrabArea(i);
 			}
 		}
 		if (firstId > -1) {
 			const GrabWidget* const firstWidget = _grabAreas[firstId];
-			it.value().red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
-			it.value().green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
-			it.value().blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
+			settings.red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
+			settings.green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
+			settings.blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
 		}
+		firstPass = false;
 	}
 
 	onMonitor_currentIndexChanged(_ui->cbMonitorSelect->currentIndex());
@@ -157,16 +157,14 @@ bool GlobalColorCoefPage::validatePage()
 	Settings::setConnectedDevice(devType);
 	Settings::setNumberOfLeds(devType, _transSettings->zonePositions.size());
 
-	QMap<int, QPoint>::const_iterator it = _transSettings->zonePositions.constBegin();
-	while (it != _transSettings->zonePositions.constEnd()) {
-		const int id = it.key();
-		Settings::setLedPosition(id, it.value());
+	for (const GrabWidget * const widget : _grabAreas) {
+		const int id = widget->getId();
+		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
 		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
-		Settings::setLedCoefRed(id, _grabAreas[id]->getCoefRed());
-		Settings::setLedCoefGreen(id, _grabAreas[id]->getCoefGreen());
-		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
-		++it;
+		Settings::setLedCoefRed(id, widget->getCoefRed());
+		Settings::setLedCoefGreen(id, widget->getCoefGreen());
+		Settings::setLedCoefBlue(id, widget->getCoefBlue());
 	}
 
 	cleanupPage();
@@ -205,11 +203,9 @@ void GlobalColorCoefPage::onCoefValueChanged(int value)
 	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
 
 	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
-	QMap<int, GrabWidget*>::iterator it = _grabAreas.begin();
-	while (it != _grabAreas.end()) {
-		if (settings.screen->geometry().contains(it.value()->geometry().center()))
-			it.value()->setCoefs(wba);
-		++it;
+	for (GrabWidget * const widget : _grabAreas) {
+		if (settings.screen->geometry().contains(widget->geometry().center()))
+			widget->setCoefs(wba);
 	}
 
 	settings.red = _ui->sbRed->value();

@@ -89,18 +89,16 @@ void ZonePlacementPage::initializePage()
 		const int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_transSettings->ledCount = ledCount;
 		_zonePool.reserve(_transSettings->ledCount);
-		QMap<int, MonitorSettings>::iterator it = _screens.begin();
-		while (it != _screens.end()) {
+		for (MonitorSettings& settings : _screens) {
 			int startingLed = -1;
 			for (int i = 0; i < ledCount; i++) {
 				const QRect areaGeometry(Settings::getLedPosition(i), Settings::getLedSize(i));
-				if (it.value().screen->geometry().contains(areaGeometry.center())) {
-					addGrabArea(it.value().grabAreas, i, areaGeometry, Settings::isLedEnabled(i));
+				if (settings.screen->geometry().contains(areaGeometry.center())) {
+					addGrabArea(settings.grabAreas, i, areaGeometry, Settings::isLedEnabled(i));
 					startingLed = startingLed < 0 ? i : std::min(i, startingLed);
 				}
 			}
-			it.value().startingLed = startingLed;
-			++it;
+			settings.startingLed = startingLed;
 		}
 		monitorLedCount = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas.count();
 		if (monitorLedCount == 0)
@@ -152,12 +150,10 @@ void ZonePlacementPage::onClearDisplay_clicked()
 bool ZonePlacementPage::checkZoneIssues()
 {
 	QMultiMap<int, std::nullptr_t> ids;
-	QMap<int, MonitorSettings>::const_iterator it = _screens.cbegin();
 	// get all IDs (even repeating ones)
-	while (it != _screens.cend()) {
-		for (const GrabWidget* const widget : it.value().grabAreas)
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const widget : settings.grabAreas)
 			ids.insert(widget->getId(), nullptr);
-		++it;
 	}
 
 	// build gap string list and gather overlaping IDs (no repeats)
@@ -220,16 +216,14 @@ bool ZonePlacementPage::validatePage()
 	_transSettings->zonePositions.clear();
 	_transSettings->zoneSizes.clear();
 	_transSettings->zoneEnabled.clear();
-	QMap<int, MonitorSettings>::const_iterator it = _screens.constBegin();
 	_transSettings->ledCount = 0;
-	while (it != _screens.constEnd()) {
-		for (const GrabWidget* const grabArea : it.value().grabAreas) {
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const grabArea : settings.grabAreas) {
 			_transSettings->zonePositions.insert(grabArea->getId(), grabArea->geometry().topLeft());
 			_transSettings->zoneSizes.insert(grabArea->getId(), grabArea->geometry().size());
 			_transSettings->zoneEnabled.insert(grabArea->getId(), grabArea->isAreaEnabled());
 			_transSettings->ledCount = std::max(grabArea->getId() + 1, _transSettings->ledCount);
 		}
-		++it;
 	}
 
 	cleanupPage();
@@ -272,9 +266,8 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	resetNewAreaRect();
 
 	_transSettings->ledCount = 0;
-	QMap<int, MonitorSettings>::const_iterator it = _screens.constBegin();
-	for (; it != _screens.constEnd(); ++it) {
-		for (const GrabWidget* const widget : it.value().grabAreas)
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const widget : settings.grabAreas)
 			_transSettings->ledCount = std::max(widget->getId() + 1, _transSettings->ledCount);
 	}
 	checkZoneIssues();

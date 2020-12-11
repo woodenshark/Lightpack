@@ -39,6 +39,7 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 	_ui(new Ui::ZonePlacementPage)
 {
 	_ui->setupUi(this);
+	_ledNumberUpdate.setSingleShot(true);
 }
 
 ZonePlacementPage::~ZonePlacementPage()
@@ -114,6 +115,8 @@ void ZonePlacementPage::initializePage()
 	resetDeviceSettings();
 	turnLightsOff();
 	checkZoneIssues();
+
+	connect(&_ledNumberUpdate, &QTimer::timeout, this, &ZonePlacementPage::onNumberOfLeds_timeout);
 }
 
 void ZonePlacementPage::cleanupPage()
@@ -409,9 +412,10 @@ void ZonePlacementPage::onApply_clicked()
 	saveMonitorSettings(settings);
 }
 
-
-void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::onNumberOfLeds_timeout()
 {
+	const int numOfLed = _ui->sbNumberOfLeds->value();
+
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
 	while (numOfLed < grabAreas.size())
 		removeLastGrabArea();
@@ -436,6 +440,13 @@ void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 		}
 	}
 	checkZoneIssues();
+}
+
+void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
+{
+	Q_UNUSED(numOfLed);
+	using namespace std::chrono_literals;
+	_ledNumberUpdate.start(500ms);
 }
 
 void ZonePlacementPage::onTopLeds_valueChanged(int numOfLed)

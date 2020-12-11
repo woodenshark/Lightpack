@@ -27,6 +27,7 @@
 #ifndef ZONECONFIGURATION_HPP
 #define ZONECONFIGURATION_HPP
 
+#include <QTimer>
 #include "WizardPageUsingDevice.hpp"
 #include "SettingsAwareTrait.hpp"
 
@@ -60,6 +61,7 @@ private slots:
 	void onPegasus_clicked();
 	void onApply_clicked();
 	void onNumberOfLeds_valueChanged(int arg1);
+	void onNumberOfLeds_timeout();
 	void onTopLeds_valueChanged(int arg1);
 	void onSideLeds_valueChanged(int arg1);
 	void onMonitor_currentIndexChanged(int idx);
@@ -103,6 +105,7 @@ private:
 
 	QMap<int, MonitorSettings> _screens;
 	QList<GrabWidget*> _zonePool;
+	QTimer _ledNumberUpdate;
 };
 
 #endif // ZONECONFIGURATION_HPP

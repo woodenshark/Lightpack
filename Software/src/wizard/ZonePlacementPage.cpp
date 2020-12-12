@@ -445,6 +445,9 @@ void ZonePlacementPage::onNumberOfLeds_timeout()
 void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 {
 	Q_UNUSED(numOfLed);
+	// this delay is meant to leave the UI responsive while adjusting the number of leds
+	// it has to be long enough to have the time to type 3-4 digits and/or adjust via spinbox controls
+	// so the grab areas spawn/despawn has a higher chance of occurring when the user is done editing
 	using namespace std::chrono_literals;
 	_ledNumberUpdate.start(500ms);
 }

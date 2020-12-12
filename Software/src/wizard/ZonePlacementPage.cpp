@@ -39,6 +39,7 @@ ZonePlacementPage::ZonePlacementPage(bool isInitFromSettings, TransientSettings 
 	_ui(new Ui::ZonePlacementPage)
 {
 	_ui->setupUi(this);
+	_ledNumberUpdate.setSingleShot(true);
 }
 
 ZonePlacementPage::~ZonePlacementPage()
@@ -75,11 +76,11 @@ void ZonePlacementPage::initializePage()
 	connect(_ui->pbPegasus, &QPushButton::clicked, this, &ZonePlacementPage::onPegasus_clicked);
 	connect(_ui->pbApply, &QPushButton::clicked, this, &ZonePlacementPage::onApply_clicked);
 	connect(_ui->pbClearDisplay, &QPushButton::clicked, this, &ZonePlacementPage::onClearDisplay_clicked);
-	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
+	connect(_ui->cbMonitorSelect, qOverload<int>(&QComboBox::currentIndexChanged), this, &ZonePlacementPage::onMonitor_currentIndexChanged);
 
-	connect(_ui->sbNumberOfLeds, SIGNAL(valueChanged(int)), this, SLOT(onNumberOfLeds_valueChanged(int)));
-	connect(_ui->sbTopLeds, SIGNAL(valueChanged(int)), this, SLOT(onTopLeds_valueChanged(int)));
-	connect(_ui->sbSideLeds, SIGNAL(valueChanged(int)), this, SLOT(onSideLeds_valueChanged(int)));
+	connect(_ui->sbNumberOfLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onNumberOfLeds_valueChanged);
+	connect(_ui->sbTopLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onTopLeds_valueChanged);
+	connect(_ui->sbSideLeds, qOverload<int>(&QSpinBox::valueChanged), this, &ZonePlacementPage::onSideLeds_valueChanged);
 
 	_ui->sbNumberOfLeds->setMaximum(device()->maxLedsCount());
 	_ui->sbStartingLed->setMaximum(device()->maxLedsCount() - 1);
@@ -89,18 +90,17 @@ void ZonePlacementPage::initializePage()
 	if (_isInitFromSettings) {
 		const int ledCount = Settings::getNumberOfLeds(Settings::getConnectedDevice());
 		_transSettings->ledCount = ledCount;
-		QMap<int, MonitorSettings>::iterator it = _screens.begin();
-		while (it != _screens.end()) {
+		_zonePool.reserve(_transSettings->ledCount);
+		for (MonitorSettings& settings : _screens) {
 			int startingLed = -1;
 			for (int i = 0; i < ledCount; i++) {
 				const QRect areaGeometry(Settings::getLedPosition(i), Settings::getLedSize(i));
-				if (it.value().screen->geometry().contains(areaGeometry.center())) {
-					addGrabArea(it.value().grabAreas, i, areaGeometry, Settings::isLedEnabled(i));
+				if (settings.screen->geometry().contains(areaGeometry.center())) {
+					addGrabArea(settings.grabAreas, i, areaGeometry, Settings::isLedEnabled(i));
 					startingLed = startingLed < 0 ? i : std::min(i, startingLed);
 				}
 			}
-			it.value().startingLed = startingLed;
-			++it;
+			settings.startingLed = startingLed;
 		}
 		monitorLedCount = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas.count();
 		if (monitorLedCount == 0)
@@ -116,10 +116,13 @@ void ZonePlacementPage::initializePage()
 	resetDeviceSettings();
 	turnLightsOff();
 	checkZoneIssues();
+
+	connect(&_ledNumberUpdate, &QTimer::timeout, this, &ZonePlacementPage::onNumberOfLeds_timeout);
 }
 
 void ZonePlacementPage::cleanupPage()
 {
+	qDeleteAll(_zonePool);
 	cleanupGrabAreas();
 	cleanupMonitors();
 }
@@ -151,19 +154,19 @@ void ZonePlacementPage::onClearDisplay_clicked()
 bool ZonePlacementPage::checkZoneIssues()
 {
 	QMultiMap<int, std::nullptr_t> ids;
-	QMap<int, MonitorSettings>::const_iterator it = _screens.cbegin();
 	// get all IDs (even repeating ones)
-	while (it != _screens.cend()) {
-		for (const GrabWidget* const widget : it.value().grabAreas)
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const widget : settings.grabAreas)
 			ids.insert(widget->getId(), nullptr);
-		++it;
 	}
 
 	// build gap string list and gather overlaping IDs (no repeats)
 	QStringList gapStrs;
 	int prevId = -1;
 	QList<int> overlapIds;
-	for (const int id : ids.keys()) {
+	QMultiMap<int, std::nullptr_t>::const_iterator idIt = ids.constBegin();
+	while (idIt != ids.constEnd()) {
+		const int id = idIt.key();
 		const int delta = id - prevId;
 		if (delta == 2)
 			gapStrs << QString::number(id);
@@ -172,6 +175,7 @@ bool ZonePlacementPage::checkZoneIssues()
 		else if (delta == 0)
 			overlapIds << id;
 		prevId = id;
+		++idIt;
 	}
 
 	// condense overlapping IDs into "X-Y" ranges when possible and build the string list
@@ -216,16 +220,14 @@ bool ZonePlacementPage::validatePage()
 	_transSettings->zonePositions.clear();
 	_transSettings->zoneSizes.clear();
 	_transSettings->zoneEnabled.clear();
-	QMap<int, MonitorSettings>::const_iterator it = _screens.constBegin();
 	_transSettings->ledCount = 0;
-	while (it != _screens.constEnd()) {
-		for (const GrabWidget* const grabArea : it.value().grabAreas) {
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const grabArea : settings.grabAreas) {
 			_transSettings->zonePositions.insert(grabArea->getId(), grabArea->geometry().topLeft());
 			_transSettings->zoneSizes.insert(grabArea->getId(), grabArea->geometry().size());
 			_transSettings->zoneEnabled.insert(grabArea->getId(), grabArea->isAreaEnabled());
 			_transSettings->ledCount = std::max(grabArea->getId() + 1, _transSettings->ledCount);
 		}
-		++it;
 	}
 
 	cleanupPage();
@@ -246,7 +248,10 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
 	const int startId = _ui->sbStartingLed->value() - 1;
 
-	qDeleteAll(grabAreas);
+	for (GrabWidget* const widget : grabAreas)
+		widget->hide();
+	_zonePool.append(grabAreas);
+
 	grabAreas.clear();
 	grabAreas.reserve(distributor->areaCount());
 	for(int i = 0; i < distributor->areaCount(); i++) {
@@ -265,9 +270,8 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 	resetNewAreaRect();
 
 	_transSettings->ledCount = 0;
-	QMap<int, MonitorSettings>::const_iterator it = _screens.constBegin();
-	for (; it != _screens.constEnd(); ++it) {
-		for (const GrabWidget* const widget : it.value().grabAreas)
+	for (const MonitorSettings& settings : _screens) {
+		for (const GrabWidget* const widget : settings.grabAreas)
 			_transSettings->ledCount = std::max(widget->getId() + 1, _transSettings->ledCount);
 	}
 	checkZoneIssues();
@@ -275,13 +279,19 @@ void ZonePlacementPage::distributeAreas(AreaDistributor *distributor, bool inver
 
 void ZonePlacementPage::addGrabArea(QList<GrabWidget*>& list, int id, const QRect &r, const bool enabled)
 {
-	GrabWidget * const zone = new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &list);
+	const bool reuse = !_zonePool.isEmpty();
+	GrabWidget * const zone = reuse ? _zonePool.takeLast() : new GrabWidget(id, DimUntilInteractedWith | AllowEnableConfig | AllowMove | AllowResize, &list);
 
 	zone->move(r.topLeft());
 	zone->resize(r.size());
 	zone->setAreaEnabled(enabled);
-	connect(zone, SIGNAL(resizeOrMoveStarted(int)), this, SLOT(turnLightOn(int)));
-	connect(zone, SIGNAL(resizeOrMoveCompleted(int)), this, SLOT(turnLightsOff()));
+	if (reuse) {
+		zone->setId(id);
+		zone->setFellows(&list);
+	} else {
+		connect(zone, &GrabWidget::resizeOrMoveStarted, this, &ZonePlacementPage::turnLightOn);
+		connect(zone, &GrabWidget::resizeOrMoveCompleted, this, qOverload<>(&ZonePlacementPage::turnLightsOff));
+	}
 	zone->show();
 	list.append(zone);
 }
@@ -289,8 +299,8 @@ void ZonePlacementPage::addGrabArea(QList<GrabWidget*>& list, int id, const QRec
 void ZonePlacementPage::removeLastGrabArea()
 {
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
-	delete grabAreas.last();
-	grabAreas.removeLast();
+	_zonePool.append(grabAreas.takeLast());
+	_zonePool.last()->hide();
 }
 
 QRect ZonePlacementPage::screenRect() const
@@ -403,9 +413,10 @@ void ZonePlacementPage::onApply_clicked()
 	saveMonitorSettings(settings);
 }
 
-
-void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
+void ZonePlacementPage::onNumberOfLeds_timeout()
 {
+	const int numOfLed = _ui->sbNumberOfLeds->value();
+
 	QList<GrabWidget*>& grabAreas = _screens[_ui->cbMonitorSelect->currentIndex()].grabAreas;
 	while (numOfLed < grabAreas.size())
 		removeLastGrabArea();
@@ -430,6 +441,16 @@ void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
 		}
 	}
 	checkZoneIssues();
+}
+
+void ZonePlacementPage::onNumberOfLeds_valueChanged(int numOfLed)
+{
+	Q_UNUSED(numOfLed);
+	// this delay is meant to leave the UI responsive while adjusting the number of leds
+	// it has to be long enough to have the time to type 3-4 digits and/or adjust via spinbox controls
+	// so the grab areas spawn/despawn has a higher chance of occurring when the user is done editing
+	using namespace std::chrono_literals;
+	_ledNumberUpdate.start(500ms);
 }
 
 void ZonePlacementPage::onTopLeds_valueChanged(int numOfLed)

@@ -48,7 +48,7 @@ class GrabWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	GrabWidget(int id, int features = 0x11, QList<GrabWidget*> *fellows = NULL, QWidget *parent = 0);
+	GrabWidget(int id, int features, QList<GrabWidget*> *fellows = NULL, QWidget *parent = 0);
 	virtual ~GrabWidget();
 
 	void saveSizeAndPosition();
@@ -61,7 +61,9 @@ public:
 	void setCoefRed(const double);
 	void setCoefGreen(const double);
 	void setCoefBlue(const double);
-	void setCoefs(const WBAdjustment);
+	void setCoefs(const WBAdjustment&);
+	void setId(const int id);
+	void setFellows(QList<GrabWidget*>* const fellows);
 	bool isAreaEnabled() const;
 	void setAreaEnabled(const bool);
 	void fillBackgroundWhite();

@@ -65,11 +65,10 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	// Setting minimumSize instead does not respect the aspect ratio, leaving at 16 for now
 	ui->button_OpenConfig->setFixedSize(16, 16);
 
-	m_selfId = id;
-	m_selfIdString = QString::number(m_selfId + 1);
+	setId(id);
 	cmd = NOP;
 	m_features = features;
-	m_fellows = fellows;
+	setFellows(fellows);
 	m_backgroundColor = Qt::white;
 
 	setOpenConfigButtonBackground(m_backgroundColor);
@@ -87,13 +86,13 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 	if (features & (AllowCoefConfig | AllowEnableConfig)) {
 		m_configWidget = new GrabConfigWidget();
 		if (features & AllowEnableConfig) {
-			connect(m_configWidget, SIGNAL(isAreaEnabled_Toggled(bool)), this, SLOT(onIsAreaEnabled_Toggled(bool)));
+			connect(m_configWidget, &GrabConfigWidget::isAreaEnabled_Toggled, this, &GrabWidget::onIsAreaEnabled_Toggled);
 		}
 		if (features & AllowCoefConfig) {
 			m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
-			connect(m_configWidget, SIGNAL(coefRed_ValueChanged(double)), this, SLOT(onRedCoef_ValueChanged(double)));
-			connect(m_configWidget, SIGNAL(coefGreen_ValueChanged(double)), this, SLOT(onGreenCoef_ValueChanged(double)));
-			connect(m_configWidget, SIGNAL(coefBlue_ValueChanged(double)), this, SLOT(onBlueCoef_ValueChanged(double)));
+			connect(m_configWidget, &GrabConfigWidget::coefRed_ValueChanged, this, &GrabWidget::onRedCoef_ValueChanged);
+			connect(m_configWidget, &GrabConfigWidget::coefGreen_ValueChanged, this, &GrabWidget::onGreenCoef_ValueChanged);
+			connect(m_configWidget, &GrabConfigWidget::coefBlue_ValueChanged, this, &GrabWidget::onBlueCoef_ValueChanged);
 		}
 	} else {
 		ui->button_OpenConfig->setVisible(false);
@@ -103,7 +102,7 @@ GrabWidget::GrabWidget(int id, int features, QList<GrabWidget*> *fellows, QWidge
 		settingsProfileChanged();
 
 	if (features & (SyncSettings | AllowCoefConfig | AllowEnableConfig))
-		connect(ui->button_OpenConfig, SIGNAL(clicked()), this, SLOT(onOpenConfigButton_Clicked()));
+		connect(ui->button_OpenConfig, &QPushButton::clicked, this, &GrabWidget::onOpenConfigButton_Clicked);
 }
 
 GrabWidget::~GrabWidget()
@@ -644,13 +643,28 @@ void GrabWidget::setCoefBlue(const double coef)
 		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
 }
 
-void GrabWidget::setCoefs(const WBAdjustment coefs)
+void GrabWidget::setCoefs(const WBAdjustment& coefs)
 {
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
 
 	m_coefs = coefs;
 	if (m_features & AllowCoefConfig)
 		m_configWidget->setCoefs(m_coefs.red, m_coefs.green, m_coefs.blue);
+}
+
+void GrabWidget::setId(const int id)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_selfId = id;
+	m_selfIdString = QString::number(m_selfId + 1);
+}
+
+void GrabWidget::setFellows(QList<GrabWidget*>* const fellows)
+{
+	DEBUG_HIGH_LEVEL << Q_FUNC_INFO;
+
+	m_fellows = fellows;
 }
 
 bool GrabWidget::isAreaEnabled() const

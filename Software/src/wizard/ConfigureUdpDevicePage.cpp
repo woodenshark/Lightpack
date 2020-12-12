@@ -46,8 +46,8 @@ ConfigureUdpDevicePage::ConfigureUdpDevicePage(bool isInitFromSettings, Transien
 
 void ConfigureUdpDevicePage::initializePage()
 {
-	QString currentAddress = NULL;
-	QString currentPort = NULL;
+	QString currentAddress;
+	QString currentPort;
 	int currentTimeout = 0;
 
 	if (field(QStringLiteral("isDrgb")).toBool()) {
@@ -93,7 +93,7 @@ bool ConfigureUdpDevicePage::validatePage()
 
 	if (field(QStringLiteral("isDrgb")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDrgb(address, port, timeout));
-	} 
+	}
 	else if (field(QStringLiteral("isDnrgb")).toBool()) {
 		_transSettings->ledDevice.reset(new LedDeviceDnrgb(address, port, timeout));
 	}

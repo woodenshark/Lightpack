@@ -72,42 +72,43 @@ void GlobalColorCoefPage::initializePage()
 	// RESETS WBA
 	resetDeviceSettings();
 
-
-	QMap<int, MonitorSettings>::iterator it = _screens.begin();
-	for (; it != _screens.end(); it++) {
+	bool firstPass = true;
+	for (MonitorSettings& settings : _screens) {
 		int firstId = -1;
 		for (int i = 0; i < _transSettings->ledCount; i++) {
 			if (_transSettings->zonePositions.contains(i)) {
 				// grab first ID for each screen to use as base setting
-				if (it.value().screen->geometry().contains(_transSettings->zonePositions[i]))
+				if (settings.screen->geometry().contains(_transSettings->zonePositions[i]))
 					firstId = firstId < 0 ? i : std::min(firstId, i);
 				// add areas only on first pass
-				if (it == _screens.begin())
+				if (firstPass)
 					addGrabArea(i);
 			}
 		}
 		if (firstId > -1) {
 			const GrabWidget* const firstWidget = _grabAreas[firstId];
-			it.value().red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
-			it.value().green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
-			it.value().blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
+			settings.red = firstWidget->getCoefRed() * _ui->sbRed->maximum();
+			settings.green = firstWidget->getCoefGreen() * _ui->sbGreen->maximum();
+			settings.blue = firstWidget->getCoefBlue() * _ui->sbBlue->maximum();
 		}
+		firstPass = false;
 	}
 
 	onMonitor_currentIndexChanged(_ui->cbMonitorSelect->currentIndex());
 
-	connect(_ui->sbRed, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
-	connect(_ui->sbGreen, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
-	connect(_ui->sbBlue, SIGNAL(valueChanged(int)), this, SLOT(onCoefValueChanged(int)));
+	connect(_ui->sbRed, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
+	connect(_ui->sbGreen, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
+	connect(_ui->sbBlue, qOverload<int>(&QSpinBox::valueChanged), this, &GlobalColorCoefPage::onCoefValueChanged);
 	connect(_ui->hsColorTemperature, &QSlider::valueChanged, this, &GlobalColorCoefPage::onColorTemperatureValueChanged);
-	connect(_ui->cbMonitorSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onMonitor_currentIndexChanged(int)));
+	connect(_ui->cbMonitorSelect, qOverload<int>(&QComboBox::currentIndexChanged), this, &GlobalColorCoefPage::onMonitor_currentIndexChanged);
 
 	turnLightsOn(qRgb(255, 255, 255));
 
 	// prevent some firmwares/devices from timing out during this phase
 	// also avoids tracking widget coef signals
 	connect(&_keepAlive, &QTimer::timeout, this, &GlobalColorCoefPage::updateDevice);
-	_keepAlive.start(200);
+	using namespace std::chrono_literals;
+	_keepAlive.start(200ms);
 }
 
 bool GlobalColorCoefPage::validatePage()
@@ -156,13 +157,14 @@ bool GlobalColorCoefPage::validatePage()
 	Settings::setConnectedDevice(devType);
 	Settings::setNumberOfLeds(devType, _transSettings->zonePositions.size());
 
-	for (const int id : _transSettings->zonePositions.keys()) {
+	for (const GrabWidget * const widget : _grabAreas) {
+		const int id = widget->getId();
 		Settings::setLedPosition(id, _transSettings->zonePositions[id]);
 		Settings::setLedSize(id, _transSettings->zoneSizes[id]);
 		Settings::setLedEnabled(id, _transSettings->zoneEnabled[id]);
-		Settings::setLedCoefRed(id, _grabAreas[id]->getCoefRed());
-		Settings::setLedCoefGreen(id, _grabAreas[id]->getCoefGreen());
-		Settings::setLedCoefBlue(id, _grabAreas[id]->getCoefBlue());
+		Settings::setLedCoefRed(id, widget->getCoefRed());
+		Settings::setLedCoefGreen(id, widget->getCoefGreen());
+		Settings::setLedCoefBlue(id, widget->getCoefBlue());
 	}
 
 	cleanupPage();
@@ -201,9 +203,10 @@ void GlobalColorCoefPage::onCoefValueChanged(int value)
 	wba.blue = _ui->sbBlue->value() / (double)_ui->sbBlue->maximum();
 
 	MonitorSettings& settings = _screens[_ui->cbMonitorSelect->currentIndex()];
-	for (GrabWidget* const widget : _grabAreas.values())
+	for (GrabWidget * const widget : _grabAreas) {
 		if (settings.screen->geometry().contains(widget->geometry().center()))
 			widget->setCoefs(wba);
+	}
 
 	settings.red = _ui->sbRed->value();
 	settings.green = _ui->sbGreen->value();

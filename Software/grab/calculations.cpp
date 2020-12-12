@@ -236,36 +236,52 @@ namespace {
 
 
 enum SIMDLevel {
-    None = 0,
-    SSE4_1 = 1 << 0,
-    AVX2 = 1 << 1
+	None = 0,
+	SSE4_1 = 1 << 0,
+	AVX2 = 1 << 1
 };
-// https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
-#if defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
+
+#if defined(Q_OS_MACOS)
+#include <sys/sysctl.h>
+// https://developer.apple.com/documentation/apple_silicon/about_the_rosetta_translation_environment?language=objc
 static uint32_t available_simd() {
-    uint32_t level = SIMDLevel::None;
-    if (_may_i_use_cpu_feature(_FEATURE_AVX2))
-        level |= SIMDLevel::AVX2;
-    if (_may_i_use_cpu_feature(_FEATURE_SSE4_1))
-        level |= SIMDLevel::SSE4_1;
-    return level;
+	uint32_t level = SIMDLevel::None;
+	int ret = 0;
+	size_t size = sizeof(ret);
+	if (sysctlbyname("hw.optional.avx2_0", &ret, &size, NULL, 0) == 0 && ret == 1)
+		level |= SIMDLevel::AVX2;
+	ret = 0;
+	size = sizeof(ret);
+	if (sysctlbyname("hw.optional.sse4_1", &ret, &size, NULL, 0) == 0 && ret == 1)
+		level |= SIMDLevel::SSE4_1;
+	return level;
+}
+#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
+// https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+static uint32_t available_simd() {
+	uint32_t level = SIMDLevel::None;
+	if (_may_i_use_cpu_feature(_FEATURE_AVX2))
+		level |= SIMDLevel::AVX2;
+	if (_may_i_use_cpu_feature(_FEATURE_SSE4_1))
+		level |= SIMDLevel::SSE4_1;
+	return level;
 }
 #else /* non-Intel compiler */
 void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
 {
 #if defined(_MSC_VER)
-    __cpuidex((int*)abcd, eax, ecx);
+	__cpuidex((int*)abcd, eax, ecx);
 #else
-    uint32_t ebx = 0;
-    uint32_t edx = 0;
+	uint32_t ebx = 0;
+	uint32_t edx = 0;
 # if defined( __i386__ ) && defined ( __PIC__ )
-     /* in case of PIC under 32-bit EBX cannot be clobbered */
-    __asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+	 /* in case of PIC under 32-bit EBX cannot be clobbered */
+	__asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
 # else
-    __asm__ ( "cpuid" : "+b" (ebx),
+	__asm__ ( "cpuid" : "+b" (ebx),
 # endif
-              "+a" (eax), "+c" (ecx), "=d" (edx) );
-    abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+			  "+a" (eax), "+c" (ecx), "=d" (edx) );
+	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
 #endif
 }
 
@@ -274,37 +290,37 @@ void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
 # include <intrin.h>
 #endif
 static uint32_t available_simd() {
-    uint32_t abcd[4] = {0,0,0,0};
+	uint32_t abcd[4] = {0,0,0,0};
 
-    run_cpuid(1, 0, abcd);
-    uint32_t eax = 0x07;
-    uint32_t ecx = 0x00;
+	run_cpuid(1, 0, abcd);
+	uint32_t eax = 0x07;
+	uint32_t ecx = 0x00;
 #if defined(_MSC_VER)
-    __cpuidex((int*)abcd, eax, ecx);
+	__cpuidex((int*)abcd, eax, ecx);
 #else
-    uint32_t ebx = 0;
-    uint32_t edx = 0;
+	uint32_t ebx = 0;
+	uint32_t edx = 0;
 # if defined( __i386__ ) && defined ( __PIC__ )
-     /* in case of PIC under 32-bit EBX cannot be clobbered */
-    __asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
+	 /* in case of PIC under 32-bit EBX cannot be clobbered */
+	__asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
 # else
-    __asm__ ( "cpuid" : "+b" (ebx),
+	__asm__ ( "cpuid" : "+b" (ebx),
 # endif
-              "+a" (eax), "+c" (ecx), "=d" (edx) );
-    abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
+			  "+a" (eax), "+c" (ecx), "=d" (edx) );
+	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
 #endif
-    uint32_t level = SIMDLevel::None;
-    // CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
-    run_cpuid(7, 0, abcd);
-    if ((abcd[1] & (1 << 5)))
-        level |= SIMDLevel::AVX2;
+	uint32_t level = SIMDLevel::None;
+	// CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
+	run_cpuid(7, 0, abcd);
+	if ((abcd[1] & (1 << 5)))
+		level |= SIMDLevel::AVX2;
 
-    // CPUID.(EAX=01H, ECX=0H):ECX.SSE4_1[bit 19]==1
-    run_cpuid(1, 0, abcd);
-    if ((abcd[2] & (1 << 19)))
-        level |= SIMDLevel::SSE4_1;
+	// CPUID.(EAX=01H, ECX=0H):ECX.SSE4_1[bit 19]==1
+	run_cpuid(1, 0, abcd);
+	if ((abcd[2] & (1 << 19)))
+		level |= SIMDLevel::SSE4_1;
 
-    return level;
+	return level;
 }
 #endif
 

@@ -1,0 +1,63 @@
+app-id: __APP_ID__
+runtime: org.kde.Platform
+runtime-version: __KDE_VERSION__
+sdk: org.kde.Sdk
+finish-args:
+  # X11 + XShm access
+  - --share=ipc
+  - --socket=x11
+
+  - --share=network
+  - --socket=pulseaudio
+  - --filesystem=~/.Prismatik:rw
+  - --device=all
+
+  # needed for tray
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --own-name=org.kde.*
+build-options:
+  strip: true
+command: prismatik
+modules:
+  - name: libusb
+    buildsystem: autotools
+    config-opts:
+      - --enable-udev
+      - --enable-shared
+      - --disable-static
+    sources:
+      - type: git
+        url: https://github.com/libusb/libusb
+  - name: fftw3f
+    buildsystem: autotools
+    config-opts:
+      - --enable-float
+      - --enable-shared
+      - --disable-static
+      # - --enable-avx2
+      - --enable-sse2
+    sources:
+      - type: archive
+        url: http://fftw.org/fftw-3.3.8.tar.gz
+        sha256: 6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303
+  - name: prismatik
+    buildsystem: simple
+    builddir: true
+    build-options:
+      env:
+        PKG_TEMPLATE_DIR: Software/dist_linux/package_template
+    build-commands:
+      - qmake -v
+      - cd Software && qmake -r
+      - cd Software && make -j$FLATPAK_BUILDER_N_JOBS
+      - sed -E 's#(Exec|Icon)=.+#\1=de.psieg.Prismatik#' $PKG_TEMPLATE_DIR/usr/share/applications/prismatik.desktop > _prismatik.desktop
+      - install -Dm644 _prismatik.desktop $FLATPAK_DEST/usr/share/applications/$FLATPAK_ID.desktop
+      - install -Dm644 $PKG_TEMPLATE_DIR/etc/udev/rules.d/93-lightpack.rules $FLATPAK_DEST/etc/udev/rules.d/93-lightpack.rules
+      - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/icons/hicolor/22x22/apps/prismatik-on.png $FLATPAK_DEST/usr/share/icons/hicolor/22x22/apps/$FLATPAK_ID.png
+      - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/icons/Prismatik.png $FLATPAK_DEST/usr/share/icons/$FLATPAK_ID.png
+      - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/pixmaps/Prismatik.png $FLATPAK_DEST/usr/share/pixmaps/$FLATPAK_ID.png
+      - install -Dm755 -s Software/bin/Prismatik $FLATPAK_DEST/bin/prismatik
+    sources:
+      - type: dir
+        path: ../../..

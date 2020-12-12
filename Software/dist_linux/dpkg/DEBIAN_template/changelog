@@ -1,5 +1,5 @@
 prismatik (${version}) unstable; urgency=low
 
-  * http://code.google.com/p/lightpack/source/browse/Software/CHANGELOG
+  * https://github.com/psieg/Lightpack/blob/master/Software/CHANGELOG
 
  -- Timur Sattarov <tim.helloworld@gmail.com> ${timestamp}

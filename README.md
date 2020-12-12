@@ -108,28 +108,44 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
 ### Build Instructions for Linux
 #### Prerequisites:
 You will need the following packages, usually all of them are in distro's repository:
-* qt5-default
-* libqt5serialport5-dev
-* build-essential
-* libgtk2.0-dev
-* libusb-1.0-0-dev
-* libnotify-dev
-* libudev-dev
-* qttools5-dev-tools
-* if you are using Ubuntu: libappindicator-dev
-* not required, but the update checker uses SSL sockets: openssl
-* for sound visualizer: `libpulse-dev`, `libfftw3-dev`
+* `qt5-default`
+* `qttools5-dev-tools`
+* `libqt5serialport5-dev`
+* `build-essential`
+* `pkg-config`
+* `libusb-1.0-0-dev`
+* `libudev-dev`
+* if you are using Unity DE: `libappindicator-dev` `libnotify-dev` `libgtk2.0-dev`
+* if you are using gnome you'll need `gnome-shell-extension-appindicator` for a working tray icon
+* not required, but the update checker uses SSL sockets: `openssl`
+* for sound visualizer: `libpulse-dev`, `libfftw3-dev` (edit `build-vars.prf(.default)` and comment out `PULSEAUDIO_SUPPORT` to disable the feature)
+
+_(this is a Debian based example, see Software/dist_linux/*/Dockerfile for your particular package backend if available)_
 
 #### Build Process:
 1. Go to `<repo>/Software`
 2. Optional: if locales changed: run `./update_locales.sh`
 3. Run `qmake -r`
 4. Run `make`
+5. Resulting binary will be in `<repo>/Software/bin`
 
+#### Building a Package:
+If you target your current system / package backend:
+1. `cd Software/dist_linux`
+2. Run `./build-natively.sh` to list available backends (`dpkg`, `pacman`, `flatpak`, ...)
+3. Run `./build-natively.sh <package-backend>`
+4. Resulting package should be in `<package-backend>/` folder
 
-#### Building a deb Package:
-1. Run `scripts/linux/prepare_installer.sh`
-2. `cd dist_linux` and run `build-deb.sh`
+You can also target a different distribution / backend combination via docker (this assumes docker is up and running on your system):
+1. `cd Software/dist_linux`
+2. Run `./build-in-docker.sh` to list backends
+3. Run `./build-in-docker.sh <package-backend> <os-image-name> <os-image-tag>`:
+    * `./build-in-docker.sh dpkg debian 10.6`
+    * `./build-in-docker.sh dpkg ubuntu 18.04`
+    * `./build-in-docker.sh pacman archlinux latest`
+4. Resulting package should be in `<package-backend>/` folder
+
+_(`os-iamge-name`/`os-image-tag` should be available on hub.docker.com or existing on your system, they will be used as a base for the Prismatik builder image)_
 
 #### Manual Deployment:
 Instead of building a deb package, you can:

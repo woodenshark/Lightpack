@@ -206,7 +206,8 @@ unix:!macx{
 }
 
 macx{
-    QMAKE_LFLAGS += -F/System/Library/Frameworks -F"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/PrivateFrameworks"
+    XCODE_PATH = $$system(xcode-select -print-path)
+    QMAKE_LFLAGS += -F/System/Library/Frameworks -F"$${XCODE_PATH}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/PrivateFrameworks"
     # MacOS version using libusb and hidapi codes
     SOURCES += hidapi/mac/hid.c \
     MacOSSession.mm

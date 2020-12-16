@@ -100,6 +100,10 @@ win32 {
         QMAKE_CXXFLAGS += /MP
         # Create "fake" project dependencies of the libraries used dynamically
         LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
+
+        # emulate every other compiler, __SSE4_1__ is defined when AVX2 is enabled (and __AVX2__ is also defined)
+        DEFINES += __SSE4_1__
+        QMAKE_CXXFLAGS += /arch:AVX2
     }
 
     contains(DEFINES,NIGHTLIGHT_SUPPORT) {

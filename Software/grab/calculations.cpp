@@ -25,7 +25,9 @@
 
 #include "calculations.hpp"
 #include <stdint.h>
+#ifdef __SSE4_1__
 #include <immintrin.h>
+#endif
 
 #define PIXEL_FORMAT_ARGB 2,1,0 // channel positions in a 4 byte color
 #define PIXEL_FORMAT_ABGR 0,1,2
@@ -82,6 +84,7 @@ namespace {
 		return color;
 	};
 
+#ifdef __SSE4_1__
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
 	static ColorValue accumulateBuffer128(
 		const int * const buffer,
@@ -155,7 +158,9 @@ namespace {
 		color.b = ((color.b + _mm_extract_epi32(horizontalSum128, offsetB)) / count) & 0xff;
 		return color;
 	};
+#endif
 
+#ifdef __AVX2__
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
 	static ColorValue accumulateBuffer256(
 		const int * const buffer,
@@ -233,7 +238,7 @@ namespace {
 		color.b = (_mm_extract_epi32(horizontalSum128, offsetB) / count) & 0xff;
 		return color;
 	};
-
+#endif
 
 enum SIMDLevel {
 	None = 0,
@@ -343,18 +348,22 @@ auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
 struct simdupgrade {
 	simdupgrade() {
 		uint32_t level = available_simd();
+		#ifdef __SSE4_1__
+		if (level & SIMDLevel::SSE4_1) {
+			accumulateARGB = accumulateBuffer128<PIXEL_FORMAT_ARGB>;
+			accumulateABGR = accumulateBuffer128<PIXEL_FORMAT_ABGR>;
+			accumulateRGBA = accumulateBuffer128<PIXEL_FORMAT_RGBA>;
+			accumulateBGRA = accumulateBuffer128<PIXEL_FORMAT_BGRA>;
+		}
+		#endif
+		#ifdef __AVX2__
 		if (level & SIMDLevel::AVX2) {
 			accumulateARGB = accumulateBuffer256<PIXEL_FORMAT_ARGB>;
 			accumulateABGR = accumulateBuffer256<PIXEL_FORMAT_ABGR>;
 			accumulateRGBA = accumulateBuffer256<PIXEL_FORMAT_RGBA>;
 			accumulateBGRA = accumulateBuffer256<PIXEL_FORMAT_BGRA>;
 		}
-		else if (level & SIMDLevel::SSE4_1) {
-			accumulateARGB = accumulateBuffer128<PIXEL_FORMAT_ARGB>;
-			accumulateABGR = accumulateBuffer128<PIXEL_FORMAT_ABGR>;
-			accumulateRGBA = accumulateBuffer128<PIXEL_FORMAT_RGBA>;
-			accumulateBGRA = accumulateBuffer128<PIXEL_FORMAT_BGRA>;
-		}
+		#endif
 	}
 };
 simdupgrade avxup;

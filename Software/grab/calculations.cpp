@@ -84,6 +84,12 @@ namespace {
 		return color;
 	};
 
+auto accumulateARGB = accumulateBuffer<PIXEL_FORMAT_ARGB>;
+auto accumulateABGR = accumulateBuffer<PIXEL_FORMAT_ABGR>;
+auto accumulateRGBA = accumulateBuffer<PIXEL_FORMAT_RGBA>;
+auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
+
+#if defined(__SSE4_1__) || defined(__AVX2__)
 #ifdef __SSE4_1__
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
 	static ColorValue accumulateBuffer128(
@@ -340,12 +346,6 @@ static uint32_t available_simd() {
 
 	by default set functions to non-SIMD and upgrade to AVX2 or SSE4.1 when available
 */
-auto accumulateARGB = accumulateBuffer<PIXEL_FORMAT_ARGB>;
-auto accumulateABGR = accumulateBuffer<PIXEL_FORMAT_ABGR>;
-auto accumulateRGBA = accumulateBuffer<PIXEL_FORMAT_RGBA>;
-auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
-
-#if defined(__SSE4_1__) || defined(__AVX2__)
 struct simdupgrade {
 	simdupgrade() {
 		const uint32_t level = available_simd();

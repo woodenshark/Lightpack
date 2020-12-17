@@ -27,7 +27,7 @@
 #include <stdint.h>
 #ifdef __SSE4_1__
 #include <immintrin.h>
-#endif
+#endif // ifdef __SSE4_1__
 
 #define PIXEL_FORMAT_ARGB 2,1,0 // channel positions in a 4 byte color
 #define PIXEL_FORMAT_ABGR 0,1,2
@@ -158,7 +158,7 @@ namespace {
 		color.b = ((color.b + _mm_extract_epi32(horizontalSum128, offsetB)) / count) & 0xff;
 		return color;
 	};
-#endif
+#endif // ifdef __SSE4_1__
 
 #ifdef __AVX2__
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
@@ -238,7 +238,7 @@ namespace {
 		color.b = (_mm_extract_epi32(horizontalSum128, offsetB) / count) & 0xff;
 		return color;
 	};
-#endif
+#endif // ifdef __AVX2__
 
 enum SIMDLevel {
 	None = 0,
@@ -284,16 +284,16 @@ void run_cpuid(uint32_t eax, uint32_t ecx, uint32_t* abcd)
 	__asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
 # else
 	__asm__ ( "cpuid" : "+b" (ebx),
-# endif
+# endif // ifdef __i386__ || __PIC__
 			  "+a" (eax), "+c" (ecx), "=d" (edx) );
 	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
-#endif
+#endif // ifdef _MSC_VER
 }
 
 
 #if defined(_MSC_VER)
 # include <intrin.h>
-#endif
+#endif // ifdef _MSC_VER
 static uint32_t available_simd() {
 	uint32_t abcd[4] = {0,0,0,0};
 
@@ -310,10 +310,10 @@ static uint32_t available_simd() {
 	__asm__ ( "movl %%ebx, %%edi \n\t cpuid \n\t xchgl %%ebx, %%edi" : "=D" (ebx),
 # else
 	__asm__ ( "cpuid" : "+b" (ebx),
-# endif
+# endif // ifdef __i386__ || __PIC__
 			  "+a" (eax), "+c" (ecx), "=d" (edx) );
 	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
-#endif
+#endif // ifdef _MSC_VER
 	uint32_t level = SIMDLevel::None;
 	// CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
 	run_cpuid(7, 0, abcd);
@@ -327,7 +327,7 @@ static uint32_t available_simd() {
 
 	return level;
 }
-#endif
+#endif // else non-intel
 
 /*
 	accumulateBuffer128 requires SSE4.1
@@ -345,9 +345,10 @@ auto accumulateABGR = accumulateBuffer<PIXEL_FORMAT_ABGR>;
 auto accumulateRGBA = accumulateBuffer<PIXEL_FORMAT_RGBA>;
 auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
 
+#if defined(__SSE4_1__) || defined(__AVX2__)
 struct simdupgrade {
 	simdupgrade() {
-		uint32_t level = available_simd();
+		const uint32_t level = available_simd();
 		#ifdef __SSE4_1__
 		if (level & SIMDLevel::SSE4_1) {
 			accumulateARGB = accumulateBuffer128<PIXEL_FORMAT_ARGB>;
@@ -355,7 +356,7 @@ struct simdupgrade {
 			accumulateRGBA = accumulateBuffer128<PIXEL_FORMAT_RGBA>;
 			accumulateBGRA = accumulateBuffer128<PIXEL_FORMAT_BGRA>;
 		}
-		#endif
+		#endif // ifdef __SSE4_1__
 		#ifdef __AVX2__
 		if (level & SIMDLevel::AVX2) {
 			accumulateARGB = accumulateBuffer256<PIXEL_FORMAT_ARGB>;
@@ -363,10 +364,11 @@ struct simdupgrade {
 			accumulateRGBA = accumulateBuffer256<PIXEL_FORMAT_RGBA>;
 			accumulateBGRA = accumulateBuffer256<PIXEL_FORMAT_BGRA>;
 		}
-		#endif
+		#endif // ifdef __AVX2__
 	}
 };
 simdupgrade avxup;
+#endif // ifdef __SSE4_1__ || __AVX2__
 } // namespace
 
 namespace Grab {

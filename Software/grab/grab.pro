@@ -137,13 +137,17 @@ macx {
     #        -framework CoreFoundation
     #QMAKE_MAC_SDK = macosx10.8
 
+    # ignored by clang when building for arm
     QMAKE_CFLAGS += -mavx2
     QMAKE_CXXFLAGS += -mavx2
 }
 
 unix:!macx {
-    QMAKE_CFLAGS += -mavx2
-    QMAKE_CXXFLAGS += -mavx2
+    CXX_TARGET = $$system($$QMAKE_CXX -dumpmachine)
+    contains(CXX_TARGET, x86_64.*) {
+        QMAKE_CFLAGS += -mavx2
+        QMAKE_CXXFLAGS += -mavx2
+    }
 }
 
 OTHER_FILES += \

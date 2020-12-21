@@ -466,13 +466,13 @@ void ApiServer::clientProcessCommands()
 			default:
 				max = MaximumNumberOfLeds::Default;
 			}
-			result = QStringLiteral("%1%2\r\n").arg(CmdResultMaxLeds, max);
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultMaxLeds, QString::number(max));
 		}
 		else if (cmdBuffer == CmdGetCountLeds)
 		{
 			API_DEBUG_OUT << CmdGetCountLeds;
 
-			result = QStringLiteral("%1%2\r\n").arg(CmdResultCountLeds, lightpack->GetCountLeds());
+			result = QStringLiteral("%1%2\r\n").arg(CmdResultCountLeds, QString::number(lightpack->GetCountLeds()));
 		}
 		else if (cmdBuffer == CmdGetLeds)
 		{

@@ -21,9 +21,8 @@ pkgver() {
 
 build() {
     cd ${_srcdir}
-    #((make clean && qmake -r) || qmake -r)
     qmake -r
-    make -j3
+    make ${MAKEFLAGS}
 }
 
 check() {

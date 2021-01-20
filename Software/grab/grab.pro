@@ -100,6 +100,10 @@ win32 {
         QMAKE_CXXFLAGS += /MP
         # Create "fake" project dependencies of the libraries used dynamically
         LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
+
+        # emulate every other compiler, __SSE4_1__ is defined when AVX2 is enabled (and __AVX2__ is also defined)
+        DEFINES += __SSE4_1__
+        QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
     }
 
     contains(DEFINES,NIGHTLIGHT_SUPPORT) {
@@ -133,13 +137,15 @@ macx {
     #        -framework CoreFoundation
     #QMAKE_MAC_SDK = macosx10.8
 
-    QMAKE_CFLAGS += -mavx2
-    QMAKE_CXXFLAGS += -mavx2
+    # ignored by clang when building for arm
+    QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
 }
 
 unix:!macx {
-    QMAKE_CFLAGS += -mavx2
-    QMAKE_CXXFLAGS += -mavx2
+    CXX_TARGET = $$system($$QMAKE_CXX -dumpmachine)
+    contains(CXX_TARGET, x86_64.*) {
+        QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
+    }
 }
 
 OTHER_FILES += \

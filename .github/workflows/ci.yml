@@ -207,8 +207,8 @@ jobs:
       - name: Build
         working-directory: ./Software
         run: |
-          export QTDIR=/usr/local/opt/qt
-          export PATH=$PATH:$QTDIR/bin
+          export QTDIR=/usr/local/opt/qt@5
+          export PATH=$QTDIR/bin:$PATH
           qmake -r
           make
           macdeployqt bin/Prismatik.app -dmg

@@ -199,7 +199,7 @@ jobs:
           set -xe
           sw_vers
           ls -d /Applications/Xcode*.app
-          sudo xcode-select --switch `ls -d /Applications/Xcode*.app | sort -Vr | head -n1`
+          sudo xcode-select --switch /Applications/Xcode_11.7.app
           xcode-select -p
           xcodebuild -version
           xcodebuild -showsdks

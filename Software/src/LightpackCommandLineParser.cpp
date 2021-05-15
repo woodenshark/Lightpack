@@ -13,6 +13,7 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	, m_versionOption(m_parser.addVersionOption())
 	, m_helpOption(m_parser.addHelpOption())
 	, m_optionSetProfile(QStringLiteral("set-profile"), QStringLiteral("switch to another profile in already running instance"), QStringLiteral("profile"))
+	, m_optionConfigDir(QStringLiteral("config-dir"), QStringLiteral("use configurations in this directory. Will not check for already running instances if this is set."), QStringLiteral("profile"))
 {
 	m_parser.setApplicationDescription(QStringLiteral("Prismatik of Lightpack"));
 	m_parser.addOption(m_noGUIOption);
@@ -71,6 +72,11 @@ bool LightpackCommandLineParser::isSetProfile() const
 	return m_parser.isSet(m_optionSetProfile);
 }
 
+bool LightpackCommandLineParser::isSetProfile() const
+{
+	return m_parser.isSet(m_optionConfigDir);
+}
+
 Debug::DebugLevels LightpackCommandLineParser::debugLevel() const
 {
 	Q_ASSERT(isSetDebuglevel());
@@ -80,6 +86,12 @@ Debug::DebugLevels LightpackCommandLineParser::debugLevel() const
 QString LightpackCommandLineParser::profileName() const {
 	Q_ASSERT(isSetProfile());
 	return m_profileName;
+}
+
+
+QString LightpackCommandLineParser::configDir() const {
+	Q_ASSERT(isSetConfigDir());
+	return m_configDir;
 }
 
 QString LightpackCommandLineParser::helpText() const {
@@ -115,6 +127,8 @@ bool LightpackCommandLineParser::parse(const QStringList &arguments)
 
 	if (m_parser.isSet(m_optionSetProfile))
 		m_profileName = m_parser.value(m_optionSetProfile);
+	if (m_parser.isSet(m_optionConfigDir))
+		m_configDir = m_parser.value(m_optionConfigDir);
 
 	if (m_parser.isSet(m_debugLevelOption))
 	{

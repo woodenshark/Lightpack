@@ -141,10 +141,14 @@ void QtSingleApplication::sysInit(const QString &appId)
 }
 
 
+void QtSingleApplication::setId(const QString &appId) {
+	if (peer != nullptr) delete peer;
+	sysInit(appId);
+}
+
 /*!
-	Creates a QtSingleApplication object. The application identifier
-	will be QCoreApplication::applicationFilePath(). \a argc, \a
-	argv, and \a GUIenabled are passed on to the QAppliation constructor.
+	Creates a QtSingleApplication object without Identfier.
+	Call setId to initialize.
 
 	If you are creating a console application (i.e. setting \a
 	GUIenabled to false), you may consider using
@@ -152,9 +156,8 @@ void QtSingleApplication::sysInit(const QString &appId)
 */
 
 QtSingleApplication::QtSingleApplication(int &argc, char **argv, bool GUIenabled)
-	: QApplication(argc, argv, GUIenabled)
+	: QApplication(argc, argv, GUIenabled), actWin(0), peer(0)
 {
-	sysInit();
 }
 
 
@@ -239,6 +242,7 @@ QtSingleApplication::QtSingleApplication(Display* dpy, const QString &appId, int
 
 bool QtSingleApplication::isRunning()
 {
+	if (peer == nullptr) return false;
 	return peer->isClient();
 }
 
@@ -258,6 +262,7 @@ bool QtSingleApplication::isRunning()
 */
 bool QtSingleApplication::sendMessage(const QString &message, int timeout)
 {
+	if (peer == nullptr) return false;
 	return peer->sendMessage(message, timeout);
 }
 
@@ -268,6 +273,7 @@ bool QtSingleApplication::sendMessage(const QString &message, int timeout)
 */
 QString QtSingleApplication::id() const
 {
+	if (peer == nullptr) return "";
 	return peer->applicationId();
 }
 
@@ -286,6 +292,7 @@ QString QtSingleApplication::id() const
 
 void QtSingleApplication::setActivationWindow(QWidget* aw, bool activateOnMessage)
 {
+	if (peer == nullptr) return;
 	actWin = aw;
 	if (activateOnMessage)
 		connect(peer, &QtLocalPeer::messageReceived, this, qOverload<>(&QtSingleApplication::activateWindow));

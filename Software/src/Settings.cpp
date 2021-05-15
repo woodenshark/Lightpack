@@ -278,7 +278,7 @@ QSettings * Settings::m_mainConfig; // LightpackMain.conf contains last profile
 Settings * Settings::m_this = new Settings();
 
 // Path to directory there store application generated stuff
-QString Settings::m_applicationDirPath = QLatin1String("");
+QString Settings::m_configDirPath = QLatin1String("");
 
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToNameMap;
 QMap<SupportedDevices::DeviceType, QString> Settings::m_devicesTypeToKeyNumberOfLedsMap;
@@ -297,14 +297,14 @@ bool Settings::Initialize( const QString & applicationDirPath, bool isDebugLevel
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-	if(!m_applicationDirPath.isEmpty())
+	if(!m_configDirPath.isEmpty())
 		return true;
 
-	m_applicationDirPath = applicationDirPath;
+	m_configDirPath = applicationDirPath;
 
 	// Append to the end of dir path '/'
-	if (m_applicationDirPath.lastIndexOf('/') != m_applicationDirPath.length() - 1)
-		m_applicationDirPath += QStringLiteral("/");
+	if (m_configDirPath.lastIndexOf('/') != m_configDirPath.length() - 1)
+		m_configDirPath += QStringLiteral("/");
 
 	QString mainConfigPath = getMainConfigPath();
 	bool settingsWasPresent = QFileInfo::exists(mainConfigPath);
@@ -587,13 +587,13 @@ bool Settings::isProfileLoaded()
 
 QString Settings::getApplicationDirPath()
 {
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << m_applicationDirPath;
-	return m_applicationDirPath;
+	DEBUG_LOW_LEVEL << Q_FUNC_INFO << m_configDirPath;
+	return m_configDirPath;
 }
 
 QString Settings::getMainConfigPath()
 {
-	QString mainConfPath = m_applicationDirPath + QStringLiteral("main.conf");
+	QString mainConfPath = m_configDirPath + QStringLiteral("main.conf");
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << mainConfPath;
 	return mainConfPath;
 }
@@ -2060,7 +2060,7 @@ double Settings::getValidLedCoef(int ledIndex, const QString & keyCoef)
 }
 
 QString Settings::getProfilesPath() {
-	return QStringLiteral("%1Profiles/").arg(m_applicationDirPath);
+	return QStringLiteral("%1Profiles/").arg(m_configDirPath);
 }
 
 bool Settings::isCheckForUpdatesEnabled() {

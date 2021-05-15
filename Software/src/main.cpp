@@ -131,30 +131,18 @@ int main(int argc, char **argv)
 	HANDLE appMutex = CreateMutexW(NULL, FALSE, L"LightpackAppMutex");
 #endif
 
-	const QString appDirPath = getApplicationDirectoryPath(argv[0]);
-
 	LogWriter logWriter;
 
 	LogWriter::ScopedMessageHandler messageHandlerGuard(&logWriter);
 	Q_UNUSED(messageHandlerGuard);
 
 	LightpackApplication lightpackApp(argc, argv);
-	lightpackApp.setLibraryPaths(QStringList(appDirPath + QStringLiteral("/plugins")));
-	lightpackApp.initializeAll(appDirPath);
 
 	// init the logger after initializeAll to know the configured debugLevel
 
-	const int logInitResult = g_debugLevel > 0 ? logWriter.initEnabled(appDirPath + "/Logs") : logWriter.initDisabled(appDirPath + "/Logs");
+	const int logInitResult = g_debugLevel > 0 ? logWriter.initEnabled(lightpackApp.configDir() + "/Logs") : logWriter.initDisabled(lightpackApp.configDir() + "/Logs");
 	if (logInitResult != LightpackApplication::OK_ErrorCode)
 		exit(logInitResult);
-
-	if (lightpackApp.isRunning())
-	{
-		lightpackApp.sendMessage(QStringLiteral("alreadyRunning"));
-
-		qWarning() << "Application already running";
-		exit(0);
-	}
 
 	Q_INIT_RESOURCE(LightpackResources);
 

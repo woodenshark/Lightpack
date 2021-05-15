@@ -13,7 +13,7 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	, m_versionOption(m_parser.addVersionOption())
 	, m_helpOption(m_parser.addHelpOption())
 	, m_optionSetProfile(QStringLiteral("set-profile"), QStringLiteral("switch to another profile in already running instance"), QStringLiteral("profile"))
-	, m_optionConfigDir(QStringLiteral("config-dir"), QStringLiteral("use configurations in this directory. Will not check for already running instances if this is set."), QStringLiteral("profile"))
+	, m_optionConfigDir(QStringLiteral("config-dir"), QStringLiteral("use configurations in this directory"), QStringLiteral("profile"))
 {
 	m_parser.setApplicationDescription(QStringLiteral("Prismatik of Lightpack"));
 	m_parser.addOption(m_noGUIOption);
@@ -26,6 +26,7 @@ LightpackCommandLineParser::LightpackCommandLineParser()
 	m_parser.addOption(m_debugLevelLowOption);
 	m_parser.addOption(m_debugLevelZeroOption);
 	m_parser.addOption(m_optionSetProfile);
+	m_parser.addOption(m_optionConfigDir);
 }
 
 bool LightpackCommandLineParser::isSetNoGUI() const
@@ -72,7 +73,7 @@ bool LightpackCommandLineParser::isSetProfile() const
 	return m_parser.isSet(m_optionSetProfile);
 }
 
-bool LightpackCommandLineParser::isSetProfile() const
+bool LightpackCommandLineParser::isSetConfigDir() const
 {
 	return m_parser.isSet(m_optionConfigDir);
 }

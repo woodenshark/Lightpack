@@ -76,6 +76,7 @@ public:
 	QtSingleApplication(Display* dpy, const QString &appId, int argc, char **argv, Qt::HANDLE visual = 0, Qt::HANDLE colormap = 0);
 #	endif // Q_OS_LINUX
 #endif // QT_VERSION < 0x050000
+	void setId(const QString& appId);
 
 	bool isRunning();
 	QString id() const;

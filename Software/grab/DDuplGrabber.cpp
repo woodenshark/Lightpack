@@ -61,9 +61,6 @@ typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(
 #define ACCESSDENIED_DUPLICATION_RETRY_INTERVAL 5000
 #define THREAD_DESTRUCTION_WAIT_TIMEOUT 3000
 
-#define DDUPL_THREAD_EVENT_NAME L"Lightpack.DDuplGrabber.Event.Thread"
-#define DDUPL_THREADRETURN_EVENT_NAME L"Lightpack.DDuplGrabber.Event.ThreadReturn"
-
 namespace {
 	// 0 = /1 (no scaling)
 	// 1 = /2
@@ -146,12 +143,12 @@ bool DDuplGrabber::init()
 		return false;
 	}
 
-	if (NULL == (m_threadEvent = CreateEventW(NULL, false, false, DDUPL_THREAD_EVENT_NAME))) {
+	if (NULL == (m_threadEvent = CreateEventW(NULL, false, false, NULL))) {
 		qCritical(Q_FUNC_INFO " unable to create threadEvent");
 		return false;
 	}
 
-	if (NULL == (m_threadReturnEvent = CreateEventW(NULL, false, false, DDUPL_THREADRETURN_EVENT_NAME))) {
+	if (NULL == (m_threadReturnEvent = CreateEventW(NULL, false, false, NULL))) {
 		qCritical(Q_FUNC_INFO " unable to create threadReturnEvent");
 		return false;
 	}

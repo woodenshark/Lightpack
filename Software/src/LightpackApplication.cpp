@@ -51,6 +51,7 @@ LightpackApplication::LightpackApplication(int &argc, char **argv)
 	: QtSingleApplication(argc, argv)
 {
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO;
+	initializeAll();
 }
 
 LightpackApplication::~LightpackApplication()
@@ -93,25 +94,77 @@ LightpackApplication::~LightpackApplication()
 	m_pluginInterface = NULL;
 }
 
-void LightpackApplication::initializeAll(const QString & appDirPath)
+const QString& LightpackApplication::configDir() {
+	return m_configDirPath;
+}
+
+
+void LightpackApplication::determineConfigDir(QString overrideDir)
+{
+	QString appDirPath = applicationDirPath();
+
+	QString lightpackMainConfPath = appDirPath + QStringLiteral("/main.conf");
+
+	cout << lightpackMainConfPath.toStdString() << endl;
+
+	if (overrideDir.isEmpty() && QFile::exists(lightpackMainConfPath))
+	{
+		/// Portable version
+		/// Store logs and settings in application directory
+		cout << "Portable version" << endl;
+	}
+	else
+	{
+		/// Unportable version
+		/// Store logs and settings in home directory of the current user
+		cout << "Unportable version" << endl;
+
+		QString home = QDir::homePath();
+		QString normalizedHome = home.endsWith(QStringLiteral("/")) ? home.left(home.size() - 1) : home;
+
+#		ifdef Q_OS_WIN
+		appDirPath = normalizedHome + QStringLiteral("/Prismatik");
+#		else
+		appDirPath = normalizedHome + QStringLiteral("/.Prismatik");
+#		endif
+		if (!overrideDir.isEmpty())
+			appDirPath = overrideDir;
+
+		QDir dir(appDirPath);
+		if (dir.exists() == false)
+		{
+			cout << "mkdir " << appDirPath.toStdString() << endl;
+			if (dir.mkdir(appDirPath) == false)
+			{
+				cerr << "Failed mkdir '" << appDirPath.toStdString() << "' for application generated stuff. Exit." << endl;
+				exit(LightpackApplication::AppDirectoryCreationFail_ErrorCode);
+			}
+		}
+	}
+
+	cout << "Configuration directory: " << appDirPath.toStdString() << endl;
+
+	m_configDirPath = appDirPath;
+	setLibraryPaths(QStringList(appDirPath + QStringLiteral("/plugins")));
+	setId("Prismatik-" + m_configDirPath);
+}
+
+
+void LightpackApplication::initializeAll()
 {
 	setApplicationName(QStringLiteral("Prismatik"));
 	setOrganizationName(QStringLiteral("Woodenshark LLC"));
 	setApplicationVersion(QStringLiteral(VERSION_STR));
 	setQuitOnLastWindowClosed(false);
 
-	m_applicationDirPath = appDirPath;
 	m_noGui = false;
 	m_isSessionLocked = false;
-
 
 	processCommandLineArguments();
 
 	printVersionsSoftwareQtOS();
-	if (isRunning())
-		return;
 
-	if (!Settings::Initialize(m_applicationDirPath, m_isDebugLevelObtainedFromCmdArgs)
+	if (!Settings::Initialize(m_configDirPath, m_isDebugLevelObtainedFromCmdArgs)
 			&& !m_noGui) {
 		runWizardLoop(false);
 	}
@@ -440,6 +493,14 @@ void LightpackApplication::processCommandLineArguments()
 		::exit(0);
 	}
 
+	bool ignore_already_running = false;
+	if (parser.isSetConfigDir()) {
+		determineConfigDir(parser.configDir());
+		//ignore_already_running = true;
+	} else {
+		determineConfigDir();
+	}
+
 	// these two options are mutually exclusive
 	if (parser.isSetNoGUI()) {
 		m_noGui = true;
@@ -452,7 +513,7 @@ void LightpackApplication::processCommandLineArguments()
 				QThread::sleep(200);
 			}
 		}
-		bool isInitFromSettings = Settings::Initialize(m_applicationDirPath, false);
+		bool isInitFromSettings = Settings::Initialize(m_configDirPath, false);
 		runWizardLoop(isInitFromSettings);
 	}
 
@@ -476,6 +537,12 @@ void LightpackApplication::processCommandLineArguments()
 	if (parser.isSetProfile()) {
 		if (isRunning())
 			sendMessage(QStringLiteral("set-profile ") + parser.profileName());
+		::exit(0);
+	}
+
+	if (!ignore_already_running && isRunning()) {
+		sendMessage(QStringLiteral("alreadyRunning"));
+		qWarning() << "Application already running";
 		::exit(0);
 	}
 

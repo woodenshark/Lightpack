@@ -396,7 +396,7 @@ private:
 	static QMutex m_mutex; // for thread-safe access to QSettings* variables
 	static QSettings * m_currentProfile; // using profile
 	static QSettings * m_mainConfig;		// store last used profile name, locale and so on
-	static QString m_applicationDirPath; // path to store app generated stuff
+	static QString m_configDirPath; // path to store app generated stuff
 	static Settings *m_this;
 	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToNameMap;
 	static QMap<SupportedDevices::DeviceType, QString> m_devicesTypeToKeyNumberOfLedsMap;

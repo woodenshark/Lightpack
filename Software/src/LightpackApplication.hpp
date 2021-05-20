@@ -45,7 +45,7 @@ public:
 	LightpackApplication(int &argc, char **argv);
 	~LightpackApplication();
 
-	void initializeAll(const QString & appDirPath);
+	const QString& configDir();
 #ifdef Q_OS_WIN
 	bool winEventFilter ( MSG * msg, long * result );
 	HWND getMainWindowHandle();
@@ -104,6 +104,9 @@ public:
 	QMutex m_mutex;
 
 private:
+	void determineConfigDir(QString overrideDir = "");
+	void initializeAll();
+
 	SettingsWindow *m_settingsWindow{nullptr};
 	ApiServer *m_apiServer{nullptr};
 	LedDeviceManager *m_ledDeviceManager{nullptr};
@@ -119,7 +122,7 @@ private:
 	LightpackPluginInterface *m_pluginInterface{nullptr};
 	QWidget *consolePlugin{nullptr};
 
-	QString m_applicationDirPath;
+	QString m_configDirPath;
 	bool m_isDebugLevelObtainedFromCmdArgs;
 	bool m_noGui;
 	DeviceLocked::DeviceLockStatus m_deviceLockStatus;

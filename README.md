@@ -67,6 +67,11 @@ handle other devices with Prismatik such as Adalight, Ardulight, or even Alienwa
   * DRGB
   * DNRGB
   * ESP8266/ESP32 ([WLED](https://github.com/Aircoookie/WLED) firmware highly recommended)
+  
+Prismatik supports multiple Lightpack devices and merges them into one. For other devices, you have two options to run on mulitple monitors:
+* Make one device cover both monitors by having one LED strip run around both displays (recommended)
+* Run two instances of Prismatik (using the `--config-dir` command line option) with each configured for one monitor/device.
+See #280 for details.
 
 
 ##### Making Plugins:

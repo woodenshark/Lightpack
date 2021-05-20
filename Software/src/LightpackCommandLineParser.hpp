@@ -42,11 +42,14 @@ public:
 	bool isSetBacklightOn() const;
 	bool isSetDebuglevel() const;
 	bool isSetProfile() const;
+	bool isSetConfigDir() const;
 	// Valid only if isSetDebuglevel() is true.
 	Debug::DebugLevels debugLevel() const;
 
 	// Valid only if isSetProfile() is true.
 	QString profileName() const;
+	// Valid only if isSetConfigDir() is true.
+	QString configDir() const;
 
 	QString helpText() const;
 	QString errorText() const;
@@ -79,10 +82,12 @@ private:
 	const QCommandLineOption m_versionOption;
 	const QCommandLineOption m_helpOption;
 	const QCommandLineOption m_optionSetProfile;
+	const QCommandLineOption m_optionConfigDir;
 
 	// Values from command line.
 	Debug::DebugLevels m_debugLevel;
 	QString m_profileName;
+	QString m_configDir;
 };
 
 #endif // LIGHTPACKCOMMANDLINEPARSER_H

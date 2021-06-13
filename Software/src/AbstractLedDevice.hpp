@@ -96,7 +96,7 @@ public slots:
 	virtual void setUsbPowerLedDisabled(bool isDisabled);
 
 protected:
-	virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors);
+	virtual void applyColorModifications(const QList<QRgb> & inColors, QList<StructRgb> & outColors, const bool rawColors = false);
 	virtual void applyDithering(QList<StructRgb>& colors, int colorDepth);
 
 protected:

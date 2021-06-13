@@ -37,7 +37,7 @@ public:
 	int maxLedsCount();
 
 public slots:
-	void setColors(const QList<QRgb> & colors);
+	void setColors(const QList<QRgb> & colors, const bool rawColors);
 
 protected:
 	virtual void reinitBufferHeader();

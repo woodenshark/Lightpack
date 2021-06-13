@@ -112,7 +112,7 @@ void AbstractLedDevice::updateDeviceSettings()
 	All modifications are made over extended 12bit RGB, so \code outColors \endcode will contain 12bit
 	RGB instead of 8bit.
 */
-void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QList<StructRgb> &outColors) {
+void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QList<StructRgb> &outColors, const bool rawColors) {
 
 	const bool isApplyWBAdjustments = m_wbAdjustments.count() == inColors.count();
 
@@ -124,8 +124,13 @@ void AbstractLedDevice::applyColorModifications(const QList<QRgb> &inColors, QLi
 		outColors[i].g = qGreen(inColors[i]) * k;
 		outColors[i].b = qBlue(inColors[i]) * k;
 
-		PrismatikMath::gammaCorrection(m_gamma, outColors[i]);
+		if (!rawColors)
+			PrismatikMath::gammaCorrection(m_gamma, outColors[i]);
 	}
+
+	// we can't completely bypass this function because of the Qrgb / StructRgb conversion above
+	if (rawColors)
+		return;
 
 	const StructLab avgColor = PrismatikMath::toLab(PrismatikMath::avgColor(outColors));
 

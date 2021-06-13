@@ -47,6 +47,8 @@ public slots:
 	virtual void setColorDepth(int value);
 	virtual void requestFirmwareVersion();
 	void switchOffLeds();
+	virtual void setColors(const QList<QRgb> & colors, const bool rawColors) = 0;
+	void setColors(const QList<QRgb> & colors) {setColors(colors, false);};
 
 protected:
 	QByteArray m_writeBufferHeader;

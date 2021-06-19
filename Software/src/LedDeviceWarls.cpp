@@ -41,12 +41,13 @@ int LedDeviceWarls::maxLedsCount()
 	return MaximumNumberOfLeds::Warls;
 }
 
-void LedDeviceWarls::setColors(const QList<QRgb> & colors)
+void LedDeviceWarls::setColors(const QList<QRgb> & colors, const bool rawColors)
 {
 	resizeColorsBuffer(colors.count());
 
-	applyColorModifications(colors, m_colorsBuffer);
-	applyDithering(m_colorsBuffer, 8);
+	applyColorModifications(colors, m_colorsBuffer, rawColors);
+	if (!rawColors)
+		applyDithering(m_colorsBuffer, 8);
 
 	const int totalColorsSaved = m_processedColorsSaved.count();
 	m_writeBuffer.clear();

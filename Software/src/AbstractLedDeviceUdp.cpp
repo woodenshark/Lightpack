@@ -110,7 +110,7 @@ void AbstractLedDeviceUdp::switchOffLeds()
 	blackFrame.reserve(count);
 	for (int i = 0; i < count; i++)
 		blackFrame << 0;
-	setColors(blackFrame);
+	setColors(blackFrame, true);
 }
 
 void AbstractLedDeviceUdp::resizeColorsBuffer(int buffSize)

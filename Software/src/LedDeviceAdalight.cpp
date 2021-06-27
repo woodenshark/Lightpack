@@ -290,9 +290,11 @@ bool LedDeviceAdalight::writeBuffer(const QByteArray & buff)
 	if (bytesWritten != buff.count())
 	{
 		qWarning() << Q_FUNC_INFO << "bytesWritten != buff.count():" << bytesWritten << buff.count() << " " << m_AdalightDevice->errorString();
+		emit ioDeviceSuccess(false);
 		return false;
 	}
 
+	emit ioDeviceSuccess(true);
 	return true;
 }
 

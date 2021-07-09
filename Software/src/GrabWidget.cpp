@@ -163,7 +163,7 @@ void GrabWidget::mousePressEvent(QMouseEvent *pe)
 
 	mousePressPosition = pe->pos();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-	mousePressGlobalPosition = pe->globalPosistion().toPoint();
+	mousePressGlobalPosition = pe->globalPosition().toPoint();
 	const QPoint eventPosition = pe->position().toPoint();
 #else
 	mousePressGlobalPosition = pe->globalPos();
@@ -244,7 +244,7 @@ QRect GrabWidget::resizeAccordingly(QMouseEvent *pe) {
 	int newY = y();
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-	const QPoint globalPos = pe->globalPosistion().toPoint();
+	const QPoint globalPos = pe->globalPosition().toPoint();
 	const QPoint eventPosition = pe->position().toPoint();
 #else
 	const QPoint globalPos = pe->globalPos();
@@ -411,7 +411,7 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 #endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-	const QPoint globalPos = pe->globalPosistion().toPoint();
+	const QPoint globalPos = pe->globalPosition().toPoint();
 #else
 	const QPoint globalPos = pe->globalPos();
 #endif

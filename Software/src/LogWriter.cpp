@@ -37,11 +37,11 @@ int LogWriter::initEnabled(const QString& logsDirPath)
 		std::cerr << "Failed to rotate old log files." << std::endl;
 
 	const QString logFilePath = logsDirPath + QStringLiteral("/Prismatik.0.log");
-	QScopedPointer<QFile> logFile(new QFile(logFilePath));
-	if (logFile->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+	std::unique_ptr<QFile> logFile = std::make_unique<QFile>(logFilePath);
+	if (logFile.get()->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
 		QMutexLocker locker(&m_mutex);
 
-		m_logStream.setDevice(logFile.take());
+		m_logStream.setDevice(logFile.release());
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 		m_logStream << Qt::endl;
 #else

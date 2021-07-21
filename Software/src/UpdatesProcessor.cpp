@@ -78,7 +78,7 @@ QList<UpdateInfo> UpdatesProcessor::readUpdates()
 	QXmlStreamReader xmlReader(_reply->readAll());
 
 	if (xmlReader.readNextStartElement()) {
-		if (xmlReader.name() == QString("updates")) {
+		if (xmlReader.name() == QStringLiteral("updates")) {
 			readUpdates(&updates, &xmlReader);
 			QList<UpdateInfo>::iterator it = updates.begin();
 			while (it != updates.end()) {
@@ -220,15 +220,15 @@ bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersi
 
 	QString condStr = predicateRef.left(2);
 
-	if (condStr == QString("lt")) {
+	if (condStr == QStringLiteral("lt")) {
 		cond = LT;
-	} else if (condStr == QString("gt")) {
+	} else if (condStr == QStringLiteral("gt")) {
 		cond = GT;
-	} else if (condStr == QString("eq")) {
+	} else if (condStr == QStringLiteral("eq")) {
 		cond = EQ;
-	} else if (condStr == QString("le")) {
+	} else if (condStr == QStringLiteral("le")) {
 		cond = LE;
-	} else if (condStr == QString("ge")) {
+	} else if (condStr == QStringLiteral("ge")) {
 		cond = GE;
 	} else {
 		cond = EQ;
@@ -265,35 +265,35 @@ bool UpdatesProcessor::isVersionMatches(const QString &predicate, const AppVersi
 QList<UpdateInfo> * UpdatesProcessor::readUpdates(QList<UpdateInfo> *updates, QXmlStreamReader *xmlReader)
 {
 	if (xmlReader->readNextStartElement()) {
-		while (xmlReader->name() == QString("update")) {
+		while (xmlReader->name() == QStringLiteral("update")) {
 			UpdateInfo updateInfo;
 			while(xmlReader->readNextStartElement()) {
-				if (xmlReader->name() == QString("id")) {
+				if (xmlReader->name() == QStringLiteral("id")) {
 					xmlReader->readNext();
 					QString id = xmlReader->text().toString();
 					updateInfo.id = id.toUInt();
-				} else if (xmlReader->name() == QString("url")) {
+				} else if (xmlReader->name() == QStringLiteral("url")) {
 					xmlReader->readNext();
 					updateInfo.url = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("pkgUrl")) {
+				} else if (xmlReader->name() == QStringLiteral("pkgUrl")) {
 					xmlReader->readNext();
 					updateInfo.pkgUrl = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("sigUrl")) {
+				} else if (xmlReader->name() == QStringLiteral("sigUrl")) {
 					xmlReader->readNext();
 					updateInfo.sigUrl = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("title")) {
+				} else if (xmlReader->name() == QStringLiteral("title")) {
 					xmlReader->readNext();
 					updateInfo.title = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("text")) {
+				} else if (xmlReader->name() == QStringLiteral("text")) {
 					xmlReader->readNext();
 					updateInfo.text = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("softwareVersion")) {
+				} else if (xmlReader->name() == QStringLiteral("softwareVersion")) {
 					xmlReader->readNext();
 					updateInfo.softwareVersion = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("firmwareVersion")) {
+				} else if (xmlReader->name() == QStringLiteral("firmwareVersion")) {
 					xmlReader->readNext();
 					updateInfo.firmwareVersion = xmlReader->text().toString();
-				} else if (xmlReader->name() == QString("update")) {
+				} else if (xmlReader->name() == QStringLiteral("update")) {
 					break;
 				}
 				xmlReader->skipCurrentElement();

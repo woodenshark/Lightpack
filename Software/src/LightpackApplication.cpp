@@ -567,44 +567,24 @@ void LightpackApplication::outputMessage(const QString& message) const
 
 void LightpackApplication::printVersionsSoftwareQtOS() const
 {
-	if (g_debugLevel > 0)
-	{
-#		ifdef GIT_REVISION
-		qDebug() << "Prismatik:" << VERSION_STR << "rev." << GIT_REVISION;
-#		else
-		qDebug() << "Prismatik:" << VERSION_STR;
-#		endif
+#	ifdef GIT_REVISION
+	qDebug() << "Prismatik:" << VERSION_STR << "rev." << GIT_REVISION;
+#	else
+	qDebug() << "Prismatik:" << VERSION_STR;
+#	endif
 
-		qDebug() << "Build with Qt verison:" << QT_VERSION_STR;
-		qDebug() << "Qt version currently in use:" << qVersion();
+	qDebug() << "Build with Qt verison:" << QT_VERSION_STR;
+	qDebug() << "Qt version currently in use:" << qVersion();
+
+	qDebug() << "Running on:" << QSysInfo::prettyProductName();
 
 #		ifdef Q_OS_WIN
-		switch(QSysInfo::windowsVersion()){
-		case QSysInfo::WV_NT:			qDebug() << "Windows NT (operating system version 4.0)"; break;
-		case QSysInfo::WV_2000:			qDebug() << "Windows 2000 (operating system version 5.0)"; break;
-		case QSysInfo::WV_XP:			qDebug() << "Windows XP (operating system version 5.1)"; break;
-		case QSysInfo::WV_2003:			qDebug() << "Windows Server 2003, Windows Server 2003 R2, Windows Home Server, Windows XP Professional x64 Edition (operating system version 5.2)"; break;
-		case QSysInfo::WV_VISTA:		qDebug() << "Windows Vista, Windows Server 2008 (operating system version 6.0)"; break;
-		case QSysInfo::WV_WINDOWS7:		qDebug() << "Windows 7, Windows Server 2008 R2 (operating system version 6.1)"; break;
-		case QSysInfo::WV_WINDOWS8:		qDebug() << "Windows 8 (operating system version 6.2)"; break;
-		case QSysInfo::WV_WINDOWS8_1:	qDebug() << "Windows 8.1 (operating system version 6.3)"; break;
-		case QSysInfo::WV_WINDOWS10:	qDebug() << "Windows 10 (operating system version 10.0)"; break;
-		default:						qDebug() << "Unknown windows version:" << QSysInfo::windowsVersion();
-		}
-
-		if (WinUtils::IsUserAdmin()) {
-			qDebug() << "App is running as Admin";
-		} else {
-			qDebug() << "Not running as Admin";
-		}
-#		elif defined(Q_OS_LINUX)
-		// TODO: print some details about OS (cat /proc/partitions? lsb_release -a?)
-#		elif defined(Q_OS_MAC)
-		qDebug() << "Mac OS";
-#		else
-		qDebug() << "Unknown operation system";
-#		endif
+	if (WinUtils::IsUserAdmin()) {
+		qDebug() << "App is running as Admin";
+	} else {
+		qDebug() << "Not running as Admin";
 	}
+#		endif
 }
 
 bool LightpackApplication::checkSystemTrayAvailability() const

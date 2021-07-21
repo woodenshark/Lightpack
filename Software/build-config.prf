@@ -28,4 +28,14 @@ macx {
     !isEmpty(_QMAKE_MAC_SDK_OVERRIDE) {
         QMAKE_MAC_SDK_OVERRIDE = $$_QMAKE_MAC_SDK_OVERRIDE
     }
+
+    # fat binaries
+    isEmpty(QMAKE_APPLE_DEVICE_ARCHS) {
+        # x86_64h is better for modern Intel devices
+        QMAKE_APPLE_DEVICE_ARCHS = x86_64h x86_64
+        versionAtLeast(QT_VERSION, 6.2.0) {
+            # arm64 is officially available starting from 6.2
+            QMAKE_APPLE_DEVICE_ARCHS += arm64
+        }
+    }
 }

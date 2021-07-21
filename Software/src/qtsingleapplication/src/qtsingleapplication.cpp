@@ -156,7 +156,7 @@ void QtSingleApplication::setId(const QString &appId) {
 */
 
 QtSingleApplication::QtSingleApplication(int &argc, char **argv, bool GUIenabled)
-	: QApplication(argc, argv, GUIenabled), actWin(0), peer(0)
+	: QApplication(argc, argv, GUIenabled), peer(0), actWin(0)
 {
 }
 

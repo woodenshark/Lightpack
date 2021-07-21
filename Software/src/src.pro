@@ -93,6 +93,8 @@ win32 {
         DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
         # Parallel build
         QMAKE_CXXFLAGS += /MP
+		# Fix __cplusplus macro as required by Qt
+		QMAKE_CXXFLAGS += /Zc:__cplusplus
         # Place *.lib and *.exp files in ../lib
         QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
     }

@@ -413,9 +413,11 @@ void LightpackApplication::onSessionChange(int change)
 				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				m_isLightsTurnedOffBySessionChange = true;
 			}
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Sleeping, isSessionLocked:" << m_isSessionLocked << "isLightsWereOnBeforeLock:" << m_isLightsWereOnBeforeLock << "isLightsTurnedOffBySessionChange : " << m_isLightsTurnedOffBySessionChange;
 			m_isSessionLocked = true;
 			break;
 		case SystemSession::Status::Unlocking:
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Unlocking, isSessionLocked:" << m_isSessionLocked << "isLightsWereOnBeforeLock:" << m_isLightsWereOnBeforeLock;
 			if (m_isSessionLocked && !SettingsScope::Settings::isKeepLightsOnAfterLock() && m_isLightsWereOnBeforeLock)
 			{
 				emit getLightpackApp()->settingsWnd()->switchOnLeds();
@@ -432,16 +434,22 @@ void LightpackApplication::onSessionChange(int change)
 				emit getLightpackApp()->settingsWnd()->switchOffLeds();
 				m_isLightsTurnedOffBySessionChange = true;
 			}
+
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Sleeping, isSuspending:" << m_isSuspending << "isLightsWereOnBeforeSuspend:" << m_isLightsWereOnBeforeSuspend << "isLightsTurnedOffBySessionChange : " << m_isLightsTurnedOffBySessionChange;
 			m_isSuspending = true;
 			break;
 		case SystemSession::Status::Resuming:
+			DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Resuming, isSuspending:" << m_isSuspending << "isLightsWereOnBeforeSuspend:" << m_isLightsWereOnBeforeSuspend;
+
 			if (m_isSuspending && !SettingsScope::Settings::isKeepLightsOnAfterSuspend() && m_isLightsWereOnBeforeSuspend)
 			{
 				emit getLightpackApp()->settingsWnd()->switchOnLeds();
 				m_isLightsTurnedOffBySessionChange = false;
 			}
+			if (m_isSuspending)
+				QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
+
 			m_isSuspending = false;
-			QMetaObject::invokeMethod(m_ledDeviceManager, "updateDeviceSettings", Qt::QueuedConnection);
 			break;
 		case SystemSession::Status::DisplayOff:
 			if (!m_isDisplayOff)

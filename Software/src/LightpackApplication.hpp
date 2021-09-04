@@ -132,11 +132,11 @@ private:
 	typedef std::vector<QSharedPointer<QAbstractNativeEventFilter> > EventFilters;
 	EventFilters m_EventFilters;
 
-	bool m_isLightsTurnedOffBySessionChange;
-	bool m_isSessionLocked;
-	bool m_isDisplayOff;
-	bool m_isSuspending;
-	bool m_isLightsWereOnBeforeLock;
-	bool m_isLightsWereOnBeforeDisplaySleep;
-	bool m_isLightsWereOnBeforeSuspend;
+	bool m_isLightsTurnedOffBySessionChange = false;
+	bool m_isSessionLocked = false;
+	bool m_isDisplayOff = false;
+	bool m_isSuspending = false;
+	bool m_isLightsWereOnBeforeLock = false;
+	bool m_isLightsWereOnBeforeDisplaySleep = false;
+	bool m_isLightsWereOnBeforeSuspend = false;
 };

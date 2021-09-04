@@ -453,8 +453,8 @@ void LedDeviceManager::initLedDevice()
 
 		connectSignalSlotsLedDevice();
 	}
-	emit ledDeviceUpdateDeviceSettings();
 	emit ledDeviceOpen();
+	emit ledDeviceUpdateDeviceSettings();
 }
 
 AbstractLedDevice * LedDeviceManager::createLedDevice(SupportedDevices::DeviceType deviceType)

@@ -13,6 +13,12 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
 #    Software changelog
 ===================================================================================
 
+Version 5.11.2.30
+---------------
+September 5, 2021
+
+* Fix Lights not working after sleep (#331)
+
 Version 5.11.2.29
 ---------------
 July 21, 2021
@@ -27,7 +33,6 @@ May 20, 2021
 
 * Add multi-instance mode
 * Fix API regression in .27 (#450)
-
 
 Version 5.11.2.27
 ---------------

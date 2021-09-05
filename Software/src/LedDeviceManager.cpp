@@ -575,8 +575,8 @@ void LedDeviceManager::disconnectSignalSlotsLedDevice()
 		qWarning() << Q_FUNC_INFO << "m_ledDevice == NULL";
 		return;
 	}
-	m_ledDevice->disconnect(this, nullptr, nullptr, nullptr);
-	disconnect(m_ledDevice, nullptr, nullptr, nullptr);
+	disconnect(m_ledDevice, nullptr, this, nullptr);
+	disconnect(this, nullptr, m_ledDevice, nullptr);
 }
 
 void LedDeviceManager::cmdQueueAppend(LedDeviceCommands::Cmd cmd)

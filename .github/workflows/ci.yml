@@ -191,7 +191,9 @@ jobs:
 
   build-macos:
     name: macOS Build
-    runs-on: macOS-11.0
+    runs-on: macOS-11
+    env:
+      QT_DEST: Qt
     steps:
       - uses: actions/checkout@v2
       - name: Select Latest Xcode
@@ -199,18 +201,48 @@ jobs:
           set -xe
           sw_vers
           ls -d /Applications/Xcode*.app
-          sudo xcode-select --switch /Applications/Xcode_11.7.app
+          LAST_XCODE=$(ls -d /Applications/Xcode*.app | grep -v beta | sort -Vr | head -n1)
+          sudo xcode-select --switch $LAST_XCODE
           xcode-select -p
           xcodebuild -version
           xcodebuild -showsdks
-      - run: brew update && brew install qt5
+      - name: install Qt installer
+        run: |
+          set -xe
+          pip3 install -U pip
+          pip3 install aqtinstall
+          pip3 show aqtinstall
+          aqt list-qt mac desktop
+          QT_VERSION=$(aqt list-qt mac desktop --spec 6 --latest-version)
+          echo "QT_VERSION=$QT_VERSION" >> $GITHUB_ENV
+      - name: Cached Qt
+        id: cache-qt
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.QT_DEST }}
+          key: ${{ runner.os }}-qt-${{ env.QT_VERSION }}
+      - name: install Qt
+        run: |
+          set -xe
+          QTDIR=$PWD/$QT_DEST/$QT_VERSION/macos
+          echo "QTDIR=$QTDIR" >> $GITHUB_ENV
+          if [[ -d "$QTDIR" ]]
+          then
+            echo using cached version
+          else
+            echo installing fresh version
+            aqt install-qt mac desktop $QT_VERSION clang_64 --modules qtserialport --outputdir $QT_DEST
+          fi
       - name: Build
         working-directory: ./Software
         run: |
-          export QTDIR=/usr/local/opt/qt@5
           export PATH=$QTDIR/bin:$PATH
           qmake -r
+          # post-12.4 xcode workaround
+          # clang confuses VERSION file with <version> header and breaks
+          mv VERSION VERSION.bak
           make
+          mv VERSION.bak VERSION
           macdeployqt bin/Prismatik.app -dmg
       - name: Check Package
         run: |

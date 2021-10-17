@@ -193,7 +193,7 @@ jobs:
     name: macOS Build
     runs-on: macOS-11
     env:
-      QT_DEST: /Qt
+      QT_DEST: ~/Qt
     steps:
       - uses: actions/checkout@v2
       - name: Select Latest Xcode

@@ -193,7 +193,7 @@ jobs:
     name: macOS Build
     runs-on: macOS-11
     env:
-      QT_DEST: ~/Qt
+      QT_DEST: Qt
     steps:
       - uses: actions/checkout@v2
       - name: Select Latest Xcode
@@ -222,9 +222,12 @@ jobs:
           path: ${{ env.QT_DEST }}
           key: ${{ runner.os }}-qt-${{ env.QT_VERSION }}
       - name: install Qt
+        # The cache is relative to the workspace (not the default working dir)
+        # so the QT installation should be too.
+        working-directory: ./
         run: |
           set -xe
-          QTDIR=$QT_DEST/$QT_VERSION/macos
+          QTDIR=$PWD/$QT_DEST/$QT_VERSION/macos
           echo "QTDIR=$QTDIR" >> $GITHUB_ENV
           if [[ -d "$QTDIR" ]]
           then
@@ -234,7 +237,6 @@ jobs:
             aqt install-qt mac desktop $QT_VERSION clang_64 --modules qtserialport --outputdir $QT_DEST
           fi
       - name: Build
-        working-directory: ./Software
         run: |
           export PATH=$QTDIR/bin:$PATH
           qmake -r

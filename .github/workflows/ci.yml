@@ -193,7 +193,7 @@ jobs:
     name: macOS Build
     runs-on: macOS-11
     env:
-      QT_DEST: Qt
+      QT_DEST: /Qt
     steps:
       - uses: actions/checkout@v2
       - name: Select Latest Xcode
@@ -224,7 +224,7 @@ jobs:
       - name: install Qt
         run: |
           set -xe
-          QTDIR=$PWD/$QT_DEST/$QT_VERSION/macos
+          QTDIR=$QT_DEST/$QT_VERSION/macos
           echo "QTDIR=$QTDIR" >> $GITHUB_ENV
           if [[ -d "$QTDIR" ]]
           then

@@ -1,5 +1,7 @@
 #!/bin/sh -xe
 
+export QT_SELECT=qt5
+
 cd ../..
 qmake -r
 make

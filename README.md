@@ -113,7 +113,8 @@ See #280 for details.
 ### Build Instructions for Linux
 #### Prerequisites:
 You will need the following packages, usually all of them are in distro's repository:
-* `qt5-default`
+* `qtbase5-dev`
+* `qtchooser`
 * `qttools5-dev-tools`
 * `libqt5serialport5-dev`
 * `build-essential`

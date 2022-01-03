@@ -14,7 +14,8 @@ RUN apt update && apt dist-upgrade -y && apt install -y \
     libudev-dev \
     libusb-1.0-0-dev \
     lsb-release \
-    qt5-default \
+    qtbase5-dev \
+    qtchooser \
     qttools5-dev-tools \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /etc/localtime

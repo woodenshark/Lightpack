@@ -623,8 +623,11 @@ GrabResult DDuplGrabber::grabScreens()
 				qCritical(Q_FUNC_INFO " Failed to AcquireNextFrame: 0x%X", hr);
 				return GrabResultError;
 			}
-			anyUpdate = true;
-
+			if (frameInfo.LastPresentTime.QuadPart == 0) {
+				// No update since last aquisition. Consider it done.
+				screenData->duplication->ReleaseFrame();
+				continue;
+			}
 			ID3D11Texture2DPtr texture;
 			hr = resource->QueryInterface(IID_ID3D11Texture2D, (void**)&texture);
 			if (FAILED(hr))
@@ -647,7 +650,14 @@ GrabResult DDuplGrabber::grabScreens()
 					desc.Height);
 				return GrabResultError;
 			}
-
+			BufferFormat bufferFormat = mapDXGIFormatToBufferFormat(desc.Format);
+			if (bufferFormat == BufferFormat::BufferFormatUnknown) {
+				qWarning() << "Unsupported format " << desc.Format << " on frame " << grabScreensCount;
+				screenData->duplication->ReleaseFrame();
+				// This is not a good format. Drop it.
+				continue;
+			}
+			anyUpdate = true;
 			D3D11_TEXTURE2D_DESC texDesc;
 			ZeroMemory(&texDesc, sizeof(texDesc));
 			texDesc.Width = desc.Width >> DownscaleMipLevel;
@@ -734,7 +744,7 @@ GrabResult DDuplGrabber::grabScreens()
 
 			screen.imgData = screenData->surfaceMap.pBits;
 			screen.imgDataSize = texDesc.Height * screenData->surfaceMap.Pitch;
-			screen.imgFormat = mapDXGIFormatToBufferFormat(desc.Format);
+			screen.imgFormat = bufferFormat;
 			screen.scale = 1.0 / (1 << DownscaleMipLevel);
 			screen.bytesPerRow = screenData->surfaceMap.Pitch;
 

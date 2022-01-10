@@ -2726,14 +2726,14 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabX11">
                  <property name="text">
-                  <string notr="true">X11 (Full screen)</string>
+                  <string>X11 (Full screen)</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabMacCoreGraphics">
                  <property name="text">
-                  <string notr="true">Mac CG (Full screen)</string>
+                  <string>Mac CG (Full screen)</string>
                  </property>
                 </widget>
                </item>
@@ -2764,7 +2764,7 @@ Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...<
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabWinAPI">
                  <property name="text">
-                  <string notr="true">WinAPI (Full screen)</string>
+                  <string>WinAPI (Full screen)</string>
                  </property>
                 </widget>
                </item>

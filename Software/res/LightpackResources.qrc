@@ -11,6 +11,8 @@
         <file>icons/profiles.png</file>
         <file>icons/about.png</file>
         <file>icons/lock.png</file>
+        <file>translations/en.qm</file>
+        <file>translations/pl_PL.qm</file>
         <file>translations/ru_RU.qm</file>
         <file>translations/uk_UA.qm</file>
         <file>icons/res_dark.png</file>

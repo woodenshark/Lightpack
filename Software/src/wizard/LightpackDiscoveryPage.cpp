@@ -57,13 +57,8 @@ void LightpackDiscoveryPage::initializePage() {
 
 		_ui->rbLightpackSelected->setChecked(true);
 
-		QString caption;
-		if (lpack->lightpacksFound() == 1)
-			caption = tr("1 Lightpack found");
-		else
-			caption = tr("%0 Lightpacks found").arg(QString::number(lpack->lightpacksFound()));
-
-		QString caption2 = tr("%0 zones are available").arg(QString::number(lpack->maxLedsCount()));
+		QString caption = tr("%n Lightpack(s) found", 0, lpack->lightpacksFound());
+		QString caption2 = tr("%n zones are available", 0, lpack->maxLedsCount());
 		_ui->labelLightpacksCount->setText(caption);
 		_ui->labelZonesAvailable->setText(caption2);
 	}

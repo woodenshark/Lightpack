@@ -255,19 +255,15 @@ You can do it either via the gear icon of the each zone OR via the global color 
     <message numerus="yes">
         <location filename="../../src/wizard/LightpackDiscoveryPage.cpp" line="60"/>
         <source>%n Lightpack(s) found</source>
-        <translation type="unfinished">找到 %n 个 Lightpack
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>找到 %n 个 Lightpack</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../../src/wizard/LightpackDiscoveryPage.cpp" line="61"/>
         <source>%n zones are available</source>
-        <translation type="unfinished">%n 个区域可用
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 个区域可用</numerusform>
         </translation>
     </message>
 </context>

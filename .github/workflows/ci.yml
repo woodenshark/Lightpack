@@ -218,7 +218,7 @@ jobs:
           pip3 install aqtinstall
           pip3 show aqtinstall
           aqt list-qt mac desktop
-          QT_VERSION=$(aqt list-qt mac desktop --spec 6 --latest-version)
+          QT_VERSION=$(aqt list-qt mac desktop --spec 6.2 --latest-version)
           echo "QT_VERSION=$QT_VERSION" >> $GITHUB_ENV
       - name: Cached Qt
         id: cache-qt

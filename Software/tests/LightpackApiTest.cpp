@@ -197,7 +197,7 @@ void LightpackApiTest::testCase_GetProfiles()
 
 	// Test UTF-8 in profile name
 
-	QString utf8Check = trUtf8("\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430"); // Russian word "Proverka"
+	QString utf8Check = tr("\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430"); // Russian word "Proverka"
 
 	Settings::loadOrCreateProfile("ApiTestProfile");
 	Settings::loadOrCreateProfile("ApiTestProfile-UTF-8-" + utf8Check);
@@ -321,7 +321,7 @@ void LightpackApiTest::testCase_SetColorValid()
 
 	QRgb rgb = qRgb(r, g, b);
 
-	setColorCmd += cmd;
+	setColorCmd += cmd.toUtf8();
 
 	// Test SetColor different valid strings
 	QVERIFY(writeCommandWithCheck(m_socket, setColorCmd, ApiServer::CmdSetResult_Ok));
@@ -368,7 +368,7 @@ void LightpackApiTest::testCase_SetColorValid2()
 
 	QFETCH(QString, colorsStr);
 
-	setColorCmd += colorsStr;
+	setColorCmd += colorsStr.toUtf8();
 
 	// Test SetColor different valid strings
 
@@ -408,7 +408,7 @@ void LightpackApiTest::testCase_SetColorInvalid()
 
 	QFETCH(QString, colorsStr);
 
-	setColorCmd += colorsStr;
+	setColorCmd += colorsStr.toUtf8();
 
 	// Test SetColor different valid strings
 	QVERIFY(writeCommandWithCheck(m_socket, setColorCmd, ApiServer::CmdSetResult_Error));
@@ -447,7 +447,7 @@ void LightpackApiTest::testCase_SetGammaValid()
 	QFETCH(double, gammaValue);
 
 	QByteArray setGammaCmd = ApiServer::CmdSetGamma;
-	setGammaCmd += gammaStr;
+	setGammaCmd += gammaStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setGammaCmd, ApiServer::CmdSetResult_Ok));
 
@@ -483,7 +483,7 @@ void LightpackApiTest::testCase_SetGammaInvalid()
 	QFETCH(QString, gammaStr);
 
 	QByteArray setGammaCmd = ApiServer::CmdSetGamma;
-	setGammaCmd += gammaStr;
+	setGammaCmd += gammaStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setGammaCmd, ApiServer::CmdSetResult_Error));
 
@@ -518,7 +518,7 @@ void LightpackApiTest::testCase_SetBrightnessValid()
 	QFETCH(int, brightnessValue);
 
 	QByteArray setBrightnessCmd = ApiServer::CmdSetBrightness;
-	setBrightnessCmd += brightnessStr;
+	setBrightnessCmd += brightnessStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setBrightnessCmd, ApiServer::CmdSetResult_Ok));
 
@@ -553,7 +553,7 @@ void LightpackApiTest::testCase_SetBrightnessInvalid()
 	QFETCH(QString, brightnessStr);
 
 	QByteArray setBrightnessCmd = ApiServer::CmdSetBrightness;
-	setBrightnessCmd += brightnessStr;
+	setBrightnessCmd += brightnessStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setBrightnessCmd, ApiServer::CmdSetResult_Error));
 
@@ -582,7 +582,7 @@ void LightpackApiTest::testCase_SetSmoothValid()
 	QFETCH(int, smoothValue);
 
 	QByteArray setSmoothCmd = ApiServer::CmdSetSmooth;
-	setSmoothCmd += smoothStr;
+	setSmoothCmd += smoothStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setSmoothCmd, ApiServer::CmdSetResult_Ok));
 
@@ -610,7 +610,7 @@ void LightpackApiTest::testCase_SetSmoothInvalid()
 	QFETCH(QString, smoothStr);
 
 	QByteArray setSmoothCmd = ApiServer::CmdSetSmooth;
-	setSmoothCmd += smoothStr;
+	setSmoothCmd += smoothStr.toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setSmoothCmd, ApiServer::CmdSetResult_Error));
 
@@ -638,7 +638,7 @@ void LightpackApiTest::testCase_SetProfile()
 	QVERIFY(profiles.count() > 0);
 
 	QByteArray setProfileCmd = ApiServer::CmdSetProfile;
-	setProfileCmd += profiles.at(0);
+	setProfileCmd += profiles.at(0).toUtf8();
 
 	QVERIFY(writeCommandWithCheck(m_socket, setProfileCmd, ApiServer::CmdSetResult_Ok));
 
@@ -681,7 +681,7 @@ void LightpackApiTest::testCase_ApiAuthorization()
 	m_little->setApiKey(testKey);
 
 	QByteArray cmdApiKey = ApiServer::CmdApiKey;
-	cmdApiKey += testKey;
+	cmdApiKey += testKey.toUtf8();
 
 	// Authorization
 	QVERIFY(writeCommandWithCheck(m_socket, cmdApiKey, ApiServer::CmdApiKeyResult_Ok));
@@ -731,11 +731,11 @@ QString LightpackApiTest::getProfilesResultString()
 
 void LightpackApiTest::processEventsFromLittle()
 {
-	QTime time;
-	time.restart();
+	QElapsedTimer timer;
+	timer.start();
 	m_little->m_isDone = false;
 
-	while (m_little->m_isDone == false && time.elapsed() < ApiServer::SignalWaitTimeoutMs)
+	while (m_little->m_isDone == false && timer.elapsed() < ApiServer::SignalWaitTimeoutMs)
 	{
 		QApplication::processEvents(QEventLoop::WaitForMoreEvents, ApiServer::SignalWaitTimeoutMs);
 	}

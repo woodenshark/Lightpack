@@ -9,7 +9,7 @@ finish-args:
 
   - --share=network
   - --socket=pulseaudio
-  - --filesystem=~/.Prismatik:rw
+  #- --filesystem=~/.Prismatik:rw
   - --device=all
 
   # needed for tray

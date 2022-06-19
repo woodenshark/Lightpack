@@ -53,10 +53,12 @@ modules:
       - cd Software && make -j$FLATPAK_BUILDER_N_JOBS
       - sed -E 's#(Exec|Icon)=.+#\1=de.psieg.Prismatik#' $PKG_TEMPLATE_DIR/usr/share/applications/prismatik.desktop > _prismatik.desktop
       - install -Dm644 _prismatik.desktop $FLATPAK_DEST/usr/share/applications/$FLATPAK_ID.desktop
+      - install -Dm644 _prismatik.desktop $FLATPAK_DEST/share/applications/$FLATPAK_ID.desktop
       - install -Dm644 $PKG_TEMPLATE_DIR/etc/udev/rules.d/93-lightpack.rules $FLATPAK_DEST/etc/udev/rules.d/93-lightpack.rules
       - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/icons/hicolor/22x22/apps/prismatik-on.png $FLATPAK_DEST/usr/share/icons/hicolor/22x22/apps/$FLATPAK_ID.png
       - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/icons/Prismatik.png $FLATPAK_DEST/usr/share/icons/$FLATPAK_ID.png
       - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/pixmaps/Prismatik.png $FLATPAK_DEST/usr/share/pixmaps/$FLATPAK_ID.png
+      - install -Dm644 $PKG_TEMPLATE_DIR/usr/share/icons/Prismatik.png $FLATPAK_DEST/share/icons/hicolor/128x128/apps/$FLATPAK_ID.png
       - install -Dm755 -s Software/bin/Prismatik $FLATPAK_DEST/bin/prismatik
     sources:
       - type: dir

@@ -69,7 +69,8 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
       - run: echo "DOCKER_CACHE_PREFIX=$(echo ${{ matrix.os }} | tr -d ' ')-" >> $GITHUB_ENV
-      - uses: satackey/action-docker-layer-caching@v0.0.10
+      - if: matrix.os != 'ubuntu 20.04'
+        uses: satackey/action-docker-layer-caching@v0.0.10
         continue-on-error: true
         with:
           key: ${{ env.DOCKER_CACHE_PREFIX }}{hash}

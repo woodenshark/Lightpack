@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ 'ubuntu 22.04', 'ubuntu 20.04', 'ubuntu 18.04', 'debian 10.6' ]
+        os: [ 'ubuntu 22.04', 'ubuntu 20.04', 'ubuntu 18.04', 'debian 11.5' ]
     name: dpkg Build (${{ matrix.os }})
     steps:
       - name: Checkout Source

@@ -25,7 +25,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -52,7 +52,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -76,7 +76,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -86,12 +86,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
       - run: sudo apt-get install gcc-avr avr-libc build-essential
       - run: ./build_batch.sh
         working-directory: ./Firmware
       - name: Archive artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: firmware
           path: Firmware/hex/*
@@ -181,7 +181,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -252,7 +252,7 @@ jobs:
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}

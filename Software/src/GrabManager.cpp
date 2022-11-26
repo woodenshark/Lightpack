@@ -190,6 +190,10 @@ void GrabManager::ledDeviceCallSuccess(bool isSuccess) {
 				m_isGrabbingSuspendedDueToDeviceError = true; // Stop clears the bit (for user stop), so re-set it here
 			}
 		}
+	} else if (m_isGrabbingSuspendedDueToDeviceError) {
+		m_isGrabbingSuspendedDueToDeviceError = false;
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "device available again, resuming grabbing";
+		start(true);
 	}
 }
 

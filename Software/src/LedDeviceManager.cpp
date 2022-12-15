@@ -695,8 +695,11 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 void LedDeviceManager::ledDeviceCommandTimedOut()
 {
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Command timed out!";
+
 	ledDeviceCommandCompleted(false);
 	emit ioDeviceSuccess(false);
+	triggerRecreateLedDevice();
 }
 
 

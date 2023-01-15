@@ -72,6 +72,7 @@ private:
 	bool tryToReopenDevice();
 	bool readDataFromDeviceWithCheck();
 	bool writeBufferToDeviceWithCheck(int command, hid_device *phid_device);
+	bool writeBufferToAllDevicesWithCheck(int command);
 	void resizeColorsBuffer(int buffSize);
 	void closeDevices();
 

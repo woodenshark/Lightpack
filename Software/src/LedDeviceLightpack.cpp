@@ -387,9 +387,14 @@ bool LedDeviceLightpack::writeBufferToDevice(int command, hid_device *phid_devic
 
 bool LedDeviceLightpack::tryToReopenDevice()
 {
+	if (m_reopening) return false;
+	m_reopening = true;
+
 	closeDevices();
 //	QThread::sleep(100);
 	open();
+
+	m_reopening = false;
 
 	if (m_devices.size() == 0)
 	{

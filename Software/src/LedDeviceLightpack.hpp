@@ -87,6 +87,7 @@ private:
 
 	unsigned char m_readBuffer[65];	/* 0-ReportID, 1..65-data */
 	unsigned char m_writeBuffer[65];	/* 0-ReportID, 1..65-data */
+	bool m_reopening = false;
 
 	QTimer *m_timerPingDevice;
 

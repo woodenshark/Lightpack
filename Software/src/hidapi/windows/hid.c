@@ -177,7 +177,8 @@ static void register_error(hid_device *device, const char *op)
 
 	// Store the message off in the Device entry so that 
 	// the hid_error() function can pick it up.
-	LocalFree(device->last_error_str);
+	if (device->last_error_str != NULL)
+		LocalFree(device->last_error_str);
 	device->last_error_str = msg;
 }
 

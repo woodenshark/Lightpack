@@ -110,7 +110,6 @@ jobs:
         with:
           cache: true
           dir: C:\Qt
-          modules: serialport
       - name: Cached Bass
         id: cache-bass
         uses: actions/cache@v2

@@ -105,16 +105,10 @@ jobs:
           submodules: recursive
       - run: choco install --no-progress openssl
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Cached Qt
-        id: cache-qt
-        uses: actions/cache@v2
-        with:
-          path: C:\Qt
-          key: ${{ runner.os }}-qt
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v3
         with:
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          cache: true
           dir: C:\Qt
           modules: serialport
       - name: Cached Bass

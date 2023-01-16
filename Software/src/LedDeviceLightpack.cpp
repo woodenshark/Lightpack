@@ -75,12 +75,13 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 	DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 #endif
 	if (m_devices.size() == 0) {
+		emit commandCompleted(false);
 		return;
 	}
 
 	if (colors.count() > maxLedsCount()) {
 		qWarning() << Q_FUNC_INFO << "data size is greater than max leds count";
-		// skip command with wrong data size
+		emit commandCompleted(false);
 		return;
 	}
 
@@ -160,12 +161,7 @@ void LedDeviceLightpack::switchOffLeds()
 
 	memset(m_writeBuffer, 0, sizeof(m_writeBuffer));
 
-	bool ok = true;
-	for(int i = 0; i < m_devices.size(); i++) {
-		if (!writeBufferToDeviceWithCheck(CMD_UPDATE_LEDS, m_devices[i]))
-			ok = false;
-	}
-
+	bool ok = writeBufferToAllDevicesWithCheck(CMD_UPDATE_LEDS);
 
 	emit commandCompleted(ok);
 	// Stop ping device if switchOffLeds() signal comes
@@ -178,11 +174,7 @@ void LedDeviceLightpack::setRefreshDelay(int value)
 	m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START] = value & 0xff;
 	m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START+1] = (value >> 8);
 
-	bool ok = true;
-	for(int i = 0; i < m_devices.size(); i++) {
-		if (!writeBufferToDeviceWithCheck(CMD_SET_TIMER_OPTIONS, m_devices[i]))
-			ok = false;
-	}
+	bool ok = writeBufferToAllDevicesWithCheck(CMD_SET_TIMER_OPTIONS);
 	emit commandCompleted(ok);
 }
 
@@ -191,11 +183,7 @@ void LedDeviceLightpack::setUsbPowerLedDisabled(bool isDisabled) {
 
 	m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START] = (unsigned char)!isDisabled;
 
-	bool ok = true;
-	for (int i = 0; i < m_devices.size(); ++i) {
-		if (!writeBufferToDeviceWithCheck(CMD_UNOFFICIAL_SET_USBLED, m_devices[i]))
-			ok = false;
-	}
+	bool ok = writeBufferToAllDevicesWithCheck(CMD_UNOFFICIAL_SET_USBLED);
 	emit commandCompleted(ok);
 }
 
@@ -205,11 +193,7 @@ void LedDeviceLightpack::setColorDepth(int value)
 
 	m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START] = (unsigned char)value;
 
-	bool ok = true;
-	for(int i = 0; i < m_devices.size(); i++) {
-		if (!writeBufferToDeviceWithCheck(CMD_SET_PWM_LEVEL_MAX_VALUE, m_devices[i]))
-			ok = false;
-	}
+	bool ok = writeBufferToAllDevicesWithCheck(CMD_SET_PWM_LEVEL_MAX_VALUE);
 	emit commandCompleted(ok);
 }
 
@@ -219,11 +203,7 @@ void LedDeviceLightpack::setSmoothSlowdown(int value)
 
 	m_writeBuffer[WRITE_BUFFER_INDEX_DATA_START] = (unsigned char)value;
 
-	bool ok = true;
-	for(int i = 0; i < m_devices.size(); i++) {
-		if (!writeBufferToDeviceWithCheck(CMD_SET_SMOOTH_SLOWDOWN, m_devices[i]))
-			ok = false;
-	}
+	bool ok = writeBufferToAllDevicesWithCheck(CMD_SET_SMOOTH_SLOWDOWN);
 	emit commandCompleted(ok);
 }
 
@@ -277,11 +257,12 @@ void LedDeviceLightpack::open()
 
 	if (m_devices.size() > 0)
 	{
+		DEBUG_LOW_LEVEL << "Open called on opened device";
 		emit openDeviceSuccess(true);
 		return;
 	}
 
-	DEBUG_LOW_LEVEL << Q_FUNC_INFO << QStringLiteral("hid_open(0x%1, 0x%2)")
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << QStringLiteral("hid_open(0x%1, 0x%2)")
 						.arg(USB_VENDOR_ID, 4, 16, QChar('0'))
 						.arg(USB_PRODUCT_ID, 4, 16, QChar('0'));
 
@@ -291,6 +272,12 @@ void LedDeviceLightpack::open()
 	if (m_devices.size() == 0)
 	{
 		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Lightpack devices not found";
+		emit openDeviceSuccess(false);
+		return;
+	}
+	if (maxLedsCount() < SettingsScope::Settings::getNumberOfLeds(SupportedDevices::DeviceTypeLightpack)) {
+		DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Found some Lightpack devices but fewer than expected";
+		close();
 		emit openDeviceSuccess(false);
 		return;
 	}
@@ -385,11 +372,27 @@ bool LedDeviceLightpack::writeBufferToDevice(int command, hid_device *phid_devic
 	return true;
 }
 
+bool LedDeviceLightpack::writeBufferToAllDevicesWithCheck(int command) {
+	if (m_devices.size() == 0) return false;
+
+	bool ok = true;
+	for (int i = 0; i < m_devices.size(); i++) {
+		if (!writeBufferToDeviceWithCheck(command, m_devices[i]))
+			ok = false;
+	}
+	return ok;
+}
+
 bool LedDeviceLightpack::tryToReopenDevice()
 {
+	if (m_reopening) return false;
+	m_reopening = true;
+
 	closeDevices();
 //	QThread::sleep(100);
 	open();
+
+	m_reopening = false;
 
 	if (m_devices.size() == 0)
 	{

@@ -109,6 +109,9 @@ void LedDeviceManager::recreateLedDevice()
 
 	disconnectSignalSlotsLedDevice();
 
+	if (m_ledDevice != NULL)
+		m_ledDevice->close();
+
 	initLedDevice();
 }
 
@@ -396,6 +399,7 @@ void LedDeviceManager::ledDeviceOpenDeviceSuccess(bool isSuccess)
 {
 	if (isSuccess) {
 		m_failedCreationAttempts = 0;
+		emit ledDeviceUpdateDeviceSettings();
 	} else {
 		m_failedCreationAttempts++;
 		triggerRecreateLedDevice();
@@ -454,7 +458,6 @@ void LedDeviceManager::initLedDevice()
 		connectSignalSlotsLedDevice();
 	}
 	emit ledDeviceOpen();
-	emit ledDeviceUpdateDeviceSettings();
 }
 
 AbstractLedDevice * LedDeviceManager::createLedDevice(SupportedDevices::DeviceType deviceType)
@@ -692,8 +695,11 @@ void LedDeviceManager::cmdQueueProcessNext()
 
 void LedDeviceManager::ledDeviceCommandTimedOut()
 {
+	DEBUG_MID_LEVEL << Q_FUNC_INFO << "Command timed out!";
+
 	ledDeviceCommandCompleted(false);
 	emit ioDeviceSuccess(false);
+	triggerRecreateLedDevice();
 }
 
 

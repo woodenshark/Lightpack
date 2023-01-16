@@ -72,6 +72,7 @@ private:
 	bool tryToReopenDevice();
 	bool readDataFromDeviceWithCheck();
 	bool writeBufferToDeviceWithCheck(int command, hid_device *phid_device);
+	bool writeBufferToAllDevicesWithCheck(int command);
 	void resizeColorsBuffer(int buffSize);
 	void closeDevices();
 
@@ -87,6 +88,7 @@ private:
 
 	unsigned char m_readBuffer[65];	/* 0-ReportID, 1..65-data */
 	unsigned char m_writeBuffer[65];	/* 0-ReportID, 1..65-data */
+	bool m_reopening = false;
 
 	QTimer *m_timerPingDevice;
 

@@ -230,16 +230,12 @@ jobs:
         run: |
           export PATH=$QTDIR/bin:$PATH
           qmake -r
-          # post-12.4 xcode workaround
-          # clang confuses VERSION file with <version> header and breaks
-          mv VERSION VERSION.bak
           make
-          mv VERSION.bak VERSION
           macdeployqt bin/Prismatik.app -dmg
       - name: Check Package
         run: |
           set -xe
-          VERSION=`cat VERSION`
+          VERSION=`cat RELEASE_VERSION`
           PKG_PATH="Software/bin/Prismatik.dmg"
           PKG_NAME="Prismatik_${VERSION}.dmg"
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV

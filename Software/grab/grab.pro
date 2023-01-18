@@ -100,6 +100,8 @@ win32 {
         QMAKE_CXXFLAGS += /MP
         # Fix __cplusplus macro as required by Qt
         QMAKE_CXXFLAGS += /Zc:__cplusplus
+        # As required by Qt
+        QMAKE_CXXFLAGS += /permissive-
         # Create "fake" project dependencies of the libraries used dynamically
         LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
 

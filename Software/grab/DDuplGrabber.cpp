@@ -85,6 +85,25 @@ struct DDuplScreenData
 	DXGI_MAPPED_RECT surfaceMap;
 };
 
+DWORD WINAPI DDuplGrabberThreadProc(LPVOID arg) {
+	DDuplGrabber* _this = (DDuplGrabber*)arg;
+	DWORD errorcode;
+
+	while (true) {
+		if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(_this->m_threadEvent, INFINITE))) {
+			switch (_this->m_threadCommand) {
+			case Exit:
+				SetEvent(_this->m_threadReturnEvent);
+				return 0;
+			case Reallocate:
+				_this->m_threadReallocateResult = _this->_reallocate(_this->m_threadReallocateArg);
+				break;
+			}
+			SetEvent(_this->m_threadReturnEvent);
+		}
+	}
+}
+
 DDuplGrabber::DDuplGrabber(QObject * parent, GrabberContext *context)
 	: GrabberBase(parent, context),
 	m_state(Uninitialized),
@@ -183,25 +202,6 @@ bool DDuplGrabber::recreateAdapters() {
 	}
 
 	return true;
-}
-
-DWORD WINAPI DDuplGrabberThreadProc(LPVOID arg) {
-	DDuplGrabber* _this = (DDuplGrabber*)arg;
-	DWORD errorcode;
-
-	while (true) {
-		if (WAIT_OBJECT_0 == (errorcode = WaitForSingleObject(_this->m_threadEvent, INFINITE))) {
-			switch (_this->m_threadCommand) {
-			case Exit:
-				SetEvent(_this->m_threadReturnEvent);
-				return 0;
-			case Reallocate:
-				_this->m_threadReallocateResult = _this->_reallocate(_this->m_threadReallocateArg);
-				break;
-			}
-			SetEvent(_this->m_threadReturnEvent);
-		}
-	}
 }
 
 bool DDuplGrabber::runThreadCommand(DWORD timeout) {

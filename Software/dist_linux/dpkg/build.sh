@@ -7,7 +7,7 @@ qmake -r
 make
 cd -
 
-VERSION=`cat ../../VERSION`
+VERSION=`cat ../../RELEASE_VERSION`
 
 arch=amd64
 [ ! -z $1 ] && arch=$1

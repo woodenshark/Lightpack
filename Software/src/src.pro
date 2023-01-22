@@ -98,6 +98,8 @@ win32 {
         QMAKE_CXXFLAGS += /MP
         # Fix __cplusplus macro as required by Qt
         QMAKE_CXXFLAGS += /Zc:__cplusplus
+        # As required by Qt
+        QMAKE_CXXFLAGS += -permissive-
         # Place *.lib and *.exp files in ../lib
         QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
     }

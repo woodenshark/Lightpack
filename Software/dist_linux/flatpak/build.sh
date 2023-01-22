@@ -2,7 +2,7 @@
 kde_version=5.15
 flatpak_id=de.psieg.Prismatik
 destdir=tmp
-VERSION=`cat ../../VERSION`
+VERSION=`cat ../../RELEASE_VERSION`
 
 set -xe
 

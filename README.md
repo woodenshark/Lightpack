@@ -8,7 +8,7 @@ Lightpack project with Prismatik flavour
 [![AUR bin package](https://img.shields.io/aur/version/prismatik-psieg-bin?logo=arch-linux&label=aur-bin&labelColor=lightGrey&color=blue)](https://aur.archlinux.org/packages/prismatik-psieg-bin/)
 [![AUR git package](https://img.shields.io/aur/version/prismatik-psieg?logo=arch-linux&label=aur-src&labelColor=lightGrey&color=grey)](https://aur.archlinux.org/packages/prismatik-psieg/)
 
-*Modified version which includes various improvements for Windows, esp. a Desktop Duplication API Grabber*
+*Modified version (forked in Dec 2014) which includes various improvements for Windows, esp. a Desktop Duplication API Grabber*
 
 **Table of Contents:** <br />
 &nbsp;&nbsp;[Short Description](#lightpack-project-with-prismatik-flavour) <br />

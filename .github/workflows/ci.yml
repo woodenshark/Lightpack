@@ -110,8 +110,7 @@ jobs:
         with:
           cache: true
           dir: C:\Qt
-          version: 6.*
-          modules: qtserialport
+          version: 5.*
       - name: Cached Bass
         id: cache-bass
         uses: actions/cache@v2
@@ -155,7 +154,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          set QTDIR=%Qt6_Dir%
+          set QTDIR=%Qt5_Dir%
           call scripts\win32\generate_sln.bat
           MSBuild.exe Lightpack.sln /p:Configuration=Release
       - name: Prepare Installer
@@ -165,7 +164,7 @@ jobs:
       - name: Build Installer
         shell: cmd
         run: |
-          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script_qt6.iss
+          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
         working-directory: ./Software/dist_windows
       - name: Check Package
         shell: bash

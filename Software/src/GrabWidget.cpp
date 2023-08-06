@@ -405,9 +405,11 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 	DEBUG_HIGH_LEVEL << Q_FUNC_INFO << "pe->pos() =" << pe->pos();
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-	QRect screen = QGuiApplication::screenAt(this->geometry().center())->geometry();
+	const QScreen* screen = QGuiApplication::screenAt(this->geometry().center());
+	if (screen == nullptr) return;
+	QRect screenRect = screen->geometry();
 #else
-	QRect screen = QApplication::desktop()->screenGeometry(this);
+	QRect screenRect = QApplication::desktop()->screenGeometry(this);
 #endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -425,38 +427,41 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 		bool snapped;
 
 		snapped = snapEdgeToScreenOrClosestFellow(
-			newRect, screen,
+			newRect, screenRect,
 			[](QRect& r, int v) { r.moveLeft(v); },
 			[](const QRect& r) { return r.left(); },
 			[](const QRect& r) { return r.right() + 1; });
 		if (!snapped) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) { r.moveRight(v); },
 				[](const QRect& r) { return r.right(); },
 				[](const QRect& r) { return r.left() - 1; });
 		}
 
 		snapped = snapEdgeToScreenOrClosestFellow(
-			newRect, screen,
+			newRect, screenRect,
 			[](QRect& r, int v) { r.moveTop(v); },
 			[](const QRect& r) { return r.top(); },
 			[](const QRect& r) { return r.bottom() + 1; });
 		if (!snapped) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) { r.moveBottom(v); },
 				[](const QRect& r) { return r.bottom(); },
 				[](const QRect& r) { return r.top() - 1; });
 		}
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+		if (QGuiApplication::screenAt(newRect.center()) == nullptr) return;
+#endif
 		move(newRect.topLeft());
 	} else {
 		QRect newRect = resizeAccordingly(pe);
 
 		if (cmd == RESIZE_HOR_LEFT || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_LEFT_UP) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) {	r.setLeft(v); },
 				[](const QRect& r) { return r.left(); },
 				[](const QRect& r) { return r.right() + 1; });
@@ -464,7 +469,7 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 
 		if (cmd == RESIZE_VER_UP || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_LEFT_UP) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) {	r.setTop(v); },
 				[](const QRect& r) { return r.top(); },
 				[](const QRect& r) { return r.bottom() + 1; });
@@ -472,7 +477,7 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 
 		if (cmd == RESIZE_HOR_RIGHT || cmd == RESIZE_RIGHT_UP || cmd == RESIZE_RIGHT_DOWN) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) {	r.setRight(v); },
 				[](const QRect& r) { return r.right(); },
 				[](const QRect& r) { return r.left() - 1; });
@@ -480,12 +485,15 @@ void GrabWidget::mouseMoveEvent(QMouseEvent *pe)
 
 		if (cmd == RESIZE_VER_DOWN || cmd == RESIZE_LEFT_DOWN || cmd == RESIZE_RIGHT_DOWN) {
 			snapEdgeToScreenOrClosestFellow(
-				newRect, screen,
+				newRect, screenRect,
 				[](QRect& r, int v) {	r.setBottom(v); },
 				[](const QRect& r) { return r.bottom(); },
 				[](const QRect& r) { return r.top() - 1; });
 		}
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+		if (QGuiApplication::screenAt(newRect.center()) == nullptr) return;
+#endif
 		if (newRect.size() != geometry().size()) {
 			resize(newRect.size());
 		}

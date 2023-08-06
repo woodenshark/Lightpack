@@ -109,7 +109,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
-          dir: C:\Qt
+          cache-key-prefix: install-qt-action-default
           version: 5.*
       - name: Cached Bass
         id: cache-bass

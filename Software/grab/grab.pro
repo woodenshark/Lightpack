@@ -106,9 +106,9 @@ win32 {
         LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
 
         # emulate every other compiler, __SSE4_1__ is defined when AVX2 is enabled (and __AVX2__ is also defined)
-        DEFINES += __SSE4_1__ __AVX2__
+        DEFINES += __SSE4_1__ __AVX2__ __AVX512F__ __AVX512BW__
         # causes global vectorization, enable if your target CPU has AVX2
-        # QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
+        # QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2 $$QMAKE_CFLAGS_AVX512F $$QMAKE_CFLAGS_AVX512BW
     }
 
     contains(DEFINES,NIGHTLIGHT_SUPPORT) {
@@ -149,7 +149,7 @@ macx {
 unix:!macx {
     CXX_TARGET = $$system($$QMAKE_CXX -dumpmachine)
     contains(CXX_TARGET, x86_64.*) {
-        QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
+        QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2 $$QMAKE_CFLAGS_AVX512F $$QMAKE_CFLAGS_AVX512BW
     }
 }
 

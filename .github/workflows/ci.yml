@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ 'ubuntu 22.04', 'ubuntu 20.04', 'ubuntu 18.04', 'debian 11.5' ]
+        os: [ 'ubuntu 22.04', 'ubuntu 20.04', 'debian 12.4' ]
     name: dpkg Build (${{ matrix.os }})
     steps:
       - name: Checkout Source
@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
       - run: sudo apt-get install gcc-avr avr-libc build-essential
       - run: ./build_batch.sh
         working-directory: ./Firmware
@@ -114,7 +114,7 @@ jobs:
           modules: qtserialport
       - name: Cached Bass
         id: cache-bass
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: C:\bass
           key: ${{ runner.os }}-bass_24
@@ -130,7 +130,7 @@ jobs:
           }
       - name: Cached NightLight
         id: cache-nightlight
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: C:\NightLight
           key: ${{ runner.os }}-nightlight_1.3_1909
@@ -209,7 +209,7 @@ jobs:
           echo "QT_VERSION=$QT_VERSION" >> $GITHUB_ENV
       - name: Cached Qt
         id: cache-qt
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ env.QT_DEST }}
           key: ${{ runner.os }}-qt-${{ env.QT_VERSION }}

@@ -89,7 +89,7 @@ auto accumulateABGR = accumulateBuffer<PIXEL_FORMAT_ABGR>;
 auto accumulateRGBA = accumulateBuffer<PIXEL_FORMAT_RGBA>;
 auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
 
-#if defined(__SSE4_1__) || defined(__AVX2__)
+#if defined(__SSE4_1__) || defined(__AVX2__) || (defined(__AVX512F__) && defined(__AVX512BW__))
 #ifdef __SSE4_1__
 	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
 	static ColorValue accumulateBuffer128(
@@ -245,11 +245,69 @@ auto accumulateBGRA = accumulateBuffer<PIXEL_FORMAT_BGRA>;
 		return color;
 	};
 #endif // ifdef __AVX2__
+#if defined(__AVX512F__) && defined(__AVX512BW__)
+	template<uint8_t offsetR, uint8_t offsetG, uint8_t offsetB>
+	static ColorValue accumulateBuffer512(
+		const int * const buffer,
+		const size_t pitch,
+		const QRect& rect) {
+
+		__m512i sum[bytesPerPixel] = {
+			_mm512_setzero_epi32(),
+			_mm512_setzero_epi32(),
+			_mm512_setzero_epi32(),
+			_mm512_setzero_epi32()
+		}; // A,R,G,B sums
+
+		constexpr const uint32_t zero = (1 << 7);
+
+		const __m512i shuffleR = _mm512_set4_epi32(
+			(zero << 24) | (zero << 16) | (zero << 8) | (3*4+offsetR),
+			(zero << 24) | (zero << 16) | (zero << 8) | (2*4+offsetR),
+			(zero << 24) | (zero << 16) | (zero << 8) | (1*4+offsetR),
+			(zero << 24) | (zero << 16) | (zero << 8) | (0*4+offsetR)
+		);
+		const __m512i shuffleG = _mm512_set4_epi32(
+			(zero << 24) | (zero << 16) | (zero << 8) | (3*4+offsetG),
+			(zero << 24) | (zero << 16) | (zero << 8) | (2*4+offsetG),
+			(zero << 24) | (zero << 16) | (zero << 8) | (1*4+offsetG),
+			(zero << 24) | (zero << 16) | (zero << 8) | (0*4+offsetG)
+		);
+		const __m512i shuffleB = _mm512_set4_epi32(
+			(zero << 24) | (zero << 16) | (zero << 8) | (3*4+offsetB),
+			(zero << 24) | (zero << 16) | (zero << 8) | (2*4+offsetB),
+			(zero << 24) | (zero << 16) | (zero << 8) | (1*4+offsetB),
+			(zero << 24) | (zero << 16) | (zero << 8) | (0*4+offsetB)
+		);
+
+		constexpr const int stepsPerLoad = 4;
+		constexpr const int pixelsPerLoad = pixelsPerStep * stepsPerLoad;
+		const size_t softlimit = rect.width() / pixelsPerLoad;
+		const size_t delta = (size_t)rect.width() - (softlimit * pixelsPerLoad);
+		const __mmask16 deltamask = 0xFFFF >> (16 - delta);
+		for (size_t currentY = 0; currentY < (size_t)rect.height(); ++currentY) {
+			for (size_t currentX = 0; currentX <= softlimit; ++currentX) {
+				const size_t index = pitch * (rect.y() + currentY) + rect.x() + currentX * pixelsPerLoad; // starting offset for lines
+				const __m512i vec8 = _mm512_maskz_loadu_epi32(currentX == softlimit ? deltamask : __mmask16(0xFFFF), &buffer[index]);
+				sum[offsetR] = _mm512_add_epi32(sum[offsetR], _mm512_shuffle_epi8(vec8, shuffleR));
+				sum[offsetG] = _mm512_add_epi32(sum[offsetG], _mm512_shuffle_epi8(vec8, shuffleG));
+				sum[offsetB] = _mm512_add_epi32(sum[offsetB], _mm512_shuffle_epi8(vec8, shuffleB));
+			}
+		}
+		const size_t count = rect.height() * rect.width();
+		ColorValue color;
+		color.r = (_mm512_reduce_add_epi32(sum[offsetR]) / count) & 0xff;
+		color.g = (_mm512_reduce_add_epi32(sum[offsetG]) / count) & 0xff;
+		color.b = (_mm512_reduce_add_epi32(sum[offsetB]) / count) & 0xff;
+		return color;
+	};
+#endif // ifdef __AVX512F__ && __AVX512BW__
 
 enum SIMDLevel {
 	None = 0,
 	SSE4_1 = 1 << 0,
-	AVX2 = 1 << 1
+	AVX2 = 1 << 1,
+	AVX512 = 1 << 2
 };
 
 #if defined(Q_OS_MACOS)
@@ -271,6 +329,8 @@ static uint32_t available_simd() {
 // https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
 static uint32_t available_simd() {
 	uint32_t level = SIMDLevel::None;
+	if (_may_i_use_cpu_feature(_FEATURE_AVX512F | _FEATURE_AVX512BW))
+		level |= SIMDLevel::AVX512;
 	if (_may_i_use_cpu_feature(_FEATURE_AVX2))
 		level |= SIMDLevel::AVX2;
 	if (_may_i_use_cpu_feature(_FEATURE_SSE4_1))
@@ -321,8 +381,13 @@ static uint32_t available_simd() {
 	abcd[0] = eax; abcd[1] = ebx; abcd[2] = ecx; abcd[3] = edx;
 #endif // ifdef _MSC_VER
 	uint32_t level = SIMDLevel::None;
-	// CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
 	run_cpuid(7, 0, abcd);
+	// CPUID.(EAX=07H, ECX=0H):EBX.AVX512F [bit 16]==1
+	// CPUID.(EAX=07H, ECX=0H):EBX.AVX512BW[bit 30]==1
+	if ((abcd[1] & (1 << 16)) && (abcd[1] & (1 << 30)))
+		level |= SIMDLevel::AVX512;
+
+	// CPUID.(EAX=07H, ECX=0H):EBX.AVX2[bit 5]==1
 	if ((abcd[1] & (1 << 5)))
 		level |= SIMDLevel::AVX2;
 
@@ -344,7 +409,12 @@ static uint32_t available_simd() {
 	SSE4.1   97.88% / +0.69%
 	AVX2     74.19% / +2.73%
 
-	by default set functions to non-SIMD and upgrade to AVX2 or SSE4.1 when available
+	(September 2023)
+	SSE4.1   99.55% / +0.08%
+	AVX2     92.04% / +0.80%
+	AVX512F  10.00% / -0.15%
+
+	by default set functions to non-SIMD and upgrade to AVX2/512 or SSE4.1 when available
 */
 struct simdupgrade {
 	simdupgrade() {
@@ -365,10 +435,18 @@ struct simdupgrade {
 			accumulateBGRA = accumulateBuffer256<PIXEL_FORMAT_BGRA>;
 		}
 		#endif // ifdef __AVX2__
+		#if defined(__AVX512F__) && defined(__AVX512BW__)
+		if (level & SIMDLevel::AVX512) {
+			accumulateARGB = accumulateBuffer512<PIXEL_FORMAT_ARGB>;
+			accumulateABGR = accumulateBuffer512<PIXEL_FORMAT_ABGR>;
+			accumulateRGBA = accumulateBuffer512<PIXEL_FORMAT_RGBA>;
+			accumulateBGRA = accumulateBuffer512<PIXEL_FORMAT_BGRA>;
+		}
+		#endif // ifdef __AVX512F__ && __AVX512BW__
 	}
 };
 simdupgrade avxup;
-#endif // ifdef __SSE4_1__ || __AVX2__
+#endif // ifdef __SSE4_1__ || __AVX2__ || (__AVX512F__ && __AVX512BW__)
 } // namespace
 
 namespace Grab {

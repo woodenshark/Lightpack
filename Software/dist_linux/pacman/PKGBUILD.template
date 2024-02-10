@@ -12,6 +12,7 @@ provides=('lightpack' 'prismatik' 'prismatik-bin' 'prismatik-git' 'prismatik-psi
 conflicts=('lightpack' 'prismatik' 'prismatik-bin' 'prisamtik-git' 'prismatik-psieg' 'prismatik-psieg-git')
 changelog="../../CHANGELOG"
 install=prismatik.install
+options=(!debug)
 _pkgdir=../../package_template
 _srcdir=../../..
 

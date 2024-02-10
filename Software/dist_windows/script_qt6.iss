@@ -122,3 +122,31 @@ english.RemoveOnly =(remove only)
 ; Docs link name
 russian.OpenWiki =Открытая документация
 english.OpenWiki =Open documentation
+
+; Docs link name
+russian.IAgree =Я согласен
+english.IAgree =I agree
+
+; https://stackoverflow.com/questions/51290580/on-inno-setup-license-page-replace-checkboxes-by-i-agree-button
+[Code]
+
+procedure InitializeWizard();
+begin
+  // Hide radio buttons and pre-select "accept", to enable "next" button
+  WizardForm.LicenseAcceptedRadio.Checked := True;
+  WizardForm.LicenseAcceptedRadio.Visible := False;
+  WizardForm.LicenseNotAcceptedRadio.Visible := False;
+  WizardForm.LicenseMemo.Height :=
+    WizardForm.LicenseNotAcceptedRadio.Top +
+    WizardForm.LicenseNotAcceptedRadio.Height -
+    WizardForm.LicenseMemo.Top - ScaleY(5);
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  // Dubious, but you have asked for it
+  if CurPageID = wpLicense then
+  begin
+    WizardForm.NextButton.Caption := '&I agree';
+  end;
+end;

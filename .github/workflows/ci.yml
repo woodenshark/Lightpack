@@ -14,7 +14,7 @@ jobs:
     name: pacman Build (Arch Linux)
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build
         working-directory: Software/dist_linux
         run: ./build-in-docker.sh pacman archlinux latest
@@ -25,7 +25,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -35,7 +35,7 @@ jobs:
     name: Flatpack Build
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Flatpak
         run: |
           set -xe
@@ -52,7 +52,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH)" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -65,7 +65,7 @@ jobs:
     name: dpkg Build (${{ matrix.os }})
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build
         working-directory: Software/dist_linux
         run: ./build-in-docker.sh dpkg ${{ matrix.os }}
@@ -76,7 +76,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$(basename $PKG_PATH | sed 's#amd64#${{ matrix.os }}_amd64#; s# ##')" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -85,13 +85,13 @@ jobs:
     name: Firmware Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
       - run: sudo apt-get install gcc-avr avr-libc build-essential
       - run: ./build_batch.sh
         working-directory: ./Firmware
       - name: Archive artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: firmware
           path: Firmware/hex/*
@@ -100,17 +100,18 @@ jobs:
     name: Windows Build
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: choco install --no-progress openssl --version=1.1.1.2100
+      - run: choco install --no-progress openssl
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
           cache-key-prefix: install-qt-action-default
-          version: 5.*
+          version: 6.*
+          modules: qtserialport
       - name: Cached Bass
         id: cache-bass
         uses: actions/cache@v2
@@ -154,7 +155,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          set QTDIR=%Qt5_Dir%
+          set QTDIR=%Qt6_Dir%
           call scripts\win32\generate_sln.bat
           MSBuild.exe Lightpack.sln /p:Configuration=Release
       - name: Prepare Installer
@@ -164,7 +165,7 @@ jobs:
       - name: Build Installer
         shell: cmd
         run: |
-          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script.iss
+          "C:/Program Files (x86)/Inno Setup 6/ISCC.exe" script_qt6.iss
         working-directory: ./Software/dist_windows
       - name: Check Package
         shell: bash
@@ -175,7 +176,7 @@ jobs:
           echo "PKG_PATH=Software/$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}
@@ -186,7 +187,7 @@ jobs:
     env:
       QT_DEST: Qt
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Select Latest Xcode
         run: |
           set -xe
@@ -242,7 +243,7 @@ jobs:
           echo "PKG_PATH=$PKG_PATH" >> $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
       - name: Upload Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
           path: ${{ env.PKG_PATH }}

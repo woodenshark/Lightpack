@@ -121,7 +121,7 @@ protected:
 		*/
 	virtual QList< ScreenInfo > * screensWithWidgets(QList< ScreenInfo > * result, const QList<GrabWidget *> &grabWidgets) = 0;
 	virtual bool isReallocationNeeded(const QList< ScreenInfo > &grabScreens) const;
-	const GrabbedScreen * screenOfRect(const QRect &rect) const;
+	const GrabbedScreen * screenOfWidget(const QWidget &widget) const;
 
 signals:
 	void frameGrabAttempted(GrabResult grabResult);

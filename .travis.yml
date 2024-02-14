@@ -1,0 +1,34 @@
+language: cpp
+#language: objective-c
+
+osx_image: xcode12.2
+
+notifications:
+  email: false
+
+os:
+  - osx
+
+before_install:
+  - brew update
+  - brew install qt5
+  - export QTDIR=/usr/local/opt/qt5
+  - export PATH=$PATH:$QTDIR/bin
+  - export VERSION=`cat Software/VERSION`
+  - qmake -v
+
+script:
+  - cd Software
+  - set -e
+  - ./update_locales.sh
+  - qmake -r
+  - make
+  - macdeployqt bin/Prismatik.app -dmg
+  - ls bin
+  - hdiutil attach bin/Prismatik.dmg
+  - ls /Volumes/bin:Prismatik/Prismatik.app
+  - otool -L /Volumes/bin:Prismatik/Prismatik.app/Contents/MacOS/Prismatik
+  - otool -L /Volumes/bin:Prismatik/Prismatik.app/Contents/Frameworks/QtWidgets.framework/Versions/5/QtWidgets
+  - hdiutil detach /Volumes/bin:Prismatik
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then curl -T bin/Prismatik.dmg "https://psieg.de/lightpack/osx_builds/Prismatik_${VERSION}_${TRAVIS_BUILD_NUMBER}.dmg" -u "${PSIEG_UPLOAD_USER}:${PSIEG_UPLOAD_PASSWORD}"; fi'
+  - set +e

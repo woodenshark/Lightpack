@@ -30,9 +30,16 @@
 # -------------------------------------------------
 
 TEMPLATE = subdirs
-CONFIG += ordered
 
-SUBDIRS = math grab
+include(build-config.prf)
 
-win32:SUBDIRS += libraryinjector hooks tests
-SUBDIRS += src
+SUBDIRS = src
+SUBDIRS += math grab
+src.depends = math grab
+
+win32:SUBDIRS += libraryinjector hooks unhook tests
+contains(QMAKE_TARGET.arch, x86_64) {
+    SUBDIRS += offsetfinder hooks32 unhook32
+    hooks32.file = hooks/hooks32.pro
+    unhook32.file = unhook/unhook32.pro
+}

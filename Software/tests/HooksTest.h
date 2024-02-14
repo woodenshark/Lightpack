@@ -5,14 +5,14 @@
 
 class HooksTest : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit HooksTest(QObject *parent = 0);
+	explicit HooksTest(QObject *parent = 0);
 
 private slots:
-    void jmpHookTestCase();
-    void vfTableHookTestCase();
-    void reportLogTestCase();
+	void jmpHookTestCase();
+	void vfTableHookTestCase();
+	void reportLogTestCase();
 
 };
 

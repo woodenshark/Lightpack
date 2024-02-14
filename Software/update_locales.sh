@@ -29,6 +29,7 @@ echo "================================================="
 echo "Updating translation files for Lightpack project:"
 echo 
 lupdate $1 src/src.pro
+echo "done"
 
 echo 
 echo "==========================================================="
@@ -37,9 +38,6 @@ echo
 lrelease src/src.pro
 
 echo
-echo Press enter to exit...
-
-read
 
 exit 0
 

@@ -6,11 +6,11 @@
 class Logger;
 
 class LoggableTrait {
-    public:
-    LoggableTrait(Logger *logger): m_logger(logger) {}
+	public:
+	LoggableTrait(Logger *logger): m_logger(logger) {}
 
 protected:
-    Logger *m_logger;
+	Logger *m_logger;
 };
 
 #endif // LOGGABLETRAIT_HPP

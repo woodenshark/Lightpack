@@ -30,41 +30,22 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="2" column="1">
+    <widget class="QRadioButton" name="rbArdulight">
+     <property name="text">
+      <string>Ardulight (Serial, 255 LEDs)</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
    <item row="1" column="1">
     <widget class="QRadioButton" name="rbAdalight">
      <property name="text">
-      <string>Adalight</string>
+      <string>Adalight (Serial, 511 LEDs)</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="4" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="1" column="0">
     <spacer name="horizontalSpacer">
@@ -79,10 +60,23 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QRadioButton" name="rbArdulight">
+   <item row="7" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="1">
+    <widget class="QRadioButton" name="rbDrgb">
      <property name="text">
-      <string>Ardulight</string>
+      <string>DRGB (UDP, 490 LEDs)</string>
      </property>
     </widget>
    </item>
@@ -90,6 +84,33 @@
     <widget class="QRadioButton" name="rbVirtual">
      <property name="text">
       <string>Virtual LED device</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
+    <widget class="QRadioButton" name="rbDnrgb">
+     <property name="text">
+      <string>DNRGB (UDP, 1500 LEDs)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QRadioButton" name="rbWarls">
+     <property name="text">
+      <string>WARLS (UDP, 255 LEDs)</string>
      </property>
     </widget>
    </item>

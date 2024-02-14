@@ -1,26 +1,26 @@
 /*
  * LedDeviceAlienFx.hpp
  *
- *  Created on: 17.04.2011
- *      Author: Timur Sattarov && Mike Shatohin
- *     Project: Lightpack
+ *	Created on: 17.04.2011
+ *		Author: Timur Sattarov && Mike Shatohin
+ *		Project: Lightpack
  *
- *  Lightpack is very simple implementation of the backlight for a laptop
+ *	Lightpack is very simple implementation of the backlight for a laptop
  *
- *  Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
+ *	Copyright (c) 2011 Mike Shatohin, mikeshatohin [at] gmail.com
  *
- *  Lightpack is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *	Lightpack is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 2 of the License, or
+ *	(at your option) any later version.
  *
- *  Lightpack is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	Lightpack is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -34,29 +34,29 @@
 
 class LedDeviceAlienFx : public AbstractLedDevice
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    LedDeviceAlienFx(QObject *parent = 0);
-    virtual ~LedDeviceAlienFx();
+	LedDeviceAlienFx(QObject *parent = 0);
+	virtual ~LedDeviceAlienFx();
+	QString name() const { return QStringLiteral("lightfx"); }
+	int maxLedsCount();
+	int defaultLedsCount() { return 1; }
 
 public slots:
-    const QString name() const { return "lightfx"; }
-    void open();
-    void close(){};
-    void setColors(const QList<QRgb> & colors);
-    void switchOffLeds();
-    void setRefreshDelay(int /*value*/);
-    void setColorDepth(int /*value*/);
-    void setSmoothSlowdown(int /*value*/);
-    void setColorSequence(QString /*value*/);
-    void requestFirmwareVersion();
-    size_t maxLedsCount() { return 1; }
-    size_t defaultLedsCount() { return 1; }
+	void open();
+	void close(){};
+	void setColors(const QList<QRgb> & colors);
+	void switchOffLeds();
+	void setRefreshDelay(int /*value*/);
+	void setColorDepth(int /*value*/);
+	void setSmoothSlowdown(int /*value*/);
+	void setColorSequence(const QString& /*value*/);
+	void requestFirmwareVersion();
 
 
 private:
-    HINSTANCE m_hLfxLibrary;
-    bool m_isInitialized;
+	HINSTANCE m_hLfxLibrary;
+	bool m_isInitialized;
 };
 
 #endif /* Q_OS_WIN */

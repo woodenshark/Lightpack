@@ -2,8 +2,8 @@
  * commands.h
  *
  *  Created on: 04.08.2010
- *      Author: Mike Shatohin (brunql)
- *     Project: Lightpack
+ *	  Author: Mike Shatohin (brunql)
+ *	 Project: Lightpack
  *
  *  Lightpack is a content-appropriate ambient lighting system for any computer
  *
@@ -23,35 +23,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 
 #ifndef COMMANDS_H_INCLUDED
 #define COMMANDS_H_INCLUDED
 
 // Commands to device, sends it in first byte of data[]
 enum COMMANDS{
-    CMD_UPDATE_LEDS = 1,
-    CMD_OFF_ALL,
-    CMD_SET_TIMER_OPTIONS,
-    CMD_SET_PWM_LEVEL_MAX_VALUE, /* deprecated */
-    CMD_SET_SMOOTH_SLOWDOWN,
-    CMD_SET_BRIGHTNESS,
+	CMD_UPDATE_LEDS = 1,
+	CMD_OFF_ALL,
+	CMD_SET_TIMER_OPTIONS,
+	CMD_SET_PWM_LEVEL_MAX_VALUE, /* deprecated */
+	CMD_SET_SMOOTH_SLOWDOWN,
+	CMD_SET_BRIGHTNESS,
 
-    CMD_NOP = 0x0F
+	CMD_NOP = 0x0F,
+
+	// Unofficial commands
+	CMD_UNOFFICIAL_SET_USBLED = 0x81,
 };
 
 enum PRESCALLERS{
-    CMD_SET_PRESCALLER_1,
-    CMD_SET_PRESCALLER_8,
-    CMD_SET_PRESCALLER_64,
-    CMD_SET_PRESCALLER_256,
-    CMD_SET_PRESCALLER_1024,
+	CMD_SET_PRESCALLER_1,
+	CMD_SET_PRESCALLER_8,
+	CMD_SET_PRESCALLER_64,
+	CMD_SET_PRESCALLER_256,
+	CMD_SET_PRESCALLER_1024,
 };
 
 
 enum DATA_VERSION_INDEXES{
-    INDEX_FW_VER_MAJOR = 1,
-    INDEX_FW_VER_MINOR,
+	INDEX_FW_VER_MAJOR = 1,
+	INDEX_FW_VER_MINOR,
+	INDEX_FW_VER_UNOFFICIAL = 5 // Use index 5 just in case the official firmware gets updated to use index 3 and 4 (0.0.0.0 version format)
 };
 
 #endif /* COMMANDS_H_INCLUDED */

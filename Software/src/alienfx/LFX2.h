@@ -29,13 +29,13 @@ is strictly forbidden.
 #define _EXPORTING
 
 #ifdef _EXPORTING // To be used by SDK developer
-   #define FN_DECLSPEC __declspec(dllexport)
+	#define FN_DECLSPEC __declspec(dllexport)
 
 #elif _IMPORTING // To be used for dynamic linking to dll
-   #define FN_DECLSPEC __declspec(dllimport)
+	#define FN_DECLSPEC __declspec(dllimport)
 
 #else // To be used for linking using static library
-   #define FN_DECLSPEC    
+	#define FN_DECLSPEC	
 #endif
 
 #ifdef _STDCALL_SUPPORTED

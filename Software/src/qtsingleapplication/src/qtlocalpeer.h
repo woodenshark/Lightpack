@@ -11,15 +11,15 @@
 ** "Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are
 ** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
+**	* Redistributions of source code must retain the above copyright
+**		notice, this list of conditions and the following disclaimer.
+**	* Redistributions in binary form must reproduce the above copyright
+**		notice, this list of conditions and the following disclaimer in
+**		the documentation and/or other materials provided with the
+**		distribution.
+**	* Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
+**		of its contributors may be used to endorse or promote products derived
+**		from this software without specific prior written permission.
 **
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -49,29 +49,29 @@
 
 class QtLocalPeer : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QtLocalPeer(QObject *parent = 0, const QString &appId = QString());
-    bool isClient();
-    bool sendMessage(const QString &message, int timeout);
-    QString applicationId() const
-        { return id; }
+	QtLocalPeer(QObject *parent = 0, const QString &appId = QString());
+	bool isClient();
+	bool sendMessage(const QString &message, int timeout);
+	QString applicationId() const
+		{ return id; }
 
 Q_SIGNALS:
-    void messageReceived(const QString &message);
+	void messageReceived(const QString &message);
 
 protected Q_SLOTS:
-    void receiveConnection();
+	void receiveConnection();
 
 protected:
-    QString id;
-    QString socketName;
-    QLocalServer* server;
-    QtLP_Private::QtLockedFile lockFile;
+	QString id;
+	QString socketName;
+	QLocalServer* server;
+	QtLP_Private::QtLockedFile lockFile;
 
 private:
-    static const char* ack;
+	static const char* ack;
 };
 
 #endif // QTLOCALPEER_H

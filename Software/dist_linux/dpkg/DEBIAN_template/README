@@ -1,0 +1,21 @@
+The Debian Package prismatik
+----------------------------
+
+Prismatik (formerly Lightpack) is a software part of simple implementation of the backlight for any computer and supports such devices as Adalight, Ardulight and Lightpack (https://github.com/psieg/Lightpack).
+
+Configuration program lives in the tray, without interfering with habitual work and watching movies.
+
+Main features:
+
+	* Open software and hardware
+	* Simple to build (DIY)
+	* Cross-platform software (Qt)
+	* Supports multiple devices
+	* Native screen grabbers
+	* API over TCP/IP and Python
+
+Please let us know if you find mistakes, bugs or errors.
+
+Post new issue : https://github.com/psieg/Lightpack/issues
+
+ -- Timur Sattarov <tim.helloworld@gmail.com>  Mon, 1 Apr 2013 16:04:00 +0400

@@ -1,17 +1,41 @@
-include( build-vars.prf )
+exists(build-vars.prf) {
+	include(build-vars.prf)
+} else {
+	include(build-vars.prf.default)
+}
+
 #------------------------------------------------------------------------------
-# Warnings
+# Parsing configuration
 #------------------------------------------------------------------------------
-    win32: {
-        isEmpty( QTDIR ) {
-            error("QTDIR is empty, please make sure you have correctly defined QTDIR in your build-vars.prf")
-        }
-        isEmpty( DIRECTX_SDK_DIR ):isEmpty( WIN81_SDK_DIR ) {
-            error("please make sure you have defined DIRECTX_SDK_DIR or WIN81_SDK_DIR in your build-vars.prf file")
-        }
-        CONFIG(debug, debug|release) {
-            DEBUG_EXT = d
-        } else {
-            DEBUG_EXT =
+win32 {
+    # Target architecture
+    QMAKE_TARGET.arch = $$TARGET_ARCH
+    _TARGET_ARCH = $$(TARGET_ARCH)
+    !isEmpty(_TARGET_ARCH) {
+        QMAKE_TARGET.arch = $$_TARGET_ARCH
+    }
+
+    CONFIG(debug, debug|release) {
+        DEBUG_EXT = d
+    } else {
+        DEBUG_EXT =
+    }
+}
+
+macx {
+    # Mac SDK override
+    _QMAKE_MAC_SDK_OVERRIDE = $$(QMAKE_MAC_SDK_OVERRIDE)
+    !isEmpty(_QMAKE_MAC_SDK_OVERRIDE) {
+        QMAKE_MAC_SDK_OVERRIDE = $$_QMAKE_MAC_SDK_OVERRIDE
+    }
+
+    # fat binaries
+    isEmpty(QMAKE_APPLE_DEVICE_ARCHS) {
+        # x86_64h is better for modern Intel devices
+        QMAKE_APPLE_DEVICE_ARCHS = x86_64h x86_64
+        versionAtLeast(QT_VERSION, 6.2.0) {
+            # arm64 is officially available starting from 6.2
+            QMAKE_APPLE_DEVICE_ARCHS += arm64
         }
     }
+}

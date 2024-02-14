@@ -9,10 +9,15 @@ QT         += widgets network testlib
 TARGET      = LightpackTests
 DESTDIR     = bin
 
-CONFIG     += console
+CONFIG     += console c++17
 CONFIG     -= app_bundle
 
-CONFIG(gcc):QMAKE_CXXFLAGS += -std=c++11
+include(../build-config.prf)
+
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
 
 # QMake and GCC produce a lot of stuff
 OBJECTS_DIR = stuff
@@ -47,6 +52,7 @@ HEADERS += \
     ../src/Settings.hpp \
     ../src/Plugin.hpp \
     ../src/LightpackPluginInterface.hpp \
+    ../src/LightpackCommandLineParser.hpp \
     ../grab/include/calculations.hpp \
     ../math/include/PrismatikMath.hpp \
     SettingsWindowMockup.hpp \
@@ -54,7 +60,8 @@ HEADERS += \
     LightpackApiTest.hpp \
     lightpackmathtest.hpp \
     AppVersionTest.hpp \
-    ../src/UpdatesProcessor.hpp
+    ../src/UpdatesProcessor.hpp \
+    LightpackCommandLineParserTest.hpp
 
 SOURCES += \
     ../src/ApiServerSetColorTask.cpp \
@@ -62,13 +69,15 @@ SOURCES += \
     ../src/Settings.cpp \
     ../src/Plugin.cpp \
     ../src/LightpackPluginInterface.cpp \
+    ../src/LightpackCommandLineParser.cpp \
     LightpackApiTest.cpp \
     SettingsWindowMockup.cpp \
     GrabCalculationTest.cpp \
     lightpackmathtest.cpp \
     TestsMain.cpp \
     AppVersionTest.cpp \
-    ../src/UpdatesProcessor.cpp
+    ../src/UpdatesProcessor.cpp \
+    LightpackCommandLineParserTest.cpp
 
 win32{
     HEADERS += \

@@ -1,0 +1,60 @@
+# This file contains the default values for qmake
+# Create build-vars.prf and modify the respective variables for your setup
+
+#------------------------------------------------------------------------------
+# General
+#------------------------------------------------------------------------------
+win32 {
+	# Set this to -Win32 for 32-bit
+	OPENSSL_DIR = "C:\\OpenSSL-Win64\\bin"
+	# Set this to run without openssl. The updatecheck won't work.
+	# DEFINES += NO_OPENSSL
+
+	# optional: BASS library directory, for sound visualization (http://www.un4seen.com/)
+	DEFINES += BASS_SOUND_SUPPORT
+	BASS_DIR = "C:\\bass"
+	BASSWASAPI_DIR = "C:\\bass\\wasapi"
+
+	# optional: Night Light support, x86_64 only (https://github.com/zomfg/NightLightLibrary/releases)
+	DEFINES += NIGHTLIGHT_SUPPORT
+	NIGHTLIGHT_DIR = C:\\NightLightLibrary
+
+	# Set this to x86 to compile 32-bit
+	TARGET_ARCH = x86_64
+}
+
+unix:!macx {
+	# CONFIG += debug
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
+	# QMAKE_CFLAGS_DEBUG += -ggdb
+	# QMAKE_CFLAGS_RELEASE += -march=native
+	# QMAKE_CXXFLAGS_DEBUG += -ggdb
+	# QMAKE_CXXFLAGS_RELEASE += -march=native
+	DEFINES += PULSEAUDIO_SUPPORT
+	# PULSEAUDIO_INC_DIR = "../../../pulseaudio/src"
+	# PULSEAUDIO_LIB_DIR = "../../../pulseaudio/src/.libs"
+	# FFTW3_INC_DIR = "../../../fftw-3.3.8/api"
+	# FFTW3_LIB_DIR = "../../../fftw-3.3.8/.libs"
+}
+
+# For Qt lrelease reasons, to change the MAC SDK, you have to edit src.pro directly
+# When using variables, lrelease complains about QMAKE_MAC_SDK not being set
+# You can override QMAKE_MAC_SDK value by setting this variable.
+macx {
+	# by default builds a fat binary with x86_64 + x86_64h (+ arm64)
+	# override for single architecture or other combo
+	# QMAKE_APPLE_DEVICE_ARCHS = arm64
+
+	# QMAKE_MAC_SDK_OVERRIDE = macosx10.8
+	DEFINES += SOUNDVIZ_SUPPORT
+	# DEFINES += SAVE_FRAME_TO_FILE
+
+	# CONFIG += debug
+	# QMAKE_CC = clang
+	# QMAKE_CXX = clang++
+	# QMAKE_CFLAGS_DEBUG += -ggdb
+	# QMAKE_CFLAGS_RELEASE += -march=native
+	# QMAKE_CXXFLAGS_DEBUG += -ggdb
+	# QMAKE_CXXFLAGS_RELEASE += -march=native
+}

@@ -3,27 +3,27 @@
 #ifndef CB_H
 #define CB_H
 
-#include <QtWidgets/QPushButton>
+#include <QPushButton>
 
 class ColorButton : public QPushButton
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ColorButton(QWidget *parent);
-    ~ColorButton();
-    QColor getColor();
-    void setColor(QColor color);
+	ColorButton(QWidget *parent);
+	~ColorButton();
+	QColor getColor();
+	void setColor(QColor color);
 
 signals:
-    void colorChanged(QColor);
+	void colorChanged(QColor);
 
 protected slots:
-    void click();
-    void currentColorChanged(QColor color);
+	void click();
+	void currentColorChanged(QColor color);
 
 protected:
-    QColor m_color;
+	QColor m_color;
 };
 
 #endif //CB_H

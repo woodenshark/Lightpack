@@ -9,7 +9,7 @@ QT       += widgets
 DESTDIR = ../lib
 TARGET = grab
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib c++17
 
 include(../build-config.prf)
 
@@ -23,6 +23,15 @@ INCLUDEPATH += ./include \
                ../math/include \
                ..
 
+QMAKE_CFLAGS = $$(CFLAGS)
+QMAKE_CXXFLAGS = $$(CXXFLAGS)
+QMAKE_LFLAGS = $$(LDFLAGS)
+
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 DEFINES += $${SUPPORTED_GRABBERS}
 # Linux/UNIX platform
 unix:!macx {
@@ -34,9 +43,19 @@ unix:!macx {
 
 # Mac platform
 macx {
+    contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) | contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
+        GRABBERS_HEADERS += include/MacOSGrabberBase.hpp
+        GRABBERS_SOURCES += MacOSGrabberBase.mm
+    }
+
     contains(DEFINES, MAC_OS_CG_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/MacOSGrabber.hpp
-        GRABBERS_SOURCES += MacOSGrabber.cpp
+        GRABBERS_HEADERS += include/MacOSCGGrabber.hpp
+        GRABBERS_SOURCES += MacOSCGGrabber.mm
+    }
+
+    contains(DEFINES, MAC_OS_AV_GRAB_SUPPORT) {
+        GRABBERS_HEADERS += include/MacOSAVGrabber.h
+        GRABBERS_SOURCES += MacOSAVGrabber.mm
     }
 }
 
@@ -47,14 +66,9 @@ win32 {
         GRABBERS_SOURCES += WinAPIGrabber.cpp
     }
 
-    contains(DEFINES, WINAPI_EACH_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/WinAPIGrabberEachWidget.hpp
-        GRABBERS_SOURCES += WinAPIGrabberEachWidget.cpp
-    }
-
-    contains(DEFINES, D3D9_GRAB_SUPPORT) {
-        GRABBERS_HEADERS += include/D3D9Grabber.hpp
-        GRABBERS_SOURCES += D3D9Grabber.cpp
+    contains(DEFINES, DDUPL_GRAB_SUPPORT) {
+        GRABBERS_HEADERS += include/DDuplGrabber.hpp
+        GRABBERS_SOURCES += DDuplGrabber.cpp
     }
 
     contains(DEFINES, D3D10_GRAB_SUPPORT) {
@@ -63,52 +77,54 @@ win32 {
     }
 }
 
-# Common Qt grabbers
-contains(DEFINES, QT_GRAB_SUPPORT) {
-    GRABBERS_HEADERS += \
-        include/QtGrabberEachWidget.hpp \
-        include/QtGrabber.hpp
-
-    GRABBERS_SOURCES += \
-        QtGrabberEachWidget.cpp \
-        QtGrabber.cpp
-}
-
 HEADERS += \
     include/calculations.hpp \
     include/GrabberBase.hpp \
     include/ColorProvider.hpp \
     include/GrabberContext.hpp \
+    include/BlueLightReduction.hpp \
     $${GRABBERS_HEADERS}
 
 SOURCES += \
     calculations.cpp \
     GrabberBase.cpp \
     include/ColorProvider.cpp \
+    BlueLightReduction.cpp \
     $${GRABBERS_SOURCES}
 
 win32 {
-    !isEmpty( DIRECTX_SDK_DIR ) {
-        # This will suppress gcc warnings in DX headers.
-        CONFIG(gcc) {
-            QMAKE_CXXFLAGS += -isystem "\"$${DIRECTX_SDK_DIR}/Include\""
-        } else {
-            INCLUDEPATH += "\"$${DIRECTX_SDK_DIR}/Include\""
-        }
+    CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
+        DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+        # Fix __cplusplus macro as required by Qt
+        QMAKE_CXXFLAGS += /Zc:__cplusplus
+        # As required by Qt
+        QMAKE_CXXFLAGS += /permissive-
+        # Create "fake" project dependencies of the libraries used dynamically
+        LIBS += -lprismatik-hooks -llibraryinjector -lprismatik-unhook
+
+        # emulate every other compiler, __SSE4_1__ is defined when AVX2 is enabled (and __AVX2__ is also defined)
+        DEFINES += __SSE4_1__ __AVX2__ __AVX512F__ __AVX512BW__
+        # causes global vectorization, enable if your target CPU has AVX2
+        # QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2 $$QMAKE_CFLAGS_AVX512F $$QMAKE_CFLAGS_AVX512BW
     }
 
-    # This will suppress many MSVC warnings about 'unsecure' CRT functions.
-    CONFIG(msvc) {
-        DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    contains(DEFINES,NIGHTLIGHT_SUPPORT) {
+      contains(QMAKE_TARGET.arch, x86_64) {
+        Release:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Release/
+        Debug:INCLUDEPATH += $${NIGHTLIGHT_DIR}/Debug/
+      }
     }
 
     HEADERS += \
             ../common/msvcstub.h \
             include/WinUtils.hpp \
-            include/WinDXUtils.hpp
+            ../common/WinDXUtils.hpp
     SOURCES += \
             WinUtils.cpp \
-            WinDXUtils.cpp
+            ../common/WinDXUtils.cpp
 }
 
 macx {
@@ -116,10 +132,25 @@ macx {
 
     INCLUDEPATH += /System/Library/Frameworks
 
+    HEADERS += \
+            include/MacUtils.h
+    SOURCES += \
+            MacUtils.mm
+
     #LIBS += \
     #        -framework CoreGraphics
     #        -framework CoreFoundation
     #QMAKE_MAC_SDK = macosx10.8
+
+    # ignored by clang when building for arm
+    QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2
+}
+
+unix:!macx {
+    CXX_TARGET = $$system($$QMAKE_CXX -dumpmachine)
+    contains(CXX_TARGET, x86_64.*) {
+        QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_AVX2 $$QMAKE_CFLAGS_AVX512F $$QMAKE_CFLAGS_AVX512BW
+    }
 }
 
 OTHER_FILES += \

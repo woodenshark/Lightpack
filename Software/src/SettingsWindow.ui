@@ -7,24 +7,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>608</width>
-    <height>600</height>
+    <width>485</width>
+    <height>668</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>600</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string notr="true">Prismatik</string>
+   <string notr="true">Prismatik (unofficial)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../res/LightpackResources.qrc">
@@ -53,18 +41,12 @@
        <bool>true</bool>
       </property>
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="minimumSize">
-       <size>
-        <width>115</width>
-        <height>580</height>
-       </size>
-      </property>
-      <property name="maximumSize">
        <size>
         <width>115</width>
         <height>580</height>
@@ -192,7 +174,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Experimental</string>
+        <string>Expert</string>
        </property>
        <property name="textAlignment">
         <set>AlignHCenter|AlignTop</set>
@@ -224,18 +206,6 @@
     </item>
     <item row="1" column="2">
      <widget class="QTabWidget" name="tabWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>581</height>
-       </size>
-      </property>
       <property name="tabPosition">
        <enum>QTabWidget::North</enum>
       </property>
@@ -243,7 +213,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabSoftwareOptions">
        <property name="enabled">
@@ -265,6 +235,40 @@
         <property name="rightMargin">
          <number>20</number>
         </property>
+        <item row="2" column="0">
+         <widget class="QComboBox" name="comboBox_LightpackModes">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>Screen grabbing</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mood lamp</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sound visualization</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QStackedWidget" name="stackedWidget_LightpackModes">
           <property name="sizePolicy">
@@ -277,44 +281,29 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="page">
-           <layout class="QVBoxLayout" name="verticalLayout_12">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0">
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_GrabFrequency_value">
+             <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0">
+              <item row="3" column="0" colspan="3">
+               <widget class="QCheckBox" name="checkBox_GrabApplyBlueLightReduction">
                 <property name="text">
-                 <string notr="true">0</string>
+                 <string>Apply screen color modifications (F.lux, redshift)</string>
                 </property>
-                <property name="margin">
-                 <number>3</number>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                <property name="tristate">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_SlowdownGrab_txt">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_GrabFrequency_txt_fps">
                 <property name="text">
-                 <string>Grab delay:</string>
+                 <string>FPS</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                 </property>
-                <property name="margin">
-                 <number>0</number>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -332,6 +321,9 @@
                   <height>0</height>
                  </size>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -340,35 +332,6 @@
                 </property>
                 <property name="value">
                  <number>20</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="checkBox_GrabIsAvgColors">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Average color on all LEDs</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="label_GrabFrequency_txt_fps">
-                <property name="text">
-                 <string>FPS</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-                <property name="textInteractionFlags">
-                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -394,6 +357,89 @@
                 </property>
                </widget>
               </item>
+              <item row="8" column="2">
+               <widget class="QPushButton" name="pushButton_grabOverBrightenHelp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin: 0px;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="../res/LightpackResources.qrc">
+                  <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QSlider" name="horizontalSlider_GrabOverBrighten">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;h4&gt;Over-brightening&lt;/h4&gt; To achieve a higher overall brightness, Prismatik will set the LEDs to maximum even if the grabbed color is not at full brightness.</string>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_SlowdownGrab_txt">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Grab interval:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="margin">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_GrabFrequency_value">
+                <property name="text">
+                 <string notr="true">0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="margin">
+                 <number>3</number>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="2">
                <widget class="QLabel" name="label_SlowdownGrab_txt_ms">
                 <property name="text">
@@ -404,134 +450,239 @@
                 </property>
                </widget>
               </item>
+              <item row="2" column="0" colspan="3">
+               <widget class="QCheckBox" name="checkBox_GrabIsAvgColors">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Average color on all LEDs</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QSlider" name="horizontalSlider_GrabColorTemperature">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>1000</number>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="singleStep">
+                 <number>100</number>
+                </property>
+                <property name="pageStep">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>6500</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::NoTicks</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>1000</number>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QSpinBox" name="spinBox_GrabColorTemperature">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="showGroupSeparator" stdset="0">
+                 <bool>false</bool>
+                </property>
+                <property name="suffix">
+                 <string notr="true">K</string>
+                </property>
+                <property name="minimum">
+                 <number>1000</number>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="singleStep">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>6500</number>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Over-brightening:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <widget class="QSpinBox" name="spinBox_GrabOverBrighten">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="minimum">
+                 <number>0</number>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QSlider" name="horizontalSlider_GrabGamma">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;h4&gt;Color encoding gamma&lt;/h4&gt;
+
+This is the gamma used for encoding the color with the desired &lt;b&gt;color temperature&lt;/b&gt;. Setting to &lt;b&gt;1.0&lt;/b&gt; cancels the effect.
+This is the reciprocal of the &lt;b&gt;device gamma&lt;/b&gt; which is the decoding gamma. They cancel each other if set to same value.</string>
+                </property>
+                <property name="minimum">
+                 <number>5</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="pageStep">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>220</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_GrabGamma">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="minimum">
+                 <double>0.050000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.200000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0" colspan="2">
+               <widget class="QCheckBox" name="checkBox_GrabApplyColorTemperature">
+                <property name="whatsThis">
+                 <string>&lt;h4&gt;Color temperature &amp;amp; gamma&lt;/h4&gt;
+
+Internally emulates the effects of f.lux, redshift, Night Light, Night Shift...</string>
+                </property>
+                <property name="text">
+                 <string>Apply color temperature and gamma</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="2">
+               <widget class="QPushButton" name="pushButton_grabGammaHelp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin: 0px;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="../res/LightpackResources.qrc">
+                  <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QPushButton" name="pushButton_grabApplyColorTemperatureHelp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin:0px;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="../res/LightpackResources.qrc">
+                  <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_3">
-              <property name="title">
-               <string>Eyes care settings</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="7" column="0">
-                <widget class="QRadioButton" name="radioButton_LuminosityDeadZone">
-                 <property name="text">
-                  <string>Dead-zone</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="styleSheet">
-                  <string notr="true">margin-top:0px;</string>
-                 </property>
-                 <property name="text">
-                  <string>Scene luminosity threshold:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0">
-                <widget class="QLabel" name="label_luminosityThresholdUsedFor">
-                 <property name="text">
-                  <string>Luminosity threshold is used for:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
-                <widget class="QRadioButton" name="radioButton_MinimumLuminosity">
-                 <property name="text">
-                  <string>Minimum luminosity level</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="3">
-                <widget class="QSpinBox" name="spinBox_LuminosityThreshold">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>50</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="minimum">
-                  <number>0</number>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="4">
-                <widget class="QPushButton" name="pushButton_lumosityThresholdHelp">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">margin: 0px;</string>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../res/LightpackResources.qrc">
-                   <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-                 </property>
-                 <property name="flat">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QSlider" name="horizontalSlider_LuminosityThreshold">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="whatsThis">
-                  <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can adjust &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in the dark scenes or you can adjust &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turning lights OFF in the dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
             </item>
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
-               <string>Appearance of grab widgets</string>
+               <string>Grab widget adjustment</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabWidgetsDontShow">
                  <property name="text">
-                  <string>Do not show</string>
+                  <string>Hidden</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -551,7 +702,7 @@
                <item>
                 <widget class="QRadioButton" name="radioButton_White">
                  <property name="text">
-                  <string>White</string>
+                  <string>All white</string>
                  </property>
                 </widget>
                </item>
@@ -562,6 +713,15 @@
           </widget>
           <widget class="QWidget" name="page_2">
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="comboBox_MoodLampLamp"/>
+            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -578,7 +738,7 @@
                </widget>
               </item>
               <item>
-               <widget class="ColorButton" name="pushButton_SelectColor">
+               <widget class="ColorButton" name="pushButton_SelectColorMoodLamp">
                 <property name="text">
                  <string/>
                 </property>
@@ -683,9 +843,217 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="page_3">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Sound device:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QComboBox" name="comboBox_SoundVizDevice"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_SoundVizDeviceHelp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="whatsThis">
+                 <string>By default, on macOS this feature is limited to input devices (mic, line-in...), a third party software (such as Soundflower etc) is needed to redirect desktop sound into a virtual input that can be used here. The device has to support Linear PCM, 44100Hz (or 32000, 48000) sample rate and 16 (or 24, 32) bits per channel.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin:0;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="../res/LightpackResources.qrc">
+                  <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_SoundVizVisualizer"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QRadioButton" name="radioButton_SoundVizConstantMode">
+                <property name="text">
+                 <string>Animate colors from</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="ColorButton" name="pushButton_SelectColorSoundVizMin">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>to</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="ColorButton" name="pushButton_SelectColorSoundVizMax">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <item>
+               <widget class="QRadioButton" name="radioButton_SoundVizLiquidMode">
+                <property name="text">
+                 <string>Change color with rate:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_slowSoundVizLiquidSpeed">
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin-bottom:0.4em; margin-left:0.5em</string>
+                </property>
+                <property name="text">
+                 <string>Slow</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="horizontalSlider_SoundVizLiquidSpeed">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_fastSoundVizLiquidSpeed">
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">margin-bottom:0.4em;</string>
+                </property>
+                <property name="text">
+                 <string>Fast</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_SoundvizLightpackSmoothnessNote">
+              <property name="text">
+               <string>Please note: The sound visualizer works best with low smoothness settings (20 and below, 10 recommended)</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <property name="topMargin">
            <number>5</number>
@@ -771,7 +1139,133 @@
           </item>
          </layout>
         </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Mode:</string>
+          </property>
+         </widget>
+        </item>
         <item row="4" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Eye care settings</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="7" column="0">
+            <widget class="QRadioButton" name="radioButton_LuminosityDeadZone">
+             <property name="text">
+              <string>Dead-zone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="styleSheet">
+              <string notr="true">margin-top:0px;</string>
+             </property>
+             <property name="text">
+              <string>Scene luminosity threshold:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_luminosityThresholdUsedFor">
+             <property name="text">
+              <string>Luminosity threshold is used for:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QRadioButton" name="radioButton_MinimumLuminosity">
+             <property name="text">
+              <string>Minimum luminosity level</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QSpinBox" name="spinBox_LuminosityThreshold">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>50</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="4">
+            <widget class="QPushButton" name="pushButton_lumosityThresholdHelp">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">margin: 0px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../res/LightpackResources.qrc">
+               <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QSlider" name="horizontalSlider_LuminosityThreshold">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;h4&gt;Scene luminosity threshold&lt;/h4&gt; It works in two ways: You can either use &lt;b&gt;minimum luminosity level&lt;/b&gt; for soft and gentle light in dark scenes or you can use &lt;b&gt;dead-zone&lt;/b&gt; luminosity grabbing which ignores small non-black objects on black backgrounds and turns lights OFF in dark scenes. This is eye-saving vs. eye-killing options which works mutually. We &lt;b&gt;recommend&lt;/b&gt; to use threshold for minimum luminosity level.</string>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <spacer name="verticalSpacer_5">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -783,42 +1277,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="2" column="0">
-         <widget class="QComboBox" name="comboBox_LightpackModes">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>Screen grabbing</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Mood lamp</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Mode:</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -835,91 +1293,26 @@
        <attribute name="title">
         <string>Device</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_12">
+       <layout class="QGridLayout" name="gridLayout_12" columnstretch="0,0,0,0,0,0">
         <property name="leftMargin">
          <number>20</number>
         </property>
         <property name="rightMargin">
          <number>20</number>
         </property>
-        <item row="12" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <property name="bottomMargin">
-           <number>13</number>
-          </property>
-          <item>
-           <widget class="QPushButton" name="pbRunConfigurationWizard">
-            <property name="text">
-             <string>Run configuration wizard</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Overall brightness:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
+        <item row="7" column="4">
+         <widget class="QPushButton" name="pushButton_DitheringHelp">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>60</width>
-            <height>0</height>
-           </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>16</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="pushButton_GammaCorrectionHelp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
           </property>
           <property name="styleSheet">
            <string notr="true">margin:0px;</string>
@@ -936,20 +1329,14 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_15">
-          <property name="styleSheet">
-           <string notr="true">margin:0px;</string>
-          </property>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>%</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Brightness cap:</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="6" column="0">
          <widget class="QSlider" name="horizontalSlider_GammaCorrection">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -980,16 +1367,22 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
+        <item row="4" column="0">
+         <widget class="QSlider" name="horizontalSlider_DeviceBrightnessCap">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Brightness Cap&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lowers the brightness limit of LEDs (as opposed to overall brightness). Can be used to limit the power draw and the heat output. Defaults to 100% (no limit).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="minimum">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="maximum">
            <number>100</number>
-          </property>
-          <property name="pageStep">
-           <number>1</number>
           </property>
           <property name="value">
            <number>100</number>
@@ -999,7 +1392,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="6" column="2">
          <widget class="QDoubleSpinBox" name="doubleSpinBox_DeviceGamma">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1033,39 +1426,62 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Keep lights ON after exit</string>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
+        <item row="25" column="0">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
          </spacer>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="2">
+         <widget class="QSpinBox" name="spinBox_DeviceBrightnessCap">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>29</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="21" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterScreenOff">
+          <property name="text">
+           <string>Keep lights ON after display sleep</string>
+          </property>
+         </widget>
+        </item>
+        <item row="22" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
+          <property name="text">
+           <string>Keep lights ON after lock computer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <widget class="QLabel" name="label_GammaCorrection">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1078,10 +1494,201 @@
           </property>
          </widget>
         </item>
-        <item row="13" column="0" colspan="3">
+        <item row="17" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="bottomMargin">
+           <number>13</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="pbRunConfigurationWizard">
+            <property name="text">
+             <string>Run configuration wizard</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QSlider" name="horizontalSlider_DeviceBrightness">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="0" colspan="6">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterExit">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Keep lights ON after exit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="23" column="0">
+         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterSuspend">
+          <property name="text">
+           <string>Keep lights ON after system suspend</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4">
+         <widget class="QPushButton" name="pushButton_GammaCorrectionHelp">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">margin:0px;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/LightpackResources.qrc">
+            <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QPushButton" name="pushButton_BrightnessCapHelp">
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/LightpackResources.qrc">
+            <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Overall brightness:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QCheckBox" name="checkBox_EnableDithering">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h4 style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:medium; font-weight:600;&quot;&gt;Dithering&lt;/span&gt;&lt;/h4&gt;&lt;p&gt;Increases color accuracy with some devices, but may introduce flickering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Enable Dithering</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QSpinBox" name="spinBox_DeviceBrightness">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>45</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>9</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="0" colspan="6">
          <widget class="QTabWidget" name="tabDevices">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -1093,14 +1700,14 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="documentMode">
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="tabDeviceLightpack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -1115,7 +1722,13 @@
             <string>Lightpack</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_13">
-            <item row="4" column="0">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item row="5" column="0">
              <widget class="QLabel" name="label_9">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1128,29 +1741,87 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceRefreshDelay">
+            <item row="4" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceColorDepth">
               <property name="whatsThis">
-               <string>&lt;h4&gt;Refresh delay&lt;/h4&gt; This setting’s values are inversely proportional to the PWM’s frequency. It's affects to performance.</string>
+               <string>&lt;h4&gt;Color depth&lt;/h4&gt; Number of colors per channel, one RGB LED uses 3 channels (value in power of 3).</string>
               </property>
               <property name="minimum">
-               <number>64</number>
+               <number>32</number>
               </property>
               <property name="maximum">
-               <number>1023</number>
+               <number>255</number>
               </property>
               <property name="pageStep">
                <number>1</number>
               </property>
               <property name="value">
-               <number>64</number>
+               <number>100</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_DeviceColorDepth">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Color depth (Lightpack 5 and below):</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceSmooth">
+              <property name="whatsThis">
+               <string>&lt;h4&gt;Smoothness&lt;/h4&gt; It defines how many steps will be color changed in</string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QPushButton" name="pushButton_LightpackColorDepthHelp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">margin:0px;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
              <widget class="QSpinBox" name="spinBox_DeviceColorDepth">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1181,7 +1852,36 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="2">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBox_DisableUsbPowerLed">
+              <property name="text">
+               <string>Disable USB Power LED</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QSlider" name="horizontalSlider_DeviceRefreshDelay">
+              <property name="whatsThis">
+               <string>&lt;h4&gt;Refresh delay&lt;/h4&gt; This setting’s values are inversely proportional to the PWM’s frequency. It's affects to performance.</string>
+              </property>
+              <property name="minimum">
+               <number>64</number>
+              </property>
+              <property name="maximum">
+               <number>1023</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>64</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
              <widget class="QPushButton" name="pushButton_LightpackSmoothnessHelp">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1204,154 +1904,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_DeviceRefreshDelay">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Refresh delay (Lightpack 5 and below):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceColorDepth">
-              <property name="whatsThis">
-               <string>&lt;h4&gt;Color depth&lt;/h4&gt; Number of colors per channel, one RGB LED uses 3 channels (value in power of 3).</string>
-              </property>
-              <property name="minimum">
-               <number>32</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="pageStep">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>100</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="2">
-             <widget class="QPushButton" name="pushButton_LightpackRefreshDelayHelp">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">margin:0px;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../res/LightpackResources.qrc">
-                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QSpinBox" name="spinBox_DeviceSmooth">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>60</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="minimum">
-               <number>0</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="value">
-               <number>100</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QSlider" name="horizontalSlider_DeviceSmooth">
-              <property name="whatsThis">
-               <string>&lt;h4&gt;Smoothness&lt;/h4&gt; It defines how many steps will be color changed in</string>
-              </property>
-              <property name="minimum">
-               <number>0</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="pageStep">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>100</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QPushButton" name="pushButton_LightpackColorDepthHelp">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">margin:0px;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../res/LightpackResources.qrc">
-                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_DeviceColorDepth">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Color depth (Lightpack 5 and below):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
+            <item row="8" column="1">
              <widget class="QSpinBox" name="spinBox_DeviceRefreshDelay">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1382,43 +1935,87 @@
               </property>
              </widget>
             </item>
-            <item row="8" column="0">
-             <spacer name="verticalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+            <item row="8" column="2">
+             <widget class="QPushButton" name="pushButton_LightpackRefreshDelayHelp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="sizeHint" stdset="0">
+              <property name="styleSheet">
+               <string notr="true">margin:0px;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QSpinBox" name="spinBox_DeviceSmooth">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
                <size>
-                <width>20</width>
-                <height>40</height>
+                <width>50</width>
+                <height>0</height>
                </size>
               </property>
-             </spacer>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_DeviceRefreshDelay">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Refresh delay (Lightpack 5 and below):</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
           <widget class="QWidget" name="tabDeviceVirtual">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <attribute name="title">
             <string>Virtual</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <property name="horizontalSpacing">
-             <number>12</number>
-            </property>
-            <item row="1" column="0">
-             <spacer name="verticalSpacer_15">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="0" colspan="2">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
              <widget class="QFrame" name="frame_VirtualLeds">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
@@ -1433,15 +2030,15 @@
               </layout>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QCheckBox" name="checkBox_KeepLightsOnAfterLockComputer">
-          <property name="text">
-           <string>Keep lights ON after lock computer</string>
-          </property>
          </widget>
         </item>
        </layout>
@@ -1470,6 +2067,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QComboBox" name="comboBox_Profiles">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="editable">
                 <bool>true</bool>
                </property>
@@ -1482,12 +2085,6 @@
               <widget class="QPushButton" name="pushButton_ProfileNew">
                <property name="enabled">
                 <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
                </property>
                <property name="toolTip">
                 <string>Add new profile</string>
@@ -1515,12 +2112,6 @@
                <property name="enabled">
                 <bool>true</bool>
                </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="toolTip">
                 <string>Reset current profile to defaults</string>
                </property>
@@ -1546,12 +2137,6 @@
               <widget class="QPushButton" name="pushButton_DeleteProfile">
                <property name="enabled">
                 <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
                </property>
                <property name="toolTip">
                 <string>Delete profile</string>
@@ -1643,22 +2228,10 @@
              </item>
              <item>
               <widget class="QComboBox" name="comboBox_Language">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
                  <width>150</width>
                  <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>150</width>
-                 <height>16777215</height>
                 </size>
                </property>
                <property name="sizeAdjustPolicy">
@@ -1667,19 +2240,6 @@
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_ExpertModeEnabled">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Expert mode</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -1700,16 +2260,10 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabPlugins">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <attribute name="title">
         <string>Plugins</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_14" stretch="0,1,1">
+       <layout class="QVBoxLayout" name="verticalLayout_14" stretch="0,0,1">
         <property name="spacing">
          <number>9</number>
         </property>
@@ -1739,8 +2293,7 @@
              </size>
             </property>
             <property name="whatsThis">
-             <string>
-&lt;h4&gt;Plugins&lt;/h4&gt; Here you can manage your plugins which stores in you profile folder. Plugins work in priority of order &amp;mdash; first plugin in the list has the highest priority. You can increase or decrease priority of any plugin in list.</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:medium; font-weight:600;&quot;&gt;Plugins&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Here you can manage your plugins which are stored in you profile folder. Check each plugin's documentation for requirements and settings. Plugins work in priority of order — first plugin in the list has the highest priority.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">margin-top:0px;</string>
@@ -1792,23 +2345,14 @@
          </layout>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_14" rowstretch="1,0,0,0" columnstretch="1,0">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetMinimumSize</enum>
-          </property>
-          <item row="0" column="0" rowspan="4">
+         <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
+          <item>
            <widget class="QListWidget" name="list_Plugins">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>100</height>
-             </size>
             </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
@@ -1827,84 +2371,56 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="pushButton_UpPriority">
-            <property name="toolTip">
-             <string>Increase priority</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../res/LightpackResources.qrc">
-              <normaloff>:/icons/arrow_up_gray.png</normaloff>:/icons/arrow_up_gray.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_DownPriority">
-            <property name="toolTip">
-             <string>Decrease priority</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../res/LightpackResources.qrc">
-              <normaloff>:/icons/arrow_down_gray.png</normaloff>:/icons/arrow_down_gray.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="pushButton_ConsolePlugin">
-            <property name="toolTip">
-             <string>Open python console</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../res/LightpackResources.qrc">
-              <normaloff>:/icons/console_gray.png</normaloff>:/icons/console_gray.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="pushButton_ReloadPlugins">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Reload plugins</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../res/LightpackResources.qrc">
-              <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
-            </property>
-           </widget>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QPushButton" name="pushButton_UpPriority">
+              <property name="toolTip">
+               <string>Increase priority</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/arrow_up_gray.png</normaloff>:/icons/arrow_up_gray.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_DownPriority">
+              <property name="toolTip">
+               <string>Decrease priority</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/arrow_down_gray.png</normaloff>:/icons/arrow_down_gray.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_ReloadPlugins">
+              <property name="toolTip">
+               <string>Reload plugins</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../res/LightpackResources.qrc">
+                <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
         <item>
          <widget class="QTabWidget" name="tabPlugin">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>500</height>
-           </size>
-          </property>
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -1913,8 +2429,8 @@
             <string>Info</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,0,0">
-            <item row="2" column="0">
-             <widget class="QLabel" name="labePluginVersion">
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelPluginAuthor">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1934,10 +2450,24 @@
                </size>
               </property>
               <property name="text">
-               <string>Version:</string>
+               <string>Author:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_PluginVersion">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_PluginAuthor">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1976,22 +2506,15 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="label_PluginAuthor">
-              <property name="text">
-               <string/>
+            <item row="3" column="0" colspan="3">
+             <widget class="QTextBrowser" name="tb_PluginDescription">
+              <property name="openExternalLinks">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="label_PluginVersion">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelPluginAuthor">
+            <item row="2" column="0">
+             <widget class="QLabel" name="labePluginVersion">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -2011,7 +2534,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Author:</string>
+               <string>Version:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
@@ -2028,26 +2551,13 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="0" colspan="3">
-             <widget class="QTextBrowser" name="tb_PluginDescription">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="openExternalLinks">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabExperimental">
+      <widget class="QWidget" name="tabExpert">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -2055,16 +2565,16 @@
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Experimental</string>
+        <string>Expert</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
         <property name="spacing">
          <number>12</number>
         </property>
         <item>
          <widget class="QLabel" name="label_DevTabWarning">
           <property name="text">
-           <string>This tab is used for experimental and not stable features. Any tuning with all these controls provide inevetible plane crash, miscarrige or nuclear disaster. Use it on your own risk.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tab is used for experimental and unstable features. Any tuning with these controls may cause inevitable plane crash, miscarriage or nuclear disaster. Use it at your own risk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="scaledContents">
            <bool>false</bool>
@@ -2085,6 +2595,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enables TCP socket server.&lt;/p&gt;&lt;p&gt;You can connect via &amp;quot;telnet &amp;lt;ip&amp;gt; &amp;lt;port&amp;gt;&amp;quot; for example and manually execute available commands.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -2100,6 +2613,9 @@
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
             <widget class="QCheckBox" name="checkBox_listenOnlyOnLoInterface">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When enabled, you can connect ONLY from the same computer through 127.0.0.1/localhost address.&lt;/p&gt;&lt;p&gt;Disable this if you want to connect from anywhere else.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Listen only on local interface (127.0.0.1)</string>
              </property>
@@ -2113,10 +2629,16 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_ApiPort">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TCP port to listen.&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top: .1em</string>
              </property>
@@ -2130,6 +2652,9 @@
            </item>
            <item row="5" column="2">
             <widget class="QPushButton" name="pushButton_GenerateNewApiKey">
+             <property name="toolTip">
+              <string>Generate a random one</string>
+             </property>
              <property name="text">
               <string>Generate</string>
              </property>
@@ -2150,7 +2675,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Copy and paste this key into the application using the API, for authorization on the server</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="styleSheet">
               <string notr="true"/>
@@ -2165,6 +2690,9 @@
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="label_ApiKey">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The API Key all the clients should provide to authenticate. Could be any custom string (%1 character limit). &lt;/p&gt;&lt;p&gt;Default: %2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">margin-top:0</string>
              </property>
@@ -2196,43 +2724,23 @@
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
-                <widget class="QRadioButton" name="radioButton_GrabQt">
-                 <property name="text">
-                  <string notr="true">Qt (Full screen)</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radioButton_GrabQt_EachWidget">
-                 <property name="text">
-                  <string notr="true">Qt (Each widget)</string>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radioButton_GrabD3D9">
-                 <property name="text">
-                  <string notr="true">D3D9 (Full screen)</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QRadioButton" name="radioButton_GrabX11">
                  <property name="text">
-                  <string notr="true">X11 (Full screen)</string>
+                  <string>X11 (Full screen)</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabMacCoreGraphics">
                  <property name="text">
-                  <string notr="true">Mac CG (Full screen)</string>
+                  <string>Mac CG (Full screen)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioButton_GrabMacAVFoundation">
+                 <property name="text">
+                  <string>Mac AV (Full screen)</string>
                  </property>
                 </widget>
                </item>
@@ -2256,14 +2764,14 @@
                <item>
                 <widget class="QRadioButton" name="radioButton_GrabWinAPI">
                  <property name="text">
-                  <string notr="true">WinAPI (Full screen)</string>
+                  <string>WinAPI (Full screen)</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QRadioButton" name="radioButton_GrabWinAPI_EachWidget">
+                <widget class="QRadioButton" name="radioButton_GrabDDupl">
                  <property name="text">
-                  <string notr="true">WinAPI (Each widget)</string>
+                  <string>Win8 Desktop Duplication</string>
                  </property>
                 </widget>
                </item>
@@ -2295,6 +2803,36 @@
              </property>
             </widget>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_EnableDx9Capture">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>also hook D3D9 (high performance impact)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </item>
@@ -2312,8 +2850,28 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_LoggingLevel">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log verbosity: %1-%2 where %1 = no logs.&lt;/p&gt;&lt;p&gt;After enabling logs you need to restart the program.&lt;/p&gt;&lt;p&gt;When enabled you can use the &lt;img src=&quot;:/buttons/arrow_right_dark_24px.png&quot; width=&quot;12&quot;&gt; button to open the log directory.&lt;/p&gt;&lt;p&gt;Default: %3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="maximum">
              <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButton_OpenLogs">
+            <property name="toolTip">
+             <string>open Log folder</string>
+            </property>
+            <property name="whatsThis">
+             <string>open Log folder</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/LightpackResources.qrc">
+              <normaloff>:/buttons/arrow_right_dark_24px.png</normaloff>:/buttons/arrow_right_dark_24px.png</iconset>
             </property>
            </widget>
           </item>
@@ -2341,8 +2899,11 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkBox_SendDataOnlyIfColorsChanges">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When disabled every frame will be sent to the device. This is recommended for devices with inactivity timers built into firmwares (some custom Adalight sketches for example) or configured via Prismatik (UDP devices with a &amp;lt; 255 timeout value).&lt;/p&gt;&lt;p&gt;When enabled every new frame will be compared with the previous one, and will be sent only if differences are detected (can be useful in low bandwidth situations).&lt;/p&gt;&lt;p&gt;Default: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
-           <string>Send data only if colors changes</string>
+           <string>Send data only if colors changed</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -2382,6 +2943,9 @@
          <spacer name="verticalSpacer_13">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -2440,7 +3004,7 @@
            </size>
           </property>
           <property name="text">
-           <string>&lt;h2&gt;Prismatik&lt;/h2&gt;</string>
+           <string>&lt;h2&gt;Prismatik (unofficial fork)&lt;/h2&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -2474,7 +3038,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Open-source software from team made &lt;b&gt;Lightpack&lt;/b&gt; &amp;mdash; content-appropriate ambient lighting system with USB interface</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:600;&quot;&gt;Woodenshark&lt;/span&gt; team created this software with &lt;span style=&quot; font-weight:600;&quot;&gt;Lightpack&lt;/span&gt; — content-appropriate ambient lighting system with USB interface&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This is an unofficial fork of the open source project that is not affiliated with Woodenshark or Lightpack&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -2493,22 +3057,10 @@
         <item>
          <widget class="QLabel" name="labelVersions">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -2530,25 +3082,13 @@
         <item>
          <widget class="QLabel" name="label_8">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
           <property name="text">
-           <string notr="true">&lt;a href=&quot;http://lightpack.tv/&quot;&gt;lightpack.tv&lt;/a&gt;</string>
+           <string notr="true">&lt;a href=&quot;https://github.com/psieg/Lightpack&quot;&gt;github.com/psieg/Lightpack&lt;/a&gt; &lt;a href=&quot;http://lightpack.tv/&quot;&gt;lightpack.tv&lt;/a&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -2561,6 +3101,23 @@
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_checkForUpdates">
+          <property name="text">
+           <string>Check for updates on startup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_installUpdates">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Install updates automatically</string>
           </property>
          </widget>
         </item>
@@ -2584,7 +3141,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="label_licenseAndCredits">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -2603,7 +3160,7 @@
            </font>
           </property>
           <property name="text">
-           <string>This program is distributed &amp;laquo;as is&amp;raquo;. It source code is under &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;GPL license&lt;/a&gt;. No warranty of any kind is expressed or implied. The authors will not be liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software. All content, such as icons, plugins, bitmaps etc. is under &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;CC-BY-SA&lt;/a&gt; if otherwise is not noticed. &lt;br /&gt;&lt;br /&gt;This software build with &lt;a href=&quot;http://qt-project.org/&quot;&gt;Qt&lt;/a&gt; cross-platform framework and &lt;a href=&quot;http://somerandomdude.com/work/iconic/&quot;&gt;&amp;laquo;Iconic&amp;raquo;&lt;/a&gt; icon set by P.J. Onori as a third-party licensed products.</string>
+           <string>This program is distributed «as is». Its source code is under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GPL license&lt;/span&gt;&lt;/a&gt;. No warranty of any kind is expressed or implied. The authors will not be liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software. All content, such as icons, plugins, bitmaps etc. is under &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;CC-BY-SA&lt;/span&gt;&lt;/a&gt; if otherwise is not noticed. &lt;br/&gt;&lt;br/&gt;This software build with the &lt;a href=&quot;http://qt-project.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Qt&lt;/span&gt;&lt;/a&gt; cross-platform framework, the &lt;a href=&quot;http://www.openssl.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;OpenSSL Toolkit&lt;/span&gt;&lt;/a&gt; and &lt;a href=&quot;http://somerandomdude.com/work/iconic/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;«Iconic»&lt;/span&gt;&lt;/a&gt; icon set by P.J. Onori as third-party licensed products.</string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -2622,10 +3179,16 @@
         <item>
          <widget class="QTextBrowser" name="textBrowser">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
           </property>
           <property name="source">
            <url>
@@ -2652,33 +3215,102 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>listWidget</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboBox_LightpackModes</tabstop>
+  <tabstop>spinBox_GrabSlowdown</tabstop>
+  <tabstop>checkBox_GrabIsAvgColors</tabstop>
+  <tabstop>checkBox_GrabApplyBlueLightReduction</tabstop>
+  <tabstop>checkBox_GrabApplyColorTemperature</tabstop>
+  <tabstop>pushButton_grabApplyColorTemperatureHelp</tabstop>
+  <tabstop>horizontalSlider_GrabColorTemperature</tabstop>
+  <tabstop>spinBox_GrabColorTemperature</tabstop>
+  <tabstop>horizontalSlider_GrabGamma</tabstop>
+  <tabstop>doubleSpinBox_GrabGamma</tabstop>
+  <tabstop>pushButton_grabGammaHelp</tabstop>
+  <tabstop>horizontalSlider_GrabOverBrighten</tabstop>
+  <tabstop>spinBox_GrabOverBrighten</tabstop>
+  <tabstop>pushButton_grabOverBrightenHelp</tabstop>
+  <tabstop>radioButton_GrabWidgetsDontShow</tabstop>
+  <tabstop>radioButton_Colored</tabstop>
+  <tabstop>radioButton_White</tabstop>
+  <tabstop>horizontalSlider_LuminosityThreshold</tabstop>
+  <tabstop>spinBox_LuminosityThreshold</tabstop>
+  <tabstop>pushButton_lumosityThresholdHelp</tabstop>
+  <tabstop>radioButton_MinimumLuminosity</tabstop>
+  <tabstop>radioButton_LuminosityDeadZone</tabstop>
+  <tabstop>pushButton_EnableDisableDevice</tabstop>
   <tabstop>horizontalSlider_DeviceBrightness</tabstop>
-  <tabstop>horizontalSlider_GammaCorrection</tabstop>
-  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
   <tabstop>spinBox_DeviceBrightness</tabstop>
+  <tabstop>horizontalSlider_DeviceBrightnessCap</tabstop>
+  <tabstop>spinBox_DeviceBrightnessCap</tabstop>
+  <tabstop>pushButton_BrightnessCapHelp</tabstop>
+  <tabstop>horizontalSlider_GammaCorrection</tabstop>
   <tabstop>doubleSpinBox_DeviceGamma</tabstop>
+  <tabstop>pushButton_GammaCorrectionHelp</tabstop>
+  <tabstop>checkBox_EnableDithering</tabstop>
+  <tabstop>pushButton_DitheringHelp</tabstop>
+  <tabstop>pbRunConfigurationWizard</tabstop>
+  <tabstop>tabDevices</tabstop>
+  <tabstop>checkBox_DisableUsbPowerLed</tabstop>
+  <tabstop>horizontalSlider_DeviceColorDepth</tabstop>
+  <tabstop>spinBox_DeviceColorDepth</tabstop>
+  <tabstop>pushButton_LightpackColorDepthHelp</tabstop>
   <tabstop>horizontalSlider_DeviceSmooth</tabstop>
   <tabstop>spinBox_DeviceSmooth</tabstop>
+  <tabstop>pushButton_LightpackSmoothnessHelp</tabstop>
+  <tabstop>horizontalSlider_DeviceRefreshDelay</tabstop>
+  <tabstop>spinBox_DeviceRefreshDelay</tabstop>
+  <tabstop>pushButton_LightpackRefreshDelayHelp</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterExit</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterScreenOff</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterLockComputer</tabstop>
+  <tabstop>checkBox_KeepLightsOnAfterSuspend</tabstop>
   <tabstop>comboBox_Profiles</tabstop>
-  <tabstop>radioButton_GrabQt</tabstop>
-  <tabstop>radioButton_GrabQt_EachWidget</tabstop>
-  <tabstop>radioButton_GrabD3D9</tabstop>
-  <tabstop>radioButton_GrabX11</tabstop>
-  <tabstop>radioButton_GrabMacCoreGraphics</tabstop>
-  <tabstop>radioButton_GrabWinAPI</tabstop>
-  <tabstop>radioButton_GrabWinAPI_EachWidget</tabstop>
-  <tabstop>spinBox_LoggingLevel</tabstop>
-  <tabstop>checkBox_PingDeviceEverySecond</tabstop>
-  <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
-  <tabstop>pushButton_EnableDisableDevice</tabstop>
   <tabstop>pushButton_ProfileNew</tabstop>
   <tabstop>pushButton_ProfileResetToDefault</tabstop>
   <tabstop>pushButton_DeleteProfile</tabstop>
   <tabstop>commandLinkButton_OpenSettings</tabstop>
   <tabstop>comboBox_Language</tabstop>
-  <tabstop>groupBox_Api</tabstop>
-  <tabstop>spinBox_GrabSlowdown</tabstop>
+  <tabstop>pushButton_AllPluginsHelp</tabstop>
+  <tabstop>list_Plugins</tabstop>
+  <tabstop>pushButton_UpPriority</tabstop>
+  <tabstop>pushButton_DownPriority</tabstop>
+  <tabstop>pushButton_ReloadPlugins</tabstop>
   <tabstop>tabPlugin</tabstop>
+  <tabstop>tb_PluginDescription</tabstop>
+  <tabstop>groupBox_Api</tabstop>
+  <tabstop>checkBox_listenOnlyOnLoInterface</tabstop>
+  <tabstop>lineEdit_ApiPort</tabstop>
+  <tabstop>lineEdit_ApiKey</tabstop>
+  <tabstop>pushButton_GenerateNewApiKey</tabstop>
+  <tabstop>radioButton_GrabX11</tabstop>
+  <tabstop>radioButton_GrabMacCoreGraphics</tabstop>
+  <tabstop>radioButton_GrabMacAVFoundation</tabstop>
+  <tabstop>radioButton_GrabWinAPI</tabstop>
+  <tabstop>radioButton_GrabDDupl</tabstop>
+  <tabstop>checkBox_EnableDx1011Capture</tabstop>
+  <tabstop>checkBox_EnableDx9Capture</tabstop>
+  <tabstop>spinBox_LoggingLevel</tabstop>
+  <tabstop>toolButton_OpenLogs</tabstop>
+  <tabstop>checkBox_PingDeviceEverySecond</tabstop>
+  <tabstop>checkBox_SendDataOnlyIfColorsChanges</tabstop>
+  <tabstop>checkBox_checkForUpdates</tabstop>
+  <tabstop>checkBox_installUpdates</tabstop>
+  <tabstop>textBrowser</tabstop>
+  <tabstop>comboBox_SoundVizVisualizer</tabstop>
+  <tabstop>pushButton_SoundVizDeviceHelp</tabstop>
+  <tabstop>radioButton_SoundVizConstantMode</tabstop>
+  <tabstop>radioButton_ConstantColorMoodLampMode</tabstop>
+  <tabstop>horizontalSlider_MoodLampSpeed</tabstop>
+  <tabstop>comboBox_SoundVizDevice</tabstop>
+  <tabstop>pushButton_SelectColorMoodLamp</tabstop>
+  <tabstop>radioButton_LiquidColorMoodLampMode</tabstop>
+  <tabstop>horizontalSlider_SoundVizLiquidSpeed</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMax</tabstop>
+  <tabstop>pushButton_SelectColorSoundVizMin</tabstop>
+  <tabstop>comboBox_MoodLampLamp</tabstop>
+  <tabstop>radioButton_SoundVizLiquidMode</tabstop>
  </tabstops>
  <resources>
   <include location="../res/LightpackResources.qrc"/>
@@ -2691,12 +3323,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>84</y>
+     <x>341</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>84</y>
+     <x>429</x>
+     <y>358</y>
     </hint>
    </hints>
   </connection>
@@ -2707,12 +3339,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>84</y>
+     <x>429</x>
+     <y>358</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>84</y>
+     <x>341</x>
+     <y>354</y>
     </hint>
    </hints>
   </connection>
@@ -2723,12 +3355,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>75</y>
+     <x>341</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>75</y>
+     <x>429</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -2739,12 +3371,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>75</y>
+     <x>429</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>75</y>
+     <x>341</x>
+     <y>318</y>
     </hint>
    </hints>
   </connection>
@@ -2755,12 +3387,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>233</x>
-     <y>46</y>
+     <x>429</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
-     <x>167</x>
-     <y>46</y>
+     <x>324</x>
+     <y>58</y>
     </hint>
    </hints>
   </connection>
@@ -2771,12 +3403,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>167</x>
-     <y>46</y>
+     <x>324</x>
+     <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>46</y>
+     <x>429</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -2787,12 +3419,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>65</y>
+     <x>341</x>
+     <y>282</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>65</y>
+     <x>429</x>
+     <y>286</y>
     </hint>
    </hints>
   </connection>
@@ -2803,12 +3435,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>65</y>
+     <x>429</x>
+     <y>286</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>65</y>
+     <x>341</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -2819,12 +3451,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>393</x>
-     <y>289</y>
+     <x>368</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
-     <x>492</x>
-     <y>292</y>
+     <x>422</x>
+     <y>384</y>
     </hint>
    </hints>
   </connection>
@@ -2835,12 +3467,172 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>480</x>
-     <y>299</y>
+     <x>422</x>
+     <y>384</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>297</y>
+     <x>368</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_GrabOverBrighten</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_GrabOverBrighten</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_GrabOverBrighten</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_GrabOverBrighten</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>242</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_GrabColorTemperature</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_GrabColorTemperature</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>184</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_GrabColorTemperature</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_GrabColorTemperature</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>188</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_GrabApplyColorTemperature</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalSlider_GrabColorTemperature</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_GrabApplyColorTemperature</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalSlider_GrabGamma</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>206</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_GrabApplyColorTemperature</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBox_GrabColorTemperature</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_GrabApplyColorTemperature</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>doubleSpinBox_GrabGamma</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_DeviceBrightnessCap</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_DeviceBrightnessCap</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>116</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_DeviceBrightnessCap</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_DeviceBrightnessCap</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>390</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>

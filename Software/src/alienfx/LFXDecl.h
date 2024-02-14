@@ -26,9 +26,9 @@ is strictly forbidden.
 #pragma once
 
 // Helper release and delete functions, used in cleanup routines
-#define LFX_SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-#define LFX_SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
-#define LFX_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
+#define LFX_SAFE_DELETE(p)		{ if(p) { delete (p);		(p)=NULL; } }
+#define LFX_SAFE_RELEASE(p)		{ if(p) { (p)->Release(); (p)=NULL; } }
+#define LFX_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);	(p)=NULL; } }
 
 #define LFX_DEF_STRING_SIZE 255	// Default string size
 #define LFX_MAX_STRING_SIZE 255	// Maximum string size
@@ -95,7 +95,7 @@ is strictly forbidden.
 //
 //		Bits 9 through 17 are split into lower, middle and upper sections as well
 //
-//		Bit  9: [ MIDDLE, LOWER, LEFT ]
+//		Bit	9: [ MIDDLE, LOWER, LEFT ]
 //		Bit 10: [ MIDDLE, LOWER, CENTER ]
 //		Bit 11: [ MIDDLE, LOWER, RIGHT ]
 //

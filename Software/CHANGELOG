@@ -6,11 +6,265 @@ _/_/_/_/  _/    _/_/_/  _/    _/      _/_/  _/_/_/      _/_/_/    _/_/_/  _/    
                    _/                      _/                                         
               _/_/                        _/                                          
 
-                        lightpack.googlecode.com
+                        github.com/psieg/Lightpack
+                               lightpack.tv
 
 ===================================================================================
 #    Software changelog
 ===================================================================================
+
+Version 5.11.2.31
+---------------
+January 8, 2022
+
+* Fix HDR flickering on Windows (#255)
+
+Version 5.11.2.30
+---------------
+September 5, 2021
+
+* Fix Lights not working after sleep (#331)
+
+Version 5.11.2.29
+---------------
+July 21, 2021
+
+* Fix LEDs staying on after shutdown (#472)
+* Fix crash on non-AVX hardware in .28 (#464)
+* Preparations for Qt6
+
+Version 5.11.2.28
+---------------
+May 20, 2021
+
+* Add multi-instance mode
+* Fix API regression in .27 (#450)
+
+Version 5.11.2.27
+---------------
+December 7, 2020
+
+* Improved zone placement wizard (fixed)
+
+Version 5.11.2.26
+---------------
+December 6, 2020
+
+* Improved zone placement wizard
+
+Version 5.11.2.25
+---------------
+November 1, 2020
+
+* Fix plugin startup (#396)
+* Optimized DNRGB packets (#402)
+* Disable Dithering by default (#398)
+* Fix incorrect colors on Mac (#399)
+
+Version 5.11.2.24
+---------------
+October 11, 2020
+
+* Add power limit and brightness cap (#342)
+* Add dithering for higher color accuracy
+* Fix some crashes (#354, #368)
+* Fix device initialization (#375, #385)
+
+Version 5.11.2.23
+---------------
+May 29, 2020
+
+* Reduce CPU load using SSE/AVX
+* Fixes to Zone Distributors
+* Tweaks for MacOS grabbing
+* Fix Windows Night Light detection
+* Slowed gamma ramp memory leak (Windows)
+
+Version 5.11.2.22
+---------------
+March 29, 2020
+
+* Support for UDP devices (WARLS, DRGB, DNRGB)
+* Pulseaudio Sound Visualizer
+* Tweaks for Adalight/Adrulight devices
+
+Version 5.11.2.21
+---------------
+January 26, 2020
+
+* Updated self-updater to avoid antivirus false positives (#292)
+
+Version 5.11.2.20
+---------------
+January 20, 2020
+
+* Add new moodlights modes
+* Stop grabbing when device is disconnected (#248)
+* DDupl: handle portrait mode (#253)
+
+Version 5.11.2.19
+---------------
+January 19, 2019
+
+* Fix a crash when using DDupl grabber (#240)
+* Do not retry autoupdates
+
+Version 5.11.2.18
+---------------
+January 18, 2019
+
+* MacOS AV Grabber (#210)
+* Sound Visualizer for MacOS
+* Windows 10 Night Light and MacOS support (#177)
+* Improved DDupl grabbing performance
+* SessionChangeDetector for MacOS (#82)
+* Detect display sleep on Windows (#147)
+* Twin Peaks sound visualizer
+* Grab timing fix (#120)
+* Re-launching opens Settings Window (#142)
+
+Version 5.11.2.17
+---------------
+April 26, 2018
+
+* Fix broken white balance in wizard (#176)
+* Fix stops working after switching display (DDupl) (#181)
+
+Version 5.11.2.16
+---------------
+April 6, 2018
+
+* Add untested higher baud rates (#116)
+* Fix f.lux flickering (#158)
+* Do not create a log file if logging is disabled (#93)
+* Tweaks to the Auto Updater
+* Change the FPS counter to be closer to reality
+
+Version 5.11.2.15
+---------------
+March 21, 2018
+
+* Attempt to reconnect if the device is disconnected (#137)
+
+Version 5.11.2.14
+---------------
+March 20, 2018
+
+* Add automatic self-updater (enabled by default)
+* Add API to persist last set colors when unlocking (#132)
+* Allow up to 512 LEDs for Adalight (#148, #149)
+* Fix API using more than 100 LEDs (#152)
+* Fix F.lux adjustment for multiple monitors (#127)
+* Fix data sent to device during setup wizard (#124)
+
+Version 5.11.2.13
+---------------
+June 17, 2017
+
+* Support F.lux and similar programs (#87)
+* Add API sound commands (#112)
+
+Version 5.11.2.12
+---------------
+April 13, 2017
+
+* Improve macOS performance (#70)
+* Add color calibration page to wizard (#86)
+* Re-enable tray on Linux / Unity (#36)
+* Increase tray icon resolution (#96)
+* Fix API setMode command (#94)
+* Fix lights stay off after resume in certain cases
+* Fix SoundViz using incorrect device after profile switch
+
+Version 5.11.2.11
+---------------
+October 21, 2016
+
+* Recommend DDupl to non-expert users
+* Fix custom offset/rotation not saved (#77)
+* Disable tray if not available (Unity)
+* Reinitialize device after resume (#64)
+
+Version 5.11.2.10
+---------------
+July 27, 2016
+
+* Extend custom distribution (#59)
+* Fix UI/settings bugs (#65)
+* Fix white balance ignored by luminosity threshold (#63)
+* Fix lights turning on themselves (#58)
+
+Version 5.11.2.9
+---------------
+June 12, 2016
+
+* Windows: Add sound visualizer
+* Add custom distribution to wizard (#31)
+* Add overbrighten feature: Increase overall grab brightness
+* Fix a crash when using DDupl and gaming on one of multiple screens
+* Fix timing issue: Wizard finds no devices when launched from Prismatik
+
+Version 5.11.2.8
+---------------
+June 5, 2016
+
+* Grab widgets snap to each other (#40)
+* Ability to toggle the power LED state (#27)
+* Include update check on startup
+
+Version 5.11.2.7
+---------------
+April 30, 2016
+
+* Fix API compatiblity, now on Prismatik API 2.0 (#34)
+* Improved layout for high dpi screens (#33)
+* Fix standby detection and add option to keep lights on after standby (#28)
+* DDupl: different behavior for logon screen and UAC prompts
+
+Version 5.11.2.6
+---------------
+February 21, 2016
+
+* Move DirectX scanning to dedicated thread (#17)
+
+Version 5.11.2.5
+---------------
+February 14, 2016
+
+* Implement missing API get methods (#16)
+* Move DirectX Grabber to dedicated thread (#17)
+
+Version 5.11.2.4
+---------------
+February 7, 2016
+
+* Enable Desktop Duplication grabber to grab screensavers
+* Fix crash when launching configuration wizard
+
+Version 5.11.2.3
+---------------
+September 1, 2015
+
+* Fix constant color shutting off (regression from #10)
+* Fix DX admin message prematurely creating a message loop
+
+Version 5.11.2.2
+---------------
+August 1, 2015
+
+* Removed unnecessary dependencies from installer (#8)
+* Keep sending updates to the device even if no grabbing happened (#10)
+* Fixed crash when deleting profile (woodenshark#42)
+* Desktop Duplication is now the default grabber
+* Live DX enable/disable fix
+
+Version 5.11.2.1
+---------------
+July 23, 2015
+
+* Windows 8 Desktop Duplication API Grabber
+* x64 build with improved DirectX grabbing
+* Qt 5.5
 
 Version 5.11.2
 ---------------
@@ -24,7 +278,6 @@ September 30, 2014
 * Add missing dependency (linqt5serialport5) to deb-package information
 * New command line option: "--set-profile <profile_name>" for switching profile from external programs/scripts
 * New command line option "--debug <level>" changes verbosity level of debug output. Valid values are: high, mid, low, zero. --debug-high and similar command line options from now on are obsolete and will be removed in future versions.
-
 
 Version 5.11.1
 ---------------

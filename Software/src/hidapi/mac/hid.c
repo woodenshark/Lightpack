@@ -263,22 +263,21 @@ static int32_t get_max_report_length(IOHIDDeviceRef device)
 
 static int get_string_property(IOHIDDeviceRef device, CFStringRef prop, wchar_t *buf, size_t len)
 {
-	CFStringRef str;
 	
 	if (!len)
 		return 0;
 
-	str = IOHIDDeviceGetProperty(device, prop);
+	CFStringRef str = IOHIDDeviceGetProperty(device, prop);
 
 	buf[0] = 0;
 
 	if (str) {
-		len --;
+		len--;
 
 		CFIndex str_len = CFStringGetLength(str);
 		CFRange range;
 		range.location = 0;
-		range.length = (str_len > len)? len: str_len;
+		range.length = (str_len > (CFIndex)len)? len: str_len;
 		CFIndex used_buf_len;
 		CFIndex chars_copied;
 		chars_copied = CFStringGetBytes(str,
@@ -300,11 +299,10 @@ static int get_string_property(IOHIDDeviceRef device, CFStringRef prop, wchar_t 
 
 static int get_string_property_utf8(IOHIDDeviceRef device, CFStringRef prop, char *buf, size_t len)
 {
-	CFStringRef str;
 	if (!len)
 		return 0;
 
-	str = IOHIDDeviceGetProperty(device, prop);
+	CFStringRef str = IOHIDDeviceGetProperty(device, prop);
 
 	buf[0] = 0;
 
@@ -314,7 +312,7 @@ static int get_string_property_utf8(IOHIDDeviceRef device, CFStringRef prop, cha
 		CFIndex str_len = CFStringGetLength(str);
 		CFRange range;
 		range.location = 0;
-		range.length = (str_len > len)? len: str_len;
+		range.length = (str_len > (CFIndex)len)? len: str_len;
 		CFIndex used_buf_len;
 		CFIndex chars_copied;
 		chars_copied = CFStringGetBytes(str,
@@ -390,8 +388,6 @@ static int make_path(IOHIDDeviceRef device, char *buf, size_t len)
 /* Initialize the IOHIDManager. Return 0 for success and -1 for failure. */
 static int init_hid_manager(void)
 {
-	IOReturn res;
-	
 	/* Initialize all the HID Manager Objects */
 	hid_mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 	if (hid_mgr) {

@@ -12,9 +12,10 @@ CONFIG(msvc) {
 } else {
     PRE_TARGETDEPS += ../lib/libgrab.a
 }
-DESTDIR     = bin
+DESTDIR     = ../bin
 TEMPLATE    = app
 QT         += network widgets
+CONFIG += c++17
 win32 {
     QT += serialport
 }
@@ -45,8 +46,11 @@ isEmpty( GIT_REVISION ){
     DEFINES += GIT_REVISION=\\\"$${GIT_REVISION}\\\"
 }
 
-TRANSLATIONS += ../res/translations/ru_RU.ts \
-       ../res/translations/uk_UA.ts
+TRANSLATIONS += ../res/translations/en.ts \
+       ../res/translations/ru_RU.ts \
+       ../res/translations/uk_UA.ts \
+       ../res/translations/pl_PL.ts \
+       ../res/translations/zh_CN.ts
 RESOURCES    = ../res/LightpackResources.qrc
 RC_FILE      = ../res/Lightpack.rc
 
@@ -58,8 +62,21 @@ DEFINES += $${SUPPORTED_GRABBERS}
 
 LIBS    += -L../lib -lgrab -lprismatik-math
 
+QMAKE_CFLAGS = $$(CFLAGS)
+QMAKE_CXXFLAGS = $$(CXXFLAGS)
+QMAKE_LFLAGS = $$(LDFLAGS)
+
+CONFIG(clang) {
+    QMAKE_CXXFLAGS += -stdlib=libc++
+    LIBS += -stdlib=libc++
+}
+
 unix:!macx{
-    CONFIG    += link_pkgconfig debug
+    PKGCONFIG_BIN = $$system(which pkg-config)
+    isEmpty(PKGCONFIG_BIN) {
+        error("pkg-config not found")
+    }
+    CONFIG    += link_pkgconfig
     PKGCONFIG += libusb-1.0
 
     DESKTOP = $$(XDG_CURRENT_DESKTOP)
@@ -74,7 +91,19 @@ unix:!macx{
 }
 
 win32 {
-    CONFIG(msvc):DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+    CONFIG(msvc) {
+        # This will suppress many MSVC warnings about 'unsecure' CRT functions.
+        DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+        # Parallel build
+        QMAKE_CXXFLAGS += /MP
+        # Fix __cplusplus macro as required by Qt
+        QMAKE_CXXFLAGS += /Zc:__cplusplus
+        # As required by Qt
+        QMAKE_CXXFLAGS += -permissive-
+        # Place *.lib and *.exp files in ../lib
+        QMAKE_LFLAGS += /IMPLIB:..\\lib\\$(TargetName).lib
+    }
+
     # Windows version using WinAPI for HID
     LIBS    += -lsetupapi
     # For QSerialDevice
@@ -99,32 +128,71 @@ win32 {
     LIBS    += -lwtsapi32
 
     CONFIG(msvc) {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./
+        versionAtLeast(QT_VERSION, 6.0.0) {
+            QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
+                $$[QT_INSTALL_BINS]/windeployqt --no-opengl-sw --no-svg --no-translations --no-compiler-runtime \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)
+        } else {
+            QMAKE_POST_LINK = cd $(TargetDir) $$escape_expand(\r\n)\
+                $$[QT_INSTALL_BINS]/windeployqt --no-angle --no-svg --no-translations --no-compiler-runtime \"$(TargetName)$(TargetExt)\" $$escape_expand(\r\n)
+        }
+        QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+            if $(PlatformToolsetVersion) LEQ 140 copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+            if $(PlatformToolsetVersion) GTR 140 copy /y \"$(VcInstallDir)Redist\\MSVC\\$(VCToolsRedistVersion)\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcp*.dll\" .\ $$escape_expand(\r\n)\
+            if $(PlatformToolsetVersion) LSS 140 copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\msvcr$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+            if $(PlatformToolsetVersion) EQU 140 copy /y \"$(VcInstallDir)redist\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\vcruntime$(PlatformToolsetVersion).dll\" .\ $$escape_expand(\r\n)\
+            if $(PlatformToolsetVersion) GTR 140 copy /y \"$(VcInstallDir)Redist\\MSVC\\$(VCToolsRedistVersion)\\$(PlatformTarget)\\Microsoft.VC$(PlatformToolsetVersion).CRT\\vcruntime*.dll\" .\ $$escape_expand(\r\n)
+        !contains(DEFINES, NO_OPENSSL) {
+            # QT switched to OpenSSL 1.1 in 5.12.4 and to 3.x in 6, which has different binary names
+            versionAtLeast(QT_VERSION, "6.0.0") {
+                QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\libcrypto-3-x64.dll\" .\ $$escape_expand(\r\n)\
+                    copy /y \"$${OPENSSL_DIR}\\libssl-3-x64.dll\" .\ $$escape_expand(\r\n)\
+                    IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
+            } else:versionAtLeast(QT_VERSION, "5.12.4") {
+                QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\libcrypto-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
+                    copy /y \"$${OPENSSL_DIR}\\libssl-1_1-x64.dll\" .\ $$escape_expand(\r\n)\
+                    IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
+            } else {
+                QMAKE_POST_LINK += copy /y \"$${OPENSSL_DIR}\\ssleay32.dll\" .\ $$escape_expand(\r\n)\
+                    copy /y \"$${OPENSSL_DIR}\\libeay32.dll\" .\ $$escape_expand(\r\n)\
+                    IF EXIST  \"$${OPENSSL_DIR}\\msvcr*.dll\" copy /y \"$${OPENSSL_DIR}\\msvcr*.dll\" .\ $$escape_expand(\r\n)
+            }
+        }
+
     } else {
-        QMAKE_POST_LINK = cd $(DESTDIR) && \
-                cp -f \"../../lib/prismatik-hooks.dll\" ./ && \
-                cp -f \"../../lib/libraryinjector.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Core$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Gui$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5SerialPort$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Widgets$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./
+        warning("unsupported setup - update src.pro to copy dependencies")
+    }
+
+    contains(DEFINES,BASS_SOUND_SUPPORT) {
+        INCLUDEPATH += $${BASS_DIR}/c/ \
+            $${BASSWASAPI_DIR}/c/
+
+        contains(QMAKE_TARGET.arch, x86_64) {
+            LIBS += -L$${BASS_DIR}/c/x64/ -L$${BASSWASAPI_DIR}/c/x64/
+        } else {
+            LIBS += -L$${BASS_DIR}/c/ -L$${BASSWASAPI_DIR}/c/
+        }
+
+        LIBS    += -lbass -lbasswasapi
+
+        contains(QMAKE_TARGET.arch, x86_64) {
+            QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+                copy /y \"$${BASS_DIR}\\x64\\bass.dll\" .\ $$escape_expand(\r\n)\
+                copy /y \"$${BASSWASAPI_DIR}\\x64\\basswasapi.dll\" .\
+        } else {
+            QMAKE_POST_LINK += cd $(TargetDir) $$escape_expand(\r\n)\
+                copy /y \"$${BASS_DIR}\\bass.dll\" .\ $$escape_expand(\r\n)\
+                copy /y \"$${BASSWASAPI_DIR}\\basswasapi.dll\" .\
+        }
+
+        DEFINES += SOUNDVIZ_SUPPORT
+    }
+
+    contains(DEFINES,NIGHTLIGHT_SUPPORT) {
+        contains(QMAKE_TARGET.arch, x86_64) {
+            Release:LIBS += -L$${NIGHTLIGHT_DIR}/Release/
+            Debug:LIBS += -L$${NIGHTLIGHT_DIR}/Debug/
+            LIBS += -lNightLightLibrary
+        }
     }
 }
 
@@ -133,12 +201,42 @@ unix:!macx{
     SOURCES += hidapi/linux/hid-libusb.c
     # For X11 grabber
     LIBS +=-lXext -lX11
+
+    contains(DEFINES,PULSEAUDIO_SUPPORT) {
+        INCLUDEPATH += $${PULSEAUDIO_INC_DIR} \
+            $${FFTW3_INC_DIR}
+
+        defined(PULSEAUDIO_LIB_DIR, var) {
+            LIBS += -L$${PULSEAUDIO_LIB_DIR}
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${PULSEAUDIO_LIB_DIR}/libpulse.so.0" $(DESTDIR)
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${PULSEAUDIO_LIB_DIR}/libpulsecommon-13.0.so" $(DESTDIR)
+        }
+
+        defined(PULSEAUDIO_LIB_DIR, var) {
+            LIBS += -L$${FFTW3_LIB_DIR}
+            QMAKE_POST_LINK += $(INSTALL_PROGRAM) "$${FFTW3_LIB_DIR}/libfftw3f.so.3" $(DESTDIR)
+        }
+
+        LIBS += -lpulse -lfftw3f
+        DEFINES += SOUNDVIZ_SUPPORT
+    }
 }
 
 macx{
-    QMAKE_LFLAGS += -F/System/Library/Frameworks
+    XCODE_PATH = $$system(xcode-select -print-path)
+    QMAKE_LFLAGS += -F/System/Library/Frameworks -F"$${XCODE_PATH}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/PrivateFrameworks"
     # MacOS version using libusb and hidapi codes
-    SOURCES += hidapi/mac/hid.c
+    SOURCES += hidapi/mac/hid.c \
+    MacOSSession.mm
+
+    HEADERS += \
+    MacOSSession.h
+
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += MacOSSoundManager.mm
+        HEADERS += MacOSSoundManager.h
+    }
+
     LIBS += \
             -framework Cocoa \
             -framework Carbon \
@@ -149,24 +247,38 @@ macx{
             -framework ApplicationServices \
             -framework OpenGL \
             -framework IOKit \
+            # private framework
+            -weak_framework CoreBrightness \
+            -framework AppKit \
+            -framework Accelerate \
+            -framework CoreMedia \
+            -framework AVFoundation \
+            -framework CoreVideo \
 
     ICON = ../res/icons/Prismatik.icns
 
     QMAKE_INFO_PLIST = ./Info.plist
 
-    isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
-        # Default value
-        # For build universal binaries (native on Intel and PowerPC)
-        QMAKE_MAC_SDK = macosx10.9
-    } else {
-        message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
-        QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
-    }
+    #see build-vars.prf
+    #isEmpty( QMAKE_MAC_SDK_OVERRIDE ) {
+    #    # Default value
+    #    # For build universal binaries (native on Intel and PowerPC)
+    #    QMAKE_MAC_SDK = macosx10.9
+    #} else {
+    #    message( "Overriding default QMAKE_MAC_SDK with value $${QMAKE_MAC_SDK_OVERRIDE}" )
+    #    QMAKE_MAC_SDK = $${QMAKE_MAC_SDK_OVERRIDE}
+    #}
 
     CONFIG(clang) {
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.6 -stdlib=libstdc++ -x objective-c++
+        QMAKE_CXXFLAGS += -x objective-c++
     }
 }
+
+# Generate .qm language files
+QMAKE_MAC_SDK = macosx
+# Qt sets this to its own minimum
+# QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
+system($$[QT_INSTALL_BINS]/lrelease src.pro)
 
 INCLUDEPATH += . \
                .. \
@@ -181,15 +293,20 @@ SOURCES += \
     LightpackApplication.cpp  main.cpp   SettingsWindow.cpp  Settings.cpp \
     GrabWidget.cpp  GrabConfigWidget.cpp \
     LogWriter.cpp \
-    SpeedTest.cpp \
     LedDeviceLightpack.cpp \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
     LedDeviceVirtual.cpp \
+    AbstractLedDeviceUdp.cpp \
+    LedDeviceDrgb.cpp \
+    LedDeviceDnrgb.cpp \
+    LedDeviceWarls.cpp \
     ColorButton.cpp \
     ApiServer.cpp \
     ApiServerSetColorTask.cpp \
     MoodLampManager.cpp \
+    MoodLamp.cpp \
+    LiquidColorGenerator.cpp \
     LedDeviceManager.cpp \
     SelectWidget.cpp \
     GrabManager.cpp \
@@ -198,22 +315,22 @@ SOURCES += \
     Plugin.cpp \
     LightpackPluginInterface.cpp \
     TimeEvaluations.cpp \
-    EndSessionDetector.cpp \
-    wizard/ZoneWidget.cpp \
+    SystemSession.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \
+    wizard/WizardPageUsingDevice.cpp \
     wizard/SelectProfilePage.cpp \
     wizard/MonitorIdForm.cpp \
-    wizard/MonitorConfigurationPage.cpp \
     wizard/LightpackDiscoveryPage.cpp \
-    wizard/GrabAreaWidget.cpp \
-    wizard/AndromedaDistributor.cpp \
     wizard/ConfigureDevicePage.cpp \
+    wizard/ConfigureUdpDevicePage.cpp \
+    wizard/ConfigureDevicePowerPage.cpp \
     wizard/SelectDevicePage.cpp \
-    wizard/CassiopeiaDistributor.cpp \
-    wizard/PegasusDistributor.cpp \
+    wizard/GlobalColorCoefPage.cpp \
+    wizard/CustomDistributor.cpp \
     systrayicon/SysTrayIcon.cpp \
-    UpdatesProcessor.cpp
+    UpdatesProcessor.cpp \
+    LightpackCommandLineParser.cpp
 
 HEADERS += \
     LightpackApplication.hpp \
@@ -227,12 +344,15 @@ HEADERS += \
     GrabConfigWidget.hpp \
     debug.h \
     LogWriter.hpp \
-    SpeedTest.hpp \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
     LedDeviceLightpack.hpp \
     LedDeviceAdalight.hpp \
     LedDeviceArdulight.hpp \
+    AbstractLedDeviceUdp.hpp \
+    LedDeviceDrgb.hpp \
+    LedDeviceDnrgb.hpp \
+    LedDeviceWarls.hpp \
     LedDeviceVirtual.hpp \
     ColorButton.hpp \
     ../common/defs.h \
@@ -241,6 +361,8 @@ HEADERS += \
     ../../CommonHeaders/COMMANDS.h \
     ../../CommonHeaders/USB_ID.h \
     MoodLampManager.hpp \
+    MoodLamp.hpp \
+    LiquidColorGenerator.hpp \
     LedDeviceManager.hpp \
     SelectWidget.hpp \
     ../common/D3D10GrabberDefs.hpp \
@@ -248,53 +370,64 @@ HEADERS += \
     PluginsManager.hpp \
     Plugin.hpp \
     LightpackPluginInterface.hpp \
-    EndSessionDetector.hpp \
-    wizard/ZoneWidget.hpp \
+    SystemSession.hpp \
     wizard/ZonePlacementPage.hpp \
     wizard/Wizard.hpp \
+    wizard/WizardPageUsingDevice.hpp \
     wizard/SettingsAwareTrait.hpp \
     wizard/SelectProfilePage.hpp \
     wizard/MonitorIdForm.hpp \
-    wizard/MonitorConfigurationPage.hpp \
     wizard/LightpackDiscoveryPage.hpp \
-    wizard/GrabAreaWidget.hpp \
-    wizard/AndromedaDistributor.hpp \
     wizard/ConfigureDevicePage.hpp \
+    wizard/ConfigureUdpDevicePage.hpp \
+    wizard/ConfigureDevicePowerPage.hpp \
     wizard/SelectDevicePage.hpp \
+    wizard/GlobalColorCoefPage.hpp \
     types.h \
     wizard/AreaDistributor.hpp \
-    wizard/CassiopeiaDistributor.hpp \
-    wizard/PegasusDistributor.hpp \
+    wizard/CustomDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
-    systrayicon/SysTrayIcon_p.hpp \
-    UpdatesProcessor.hpp
+    UpdatesProcessor.hpp \
+    LightpackCommandLineParser.hpp
 
-!contains(DEFINES,UNITY_DESKTOP) {
-    HEADERS += systrayicon/SysTrayIcon_qt_p.hpp
-}
-
-contains(DEFINES,UNITY_DESKTOP) {
-    HEADERS += systrayicon/SysTrayIcon_unity_p.hpp
+contains(DEFINES,SOUNDVIZ_SUPPORT) {
+    SOURCES += SoundManagerBase.cpp SoundVisualizer.cpp
+    HEADERS += SoundManagerBase.hpp SoundVisualizer.hpp
 }
 
 win32 {
-    SOURCES += LedDeviceAlienFx.cpp
-    HEADERS += LedDeviceAlienFx.hpp
+    SOURCES += LedDeviceAlienFx.cpp \
+    WindowsSession.cpp
+
+    HEADERS += LedDeviceAlienFx.hpp \
+    WindowsSession.hpp
+
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += WindowsSoundManager.cpp
+        HEADERS += WindowsSoundManager.hpp
+    }
+}
+
+unix:!macx {
+    contains(DEFINES,SOUNDVIZ_SUPPORT) {
+        SOURCES += PulseAudioSoundManager.cpp
+        HEADERS += PulseAudioSoundManager.hpp
+    }
 }
 
 FORMS += SettingsWindow.ui \
     GrabWidget.ui \
     GrabConfigWidget.ui \
-    wizard/ZoneWidget.ui \
     wizard/ZonePlacementPage.ui \
     wizard/Wizard.ui \
     wizard/SelectProfilePage.ui \
     wizard/MonitorIdForm.ui \
-    wizard/MonitorConfigurationPage.ui \
     wizard/LightpackDiscoveryPage.ui \
-    wizard/GrabAreaWidget.ui \
     wizard/ConfigureDevicePage.ui \
-    wizard/SelectDevicePage.ui
+    wizard/ConfigureUdpDevicePage.ui \
+    wizard/ConfigureDevicePowerPage.ui \
+    wizard/SelectDevicePage.ui \
+    wizard/GlobalColorCoefPage.ui
 
 #
 # QtSingleApplication
